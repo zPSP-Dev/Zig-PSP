@@ -1,0 +1,6 @@
+zig-cache
+*.o
+*SFO
+*.elf
+*.PBP
+*.prx
