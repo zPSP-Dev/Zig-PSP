@@ -1,3 +1,5 @@
+
+
 __asm__ (                                                       \
 	"    .set push\n"                                               \
 	"    .section .lib.ent.top, \"a\", @progbits\n"                 \

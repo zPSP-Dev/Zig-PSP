@@ -20,7 +20,7 @@ pub fn build(b: *Builder) void {
     const psp_app_name = "Zig Test App";
 
     const exe = b.addObject("main", "src/main.zig");
-    exe.addCSourceFile("src/stub.c", &[_][]const u8{"-DPSP_ZIG_APP_VER_MAJ=1", "-DPSP_ZIG_APP_VER_MIN=0", "-DPSP_ZIG_APP_NAME=" ++ psp_app_name, "-pedantic", "-Wall", "-Werror"});
+    exe.addCSourceFile("src/psp/stub.c", &[_][]const u8{"-DPSP_ZIG_APP_VER_MAJ=1", "-DPSP_ZIG_APP_VER_MIN=0", "-DPSP_ZIG_APP_NAME=" ++ psp_app_name, "-pedantic", "-Wall", "-Werror"});
     exe.setOutputDir("zig-cache/");
     
     exe.setTarget(target);
