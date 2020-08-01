@@ -8,7 +8,6 @@ const DEFAULT_MAIN_THREAD_NAME : [*c]const u8 = "user_main";
 
 pub extern fn main(argc: SceSize, argv: ?*c_void) c_int;
 
-
 fn _module_main_thread(argc: SceSize, argv: ?*c_void) callconv(.C) c_int {
     return main(argc, argv);
 }
