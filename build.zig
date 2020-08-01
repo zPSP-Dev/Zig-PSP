@@ -27,9 +27,9 @@ pub fn build(b: *Builder) void {
     exe.setBuildMode(mode);
     
     const link_to_elf = b.addSystemCommand(&[_][]const u8{
-        "ld.lld", "-L./lib", "-L../psp/lib", //GET RID OF EXTERNAL DEPS
+        "ld.lld", "-L./lib",
         "-Tlib/linkfile.ld",
-        "-lpsp", //GET RID OF C AS SOON AS POSSIBLE
+        "-lpsp",
         exe.getOutputPath(),
         "-o",
         "zig-cache/app.elf",
