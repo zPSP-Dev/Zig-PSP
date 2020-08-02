@@ -1,3 +1,5 @@
+//This is currently unused - but is one of the last C holdouts
+//I'd really appreciate it if someone could figure out how to turn stub.c into a working stub.zig
 usingnamespace @import("sys/pspkernel.zig");
 
 extern const __lib_ent_top:  [*c]u8;
