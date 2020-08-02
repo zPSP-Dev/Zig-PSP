@@ -31,16 +31,21 @@ pub extern fn scePowerIdleTimerDisable(unknown: c_int) c_int;
 pub extern fn scePowerRequestStandby() c_int;
 pub extern fn scePowerRequestSuspend() c_int;
 
-pub const PSP_POWER_CB_SUSPENDING = 0x00010000;
-pub const PSP_POWER_CB_RESUMING = 0x00020000;
-pub const PSP_POWER_CB_STANDBY = 0x00080000;
-pub const PSP_POWER_CB_BATTERY_EXIST = 0x00000080;
-pub const PSP_POWER_TICK_ALL = 0;
-pub const PSP_POWER_CB_HOLD_SWITCH = 0x40000000;
-pub const PSP_POWER_CB_AC_POWER = 0x00001000;
-pub const PSP_POWER_CB_BATTERY_LOW = 0x00000100;
-pub const PSP_POWER_TICK_DISPLAY = 6;
-pub const PSP_POWER_TICK_SUSPEND = 1;
-pub const PSP_POWER_CB_POWER_SWITCH = 0x80000000;
-pub const PSP_POWER_CB_BATTPOWER = 0x0000007F;
-pub const PSP_POWER_CB_RESUME_COMPLETE = 0x00040000;
+pub const PSPPowerCB = extern enum(u32){
+    Battpower = 0x0000007f,
+    BatteryExist = 0x00000080,
+    BatteryLow = 0x00000100,
+    ACPower = 0x00001000,
+    Suspending = 0x00010000,
+    Resuming = 0x00020000,
+    ResumeComplete = 0x00040000,
+    Standby = 0x00080000,
+    HoldSwitch = 0x40000000,
+    PowerSwitch = 0x80000000,
+};
+
+pub const PSPPowerTick = extern enum(u32){
+    All = 0,
+    Suspend = 1,
+    Display = 6
+};

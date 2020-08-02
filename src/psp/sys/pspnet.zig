@@ -190,45 +190,58 @@ pub extern fn sceNetApctlGetState(pState: [*c]c_int) c_int;
 pub extern fn sceNetInetInit() c_int;
 pub extern fn sceNetInetTerm() c_int;
 
-pub const PSP_NET_APCTL_EVENT_ERROR = 6;
-pub const PSP_NET_APCTL_STATE_KEY_EXCHANGE = 6;
-pub const PSP_NET_APCTL_INFO_START_BROWSER = 17;
-pub const PSP_NET_APCTL_STATE_DISCONNECTED = 0;
-pub const PSP_NET_APCTL_EVENT_RECONNECT = 10;
-pub const PSP_NET_APCTL_EVENT_CONNECT_REQUEST = 0;
-pub const PSP_NET_APCTL_INFO_SUBNETMASK = 9;
-pub const PSP_NET_APCTL_STATE_GOT_IP = 4;
-pub const PSP_NET_APCTL_INFO_IP = 8;
-pub const PSP_NET_APCTL_STATE_SCANNING = 1;
-pub const PSP_NET_APCTL_EVENT_SCAN_COMPLETE = 2;
-pub const PSP_NET_APCTL_STATE_EAP_AUTH = 5;
-pub const PSP_NET_APCTL_INFO_SSID_LENGTH = 3;
-pub const PSP_NET_APCTL_INFO_SECDNS = 12;
-pub const PSP_NET_APCTL_STATE_JOINING = 2;
-pub const PSP_NET_APCTL_EVENT_SCAN_REQUEST = 1;
-pub const PSP_NET_APCTL_EVENT_ESTABLISHED = 3;
-pub const PSP_NET_APCTL_EVENT_KEY_EXCHANGE = 9;
-pub const PSP_NET_APCTL_INFO_SECURITY_TYPE_WPA = 2;
-pub const PSP_NET_APCTL_INFO_PROXY_URL = 14;
-pub const PSP_NET_APCTL_EVENT_GET_IP = 4;
-pub const PSP_NET_APCTL_STATE_GETTING_IP = 3;
-pub const PSP_NET_APCTL_INFO_GATEWAY = 10;
-pub const PSP_NET_APCTL_INFO_USE_PROXY = 13;
-pub const PSP_NET_APCTL_INFO_SSID = 2;
-pub const PSP_NET_APCTL_INFO_8021_EAP_TYPE = 16;
-pub const PSP_NET_APCTL_EVENT_DISCONNECT_REQUEST = 5;
-pub const PSP_NET_APCTL_INFO_PROXY_PORT = 15;
-pub const PSP_NET_APCTL_INFO_SECURITY_TYPE_NONE = 0;
-pub const PSP_NET_APCTL_INFO_CHANNEL = 6;
-pub const PSP_NET_APCTL_INFO_PROFILE_NAME = 0;
-pub const PSP_NET_APCTL_INFO_WIFISP = 18;
-pub const PSP_NET_APCTL_INFO_PRIMDNS = 11;
-pub const PSP_NET_APCTL_EVENT_INFO = 7;
-pub const PSP_NET_APCTL_INFO_SECURITY_TYPE = 4;
-pub const PSP_NET_APCTL_INFO_BSSID = 1;
-pub const PSP_NET_APCTL_INFO_STRENGTH = 5;
-pub const PSP_NET_APCTL_INFO_SECURITY_TYPE_WEP = 1;
-pub const PSP_NET_APCTL_INFO_POWER_SAVE = 7;
+pub const ApctlState = extern enum(c_int) {
+    Disconnected,
+    Scanning,
+    Joining,
+    GettingIp,
+    GotIp,
+    EapAuth,
+    KeyExchange,
+};
+
+pub const ApctlEvent = extern enum(c_int) {
+    ConnectRequest,
+    ScanRequest,
+    ScanComplete,
+    Established,
+    GetIp,
+    DisconnectRequest,
+    Error,
+    Info,
+    EapAuth,
+    KeyExchange,
+    Reconnect,
+};
+
+pub const ApctlInfo = extern enum(c_int) {
+    ProfileName,
+    Bssid,
+    Ssid,
+    SsidLength,
+    SecurityType,
+    Strength,
+    Channel,
+    PowerSave,
+    Ip,
+    SubnetMask,
+    Gateway,
+    PrimaryDns,
+    SecondaryDns,
+    UseProxy,
+    ProxyUrl,
+    ProxyPort,
+    EapType,
+    StartBrowser,
+    Wifisp,
+};
+
+pub const ApctlInfoSecurityType = extern enum (c_int) {
+    None,
+    Wep,
+    Wpa,
+};
+
 pub const productStruct = struct_productStruct;
 pub const SceNetAdhocctlPeerInfo = struct_SceNetAdhocctlPeerInfo;
 pub const SceNetAdhocctlScanInfo = struct_SceNetAdhocctlScanInfo;
