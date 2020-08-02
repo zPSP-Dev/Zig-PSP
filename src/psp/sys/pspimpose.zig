@@ -1,0 +1,12 @@
+pub const SceImposeParam = c_int;
+pub extern fn sceImposeGetParam(param: SceImposeParam) c_int;
+pub extern fn sceImposeSetParam(param: SceImposeParam, value: c_int) c_int;
+pub extern fn sceImposeGetBacklightOffTime() c_int;
+pub extern fn sceImposeSetBacklightOffTime(value: c_int) c_int;
+pub extern fn sceImposeGetLanguageMode(lang: [*c]c_int, button: [*c]c_int) c_int;
+pub extern fn sceImposeSetLanguageMode(lang: c_int, button: c_int) c_int;
+pub extern fn sceImposeGetUMDPopup() c_int;
+pub extern fn sceImposeSetUMDPopup(value: c_int) c_int;
+pub extern fn sceImposeGetHomePopup() c_int;
+pub extern fn sceImposeSetHomePopup(value: c_int) c_int;
+pub extern fn sceImposeCheckVideoOut(value: [*c]c_int) c_int;

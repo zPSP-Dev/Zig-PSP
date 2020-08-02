@@ -9,6 +9,6 @@ fn _module_main_thread(argc: SceSize, argv: ?*c_void) callconv(.C) c_int {
 
 pub export fn module_start(argc: c_uint, argv: ?*c_void) c_int {
     var thid : SceUID = 0;
-    thid = sceKernelCreateThread("user_main", _module_main_thread, 0x20, 256 * 1024, PSP_THREAD_ATTR_USER | PSP_THREAD_ATTR_VFPU, 0);
+    thid = sceKernelCreateThread("user_main", _module_main_thread, 0x20, 256 * 1024, @enumToInt(PspThreadAttributes.PSP_THREAD_ATTR_USER) | @enumToInt(PspThreadAttributes.PSP_THREAD_ATTR_VFPU), 0);
     return sceKernelStartThread(thid, argc, argv);   
 }

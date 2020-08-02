@@ -5,13 +5,7 @@ pub const struct_SceKernelSysClock = extern struct {
     hi: SceUInt32,
 };
 pub const SceKernelSysClock = struct_SceKernelSysClock;
-pub const PSP_THREAD_ATTR_VFPU = @enumToInt(enum_PspThreadAttributes.PSP_THREAD_ATTR_VFPU);
-pub const PSP_THREAD_ATTR_USER = @enumToInt(enum_PspThreadAttributes.PSP_THREAD_ATTR_USER);
-pub const PSP_THREAD_ATTR_USBWLAN = @enumToInt(enum_PspThreadAttributes.PSP_THREAD_ATTR_USBWLAN);
-pub const PSP_THREAD_ATTR_VSH = @enumToInt(enum_PspThreadAttributes.PSP_THREAD_ATTR_VSH);
-pub const PSP_THREAD_ATTR_SCRATCH_SRAM = @enumToInt(enum_PspThreadAttributes.PSP_THREAD_ATTR_SCRATCH_SRAM);
-pub const PSP_THREAD_ATTR_NO_FILLSTACK = @enumToInt(enum_PspThreadAttributes.PSP_THREAD_ATTR_NO_FILLSTACK);
-pub const PSP_THREAD_ATTR_CLEAR_STACK = @enumToInt(enum_PspThreadAttributes.PSP_THREAD_ATTR_CLEAR_STACK);
+
 pub const enum_PspThreadAttributes = extern enum(u32) {
     PSP_THREAD_ATTR_VFPU = 16384,
     PSP_THREAD_ATTR_USER = 2147483648,
@@ -62,12 +56,6 @@ pub const struct_SceKernelThreadRunStatus = extern struct {
     releaseCount: SceUInt,
 };
 pub const SceKernelThreadRunStatus = struct_SceKernelThreadRunStatus;
-pub const PSP_THREAD_RUNNING = @enumToInt(enum_PspThreadStatus.PSP_THREAD_RUNNING);
-pub const PSP_THREAD_READY = @enumToInt(enum_PspThreadStatus.PSP_THREAD_READY);
-pub const PSP_THREAD_WAITING = @enumToInt(enum_PspThreadStatus.PSP_THREAD_WAITING);
-pub const PSP_THREAD_SUSPEND = @enumToInt(enum_PspThreadStatus.PSP_THREAD_SUSPEND);
-pub const PSP_THREAD_STOPPED = @enumToInt(enum_PspThreadStatus.PSP_THREAD_STOPPED);
-pub const PSP_THREAD_KILLED = @enumToInt(enum_PspThreadStatus.PSP_THREAD_KILLED);
 pub const enum_PspThreadStatus = extern enum(c_int) {
     PSP_THREAD_RUNNING = 1,
     PSP_THREAD_READY = 2,
@@ -143,14 +131,10 @@ pub const struct_SceKernelEventFlagOptParam = extern struct {
     size: SceSize,
 };
 pub const SceKernelEventFlagOptParam = struct_SceKernelEventFlagOptParam;
-pub const PSP_EVENT_WAITMULTIPLE = @enumToInt(enum_PspEventFlagAttributes.PSP_EVENT_WAITMULTIPLE);
 pub const enum_PspEventFlagAttributes = extern enum(c_int) {
     PSP_EVENT_WAITMULTIPLE = 512,
     _,
 };
-pub const PSP_EVENT_WAITAND = @enumToInt(enum_PspEventFlagWaitTypes.PSP_EVENT_WAITAND);
-pub const PSP_EVENT_WAITOR = @enumToInt(enum_PspEventFlagWaitTypes.PSP_EVENT_WAITOR);
-pub const PSP_EVENT_WAITCLEAR = @enumToInt(enum_PspEventFlagWaitTypes.PSP_EVENT_WAITCLEAR);
 pub const enum_PspEventFlagWaitTypes = extern enum(c_int) {
     PSP_EVENT_WAITAND = 0,
     PSP_EVENT_WAITOR = 1,
@@ -222,21 +206,6 @@ pub extern fn sceKernelNotifyCallback(cb: SceUID, arg2: c_int) c_int;
 pub extern fn sceKernelCancelCallback(cb: SceUID) c_int;
 pub extern fn sceKernelGetCallbackCount(cb: SceUID) c_int;
 pub extern fn sceKernelCheckCallback() c_int;
-pub const SCE_KERNEL_TMID_Thread = @enumToInt(enum_SceKernelIdListType.SCE_KERNEL_TMID_Thread);
-pub const SCE_KERNEL_TMID_Semaphore = @enumToInt(enum_SceKernelIdListType.SCE_KERNEL_TMID_Semaphore);
-pub const SCE_KERNEL_TMID_EventFlag = @enumToInt(enum_SceKernelIdListType.SCE_KERNEL_TMID_EventFlag);
-pub const SCE_KERNEL_TMID_Mbox = @enumToInt(enum_SceKernelIdListType.SCE_KERNEL_TMID_Mbox);
-pub const SCE_KERNEL_TMID_Vpl = @enumToInt(enum_SceKernelIdListType.SCE_KERNEL_TMID_Vpl);
-pub const SCE_KERNEL_TMID_Fpl = @enumToInt(enum_SceKernelIdListType.SCE_KERNEL_TMID_Fpl);
-pub const SCE_KERNEL_TMID_Mpipe = @enumToInt(enum_SceKernelIdListType.SCE_KERNEL_TMID_Mpipe);
-pub const SCE_KERNEL_TMID_Callback = @enumToInt(enum_SceKernelIdListType.SCE_KERNEL_TMID_Callback);
-pub const SCE_KERNEL_TMID_ThreadEventHandler = @enumToInt(enum_SceKernelIdListType.SCE_KERNEL_TMID_ThreadEventHandler);
-pub const SCE_KERNEL_TMID_Alarm = @enumToInt(enum_SceKernelIdListType.SCE_KERNEL_TMID_Alarm);
-pub const SCE_KERNEL_TMID_VTimer = @enumToInt(enum_SceKernelIdListType.SCE_KERNEL_TMID_VTimer);
-pub const SCE_KERNEL_TMID_SleepThread = @enumToInt(enum_SceKernelIdListType.SCE_KERNEL_TMID_SleepThread);
-pub const SCE_KERNEL_TMID_DelayThread = @enumToInt(enum_SceKernelIdListType.SCE_KERNEL_TMID_DelayThread);
-pub const SCE_KERNEL_TMID_SuspendThread = @enumToInt(enum_SceKernelIdListType.SCE_KERNEL_TMID_SuspendThread);
-pub const SCE_KERNEL_TMID_DormantThread = @enumToInt(enum_SceKernelIdListType.SCE_KERNEL_TMID_DormantThread);
 pub const enum_SceKernelIdListType = extern enum(c_int) {
     SCE_KERNEL_TMID_Thread = 1,
     SCE_KERNEL_TMID_Semaphore = 2,
@@ -378,10 +347,6 @@ pub const struct_SceKernelThreadEventHandlerInfo = extern struct {
     common: ?*c_void,
 };
 pub const SceKernelThreadEventHandlerInfo = struct_SceKernelThreadEventHandlerInfo;
-pub const THREADEVENT_ALL = @enumToInt(enum_ThreadEventIds.THREADEVENT_ALL);
-pub const THREADEVENT_KERN = @enumToInt(enum_ThreadEventIds.THREADEVENT_KERN);
-pub const THREADEVENT_USER = @enumToInt(enum_ThreadEventIds.THREADEVENT_USER);
-pub const THREADEVENT_CURRENT = @enumToInt(enum_ThreadEventIds.THREADEVENT_CURRENT);
 pub const enum_ThreadEventIds = extern enum(c_int) {
     THREADEVENT_ALL = 4294967295,
     THREADEVENT_KERN = 4294967288,
@@ -389,10 +354,6 @@ pub const enum_ThreadEventIds = extern enum(c_int) {
     THREADEVENT_CURRENT = 0,
     _,
 };
-pub const THREAD_CREATE = @enumToInt(enum_ThreadEvents.THREAD_CREATE);
-pub const THREAD_START = @enumToInt(enum_ThreadEvents.THREAD_START);
-pub const THREAD_EXIT = @enumToInt(enum_ThreadEvents.THREAD_EXIT);
-pub const THREAD_DELETE = @enumToInt(enum_ThreadEvents.THREAD_DELETE);
 pub const enum_ThreadEvents = extern enum(c_int) {
     THREAD_CREATE = 1,
     THREAD_START = 2,
@@ -405,3 +366,15 @@ pub extern fn sceKernelReleaseThreadEventHandler(uid: SceUID) c_int;
 pub extern fn sceKernelReferThreadEventHandlerStatus(uid: SceUID, info: [*c]struct_SceKernelThreadEventHandlerInfo) c_int;
 pub extern fn sceKernelReferThreadProfiler() [*c]PspDebugProfilerRegs;
 pub extern fn sceKernelReferGlobalProfiler() [*c]PspDebugProfilerRegs;
+
+pub const PspModuleInfoAttr = enum_PspModuleInfoAttr;
+pub const PspThreadAttributes = enum_PspThreadAttributes;
+pub const PspThreadStatus = enum_PspThreadStatus;
+pub const PspEventFlagAttributes = enum_PspEventFlagAttributes;
+pub const PspEventFlagWaitTypes = enum_PspEventFlagWaitTypes;
+pub const SceKernelIdListType = enum_SceKernelIdListType;
+pub const SceKernelVplOptParam = struct_SceKernelVplOptParam;
+pub const SceKernelFplOptParam = struct_SceKernelFplOptParam;
+pub const SceKernelVTimerOptParam = struct_SceKernelVTimerOptParam;
+pub const ThreadEventIds = enum_ThreadEventIds;
+pub const ThreadEvents = enum_ThreadEvents;
