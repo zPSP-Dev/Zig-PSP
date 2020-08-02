@@ -17,6 +17,7 @@ pub fn build(b: *Builder) void {
     // between Debug, ReleaseSafe, ReleaseFast, and ReleaseSmall.
     const mode = b.standardReleaseOptions();
 
+    //This effects the name of the module (seen in PSPLink) & XMB screen menu
     const psp_app_name = "Zig Test App";
 
     const exe = b.addObject("main", "src/main.zig");

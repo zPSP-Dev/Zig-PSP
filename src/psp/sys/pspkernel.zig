@@ -12,21 +12,21 @@ pub const struct_SceKernelLoadExecParam = extern struct {
     key: [*c]const u8,
 };
 pub extern fn sceKernelLoadExec(file: [*c]const u8, param: [*c]struct_SceKernelLoadExecParam) c_int;
-pub const struct__scemoduleinfo = packed struct {
+
+pub const struct__scemoduleinfo = extern struct {
     modattribute: c_ushort,
     modversion: [2]u8,
     modname: [27]u8,
     terminal: u8,
-    gp_value: [*c]u8,
-    ent_top: [*c]u8,
-    ent_end: [*c]u8,
-    stub_top: [*c]u8,
-    stub_end: [*c]u8,
+    gp_value: ?*c_void,
+    ent_top: ?*c_void,
+    ent_end: ?*c_void,
+    stub_top: ?*c_void,
+    stub_end: ?*c_void,
 };
-pub const _sceModuleInfo = struct__scemoduleinfo;
-pub const SceModuleInfo = _sceModuleInfo;
+pub const SceModuleInfo = struct__scemoduleinfo;
 
-pub extern const _gp: [*c]u8;
+pub extern const _gp: ?*c_void;
 
 pub const PSP_MODULE_USER = @enumToInt(enum_PspModuleInfoAttr.PSP_MODULE_USER);
 pub const PSP_MODULE_NO_STOP = @enumToInt(enum_PspModuleInfoAttr.PSP_MODULE_NO_STOP);
