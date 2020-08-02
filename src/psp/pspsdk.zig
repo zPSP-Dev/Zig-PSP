@@ -1,3 +1,5 @@
+//See LICENSE for copyright information
+
 pub usingnamespace @import("sys/pspasfparser.zig");
 pub usingnamespace @import("sys/pspatrac3.zig");
 pub usingnamespace @import("sys/pspaudio.zig");
