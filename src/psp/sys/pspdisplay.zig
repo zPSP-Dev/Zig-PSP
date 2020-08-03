@@ -1,21 +1,21 @@
 pub const enum_PspDisplayPixelFormats = extern enum(c_int) {
-    PSP_DISPLAY_PIXEL_FORMAT_565 = 0,
-    PSP_DISPLAY_PIXEL_FORMAT_5551 = 1,
-    PSP_DISPLAY_PIXEL_FORMAT_4444 = 2,
-    PSP_DISPLAY_PIXEL_FORMAT_8888 = 3,
+    Format565 = 0,
+    Format5551 = 1,
+    Format4444 = 2,
+    Format8888 = 3,
     _,
 };
 
 pub const enum_PspDisplaySetBufSync = extern enum(c_int) {
-    PSP_DISPLAY_SETBUF_IMMEDIATE = 0,
-    PSP_DISPLAY_SETBUF_NEXTFRAME = 1,
+    Immediate = 0,
+    Nextframe = 1,
     _,
 };
 
 pub const enum_PspDisplayErrorCodes = extern enum(c_int) {
-    SCE_DISPLAY_ERROR_OK = 0,
-    SCE_DISPLAY_ERROR_POINTER = 2147483907,
-    SCE_DISPLAY_ERROR_ARGUMENT = 2147483911,
+    Ok = 0,
+    Pointer = 2147483907,
+    Argument = 2147483911,
     _,
 };
 pub extern fn sceDisplaySetMode(mode: c_int, width: c_int, height: c_int) c_int;

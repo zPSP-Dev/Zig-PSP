@@ -55,4 +55,6 @@ pub usingnamespace @import("sys/pspwlan.zig");
 //Smaller fixes & utilities
 pub usingnamespace @import("mem-fix.zig");
 pub usingnamespace @import("module.zig");
+pub usingnamespace @import("constants.zig");
+pub const debug = @import("debug.zig");
 //pub usingnamespace @import("broken-stub.zig");
