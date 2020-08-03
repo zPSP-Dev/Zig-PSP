@@ -388,105 +388,130 @@ pub const SceUtilityOskInputType = enum_SceUtilityOskInputType;
 pub const _SceUtilityOskData = struct__SceUtilityOskData;
 pub const _SceUtilityOskParams = struct__SceUtilityOskParams;
 
-pub const PSP_MODULE_NET_PARSEURI = 0x0103;
-pub const PSP_SYSTEMPARAM_ID_INT_DAYLIGHTSAVINGS = 7;
-pub const PSP_SYSTEMPARAM_LANGUAGE_CHINESE_TRADITIONAL = 10;
-pub const PSP_SYSTEMPARAM_TIME_FORMAT_24HR = 0;
-pub const PSP_SYSTEMPARAM_ID_STRING_NICKNAME = 1;
-pub const PSP_UTILITY_ACCEPT_CROSS = 1;
-pub const PSP_USB_MODULE_MIC = 3;
-pub const PSP_NETPARAM_USE_PROXY = 13;
-pub const PSP_AV_MODULE_AAC = 6;
-pub const PSP_SYSTEMPARAM_RETVAL_OK = 0;
-pub const PSP_AV_MODULE_ATRAC3PLUS = 2;
-pub const PSP_MODULE_NET_COMMON = 0x0100;
-pub const PSP_MODULE_AV_ATRAC3PLUS = 0x0302;
-pub const PSP_NETPARAM_NETMASK = 6;
-pub const PSP_UTILITY_ACCEPT_CIRCLE = 0;
-pub const PSP_MODULE_NP_COMMON = 0x0400;
-pub const PSP_NETPARAM_WEPKEY = 3;
-pub const PSP_MODULE_AV_AVCODEC = 0x0300;
-pub const PSP_SYSTEMPARAM_LANGUAGE_GERMAN = 4;
-pub const PSP_AV_MODULE_G729 = 7;
-pub const PSP_SYSTEMPARAM_ID_INT_TIMEZONE = 6;
-pub const PSP_SYSTEMPARAM_ID_INT_DATE_FORMAT = 4;
-pub const PSP_SYSTEMPARAM_ID_INT_LANGUAGE = 8;
-pub const PSP_NETPARAM_UNKNOWN1 = 16;
-pub const PSP_MODULE_IRDA = 0x0600;
-pub const PSP_SYSTEMPARAM_WLAN_POWERSAVE_OFF = 0;
-pub const PSP_MODULE_USB_PSPCM = 0x0200;
-pub const PSP_NETPARAM_IP = 5;
-pub const PSP_MODULE_AV_MP3 = 0x0304;
-pub const PSP_NET_MODULE_COMMON = 1;
-pub const PSP_NETPARAM_MANUAL_DNS = 8;
-pub const PSP_SYSTEMPARAM_DAYLIGHTSAVINGS_STD = 0;
-pub const PSP_NETPARAM_PRIMARYDNS = 9;
-pub const PSP_USB_MODULE_GPS = 5;
-pub const PSP_MODULE_NP_SERVICE = 0x0401;
-pub const PSP_SYSTEMPARAM_LANGUAGE_RUSSIAN = 8;
-pub const PSP_AV_MODULE_SASCORE = 1;
-pub const PSP_MODULE_NET_PARSEHTTP = 0x0104;
-pub const PSP_AV_MODULE_VAUDIO = 5;
-pub const PSP_SYSTEMPARAM_LANGUAGE_CHINESE_SIMPLIFIED = 11;
-pub const PSP_NETPARAM_ROUTE = 7;
-pub const PSP_SYSTEMPARAM_LANGUAGE_FRENCH = 2;
-pub const PSP_NETPARAM_PROXY_USER = 11;
-pub const PSP_NETPARAM_SSID = 1;
-pub const PSP_SYSTEMPARAM_ID_INT_ADHOC_CHANNEL = 2;
-pub const PSP_NETPARAM_SECONDARYDNS = 10;
-pub const PSP_MODULE_AV_SASCORE = 0x0301;
-pub const PSP_NETPARAM_ERROR_BAD_NETCONF = 0x80110601;
-pub const PSP_SYSTEMPARAM_ADHOC_CHANNEL_AUTOMATIC = 0;
-pub const PSP_SYSTEMPARAM_LANGUAGE_SPANISH = 3;
-pub const PSP_NET_MODULE_HTTP = 6;
-pub const PSP_SYSTEMPARAM_LANGUAGE_JAPANESE = 0;
-pub const PSP_SYSTEMPARAM_LANGUAGE_PORTUGUESE = 7;
-pub const PSP_NETPARAM_PROXY_SERVER = 14;
-pub const PSP_NET_MODULE_SSL = 7;
-pub const PSP_NETPARAM_PROXY_PORT = 15;
-pub const PSP_SYSTEMPARAM_RETVAL_FAIL = 0x80110103;
-pub const PSP_MODULE_AV_MPEGBASE = 0x0303;
-pub const PSP_USB_MODULE_PSPCM = 1;
-pub const PSP_NETPARAM_IS_STATIC_IP = 4;
-pub const PSP_SYSTEMPARAM_DATE_FORMAT_DDMMYYYY = 2;
-pub const PSP_MODULE_USB_MIC = 0x0201;
-pub const PSP_AV_MODULE_MPEGBASE = 3;
-pub const PSP_SYSTEMPARAM_ADHOC_CHANNEL_11 = 11;
-pub const PSP_NET_MODULE_PARSEURI = 4;
-pub const PSP_SYSTEMPARAM_DATE_FORMAT_YYYYMMDD = 0;
-pub const PSP_SYSTEMPARAM_DAYLIGHTSAVINGS_SAVING = 1;
-pub const PSP_MODULE_AV_AAC = 0x0306;
-pub const PSP_SYSTEMPARAM_ADHOC_CHANNEL_1 = 1;
-pub const PSP_MODULE_USB_CAM = 0x0202;
-pub const PSP_SYSTEMPARAM_LANGUAGE_ITALIAN = 5;
-pub const PSP_MODULE_AV_G729 = 0x0307;
-pub const PSP_SYSTEMPARAM_ID_INT_TIME_FORMAT = 5;
-pub const PSP_NETPARAM_UNKNOWN2 = 17;
-pub const PSP_SYSTEMPARAM_TIME_FORMAT_12HR = 1;
-pub const PSP_SYSTEMPARAM_ADHOC_CHANNEL_6 = 6;
-pub const PSP_MODULE_NET_ADHOC = 0x0101;
-pub const PSP_SYSTEMPARAM_WLAN_POWERSAVE_ON = 1;
-pub const PSP_MODULE_AV_VAUDIO = 0x0305;
-pub const PSP_SYSTEMPARAM_ID_INT_WLAN_POWERSAVE = 3;
-pub const PSP_NETPARAM_PROXY_PASS = 12;
-pub const PSP_SYSTEMPARAM_DATE_FORMAT_MMDDYYYY = 1;
-pub const PSP_NET_MODULE_INET = 3;
-pub const PSP_MODULE_NET_INET = 0x0102;
-pub const PSP_AV_MODULE_MP3 = 4;
-pub const PSP_MODULE_NET_SSL = 0x0106;
-pub const PSP_NETPARAM_SECURE = 2;
-pub const PSP_MODULE_NET_HTTP = 0x0105;
-pub const PSP_USB_MODULE_CAM = 4;
-pub const PSP_MODULE_NP_MATCHING2 = 0x0402;
-pub const PSP_SYSTEMPARAM_LANGUAGE_DUTCH = 6;
-pub const PSP_AV_MODULE_AVCODEC = 0;
-pub const PSP_NETPARAM_ERROR_BAD_PARAM = 0x80110604;
-pub const PSP_NET_MODULE_ADHOC = 2;
-pub const PSP_MODULE_NP_DRM = 0x0500;
-pub const PSP_MODULE_USB_GPS = 0x0203;
-pub const PSP_SYSTEMPARAM_ID_INT_UNKNOWN = 9;
-pub const PSP_SYSTEMPARAM_LANGUAGE_ENGLISH = 1;
-pub const PSP_NETPARAM_NAME = 0;
-pub const PSP_NET_MODULE_PARSEHTTP = 5;
-pub const PSP_USB_MODULE_ACC = 2;
-pub const PSP_SYSTEMPARAM_LANGUAGE_KOREAN = 9;
+pub const ModuleNet = extern enum(c_int){
+    Common = 1,
+    Adhoc = 2,
+    Inet = 3,
+    Parseuri = 4,
+    Parsehttp = 5,
+    Http = 6,
+    Ssl = 7
+};
+
+pub const ModuleUSB = extern enum(c_int){
+    Pspcm = 1,
+    Acc = 2,
+    Mic = 3,
+    Cam = 4,
+    Gps = 5,
+};
+
+pub const NetParam = extern enum(c_int){
+    Name = 0,
+    Ssid = 1,
+    Secure = 2,
+    Wepkey = 3,
+    IsStaticIp = 4,
+    Ip = 5,
+    Netmask = 6,
+    Route = 7,
+    ManualDns = 8,
+    Primarydns = 9,
+    Secondarydns = 10,
+    ProxyUser = 11,
+    ProxyPass = 12,
+    UseProxy = 13,
+    ProxyServer = 14,
+    ProxyPort = 15,
+    Unknown1 = 16,
+    Unknown2 = 17
+};
+
+pub const SystemParamID = extern enum(c_int){
+    StringNickname = 1,
+    IntAdhocChannel = 2,
+    IntWlanPowersave = 3,
+    IntDateFormat = 4,
+    IntTimeFormat = 5,
+    IntTimezone = 6,
+    IntDaylightsavings = 7,
+    IntLanguage = 8,
+    IntUnknown = 9
+};
+
+pub const ModuleAV = extern enum(c_int){
+    Avcodec = 0,
+    Sascore = 1,
+    Atrac3plus = 2,
+    Mpegbase = 3,
+    Mp3 = 4,
+    Vaudio = 5,
+    Aac = 6,
+    G729 = 7
+};
+
+pub const SystemParamLanguage = extern enum(c_int){
+    Japanese = 0,
+    English = 1,
+    French = 2,
+    Spanish = 3,
+    German = 4,
+    Italian = 5,
+    Dutch = 6,
+    Portuguese = 7,
+    Russian = 8,
+    Korean = 9,
+    ChineseTraditional = 10,
+    ChineseSimplified = 11,
+};
+
+pub const SystemParamTime = extern enum(c_int){
+    Format24Hr = 0,
+    Format12Hr = 1
+};
+
+pub const UtilityAccept = extern enum(c_int){
+    Circle = 0,
+    Cross = 1
+};
+
+pub const SystemParamAdhoc = extern enum(c_int){
+    ChannelAutomatic = 0,
+    Channel1 = 1,
+    Channel6 = 6,
+    Channel11 = 11,
+};
+
+pub const NetParamError = extern enum(c_int){
+    BadNetconf = 0x80110601,
+    BadParam = 0x80110604
+};
+
+pub const SystemParamWlanPowerSave = extern enum(c_int){
+    Off = 0,
+    On = 1
+};
+
+pub const SystemParamDaylightSavings = extern enum(c_int){
+    Std = 0,
+    Saving = 1
+};
+
+pub const SystemParamDateFormat = extern enum(c_int){
+    YYYYMMDD = 0,
+    MMDDYYYY = 1,
+    DDMMYYYY = 2
+};
+
+pub const SystemParamRetVal = extern enum(c_int){
+    Ok = 0,
+    Fail = 0x80110103
+};
+
+pub const ModuleNP = extern enum(c_int){
+    Common = 0x0400,
+    Service = 0x0401,
+    Matching2 = 0x0402,
+    Drm = 0x0500,
+    Irda = 0x0600
+};
