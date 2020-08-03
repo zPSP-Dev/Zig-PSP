@@ -49,6 +49,9 @@ A quick call to `zig build` will build your program and should emit an EBOOT.PBP
 
 One can run a .PBP file on their PSP (assuming CFW is installed) by adding their application to `PSP_DRIVE:/PSP/GAME/YourApp/EBOOT.PBP` and it will be available under the Games->Memory Stick list in the PSP's XMB.
 
+## EBOOT Customization
+In order to customize the EBOOT, one can look into the `build.zig` file and modify the constant fields to change their application icon, background, and even add animations or sounds to the EBOOT on the XMB screen.
+
 ## Documentation
 
 Currently Zig-PSP does not include documentation of the PSPSDK in the SDK's .zig files - but rather they are well documented for both [Rust](https://docs.rs/psp/) and [C](http://psp.jim.sh/pspsdk-doc/). These both have an excellent documentation of the same APIs.
