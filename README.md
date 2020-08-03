@@ -3,11 +3,11 @@
 
 ## Why Zig on the PSP?
 
-In the PSP programming community, many libraries, tools, and other features are written in C or C++ (the majority being C), which as we know has its problems with writing clean, reusable, and high quality code. Given that the core objectives of Zig as a language are to allow us to create good and reusable software, Zig seems like a perfect fit for integrating older PSP libraries while striving to develop higher quality software!
+In the PSP programming community, many libraries, tools, and other features are written in C or C++, which as we know has its problems with writing clean, reusable, and high quality code. Given that the core objectives of Zig as a language are to allow us to create well-designed and reusable software, Zig seems like a perfect fit for integrating older PSP libraries while striving to develop higher quality software!
 
 ## What about the PSPSDK?
 
-Zig-PSP has **no reliance** on the legacy toolchain - it only relies on the excellent and brand new [Rust PSP](https://github.com/overdrivenpotato/rust-psp) toolchain, which is completely feature equivalent for User Mode! The Zig PSP toolchain only requires three binaries from Rust PSP for binary generation and the statically linked toolchain library!
+Zig-PSP has **no reliance** on the legacy toolchain - it only relies on tools from the excellent and brand new [Rust PSP](https://github.com/overdrivenpotato/rust-psp) toolchain, which is completely feature equivalent for User Mode! ####The Zig PSP toolchain only requires three binaries from Rust PSP for binary generation and the statically linked toolchain library!####
 
 ## Road to 1.0!
 - [x] PSP PRX Generation
@@ -15,7 +15,7 @@ Zig-PSP has **no reliance** on the legacy toolchain - it only relies on the exce
 - [x] Full `build.zig` build script
 - [x] Remove all dependencies on PSPSDK headers
 - [x] Remove all dependencies on Newlib
-- [ ] Basic PSP Debug Printing
+- [x] Basic PSP Debug Printing
 - [ ] Basic PSP Memory Allocator
 - [ ] Basic PSP VRAM Allocator
 - [ ] Panic / Runtime Error handling
@@ -27,7 +27,8 @@ Zig-PSP has **no reliance** on the legacy toolchain - it only relies on the exce
 
 The only true external dependency that this library requires is the lld linker for LLVM. This is required purely because the build script cannot pass some of the required linker arguments through Zig itself to generate code (-emit-relocs --eh-frame-hdr --no-gc-sections -o zig-cache/app.elf). 
 
-HEY YOU BIG DUMMY! FIGURE THIS OUT BEFORE MAKING REPO PUBLIC!
+Zig-PSP also relies on binary tools from Rust-PSP 
+### HEY YOU BIG DUMMY! FIGURE THIS OUT BEFORE MAKING REPO PUBLIC!
 
 ## Usage
 
@@ -39,9 +40,10 @@ For a main.zig file one should include something like:
 const psp = @import("psp/pspsdk.zig");
 
 export fn main() void {
-     psp.enableHomeButton();
+     psp.utils.enableHomeButton();
 
-     psp.debugPrint("Hello PSP, this is Zig!");
+     psp.debug.screenInit();
+     psp.debug.screenPrint("Hello PSP, this is Zig!");
 }
 ```
 
