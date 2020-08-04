@@ -10,7 +10,7 @@ pub export fn main() void {
     const columns : u32 = 34;
 
     while(true) : (i += 1) {
-        psp.debug.internal_putchar(@mod(i,rows) * 8, @mod(i / rows, columns) * 8, @truncate(u8, i));
+        psp.debug.print("Hello from Zig!");
         var s = psp.sceDisplayWaitVblankStart();
     }
 

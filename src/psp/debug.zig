@@ -22,7 +22,7 @@ pub fn screenSetXY(sX : u8, sY : u8) void{
     y = sY;
 }
 
-pub fn clearScreen() void{
+pub fn screenClear() void{
     var i: usize = 0;
     while (i < SCR_BUF_WIDTH * SCREEN_HEIGHT) : (i += 1) {
         vram_base.?[i] = cl_col;
@@ -55,14 +55,32 @@ pub fn screenInit() void {
     stat = sceDisplaySetMode(0, SCREEN_WIDTH, SCREEN_HEIGHT);
     stat = sceDisplaySetFrameBuf(vram_base, SCR_BUF_WIDTH, @enumToInt(PspDisplayPixelFormats.Format8888), 1);
 
-    clearScreen();
+    screenClear();
+}
+
+//Currently doesn't format...
+pub fn print(comptime text: []const u8) void {
+    var i : usize = 0;
+    while(text[i] != 0) : (i += 1){
+        internal_putchar(@as(u32,x) * 8, @as(u32,y) * 8, text[i]);
+
+        x += 1;
+        if(x > 60){
+            x = 0;
+            y += 1;
+            if(y > 34){
+                y = 0;
+                screenClear();
+            }
+        }
+    }
 }
 
 extern var _acmsxfont: [2049]u8;
 
 extern fn internal_msx_glyph(i: usize) u8;
 
-pub fn internal_putchar(cx: u32, cy: u32, ch: u8) void{
+fn internal_putchar(cx: u32, cy: u32, ch: u8) void{
     var off : usize = cx + (cy * SCR_BUF_WIDTH);
     
     var i : usize = 0;
