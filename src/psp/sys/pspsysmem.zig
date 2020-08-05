@@ -1,9 +1,9 @@
 usingnamespace @import("psptypes.zig");
 
 pub const enum_PspSysMemBlockTypes = extern enum(c_int) {
-    PSP_SMEM_Low = 0,
-    PSP_SMEM_High = 1,
-    PSP_SMEM_Addr = 2,
+    MemLow = 0,
+    MemHigh = 1,
+    MemAddr = 2,
     _,
 };
 pub const SceKernelSysMemAlloc_t = c_int;

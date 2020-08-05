@@ -2,6 +2,8 @@ usingnamespace @import("sys/pspthreadman.zig");
 usingnamespace @import("sys/psploadexec.zig");
 usingnamespace @import("sys/psptypes.zig");
 
+pub usingnamespace @import("allocator.zig");
+
 var requestedExit : bool = false;
 
 pub fn isRunning() bool{
