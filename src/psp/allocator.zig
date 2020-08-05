@@ -27,7 +27,7 @@ pub const PSPAllocator = struct{
         if(old_mem.len == 0){
             //Malloc
 
-            var id : SceUID = sceKernelAllocPartitionMemory(2, "block", @enumToInt(PspSysMemBlockTypes.MemLow), new_byte_count + @sizeOf(SceUID) + new_alignment + 1, null);
+            var id : SceUID = sceKernelAllocPartitionMemory(2, "block", @enumToInt(PspSysMemBlockTypes.MemLow), new_byte_count + @sizeOf(SceUID), null);
 
             if(id < 0){
                 return Allocator.Error.OutOfMemory;
@@ -38,13 +38,9 @@ pub const PSPAllocator = struct{
             @ptrCast(*c_int, ptr).* = id;
 
             var ptr2 = @ptrCast([*]u8, ptr);
-
             ptr2 += @sizeOf(SceUID);
 
-            var padding : u32 = 1 + new_alignment;
-            ptr2[padding - 1] = @truncate(u8, padding);
-
-            return ptr2[padding..new_byte_count];
+            return ptr2[0..new_byte_count];
         }
 
         return Allocator.Error.OutOfMemory;
@@ -53,11 +49,9 @@ pub const PSPAllocator = struct{
     fn psp_shrink(allocator: *Allocator, old_mem: []u8, old_alignment: u29, new_byte_count: usize, new_alignment: u29) []u8{
         var ptr = @ptrCast([*]u8, old_mem);
 
-        ptr -= 1;
-        var padding = ptr[0];
-        ptr += 1 - padding - @sizeOf(SceUID);
+        ptr -= @sizeOf(SceUID);
 
-        var id = ptr[0];
+        var id = @ptrCast(*c_int, @alignCast(4, ptr)).*;
 
         var s = sceKernelFreePartitionMemory(id);
         return old_mem[0..new_byte_count];

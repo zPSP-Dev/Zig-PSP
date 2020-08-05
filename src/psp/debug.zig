@@ -68,8 +68,7 @@ pub fn screenInit() void {
     screenClear();
 }
 
-//Currently doesn't format...
-pub fn print(text: []u8) void {
+pub fn print(text: []const u8) void {
     var i : usize = 0;
     while(i < text.len) : (i += 1){
         

@@ -17,7 +17,7 @@ Zig-PSP has **no reliance** on the legacy toolchain - it only relies on tools fr
 - [x] Remove all dependencies on Newlib
 - [x] Basic PSP Debug Printing
 - [x] Remove dependency on Rust-PSP installs.
-- [ ] Basic PSP Memory Allocator
+- [x] Basic PSP Memory Allocator
 - [ ] Basic PSP VRAM Allocator
 - [ ] Remove the C stub file!
 - [ ] Include basic examples!
