@@ -7,7 +7,7 @@ In the PSP programming community, many libraries, tools, and other features are 
 
 ## What about the PSPSDK?
 
-Zig-PSP has **no reliance** on the legacy toolchain - it only relies on tools from the excellent and brand new [Rust PSP](https://github.com/overdrivenpotato/rust-psp) toolchain, which is completely feature equivalent for User Mode! ####The Zig PSP toolchain only requires three binaries from Rust PSP for binary generation and the statically linked toolchain library!####
+Zig-PSP has **no reliance** on the legacy toolchain - it only relies on tools from the excellent and brand new [Rust PSP](https://github.com/overdrivenpotato/rust-psp) toolchain, which is completely feature equivalent for User Mode! These are included with the download. (No Rust needed!)
 
 ## Road to 1.0!
 - [x] PSP PRX Generation
@@ -18,21 +18,20 @@ Zig-PSP has **no reliance** on the legacy toolchain - it only relies on tools fr
 - [x] Basic PSP Debug Printing
 - [ ] Basic PSP Memory Allocator
 - [ ] Basic PSP VRAM Allocator
-- [ ] Panic / Runtime Error handling
-- [ ] STD Support
-- [ ] Upstream STD support
 - [ ] Remove the C stub file!
+- [ ] Include basic examples!
+- [ ] Panic / Runtime Error handling
+- [ ] STD Support (maybe even upstream?)
 
 ## Dependencies
 
-The only true external dependency that this library requires is the lld linker for LLVM. This is required purely because the build script cannot pass some of the required linker arguments through Zig itself to generate code (-emit-relocs --eh-frame-hdr --no-gc-sections -o zig-cache/app.elf). 
+The only true external dependency that this library requires is the lld linker for LLVM. This is required purely because the build script cannot pass the -emit-relocs flag to generate an ELF.
 
-Zig-PSP also relies on binary tools from Rust-PSP 
-### HEY YOU BIG DUMMY! FIGURE THIS OUT BEFORE MAKING REPO PUBLIC!
+Zig-PSP also relies on binary tools from Rust-PSP and the static library, which are included with the download by default.
 
 ## Usage
 
-Currently, using Zig-PSP is rather straight forward - one must include the "psp" folder into their project in order to have the extern definitions for libpsp.a. One also must include libpsp.a in their project root lib/ folder, and have the ###THIS MAY CHANGE CHECK AND CHANGE THIS WHEN STUFF HAPPENS!### three generation binaries in their bin/ folder. To build a PSP app, use the included build.zig to generate a PSP EBOOT!
+Currently, using Zig-PSP is rather straight forward - one must use the include folder in their project in order to have the extern definitions for libpsp.a alongside with some custom utilities I have created. One also must include the lib/ folder to include libpsp.a alongside with the post-build tools. To build a PSP app, use the included `build.zig` script to generate a PSP executable! (EBOOT.PBP / app.prx) This script is well commented for explanation and documentation.
 
 For a main.zig file one should include something like:
 
@@ -49,7 +48,7 @@ export fn main() void {
 
 A quick call to `zig build` will build your program and should emit an EBOOT.PBP and app.prx in your root. These are the two PSP executable formats - .prx for debugging, and .PBP for running normally.
 
-One can run a .PBP file on their PSP (assuming CFW is installed) by adding their application to `PSP_DRIVE:/PSP/GAME/YourApp/EBOOT.PBP` and it will be available under the Games->Memory Stick list in the PSP's XMB.
+One can run a .PBP file on their PSP (assuming CFW is installed) by adding their application to `PSP_DRIVE:/PSP/GAME/YourAppName/EBOOT.PBP` and it will be available under the Games->Memory Stick list in the PSP's XMB.
 
 ## EBOOT Customization
 In order to customize the EBOOT, one can look into the `build.zig` file and modify the constant fields to change their application icon, background, and even add animations or sounds to the EBOOT on the XMB screen.
