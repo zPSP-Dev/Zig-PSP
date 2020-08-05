@@ -16,6 +16,7 @@ Zig-PSP has **no reliance** on the legacy toolchain - it only relies on tools fr
 - [x] Remove all dependencies on PSPSDK headers
 - [x] Remove all dependencies on Newlib
 - [x] Basic PSP Debug Printing
+- [x] Remove dependency on Rust-PSP installs.
 - [ ] Basic PSP Memory Allocator
 - [ ] Basic PSP VRAM Allocator
 - [ ] Remove the C stub file!
@@ -31,7 +32,7 @@ Zig-PSP also relies on binary tools from Rust-PSP and the static library, which 
 
 ## Usage
 
-Currently, using Zig-PSP is rather straight forward - one must use the include folder in their project in order to have the extern definitions for libpsp.a alongside with some custom utilities I have created. One also must include the lib/ folder to include libpsp.a alongside with the post-build tools. To build a PSP app, use the included `build.zig` script to generate a PSP executable! (EBOOT.PBP / app.prx) This script is well commented for explanation and documentation.
+Currently, using Zig-PSP is rather straight forward - one must use the psp folder in their project's src folder in order to have the extern definitions for libpsp.a alongside with some custom utilities I have created. One also must include the lib/ folder to include libpsp.a alongside with the post-build tools. To build a PSP app, use the included `build.zig` script to generate a PSP executable! (EBOOT.PBP / app.prx) This script is well commented for explanation and documentation.
 
 For a main.zig file one should include something like:
 
@@ -55,7 +56,7 @@ In order to customize the EBOOT, one can look into the `build.zig` file and modi
 
 ## Documentation
 
-Currently Zig-PSP does not include documentation of the PSPSDK in the SDK's .zig files - but rather they are well documented for both [Rust](https://docs.rs/psp/) and [C](http://psp.jim.sh/pspsdk-doc/). These both have an excellent documentation of the same APIs.
+Currently Zig-PSP does not include documentation of the PSPSDK in the SDK's .zig files - but rather they are well documented for both [Rust](https://docs.rs/psp/) and [C](http://psp.jim.sh/pspsdk-doc/). These both have an excellent documentation of the same APIs, although you might prefer the C documentation as this project is closer to C than Rust.
 
 ## Debugging
 
