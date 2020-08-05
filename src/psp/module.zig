@@ -1,3 +1,4 @@
+usingnamespace @import("sys/psploadexec.zig");
 usingnamespace @import("sys/pspthreadman.zig");
 usingnamespace @import("sys/psptypes.zig");
 
@@ -30,11 +31,17 @@ pub fn _module_main_thread(argc: SceSize, argv: ?*c_void) callconv(.C) c_int {
                 print(string);
 
                 //TODO: DUMP STACK TRACE
-
                 //if (@errorReturnTrace()) |trace| {
                 //    std.debug.dumpStackTrace(trace.*);
                 //}
+                
+                //EXIT STRATEGY:
 
+                //Hang for 10 seconds for error reporting
+                var stat = sceKernelDelayThread(10 * 1000 * 1000);
+
+                //Exit out.
+                sceKernelExitGame();
                 return 1;
             };
             switch (@typeInfo(@TypeOf(result))) {
