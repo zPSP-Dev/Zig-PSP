@@ -15,7 +15,6 @@ pub export fn main() void {
     psp.debug.screenInit();
 
     var psp_allocator = &psp.utils.PSPAllocator.init().allocator;
-
     printFreeMem(psp_allocator);
 
     const string = std.fmt.allocPrint(

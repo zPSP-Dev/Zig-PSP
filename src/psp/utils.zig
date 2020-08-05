@@ -3,6 +3,7 @@ usingnamespace @import("sys/psploadexec.zig");
 usingnamespace @import("sys/psptypes.zig");
 
 pub usingnamespace @import("allocator.zig");
+pub usingnamespace @import("vram.zig");
 
 var requestedExit : bool = false;
 

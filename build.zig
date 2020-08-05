@@ -38,6 +38,8 @@ pub fn build(b: *Builder) void {
     //Set mode & target
     exe.setTarget(target);
     exe.setBuildMode(mode);
+    exe.setLinkerScriptPath("lib/linkfile.ld");
+    exe.link_eh_frame_hdr = true;
     
     //New step to link the object
     //Hopefully can be removed (https://github.com/ziglang/zig/issues/5986)

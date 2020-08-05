@@ -18,8 +18,9 @@ Zig-PSP has **no reliance** on the legacy toolchain - it only relies on tools fr
 - [x] Basic PSP Debug Printing
 - [x] Remove dependency on Rust-PSP installs.
 - [x] Basic PSP Memory Allocator
-- [ ] Basic PSP VRAM Allocator
+- [x] Basic PSP VRAM Allocator
 - [ ] Remove the C stub file!
+- [ ] Convert GU to enums
 - [ ] Include basic examples!
 - [ ] Panic / Runtime Error handling
 - [ ] STD Support (maybe even upstream?)

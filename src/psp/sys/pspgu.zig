@@ -97,6 +97,20 @@ pub extern fn sceGuDrawArrayN(primitive_type: c_int, vertex_type: c_int, count: 
 pub extern fn guSwapBuffersBehaviour(behaviour: c_int) void;
 pub extern fn guSwapBuffersCallback(callback: GuSwapBuffersCallback) void;
 
+pub const GuPixelMode = extern enum(c_int){
+    Psm5650 = 0,
+    Psm5551 = 1,
+    Psm4444 = 2,
+    Psm8888 = 3,
+    PsmT4 = 4,
+    PsmT8 = 5,
+    PsmT16 = 6,
+    PsmT32 = 7,
+    PsmDXT1 = 8,
+    PsmDXT3 = 9,
+    PsmDXT5 = 10,
+};
+
 pub const GU_FILL_OPEN = 2;
 pub const GU_FALSE = 0;
 pub const GU_NOOP = 5;
@@ -122,14 +136,11 @@ pub const GU_TRANSFORM_3D = GU_TRANSFORM_SHIFT(0);
 pub const GU_COPY_INVERTED = 12;
 pub const GU_VERTEX_BITS = GU_VERTEX_SHIFT(3);
 pub const GU_FIX = 10;
-pub const GU_PSM_DXT1 = 8;
 pub const GU_NEAREST_MIPMAP_NEAREST = 4;
-pub const GU_PSM_5650 = 0;
 pub const GU_NORMAL_BITS = GU_NORMAL_SHIFT(3);
 pub const GU_TCC_RGBA = 1;
 pub const GU_SEND = 2;
 pub const GU_STENCIL_TEST = 3;
-pub const GU_PSM_4444 = 2;
 pub const GU_GEQUAL = 7;
 pub const GU_DIFFUSE = 2;
 pub const GU_TRANSFORM_2D = GU_TRANSFORM_SHIFT(1);
@@ -160,9 +171,8 @@ pub inline fn GU_VERTICES(n: var) @TypeOf(((n - 1) & 7) << 18) {
     return ((n - 1) & 7) << 18;
 }
 pub const GU_SCISSOR_TEST = 2;
-pub const GU_PSM_DXT3 = 9;
+
 pub const GU_OR = 7;
-pub const GU_PSM_T16 = 6;
 pub const GU_ENVIRONMENT_MAP = 2;
 pub const GU_SPOTLIGHT = 2;
 pub const GU_INDEX_BITS = GU_INDEX_SHIFT(3);
@@ -281,7 +291,6 @@ pub const GU_OPEN_FILL = 1;
 pub inline fn GU_ABGR(a: var, b: var, g: var, r: var) @TypeOf((a << 24) | ((b << 16) | ((g << 8) | r))) {
     return (a << 24) | ((b << 16) | ((g << 8) | r));
 }
-pub const GU_PSM_5551 = 1;
 pub const GU_EQUIV = 9;
 pub const GU_CALLBACK_SIGNAL = 1;
 pub const GU_ALWAYS = 1;
@@ -290,7 +299,6 @@ pub const GU_INDEX_16BIT = GU_INDEX_SHIFT(2);
 pub const GU_COLOR_4444 = GU_COLOR_SHIFT(6);
 pub const GU_POINTS = 0;
 pub const GU_COLOR_TEST = 17;
-pub const GU_PSM_T4 = 4;
 pub const GU_NEAREST = 0;
 pub const GU_NORMAL = 3;
 pub const GU_CCW = 1;
@@ -308,22 +316,18 @@ pub const GU_TRUE = 1;
 pub const GU_SYNC_WHAT_QUEUED = 1;
 pub const GU_NEVER = 0;
 pub const GU_FAST_CLEAR_BIT = 16;
-pub const GU_PSM_T8 = 5;
 pub const GU_INCR = 4;
 pub const GU_NEAREST_MIPMAP_LINEAR = 6;
 pub const GU_COLOR_BUFFER_BIT = 1;
 pub const GU_ADD = 0;
 pub const GU_TEXTURE_MATRIX = 1;
 pub const GU_XOR = 6;
-pub const GU_PSM_T32 = 7;
 pub inline fn GU_VERTEX_SHIFT(n: var) @TypeOf(n << 7) {
     return n << 7;
 }
 pub const GU_DEPTH_BUFFER_BIT = 4;
-pub const GU_PSM_8888 = 3;
 pub const GU_NORMAL_16BIT = GU_NORMAL_SHIFT(2);
 pub const GU_CALL = 1;
 pub const GU_COPY = 3;
-pub const GU_PSM_DXT5 = 10;
 pub const GU_ONE_MINUS_SRC_COLOR = 1;
 pub const GU_PI = @as(f32, 3.141593);
