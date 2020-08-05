@@ -93,6 +93,18 @@ pub fn print(text: []const u8) void {
     }
 }
 
+usingnamespace @import("utils.zig");
+const std = @import("std");
+
+pub fn printFormat(comptime fmt: []const u8, args: var) !void {
+    var psp_allocator = &PSPAllocator.init().allocator;
+
+    var string = try std.fmt.allocPrint(psp_allocator, fmt, args);
+    defer psp_allocator.free(string);
+    
+    print(string);
+}
+
 extern var _acmsxfont: [2049]u8;
 
 extern fn internal_msx_glyph(i: usize) u8;

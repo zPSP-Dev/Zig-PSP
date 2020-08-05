@@ -19,10 +19,11 @@ Zig-PSP has **no reliance** on the legacy toolchain - it only relies on tools fr
 - [x] Remove dependency on Rust-PSP installs.
 - [x] Basic PSP Memory Allocator
 - [x] Basic PSP VRAM Allocator
-- [ ] Remove the C stub file!
+- [x] Basic Error handling
 - [ ] Convert GU to enums
+- [ ] Remove the C stub file!
 - [ ] Include basic examples!
-- [ ] Panic / Runtime Error handling
+- [ ] Panic & Stack Traces
 - [ ] STD Support (maybe even upstream?)
 
 ## Dependencies
@@ -39,6 +40,11 @@ For a main.zig file one should include something like:
 
 ```zig
 const psp = @import("psp/pspsdk.zig");
+
+//Required to export program entrypoint.
+comptime {
+    _ = psp.module_start_struct;
+}
 
 export fn main() void {
      psp.utils.enableHomeButton();
