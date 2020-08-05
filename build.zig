@@ -56,9 +56,9 @@ pub fn build(b: *Builder) void {
 
     //Post-build actions
     
-    var prxgen_path = "lib/tools/linux/prxgen";
-    var mksfo_path = "lib/tools/linux/mksfo";
-    var pack_pbp_path = "lib/tools/linux/pack-pbp";
+    var prxgen_path : []const u8 = "lib/tools/linux/prxgen";
+    var mksfo_path : []const u8 = "lib/tools/linux/mksfo";
+    var pack_pbp_path : []const u8 = "lib/tools/linux/pack-pbp";
 
     switch (builtin.os.tag) {
         .linux => {
