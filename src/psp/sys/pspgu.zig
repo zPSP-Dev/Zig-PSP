@@ -111,223 +111,320 @@ pub const GuPixelMode = extern enum(c_int){
     PsmDXT5 = 10,
 };
 
-pub const GU_FILL_OPEN = 2;
-pub const GU_FALSE = 0;
-pub const GU_NOOP = 5;
-pub const GU_COLOR_5551 = GU_COLOR_SHIFT(5);
-pub const GU_TRIANGLE_STRIP = 4;
-pub const GU_NAND = 14;
-pub const GU_REPEAT = 0;
-pub const GU_AMBIENT_AND_DIFFUSE = GU_AMBIENT | GU_DIFFUSE;
-pub const GU_SINGLE_COLOR = 0;
-pub const GU_SYNC_WHAT_STALL = 3;
-pub const GU_NOTEQUAL = 3;
-pub const GU_OR_INVERTED = 13;
-pub const GU_SEPARATE_SPECULAR_COLOR = 1;
-pub const GU_PROJECTION = 0;
-pub const GU_INVERT = 3;
-pub const GU_DIRECTIONAL = 0;
-pub const GU_REPLACE = 2;
-pub const GU_NORMALIZED_NORMAL = 2;
-pub const GU_TRIANGLE_FAN = 5;
-pub const GU_CLAMP = 1;
-pub const GU_SYNC_FINISH = 0;
-pub const GU_TRANSFORM_3D = GU_TRANSFORM_SHIFT(0);
-pub const GU_COPY_INVERTED = 12;
-pub const GU_VERTEX_BITS = GU_VERTEX_SHIFT(3);
-pub const GU_FIX = 10;
-pub const GU_NEAREST_MIPMAP_NEAREST = 4;
-pub const GU_NORMAL_BITS = GU_NORMAL_SHIFT(3);
-pub const GU_TCC_RGBA = 1;
-pub const GU_SEND = 2;
-pub const GU_STENCIL_TEST = 3;
-pub const GU_GEQUAL = 7;
-pub const GU_DIFFUSE = 2;
-pub const GU_TRANSFORM_2D = GU_TRANSFORM_SHIFT(1);
-pub const GU_TEXTURE = 3;
-pub const GU_TEXTURE_32BITF = GU_TEXTURE_SHIFT(3);
-pub const GU_INDEX_8BIT = GU_INDEX_SHIFT(1);
-pub const GU_COLOR_8888 = GU_COLOR_SHIFT(7);
-pub const GU_TEXTURE_16BIT = GU_TEXTURE_SHIFT(2);
-pub const GU_COLOR_LOGIC_OP = 18;
-pub const GU_LINES = 1;
-pub const GU_SPECULAR = 4;
-pub const GU_LIGHTING = 10;
-pub inline fn GU_COLOR_SHIFT(n: var) @TypeOf(n << 2) {
-    return n << 2;
-}
-pub const GU_FOG = 7;
-pub const GU_TEXTURE_AUTO = 0;
-pub const GU_BLEND = 4;
-pub const GU_LIGHT3 = 14;
-pub const GU_LIGHT2 = 13;
-pub const GU_TFX_MODULATE = 0;
-pub const GU_SYNC_WHAT_DONE = 0;
-pub const GU_FRAGMENT_2X = 21;
-pub inline fn GU_TRANSFORM_SHIFT(n: var) @TypeOf(n << 23) {
-    return n << 23;
-}
-pub inline fn GU_VERTICES(n: var) @TypeOf(((n - 1) & 7) << 18) {
-    return ((n - 1) & 7) << 18;
-}
-pub const GU_SCISSOR_TEST = 2;
+pub const GuPrimitive = extern enum(c_int) {
+    Points = 0,
+    Lines = 1,
+    LineStrip = 2,
+    Triangles = 3,
+    TriangleStrip = 4,
+    TriangleFan = 5,
+    Sprites = 6,
+};
 
-pub const GU_OR = 7;
-pub const GU_ENVIRONMENT_MAP = 2;
-pub const GU_SPOTLIGHT = 2;
-pub const GU_INDEX_BITS = GU_INDEX_SHIFT(3);
-pub const GU_VERTEX_16BIT = GU_VERTEX_SHIFT(2);
-pub const GU_SYNC_NOWAIT = 1;
-pub const GU_DST_ALPHA = 4;
-pub const GU_NORMAL_32BITF = GU_NORMAL_SHIFT(3);
-pub inline fn GU_NORMAL_SHIFT(n: var) @TypeOf(n << 5) {
-    return n << 5;
+pub const PatchPrimitive = extern enum(c_int) {
+    Points = 0,
+    LineStrip = 2,
+    TriangleStrip = 4,
+};
+
+pub const GuState = extern enum(c_int) {
+    AlphaTest = 0,
+    DepthTest = 1,
+    ScissorTest = 2,
+    StencilTest = 3,
+    Blend = 4,
+    CullFace = 5,
+    Dither = 6,
+    Fog = 7,
+    ClipPlanes = 8,
+    Texture2D = 9,
+    Lighting = 10,
+    Light0 = 11,
+    Light1 = 12,
+    Light2 = 13,
+    Light3 = 14,
+    LineSmooth = 15,
+    PatchCullFace = 16,
+    ColorTest = 17,
+    ColorLogicOp = 18,
+    FaceNormalReverse = 19,
+    PatchFace = 20,
+    Fragment2X = 21,
 }
-pub const GU_MODEL = 2;
-pub inline fn GU_COLOR(r: var, g: var, b: var, a: var) @TypeOf(GU_RGBA((if (@typeInfo(@TypeOf(r * @as(f32, 255.0))) == .Pointer) @ptrCast(u32, @alignCast(@alignOf(u32.Child), r * @as(f32, 255.0))) else if (@typeInfo(@TypeOf(r * @as(f32, 255.0))) == .Int and @typeInfo(u32) == .Pointer) @intToPtr(u32, r * @as(f32, 255.0)) else @as(u32, r * @as(f32, 255.0))), (if (@typeInfo(@TypeOf(g * @as(f32, 255.0))) == .Pointer) @ptrCast(u32, @alignCast(@alignOf(u32.Child), g * @as(f32, 255.0))) else if (@typeInfo(@TypeOf(g * @as(f32, 255.0))) == .Int and @typeInfo(u32) == .Pointer) @intToPtr(u32, g * @as(f32, 255.0)) else @as(u32, g * @as(f32, 255.0))), (if (@typeInfo(@TypeOf(b * @as(f32, 255.0))) == .Pointer) @ptrCast(u32, @alignCast(@alignOf(u32.Child), b * @as(f32, 255.0))) else if (@typeInfo(@TypeOf(b * @as(f32, 255.0))) == .Int and @typeInfo(u32) == .Pointer) @intToPtr(u32, b * @as(f32, 255.0)) else @as(u32, b * @as(f32, 255.0))), (if (@typeInfo(@TypeOf(a * @as(f32, 255.0))) == .Pointer) @ptrCast(u32, @alignCast(@alignOf(u32.Child), a * @as(f32, 255.0))) else if (@typeInfo(@TypeOf(a * @as(f32, 255.0))) == .Int and @typeInfo(u32) == .Pointer) @intToPtr(u32, a * @as(f32, 255.0)) else @as(u32, a * @as(f32, 255.0))))) {
-    return GU_RGBA((if (@typeInfo(@TypeOf(r * @as(f32, 255.0))) == .Pointer) @ptrCast(u32, @alignCast(@alignOf(u32.Child), r * @as(f32, 255.0))) else if (@typeInfo(@TypeOf(r * @as(f32, 255.0))) == .Int and @typeInfo(u32) == .Pointer) @intToPtr(u32, r * @as(f32, 255.0)) else @as(u32, r * @as(f32, 255.0))), (if (@typeInfo(@TypeOf(g * @as(f32, 255.0))) == .Pointer) @ptrCast(u32, @alignCast(@alignOf(u32.Child), g * @as(f32, 255.0))) else if (@typeInfo(@TypeOf(g * @as(f32, 255.0))) == .Int and @typeInfo(u32) == .Pointer) @intToPtr(u32, g * @as(f32, 255.0)) else @as(u32, g * @as(f32, 255.0))), (if (@typeInfo(@TypeOf(b * @as(f32, 255.0))) == .Pointer) @ptrCast(u32, @alignCast(@alignOf(u32.Child), b * @as(f32, 255.0))) else if (@typeInfo(@TypeOf(b * @as(f32, 255.0))) == .Int and @typeInfo(u32) == .Pointer) @intToPtr(u32, b * @as(f32, 255.0)) else @as(u32, b * @as(f32, 255.0))), (if (@typeInfo(@TypeOf(a * @as(f32, 255.0))) == .Pointer) @ptrCast(u32, @alignCast(@alignOf(u32.Child), a * @as(f32, 255.0))) else if (@typeInfo(@TypeOf(a * @as(f32, 255.0))) == .Int and @typeInfo(u32) == .Pointer) @intToPtr(u32, a * @as(f32, 255.0)) else @as(u32, a * @as(f32, 255.0))));
+
+pub const MatrixMode = extern enum(c_int) {
+    Projection = 0,
+    View = 1,
+    Model = 2,
+    Texture = 3,
+};
+
+pub const SplineMode = extern enum(c_int) {
+    FillFill = 0,
+    OpenFill = 1,
+    FillOpen = 2,
+    OpenOpen = 3,
+};
+
+pub const ShadeModel = extern enum(c_int) {
+    Flat = 0,
+    Smooth = 1,
+};
+
+pub const LogicalOperation = extern enum(c_int) {
+    Clear = 0,
+    And = 1,
+    AndReverse = 2,
+    Copy = 3,
+    AndInverted = 4,
+    Noop = 5,
+    Xor = 6,
+    Or = 7,
+    Nor = 8,
+    Equiv = 9,
+    Inverted = 10,
+    OrReverse = 11,
+    CopyInverted = 12,
+    OrInverted = 13,
+    Nand = 14,
+    Set = 15,
+};
+
+pub const TextureFilter = extern enum(c_int) {
+    Nearest = 0,
+    Linear = 1,
+    NearestMipmapNearest = 4,
+    LinearMipmapNearest = 5,
+    NearestMipmapLinear = 6,
+    LinearMipmapLinear = 7,
+};
+
+pub const TextureMapMode = extern enum(c_int) {
+    TextureCoords = 0,
+    TextureMatrix = 1,
+    EnvironmentMap = 2,
+};
+
+pub const TextureLevelMode = extern enum(c_int) {
+    Auto = 0,
+    Const = 1,
+    Slope = 2,
+};
+
+pub const TextureProjectionMapMode = extern enum(c_int) {
+    Position = 0,
+    Uv = 1,
+    NormalizedNormal = 2,
+    Normal = 3,
+};
+
+pub const GuTexWrapMode = extern enum(c_int) {
+    Repeat = 0,
+    Clamp = 1,
+};
+
+pub const FrontFaceDirection = extern enum(c_int) {
+    Clockwise = 0,
+    CounterClockwise = 1,
+};
+
+pub const AlphaFunc = extern enum(c_int) {
+    Never = 0,
+    Always,
+    Equal,
+    NotEqual,
+    Less,
+    LessOrEqual,
+    Greater,
+    GreaterOrEqual,
+};
+
+pub const StencilFunc = extern enum(c_int) {
+    Never = 0,
+    Always,
+    Equal,
+    NotEqual,
+    Less,
+    LessOrEqual,
+    Greater,
+    GreaterOrEqual,
+};
+
+pub const ColorFunc = extern enum(c_int) {
+    Never = 0,
+    Always,
+    Equal,
+    NotEqual,
+};
+
+pub const DepthFunc = extern enum(c_int) {
+    Never = 0,
+    Always,
+    Equal,
+    NotEqual,
+    Less,
+    LessOrEqual,
+    Greater,
+    GreaterOrEqual,
+};
+
+pub const TextureEffect = extern enum(c_int) {
+    Modulate = 0,
+    Decal = 1,
+    Blend = 2,
+    Replace = 3,
+    Add = 4,
+};
+
+pub const TextureColorComponent = extern enum(c_int) {
+    Rgb = 0,
+    Rgba = 1,
+};
+
+pub const MipmapLevel = extern enum(c_int) {
+    None = 0,
+    Level1,
+    Level2,
+    Level3,
+    Level4,
+    Level5,
+    Level6,
+    Level7,
+};
+
+pub const BlendOp = extern enum(c_int) {
+    Add = 0,
+    Subtract = 1,
+    ReverseSubtract = 2,
+    Min = 3,
+    Max = 4,
+    Abs = 5,
+};
+
+pub const BlendSrc = extern enum(c_int) {
+    SrcColor = 0,
+    OneMinusSrcColor = 1,
+    SrcAlpha = 2,
+    OneMinusSrcAlpha = 3,
+    Fix = 10,
+};
+
+pub const BlendDst = extern enum(c_int) {
+    DstColor = 0,
+    OneMinusDstColor = 1,
+    DstAlpha = 4,
+    OneMinusDstAlpha = 5,
+    Fix = 10,
+};
+
+pub const StencilOperation = extern enum(c_int) {
+    Keep = 0,
+    Zero = 1,
+    Replace = 2,
+    Invert = 3,
+    Incr = 4,
+    Decr = 5,
+};
+
+pub const LightMode = extern enum(c_int) {
+    SingleColor = 0,
+    SeparateSpecularColor = 1,
+};
+
+pub const LightType = extern enum(c_int) {
+    Directional = 0,
+    Pointlight = 1,
+    Spotlight = 2,
+};
+
+pub const GuContextType = extern enum(c_int) {
+    Direct = 0,
+    Call = 1,
+    Send = 2,
+};
+
+pub const GuQueueMode = extern enum(c_int) {
+    Tail = 0,
+    Head = 1,
+};
+
+pub const GuSyncMode = extern enum(c_int) {
+    Finish = 0,
+    Signal = 1,
+    Done = 2,
+    List = 3,
+    Send = 4,
+};
+
+pub const GuSyncBehavior = extern enum(c_int) {
+    Wait = 0,
+    NoWait = 1,
+};
+
+pub const GuCallbackId = extern enum(c_int) {
+    Signal = 1,
+    Finish = 4,
+};
+
+pub enum SignalBehavior = extern enum(c_int) {
+    Suspend = 1,
+    Continue = 2,
+};
+
+pub fn abgr(a: u8, b: u8, g: u8, r: u8) u32 {
+    return (r as u32) | ((g as u32) << 8) | ((b as u32) << 16) | ((a as u32) << 24)
 }
-pub const GU_ONE_MINUS_DST_COLOR = 1;
-pub const GU_DIFFUSE_AND_SPECULAR = GU_DIFFUSE | GU_SPECULAR;
-pub const GU_TFX_REPLACE = 3;
-pub const GU_UNKNOWN_LIGHT_COMPONENT = 8;
-pub const GU_VERTEX_32BITF = GU_VERTEX_SHIFT(3);
-pub const GU_OPEN_OPEN = 3;
-pub const GU_SET = 15;
-pub inline fn GU_ARGB(a: var, r: var, g: var, b: var) @TypeOf(GU_ABGR(a, b, g, r)) {
-    return GU_ABGR(a, b, g, r);
+
+pub fn argb(a: u8, r: u8, g: u8, b: u8) u32 {
+    abgr(a, b, g, r)
 }
-pub const GU_FILL_FILL = 0;
-pub const GU_SMOOTH = 1;
-pub const GU_BEHAVIOR_CONTINUE = 2;
-pub const GU_KEEP = 0;
-pub const GU_BEHAVIOR_SUSPEND = 1;
-pub const GU_CLIP_PLANES = 8;
-pub const GU_TEXTURE_8BIT = GU_TEXTURE_SHIFT(1);
-pub const GU_DIRECT = 0;
-pub const GU_ONE_MINUS_SRC_ALPHA = 3;
-pub const GU_DECR = 5;
-pub const GU_ONE_MINUS_DST_ALPHA = 5;
-pub const GU_TCC_RGB = 0;
-pub const GU_FACE_NORMAL_REVERSE = 19;
-pub const GU_WEIGHTS_BITS = GU_WEIGHTS(8);
-pub const GU_SYNC_LIST = 3;
-pub const GU_VERTICES_BITS = GU_VERTICES(8);
-pub const GU_SPRITES = 6;
-pub const GU_TAIL = 0;
-pub const GU_DST_COLOR = 0;
-pub const GU_CW = 0;
-pub const GU_TEXTURE_BITS = GU_TEXTURE_SHIFT(3);
-pub const GU_HEAD = 1;
-pub const GU_PATCH_FACE = 20;
-pub const GU_DEPTH_TEST = 1;
-pub const GU_TEXTURE_2D = 9;
-pub const GU_LINEAR = 1;
-pub const GU_SYNC_SIGNAL = 1;
-pub const GU_SYNC_WHAT_DRAW = 2;
-pub const GU_LEQUAL = 5;
-pub const GU_LINEAR_MIPMAP_NEAREST = 5;
-pub const GU_LINE_STRIP = 2;
-pub const UINT_FAST64_MAX = __UINT_FAST64_MAX__;
-pub const GU_INVERTED = 10;
-pub const GU_WEIGHT_8BIT = GU_WEIGHT_SHIFT(1);
-pub inline fn GU_TEXTURE_SHIFT(n: var) @TypeOf(n << 0) {
-    return n << 0;
+
+pub fn rgba(r: u8, g: u8, b: u8, a: u8) u32 {
+    argb(a, r, g, b)
 }
-pub const GU_SRC_COLOR = 0;
-pub const GU_SUBTRACT = 1;
-pub const GU_CALLBACK_FINISH = 4;
-pub const GU_LIGHT1 = 12;
-pub const GU_TFX_BLEND = 2;
-pub const GU_VIEW = 1;
-pub const GU_NOR = 8;
-pub const GU_AND_INVERTED = 4;
-pub const GU_SYNC_WHAT_CANCEL = 4;
-pub inline fn GU_RGBA(r: var, g: var, b: var, a: var) @TypeOf(GU_ARGB(a, r, g, b)) {
-    return GU_ARGB(a, r, g, b);
+
+pub fn color(r: f32, g: f32, b: f32, a: f32) u32 {
+    rgba(
+        (r * 255.0) as u8,
+        (g * 255.0) as u8,
+        (b * 255.0) as u8,
+        (a * 255.0) as u8,
+    )
 }
-pub const GU_EQUAL = 2;
-pub const GU_POSITION = 0;
-pub const GU_WEIGHT_BITS = GU_WEIGHT_SHIFT(3);
-pub const GU_LINEAR_MIPMAP_LINEAR = 7;
-pub const GU_POINTLIGHT = 1;
-pub const GU_PATCH_CULL_FACE = 16;
-pub const GU_WEIGHT_16BIT = GU_WEIGHT_SHIFT(2);
-pub const GU_GREATER = 6;
-pub inline fn GU_WEIGHT_SHIFT(n: var) @TypeOf(n << 9) {
-    return n << 9;
-}
-pub const GU_FLAT = 0;
-pub const GU_TEXTURE_CONST = 1;
-pub const GU_ABS = 5;
-pub const GU_REVERSE_SUBTRACT = 2;
-pub const GU_AND_REVERSE = 2;
-pub const GU_LESS = 4;
-pub const GU_CULL_FACE = 5;
-pub const GU_TFX_DECAL = 1;
-pub const GU_WEIGHT_32BITF = GU_WEIGHT_SHIFT(3);
-pub const GU_SYNC_SEND = 4;
-pub const GU_TEXTURE_COORDS = 0;
-pub const GU_TRIANGLES = 3;
-pub const GU_COLOR_BITS = GU_COLOR_SHIFT(7);
-pub const GU_AMBIENT = 1;
-pub const GU_VERTEX_8BIT = GU_VERTEX_SHIFT(1);
-pub const GU_ALPHA_TEST = 0;
-pub const GU_OR_REVERSE = 11;
-pub const GU_TRANSFORM_BITS = GU_TRANSFORM_SHIFT(1);
-pub const GU_NORMAL_8BIT = GU_NORMAL_SHIFT(1);
-pub const GU_COLOR_5650 = GU_COLOR_SHIFT(4);
-pub const GU_SYNC_WAIT = 0;
-pub const GU_TEXTURE_SLOPE = 2;
-pub const GU_TFX_ADD = 4;
-pub const GU_DITHER = 6;
-pub const GU_UV = 1;
-pub inline fn GU_INDEX_SHIFT(n: var) @TypeOf(n << 11) {
-    return n << 11;
-}
-pub const GU_SYNC_DONE = 2;
-pub const GU_MIN = 3;
-pub const GU_OPEN_FILL = 1;
-pub inline fn GU_ABGR(a: var, b: var, g: var, r: var) @TypeOf((a << 24) | ((b << 16) | ((g << 8) | r))) {
-    return (a << 24) | ((b << 16) | ((g << 8) | r));
-}
-pub const GU_EQUIV = 9;
-pub const GU_CALLBACK_SIGNAL = 1;
-pub const GU_ALWAYS = 1;
-pub const GU_CLEAR = 0;
-pub const GU_INDEX_16BIT = GU_INDEX_SHIFT(2);
-pub const GU_COLOR_4444 = GU_COLOR_SHIFT(6);
-pub const GU_POINTS = 0;
-pub const GU_COLOR_TEST = 17;
-pub const GU_NEAREST = 0;
-pub const GU_NORMAL = 3;
-pub const GU_CCW = 1;
-pub const GU_MAX = 4;
-pub const GU_LINE_SMOOTH = 15;
-pub const GU_STENCIL_BUFFER_BIT = 2;
-pub const GU_SRC_ALPHA = 2;
-pub const GU_LIGHT0 = 11;
-pub inline fn GU_WEIGHTS(n: var) @TypeOf(((n - 1) & 7) << 14) {
-    return ((n - 1) & 7) << 14;
-}
-pub const GU_ZERO = 1;
-pub const GU_AND = 1;
-pub const GU_TRUE = 1;
-pub const GU_SYNC_WHAT_QUEUED = 1;
-pub const GU_NEVER = 0;
-pub const GU_FAST_CLEAR_BIT = 16;
-pub const GU_INCR = 4;
-pub const GU_NEAREST_MIPMAP_LINEAR = 6;
-pub const GU_COLOR_BUFFER_BIT = 1;
-pub const GU_ADD = 0;
-pub const GU_TEXTURE_MATRIX = 1;
-pub const GU_XOR = 6;
-pub inline fn GU_VERTEX_SHIFT(n: var) @TypeOf(n << 7) {
-    return n << 7;
-}
-pub const GU_DEPTH_BUFFER_BIT = 4;
-pub const GU_NORMAL_16BIT = GU_NORMAL_SHIFT(2);
-pub const GU_CALL = 1;
-pub const GU_COPY = 3;
-pub const GU_ONE_MINUS_SRC_COLOR = 1;
-pub const GU_PI = @as(f32, 3.141593);
+
+pub const ClearBitFlags = extern enum(c_int){
+    ColorBuffer = 1,
+    StencilBuffer = 2,
+    DepthBuffer = 4,
+    FastClear = 16,
+};
+
+pub const LightBitFlags = extern enum(c_int){
+    Ambient = 1,
+    Diffuse = 2,
+    Specular = 4,
+    Unknown = 8,
+};
+
+pub const VertexTypeFlags = extern enum(c_int){
+    Texture8Bit = 1,
+    Texture16Bit = 2,
+    Texture32Bitf = 3,
+    Color5650 = 4 << 2,
+    Color5551 = 5 << 2,
+    Color4444 = 6 << 2,
+    Color8888 = 7 << 2,
+    Normal8Bit = 1 << 5,
+    Normal16Bit = 2 << 5,
+    Normal32Bitf = 3 << 5,
+    Vertex8Bit = 1 << 7,
+    Vertex16Bit = 2 << 7,
+    Vertex32Bitf = 3 << 7,
+    Weight8Bit = 1 << 9,
+    Weight16Bit = 2 << 9,
+    Weight32Bitf = 3 << 9,
+    Index8Bit = 1 << 11,
+    Index16Bit = 2 << 11,
+    Transform2D = 1 << 23,
+    Transform3D = 0,
+};
