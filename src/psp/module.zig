@@ -63,7 +63,9 @@ pub fn _module_main_thread(argc: SceSize, argv: ?*c_void) callconv(.C) c_int {
     return 0;
 }
 
-
+comptime{
+    asm(@embedFile("./stub.S"));
+}
 
 pub const module_start_struct = struct {
     export fn module_start(argc: c_uint, argv: ?*c_void) c_int {

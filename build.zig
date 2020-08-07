@@ -29,9 +29,6 @@ pub fn build(b: *Builder) void {
     //Build from your main file!
     const exe = b.addObject("main", "src/main.zig");
 
-    //TODO: Remove Stub.c
-    exe.addCSourceFile("src/psp/stub.c", &[_][]const u8{"-DPSP_ZIG_APP_VER_MAJ=1", "-DPSP_ZIG_APP_VER_MIN=0", "-DPSP_ZIG_APP_NAME=" ++ psp_app_name, "-pedantic", "-Wall", "-Werror"});
-
     //Output to zig cache for now
     exe.setOutputDir("zig-cache/");
     

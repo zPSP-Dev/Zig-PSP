@@ -22,7 +22,7 @@ Zig-PSP has **no reliance** on the legacy toolchain - it only relies on tools fr
 - [x] Basic Error handling
 - [x] Convert GU to enums
 - [x] Panic Support
-- [ ] Remove the C stub file!
+- [x] Remove the C stub file!
 - [ ] Include basic examples!
 - [ ] Stack Traces
 - [ ] STD Support (maybe even upstream?)
