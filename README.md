@@ -20,10 +20,11 @@ Zig-PSP has **no reliance** on the legacy toolchain - it only relies on tools fr
 - [x] Basic PSP Memory Allocator
 - [x] Basic PSP VRAM Allocator
 - [x] Basic Error handling
-- [ ] Convert GU to enums
+- [x] Convert GU to enums
+- [x] Panic Support
 - [ ] Remove the C stub file!
 - [ ] Include basic examples!
-- [ ] Panic & Stack Traces
+- [ ] Stack Traces
 - [ ] STD Support (maybe even upstream?)
 
 ## Dependencies

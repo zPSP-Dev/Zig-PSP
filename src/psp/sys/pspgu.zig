@@ -150,7 +150,7 @@ pub const GuState = extern enum(c_int) {
     FaceNormalReverse = 19,
     PatchFace = 20,
     Fragment2X = 21,
-}
+};
 
 pub const MatrixMode = extern enum(c_int) {
     Projection = 0,
@@ -366,30 +366,30 @@ pub const GuCallbackId = extern enum(c_int) {
     Finish = 4,
 };
 
-pub enum SignalBehavior = extern enum(c_int) {
+pub const SignalBehavior = extern enum(c_int) {
     Suspend = 1,
     Continue = 2,
 };
 
 pub fn abgr(a: u8, b: u8, g: u8, r: u8) u32 {
-    return (r as u32) | ((g as u32) << 8) | ((b as u32) << 16) | ((a as u32) << 24)
+    return (r) | ((g) << 8) | ((b) << 16) | ((a) << 24);
 }
 
 pub fn argb(a: u8, r: u8, g: u8, b: u8) u32 {
-    abgr(a, b, g, r)
+    abgr(a, b, g, r);
 }
 
 pub fn rgba(r: u8, g: u8, b: u8, a: u8) u32 {
-    argb(a, r, g, b)
+    argb(a, r, g, b);
 }
 
 pub fn color(r: f32, g: f32, b: f32, a: f32) u32 {
     rgba(
-        (r * 255.0) as u8,
-        (g * 255.0) as u8,
-        (b * 255.0) as u8,
-        (a * 255.0) as u8,
-    )
+        @as(u8, (r * 255.0)),
+        @as(u8, (g * 255.0)),
+        @as(u8, (b * 255.0)),
+        @as(u8, (a * 255.0))
+    );
 }
 
 pub const ClearBitFlags = extern enum(c_int){

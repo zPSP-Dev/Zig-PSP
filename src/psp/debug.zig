@@ -3,6 +3,9 @@ usingnamespace @import("sys/pspge.zig");
 usingnamespace @import("sys/pspdisplay.zig");
 usingnamespace @import("sys/pspstdio.zig");
 usingnamespace @import("sys/pspiofilemgr.zig");
+usingnamespace @import("sys/pspthreadman.zig");
+usingnamespace @import("sys/psploadexec.zig");
+const builtin = @import("builtin");
 
 var x : u8 = 0;
 var y : u8 = 0;
@@ -105,9 +108,7 @@ pub fn printFormat(comptime fmt: []const u8, args: var) !void {
     print(string);
 }
 
-extern var _acmsxfont: [2049]u8;
-
-extern fn internal_msx_glyph(i: usize) u8;
+const msxFont = @embedFile("./msxfont.bin");
 
 fn internal_putchar(cx: u32, cy: u32, ch: u8) void{
     var off : usize = cx + (cy * SCR_BUF_WIDTH);
@@ -122,7 +123,7 @@ fn internal_putchar(cx: u32, cy: u32, ch: u8) void{
             const mask : u32 = 128;
 
             var idx : u32 = @as(u32, ch) * 8 + i;
-            var glyph : u8 = _acmsxfont[idx];
+            var glyph : u8 = msxFont[idx];
             
             if( (glyph & (mask >> @intCast(@import("std").math.Log2Int(c_int), j))) != 0 ){
                 vram_base.?[j + i * SCR_BUF_WIDTH + off] = fg_col;
@@ -136,3 +137,15 @@ fn internal_putchar(cx: u32, cy: u32, ch: u8) void{
 }
 
 //ADD MORE STUFF HERE LIKE BENCHMARKING, ERROR HANDLING, PROFILING, ETC.
+
+pub fn panic(message: []const u8, stack_trace: ?*builtin.StackTrace) noreturn {
+    screenInit();
+    print("\n!!! PSP HAS PANICKED !!!\n");
+    print("REASON: ");
+    print(message);
+    print("\nZig-PSP doesn't support stack traces - yet.\n");
+    print("Exiting in 10 seconds...");
+    var stat = sceKernelDelayThread(1000 * 1000 * 10);
+    sceKernelExitGame();
+    while(true){}
+}

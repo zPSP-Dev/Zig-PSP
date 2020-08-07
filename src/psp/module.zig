@@ -4,8 +4,17 @@ usingnamespace @import("sys/psptypes.zig");
 
 usingnamespace @import("debug.zig");
 usingnamespace @import("utils.zig");
+
+const builtin = @import("builtin");
 const root = @import("root");
 const std = @import("std");
+
+pub fn exitErr() void {
+    //Hang for 10 seconds for error reporting
+    var stat = sceKernelDelayThread(10 * 1000 * 1000);
+    //Exit out.
+    sceKernelExitGame();
+}
 
 pub fn _module_main_thread(argc: SceSize, argv: ?*c_void) callconv(.C) c_int {
     switch (@typeInfo(@TypeOf(root.main).ReturnType)) {
@@ -27,21 +36,15 @@ pub fn _module_main_thread(argc: SceSize, argv: ?*c_void) callconv(.C) c_int {
 
                 //Will fail to print if the error is an OOM
                 var psp_allocator = &PSPAllocator.init().allocator;
-                const string = std.fmt.allocPrint(psp_allocator, "error caught: {}\n", .{@errorName(err)}) catch unreachable;
-                print(string);
+                print("ERROR CAUGHT: ");
+                print(@errorName(err));
 
                 //TODO: DUMP STACK TRACE
                 //if (@errorReturnTrace()) |trace| {
                 //    std.debug.dumpStackTrace(trace.*);
                 //}
                 
-                //EXIT STRATEGY:
-
-                //Hang for 10 seconds for error reporting
-                var stat = sceKernelDelayThread(10 * 1000 * 1000);
-
-                //Exit out.
-                sceKernelExitGame();
+                exitErr();
                 return 1;
             };
             switch (@typeInfo(@TypeOf(result))) {
@@ -59,6 +62,8 @@ pub fn _module_main_thread(argc: SceSize, argv: ?*c_void) callconv(.C) c_int {
     }
     return 0;
 }
+
+
 
 pub const module_start_struct = struct {
     export fn module_start(argc: c_uint, argv: ?*c_void) c_int {
