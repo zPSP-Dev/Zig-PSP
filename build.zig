@@ -22,9 +22,9 @@ pub fn build(b: *Builder) void {
         .cpu_model = .{ .explicit = &std.Target.mips.cpu.mips2 }
     };
 
-    // Standard release options allow the person running `zig build` to select
-    // between Debug, ReleaseSafe, ReleaseFast, and ReleaseSmall.
-    const mode = b.standardReleaseOptions();
+    //All of the release modes work
+    //Debug Mode can cause issues with trap instructions
+    const mode = builtin.Mode.ReleaseSafe;
 
     //Build from your main file!
     const exe = b.addObject("main", "src/main.zig");

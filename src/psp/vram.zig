@@ -9,13 +9,21 @@ var vramOff : usize = 0;
 //Get the amount of memory needed
 fn getMemSize(width: u32, height: u32, format: GuPixelMode) c_uint {
     switch(format){
-        GuPixelMode.PsmT4 => return width * height / 2,
+        .PsmT4 => {
+            return width * height / 2;
+        },
 
-        GuPixelMode.PsmT8 => return width * height,
+        .PsmT8 => {
+            return width * height;
+        },
 
-        GuPixelMode.Psm5650, GuPixelMode.Psm5551, GuPixelMode.Psm4444, GuPixelMode.PsmT16 => return 2 * width * height,
-        
-        GuPixelMode.Psm8888, GuPixelMode.PsmT32 => return 4 * width * height,
+        .Psm5650, .Psm5551, .Psm4444, .PsmT16 => {
+            return width * height * 2;
+        },
+
+        .Psm8888, .PsmT32 => {
+            return width * height * 4;
+        },
         
         else => return 0
     }
@@ -24,12 +32,12 @@ fn getMemSize(width: u32, height: u32, format: GuPixelMode) c_uint {
 //Allocate a buffer of VRAM in VRAM-Relative pointers (0 is 0x04000000)
 pub fn allocVramRelative(width: u32, height: u32, format: GuPixelMode) *c_void {
     var res = vramOff;
-    vramOff += getMemSize(width, height, format);
+    vramOff += getMemSize(width, height, format) * 2;
 
-    return @intToPtr(vramOff);
+    return @intToPtr(*c_void, vramOff);
 }
 
 //Allocate a buffer of VRAM in VRAM-Absolute pointers (0x04000000 start)
 pub fn allocVramAbsolute(width: u32, height: u32, format: GuPixelMode) *c_void {
-    return @intToPtr(@ptrToInt(allocVramDirect(width, height, format)) + @ptrToInt(sceGeEdramGetAddr));
+    return @intToPtr(*c_void, @ptrToInt(allocVramDirect(width, height, format)) + @ptrToInt(sceGeEdramGetAddr));
 }

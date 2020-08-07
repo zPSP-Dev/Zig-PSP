@@ -22,13 +22,14 @@ Zig-PSP has **no reliance** on the legacy toolchain - it only relies on tools fr
 - [x] Panic Support
 - [x] Remove C dependencies!
 - [x] Documentation for the custom modules.
+- [ ] GFX Library
+- [ ] Profiling
 - [ ] Include basic examples!
 - [ ] Initial Release!
 
 ## Future Ideas
 - [ ] Stack Traces
 - [ ] Self-hosted tools
-- [ ] Profiling
 - [ ] CPU-level analysis and benchmarking
 - [ ] STD Custom OS Support
 - [ ] STD Upstream Support
@@ -47,18 +48,19 @@ Currently, using Zig-PSP is rather straight forward - one must use the psp folde
 For a main.zig file one should include something like:
 
 ```zig
+//A simple hello world
+
 const psp = @import("psp/pspsdk.zig");
 
-//Required to export program entrypoint.
 comptime {
     _ = psp.module_start_struct;
 }
 
-export fn main() void {
-     psp.utils.enableHomeButton();
+pub fn main() !void {
+    psp.utils.enableHomeButton();
+    psp.debug.screenInit();
 
-     psp.debug.screenInit();
-     psp.debug.screenPrint("Hello PSP, this is Zig!");
+    psp.debug.print("Hello from Zig!");
 }
 ```
 
