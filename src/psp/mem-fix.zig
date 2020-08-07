@@ -1,7 +1,7 @@
 //Why are these needed?
 //Good question - they're core features needed by libpsp.a (the Rust core allocator for Rust applications)
 //This satisfies linker issues...
-//Possibly this should be included in the allocator
+//Aside from that - there's no reason for them to exist.
 
 export fn memset(ptr: [*]u8, value: u32, num: usize) [*]u8{
     var i : usize = 0;

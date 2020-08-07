@@ -9,6 +9,7 @@ const builtin = @import("builtin");
 const root = @import("root");
 const std = @import("std");
 
+//If there's an issue this is the internal exit (wait 10 seconds and exit).
 pub fn exitErr() void {
     //Hang for 10 seconds for error reporting
     var stat = sceKernelDelayThread(10 * 1000 * 1000);
@@ -16,6 +17,7 @@ pub fn exitErr() void {
     sceKernelExitGame();
 }
 
+//This calls your main function as a thread.
 pub fn _module_main_thread(argc: SceSize, argv: ?*c_void) callconv(.C) c_int {
     switch (@typeInfo(@TypeOf(root.main).ReturnType)) {
         .NoReturn => {
@@ -63,11 +65,14 @@ pub fn _module_main_thread(argc: SceSize, argv: ?*c_void) callconv(.C) c_int {
     return 0;
 }
 
+//This includes the module stub assembly which is required - cannot be done in Zig afaik.
 comptime{
     asm(@embedFile("./stub.S"));
 }
 
+//This structure exists in order to guarantee module_start is included - which is the PSP entry point.
 pub const module_start_struct = struct {
+    //Entry point - launches main through the thread above.
     export fn module_start(argc: c_uint, argv: ?*c_void) c_int {
         var thid : SceUID = 0;
         thid = sceKernelCreateThread("user_main", _module_main_thread, 0x20, 256 * 1024, @enumToInt(PspThreadAttributes.PSP_THREAD_ATTR_USER) | @enumToInt(PspThreadAttributes.PSP_THREAD_ATTR_VFPU), 0);

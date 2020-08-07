@@ -13,23 +13,23 @@ Zig-PSP has **no reliance** on the legacy toolchain - it only relies on tools fr
 - [x] PSP PRX Generation
 - [x] All PSP Userland Library Symbols
 - [x] Full `build.zig` build script
-- [x] Remove all dependencies on PSPSDK headers
-- [x] Remove all dependencies on Newlib
+- [x] Remove all dependencies on PSPSDK headers & Newlib
 - [x] Basic PSP Debug Printing
 - [x] Remove dependency on Rust-PSP installs.
-- [x] Basic PSP Memory Allocator
-- [x] Basic PSP VRAM Allocator
-- [x] Basic Error handling
-- [x] Convert GU to enums
+- [x] Basic PSP Memory & VRAM Allocator
+- [x] Basic Error handling on Main
+- [x] Fixup enums
 - [x] Panic Support
-- [x] Remove the C stub file!
+- [x] Remove C dependencies!
+- [x] Documentation for the custom modules.
 - [ ] Include basic examples!
-- [ ] Documentation for the custom modules.
 - [ ] Initial Release!
 
 ## Future Ideas
 - [ ] Stack Traces
 - [ ] Self-hosted tools
+- [ ] Profiling
+- [ ] CPU-level analysis and benchmarking
 - [ ] STD Custom OS Support
 - [ ] STD Upstream Support
 - [ ] Remove Reliance on Rust libpsp.a?
@@ -38,7 +38,7 @@ Zig-PSP has **no reliance** on the legacy toolchain - it only relies on tools fr
 
 The only true external dependency that this library requires is the lld linker for LLVM. This is required purely because the build script cannot pass the -emit-relocs flag to generate an ELF. [See The Issue Here](https://github.com/ziglang/zig/issues/5986)
 
-Zig-PSP also relies on binary tools from Rust-PSP and the static library, which are included with the download by default.
+Zig-PSP also relies on binary tools from Rust-PSP and the static library, which are included with the download by default. There are plans to make these tools self hosted, even if the library may not be.
 
 ## Usage
 

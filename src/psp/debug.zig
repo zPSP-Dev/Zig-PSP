@@ -7,24 +7,29 @@ usingnamespace @import("sys/pspthreadman.zig");
 usingnamespace @import("sys/psploadexec.zig");
 const builtin = @import("builtin");
 
+//Internal variables for the screen
 var x : u8 = 0;
 var y : u8 = 0;
 var vram_off: i32 = 0;
 var vram_base: ?[*]u32 = null;
 
+//Gets your "cursor" X position
 pub fn screenGetX() u8 {
     return x;
 }
 
+//Gets your "cursor" Y position
 pub fn screenGetY() u8 {
     return y;
 }
 
+//Sets the "cursor" position
 pub fn screenSetXY(sX : u8, sY : u8) void{
     x = sX;
     y = sY;
 }
 
+//Clears the screen to the clear color (default is black)
 pub fn screenClear() void{
     var i: usize = 0;
     while (i < SCR_BUF_WIDTH * SCREEN_HEIGHT) : (i += 1) {
@@ -32,31 +37,39 @@ pub fn screenClear() void{
     }
 }
 
+//Color variables
 var cl_col : u32 = 0xFF000000;
 var bg_col : u32 = 0x00000000;
 var fg_col : u32 = 0xFFFFFFFF;
 
+//Set the background color
 pub fn screenSetClearColor(color: u32) void{
     cl_col = color;
 }
 
 var back_col_enable : bool = false;
 
+//Enable text highlight
 pub fn screenEnableBackColor() void {
     back_col_enable = true;
 }
 
+//Disable text highlight
 pub fn screenDisableBackColor() void {
     back_col_enable = false;
 }
 
+//Set highlight color
 pub fn screenSetBackColor(color: u32) void{
     bg_col = color;
 }
+
+//Set text color
 pub fn screenSetFrontColor(color: u32) void{
     fg_col = color;
 }
 
+//Initialize the screen
 pub fn screenInit() void {
     x = 0;
     y = 0;
@@ -71,6 +84,7 @@ pub fn screenInit() void {
     screenClear();
 }
 
+//Print out a constant string
 pub fn print(text: []const u8) void {
     var i : usize = 0;
     while(i < text.len) : (i += 1){
@@ -99,6 +113,7 @@ pub fn print(text: []const u8) void {
 usingnamespace @import("utils.zig");
 const std = @import("std");
 
+//Print with formatting via the default PSP allocator
 pub fn printFormat(comptime fmt: []const u8, args: var) !void {
     var psp_allocator = &PSPAllocator.init().allocator;
 
@@ -108,8 +123,10 @@ pub fn printFormat(comptime fmt: []const u8, args: var) !void {
     print(string);
 }
 
+//Our font
 const msxFont = @embedFile("./msxfont.bin");
 
+//Puts a character to screen
 fn internal_putchar(cx: u32, cy: u32, ch: u8) void{
     var off : usize = cx + (cy * SCR_BUF_WIDTH);
     
@@ -136,10 +153,13 @@ fn internal_putchar(cx: u32, cy: u32, ch: u8) void{
 
 }
 
-//ADD MORE STUFF HERE LIKE BENCHMARKING, ERROR HANDLING, PROFILING, ETC.
+usingnamespace @import("module.zig");
 
+//Meme panic
 pub var pancakeMode : bool = false;
 
+//Panic handler
+//Import this in main to use!
 pub fn panic(message: []const u8, stack_trace: ?*builtin.StackTrace) noreturn {
     screenInit();
     
@@ -154,7 +174,9 @@ pub fn panic(message: []const u8, stack_trace: ?*builtin.StackTrace) noreturn {
     print(message);
     print("\nZig-PSP doesn't support stack traces - yet.\n");
     print("Exiting in 10 seconds...");
-    var stat = sceKernelDelayThread(1000 * 1000 * 10);
-    sceKernelExitGame();
+    
+    exitErr();
     while(true){}
 }
+
+//ADD MORE STUFF HERE LIKE BENCHMARKING, CPU PROFILING, ETC.
