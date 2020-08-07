@@ -138,9 +138,18 @@ fn internal_putchar(cx: u32, cy: u32, ch: u8) void{
 
 //ADD MORE STUFF HERE LIKE BENCHMARKING, ERROR HANDLING, PROFILING, ETC.
 
+pub var pancakeMode : bool = false;
+
 pub fn panic(message: []const u8, stack_trace: ?*builtin.StackTrace) noreturn {
     screenInit();
-    print("\n!!! PSP HAS PANICKED !!!\n");
+    
+    if(pancakeMode){
+        //For @mrneo240
+        print("!!! PSP HAS PANCAKED !!!\n");
+    }else{
+        print("!!! PSP HAS PANICKED !!!\n");
+    }
+    
     print("REASON: ");
     print(message);
     print("\nZig-PSP doesn't support stack traces - yet.\n");

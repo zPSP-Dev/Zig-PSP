@@ -9,7 +9,7 @@ In the PSP programming community, many libraries, tools, and other features are 
 
 Zig-PSP has **no reliance** on the legacy toolchain - it only relies on tools from the excellent and brand new [Rust PSP](https://github.com/overdrivenpotato/rust-psp) toolchain, which is completely feature equivalent for User Mode! These are included with the download. (No Rust needed!)
 
-## Road to 1.0!
+## Road to Release!
 - [x] PSP PRX Generation
 - [x] All PSP Userland Library Symbols
 - [x] Full `build.zig` build script
@@ -24,8 +24,15 @@ Zig-PSP has **no reliance** on the legacy toolchain - it only relies on tools fr
 - [x] Panic Support
 - [x] Remove the C stub file!
 - [ ] Include basic examples!
+- [ ] Documentation for the custom modules.
+- [ ] Initial Release!
+
+## Future Ideas
 - [ ] Stack Traces
-- [ ] STD Support (maybe even upstream?)
+- [ ] Self-hosted tools
+- [ ] STD Custom OS Support
+- [ ] STD Upstream Support
+- [ ] Remove Reliance on Rust libpsp.a?
 
 ## Dependencies
 

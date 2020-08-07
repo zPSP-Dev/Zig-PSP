@@ -5,16 +5,12 @@ comptime {
     _ = psp.module_start_struct;
 }
 
-const MyTestErrors = error{
-    LolWhatsAnError,
-};
-
-
 fn addOne(x: u8) u8 {
     return x + 1;
 }
 
 pub fn main() !void {
+    psp.debug.pancakeMode = true;
     psp.utils.enableHomeButton();
     psp.debug.screenInit();
 
