@@ -5,3 +5,4 @@ zig-cache
 *.PBP
 *.prx
 *.log
+.DS_STORE
