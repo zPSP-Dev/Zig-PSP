@@ -15,11 +15,15 @@ const snd0 = "NULL"; //REPLACE WITH PATH TO SND0.AT3 Music
 
 pub fn build(b: *Builder) void {
     
+    var feature_set : std.Target.Cpu.Feature.Set = std.Target.Cpu.Feature.Set.empty;
+    feature_set.addFeature(@enumToInt(std.Target.mips.Feature.single_float));
+
     //PSP-Specific Build Options
     const target = z.CrossTarget{
         .cpu_arch = .mipsel,
         .os_tag = .freestanding,
-        .cpu_model = .{ .explicit = &std.Target.mips.cpu.mips2 }
+        .cpu_model = .{ .explicit = &std.Target.mips.cpu.mips2 },
+        .cpu_features_add = feature_set
     };
 
     //All of the release modes work

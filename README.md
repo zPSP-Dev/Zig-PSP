@@ -22,15 +22,15 @@ Zig-PSP has **no reliance** on the legacy toolchain - it only relies on tools fr
 - [x] Panic Support
 - [x] Remove C dependencies!
 - [x] Documentation for the custom modules.
+- [x] Benchmarking
+- [x] Include basic examples!
 - [ ] GFX Library
-- [ ] Profiling
-- [ ] Include basic examples!
 - [ ] Initial Release!
 
 ## Future Ideas
 - [ ] Stack Traces
 - [ ] Self-hosted tools
-- [ ] CPU-level analysis and benchmarking
+- [ ] CPU-level analysis and profiling
 - [ ] STD Custom OS Support
 - [ ] STD Upstream Support
 - [ ] Remove Reliance on Rust libpsp.a?

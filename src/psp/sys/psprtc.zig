@@ -23,8 +23,8 @@ pub const enum_pspRtcCheckValidErrors = extern enum(c_int) {
     PSP_TIME_INVALID_MICROSECONDS = -7,
     _,
 };
-pub extern fn sceRtcGetTickResolution(...) u32_3;
-pub extern fn sceRtcGetCurrentTick(tick: [*c]u64_4) c_int;
+pub extern fn sceRtcGetTickResolution(...) u32;
+pub extern fn sceRtcGetCurrentTick(tick: [*c]u64) c_int;
 pub extern fn sceRtcGetCurrentClock(time: [*c]pspTime, tz: c_int) c_int;
 pub extern fn sceRtcGetCurrentClockLocalTime(time: [*c]pspTime) c_int;
 pub extern fn sceRtcConvertUtcToLocalTime(tickUTC: [*c]const u64_4, tickLocal: [*c]u64_4) c_int;
