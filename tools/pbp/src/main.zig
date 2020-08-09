@@ -2,6 +2,7 @@ const std = @import("std");
 const process = std.process;
 const pack = @import("pack.zig");
 const analyze = @import("analyze.zig");
+const unpack = @import("unpack.zig");
 
 pub fn main() !void {
     std.debug.warn("zPBPTool Utility made by zPSP-Dev!\n\n", .{});
@@ -37,6 +38,10 @@ pub fn main() !void {
 
     if(std.mem.eql(u8, optionSelected, "analyze")){
         try analyze.analyzePBP();
+    }
+
+    if(std.mem.eql(u8, optionSelected, "unpack")){
+        try unpack.unpackPBP();
     }
 
 }
