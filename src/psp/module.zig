@@ -36,11 +36,11 @@ pub fn _module_main_thread(argc: SceSize, argv: ?*c_void) callconv(.C) c_int {
         .ErrorUnion => {
             const result = root.main() catch |err| {
 
-                //Will fail to print if the error is an OOM
-                var psp_allocator = &PSPAllocator.init().allocator;
                 print("ERROR CAUGHT: ");
                 print(@errorName(err));
 
+                print("\nZig-PSP doesn't support stack traces - yet.\n");
+                print("Exiting in 10 seconds...");
                 //TODO: DUMP STACK TRACE
                 //if (@errorReturnTrace()) |trace| {
                 //    std.debug.dumpStackTrace(trace.*);
