@@ -1,14 +1,13 @@
-<h1 align="center">z-PBPTool</h1>
-<p align="center">A cross-platform PBP multi-tool</p>
+<h1 align="center">zPBPTool</h1>
+<p align="center">A cross-platform multi-tool for packing, unpacking, and analyzing PSP PBP files.</p>
 
-## Why z-PBPTool?
+## Why zPBPTool?
 This tool is meant to ship with the [Zig-PSP Toolchain](https://github.com/zPSP-Dev/Zig-PSP).
 
-z-PBPTool replaces PSPSDK's `pack-pbp` and `unpack-pbp` and offers both functionalities.
-In addition to this - it also can be used to analyze a PBP without extracting.
+zPBPTool replaces PSPSDK's `pack-pbp` and `unpack-pbp` tools. In addition to this - it also can be used to analyze a PBP without extracting.
 
 ## Usage
-z-PBPTool is used internally by Zig-PSP's build process to create a PBP. It also can be used standalone.
+zPBPTool is used internally by Zig-PSP's build process to create a PBP. It also can be used standalone.
 
 To use it standalone, you can use `pbptool pack`, `pbptool unpack`, and `pbptool analyze`.
 
