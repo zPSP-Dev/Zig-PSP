@@ -68,9 +68,7 @@ pub fn main() !void {
     //Get our output file - if it doesn't exist - error out
     var outputName = try (arg_it.next(allocator) orelse{
         std.debug.warn("Usage: pack-pbp <output.pbp> <param.sfo> <icon0.png> <icon1.pmf> <pic0.png> <pic1.png> <snd0.at3> <data.psp> <data.psar>\n\n", .{});
-        
-        std.debug.warn("Could not find an PBP filename.\n", .{});
-        return error.NoPBP;
+        return;
     });
 
     if(std.mem.eql(u8, outputName, "-h")){
