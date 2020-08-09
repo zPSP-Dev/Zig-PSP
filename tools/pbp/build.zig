@@ -3,9 +3,9 @@ const builtin = @import("builtin");
 
 pub fn build(b: *Builder) void {
     const target = b.standardTargetOptions(.{});
-    const mode = builtin.Mode.ReleaseSafe;
+    const mode = builtin.Mode.Debug;
 
-    const exe = b.addExecutable("z-pack-pbp", "src/main.zig");
+    const exe = b.addExecutable("pbptool", "src/main.zig");
     exe.setTarget(target);
     exe.setBuildMode(mode);
     exe.install();
