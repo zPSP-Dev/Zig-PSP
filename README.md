@@ -24,12 +24,12 @@ Zig-PSP has **no reliance** on the legacy toolchain - it only relies on tools fr
 - [x] Documentation for the custom modules.
 - [x] Benchmarking
 - [x] Include basic examples!
-- [ ] GFX Library
+- [ ] Self-hosted tools
+- [ ] GFX Library Fixes
 - [ ] Initial Release!
 
 ## Future Ideas
 - [ ] Stack Traces
-- [ ] Self-hosted tools
 - [ ] CPU-level analysis and profiling
 - [ ] STD Custom OS Support
 - [ ] STD Upstream Support
