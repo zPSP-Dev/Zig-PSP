@@ -1,8 +1,4 @@
 <h1 align="center">Zig-PSP</h1>
-
-<p align="center">
-<img src="https://github.com/zPSP-Dev/Zig-PSP/raw/master/ZigPSP_logo.png" data-canonical-src="https://github.com/zPSP-Dev/Zig-PSP/raw/master/ZigPSP_logo.png" width="512" height="192" /></p>
-
 <p align="center">A project to bring Zig to the Sony PlayStation Portable</p>
 
 ## Why Zig on the PSP?
