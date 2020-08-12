@@ -7,7 +7,7 @@ In the PSP programming community, many libraries, tools, and other features are 
 
 ## What about the PSPSDK?
 
-Zig-PSP has **no reliance** on the legacy toolchain - it only relies on tools from the excellent and brand new [Rust PSP](https://github.com/overdrivenpotato/rust-psp) toolchain, which is completely feature equivalent for User Mode! These are included with the download. (No Rust needed!)
+Zig-PSP has **no reliance** on the legacy toolchain.
 
 ## Road to Release!
 - [x] PSP PRX Generation
@@ -25,15 +25,12 @@ Zig-PSP has **no reliance** on the legacy toolchain - it only relies on tools fr
 - [x] Benchmarking
 - [x] Include basic examples!
 - [ ] Self-hosted tools
-- [ ] GFX Library Fixes
+- [ ] Remove Reliance on Rust libpsp.a
 - [ ] Initial Release!
-
-## Future Ideas
 - [ ] Stack Traces
 - [ ] CPU-level analysis and profiling
 - [ ] STD Custom OS Support
 - [ ] STD Upstream Support
-- [ ] Remove Reliance on Rust libpsp.a?
 
 ## Dependencies
 
