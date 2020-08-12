@@ -54,9 +54,7 @@ pub usingnamespace @import("sys/pspvideocodec.zig");
 pub usingnamespace @import("sys/pspwlan.zig");
 
 //Smaller utilities
-pub usingnamespace @import("mem-fix.zig");
-pub usingnamespace @import("module.zig");
-pub usingnamespace @import("constants.zig");
-pub const debug = @import("debug.zig");
-pub const utils = @import("utils.zig");
-
+pub usingnamespace @import("utils/module.zig");
+pub usingnamespace @import("utils/constants.zig");
+pub const debug =  @import("utils/debug.zig");
+pub const utils =  @import("utils/utils.zig");
