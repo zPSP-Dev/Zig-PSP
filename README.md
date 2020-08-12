@@ -9,36 +9,9 @@
 
 In the PSP programming community, many libraries, tools, and other features are written in C or C++, which as we know has its problems with writing clean, reusable, and high quality code. Given that the core objectives of Zig as a language are to allow us to create well-designed and reusable software, Zig seems like a perfect fit for integrating older PSP libraries while striving to develop higher quality software!
 
-## What about the PSPSDK?
+## Installation Requirements
 
-Zig-PSP has **no reliance** on the legacy toolchain.
-
-## Road to Release!
-- [x] PSP PRX Generation
-- [x] All PSP Userland Library Symbols
-- [x] Full `build.zig` build script
-- [x] Remove all dependencies on PSPSDK headers & Newlib
-- [x] Basic PSP Debug Printing
-- [x] Remove dependency on Rust-PSP installs.
-- [x] Basic PSP Memory & VRAM Allocator
-- [x] Basic Error handling on Main
-- [x] Fixup enums
-- [x] Panic Support
-- [x] Remove C dependencies!
-- [x] Documentation for the custom modules.
-- [x] Benchmarking
-- [x] Include basic examples!
-- [ ] Self-hosted tools
-- [ ] Remove Reliance on Rust libpsp.a
-- [ ] Initial Release!
-- [ ] Stack Traces
-- [ ] CPU-level analysis and profiling
-- [ ] STD Custom OS Support
-- [ ] STD Upstream Support
-
-## Dependencies
-
-The only true external dependency that this library requires is the lld linker for LLVM. This is required purely because the build script cannot pass the -emit-relocs flag to generate an ELF. [See The Issue Here](https://github.com/ziglang/zig/issues/5986)
+The only other program required to use Zig-PSP is the lld linker for LLVM. This is required purely because the build script cannot pass the -emit-relocs flag to generate an ELF. [See The Issue Here](https://github.com/ziglang/zig/issues/5986)
 
 Zig-PSP also relies on binary tools included as submodules from the zPSP-Dev team.
 
@@ -74,7 +47,7 @@ In order to customize the EBOOT, one can look into the `build.zig` file and modi
 
 ## Documentation
 
-Currently Zig-PSP does not include documentation of the PSPSDK in the SDK's .zig files - but rather they are well documented for both [Rust](https://docs.rs/psp/) and [C](http://psp.jim.sh/pspsdk-doc/). These both have an excellent documentation of the same APIs, although you might prefer the C documentation as this project is closer to C than Rust.
+Currently Zig-PSP does not include documentation of the PSPSDK in the SDK's .zig files - but rather they are [well documented in C](http://psp.jim.sh/pspsdk-doc/). It is planned to add documentation in the future to resolve this
 
 ## Debugging
 
