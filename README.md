@@ -1,4 +1,7 @@
 <h1 align="center">Zig-PSP</h1>
+
+<img src=./ZigPSP_logo.png>
+
 <p align="center">A project to bring Zig to the Sony PlayStation Portable</p>
 
 ## Why Zig on the PSP?
