@@ -3,7 +3,7 @@ const builtin = @import("builtin");
 
 pub fn build(b: *Builder) void {
     const target = b.standardTargetOptions(.{});
-    const mode = builtin.Mode.Debug;
+    const mode = builtin.Mode.ReleaseFast;
 
     const exe = b.addExecutable("pbptool", "src/main.zig");
     exe.setTarget(target);
