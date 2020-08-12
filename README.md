@@ -40,7 +40,7 @@ Zig-PSP has **no reliance** on the legacy toolchain.
 
 The only true external dependency that this library requires is the lld linker for LLVM. This is required purely because the build script cannot pass the -emit-relocs flag to generate an ELF. [See The Issue Here](https://github.com/ziglang/zig/issues/5986)
 
-Zig-PSP also relies on binary tools from Rust-PSP and the static library, which are included with the download by default. There are plans to make these tools self hosted, even if the library may not be.
+Zig-PSP also relies on binary tools included as submodules from the zPSP-Dev team.
 
 ## Usage
 
