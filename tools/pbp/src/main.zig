@@ -28,7 +28,7 @@ pub fn main() !void {
     }
     
     if(std.mem.eql(u8, optionSelected, "-v")){
-        std.debug.warn("Version 1.0\n\n", .{});
+        std.debug.warn("Version 1.0\n", .{});
         return;
     }
 
