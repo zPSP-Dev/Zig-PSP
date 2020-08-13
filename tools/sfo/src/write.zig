@@ -58,10 +58,12 @@ pub fn writeSFO() !void {
         .data  = title,
     };
 
+    //We use buffers to write to
     var head : [8192]u8 = [_]u8{0} ** 8192;
     var keys : [8192]u8 = [_]u8{0} ** 8192;
     var data : [8192]u8 = [_]u8{0} ** 8192;
 
+    //Tracker pointers
     var h: [*]SFOHeader = undefined;
     var e: [*]SFOEntry = undefined;
     var k: [*]u8 = undefined;
@@ -72,26 +74,39 @@ pub fn writeSFO() !void {
     k = &keys;
     d = &data;
 
+    //Header layout
     h.*.magic = PSF_MAGIC_NUM;
     h.*.version = PSF_VERSION;
     
     i = 0;
     while(i < 8) : (i += 1){
+        //Increment count
         h.*.count = @truncate(u32, i) + 1;
+
+        //This name is offset
         e.*.nameofs = @truncate(u16, (@ptrToInt(k) - @ptrToInt(&keys)));
+        //This name is offset
         e.*.dataofs = @truncate(u16, (@ptrToInt(d) - @ptrToInt(&data)));
+
+        //Align by 4
         e.*.alignment = 4;
+
+        //What is the type?
         e.*.typec = @intCast(u8, @truncate(i8, gVals[i].typec));
 
+        //Put key inside
         std.mem.copy(u8, keys[(@ptrToInt(k) - @ptrToInt(&keys))..], gVals[i].name);
         k += gVals[i].name.len + 1;
 
+        //Value set
         if(e.*.typec == PSP_TYPE_VAL){
+            //Set values in data buffer
             e.*.valsize = 4;
             e.*.totalsize = 4;
             @ptrCast(*u32, @alignCast(4, d)).* = gVals[i].value;
             d += 4;
         }else{
+            //Copy string to data buffer
             var totalsize : usize = 0;
             var valsize : usize = 0;
 
@@ -110,13 +125,18 @@ pub fn writeSFO() !void {
         e += 1;
     }
     
+    //Get the header size
     var head_size : usize = (@ptrToInt(e) - @ptrToInt(&head));
     h.*.keyofs = @truncate(u32, head_size);
 
+    //Calculate key and data size
     var key_size : usize = (@ptrToInt(k) - @ptrToInt(&keys));
     var data_size : usize = (@ptrToInt(d) - @ptrToInt(&data));
+    
+    //Value offset is after headers and keys
     h.*.valofs = @truncate(u32, head_size + key_size);
     
+    //Align keys
     var @"align" : u32 = 3 - @truncate(u32, key_size & 3);
     while (@"align" < 3) {
         k += 1;
@@ -127,12 +147,8 @@ pub fn writeSFO() !void {
     var of = try fs.cwd().createFile(outputFile, fs.File.CreateFlags {.truncate = true});
     defer of.close();
 
-    std.debug.warn("Head: {}\n", .{head_size});
-    std.debug.warn("Key: {}\n", .{key_size});
-    std.debug.warn("Data: {}\n", .{data_size});
-
+    //Write data
     _ = try of.writeAll(head[0..head_size]);
     _ = try of.writeAll(keys[0..key_size]);
     _ = try of.writeAll(data[0..data_size]);
-    
 }

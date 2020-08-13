@@ -2,6 +2,7 @@ const std = @import("std");
 const process = std.process;
 
 const write = @import("write.zig");
+const read = @import("read.zig");
 
 pub fn main() !void {
     std.debug.warn("zSFOTool Utility made by zPSP-Dev!\n\n", .{});
@@ -32,7 +33,7 @@ pub fn main() !void {
     }
 
     if(std.mem.eql(u8, optionSelected, "read")){
-        
+        try read.readSFO();
     }
 
     if(std.mem.eql(u8, optionSelected, "write")){
