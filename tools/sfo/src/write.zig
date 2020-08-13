@@ -116,9 +116,6 @@ pub fn writeSFO() !void {
             e.*.totalsize = @truncate(u32, totalsize);
 
             @memset(d, 0, totalsize);
-
-            
-            std.debug.warn("{}\n", .{gVals[i].data});
             std.mem.copy(u8, data[(@ptrToInt(d) - @ptrToInt(&data))..], gVals[i].data.?);
             d += totalsize;
         }
@@ -151,4 +148,6 @@ pub fn writeSFO() !void {
     _ = try of.writeAll(head[0..head_size]);
     _ = try of.writeAll(keys[0..key_size]);
     _ = try of.writeAll(data[0..data_size]);
+
+    std.debug.warn("Finished!\n", .{});
 }
