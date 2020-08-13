@@ -7,7 +7,7 @@ comptime {
 }
 
 pub fn main() !void {
-    psp.utils.enableHomeButton();
+    psp.utils.enable_home_callback();
     psp.debug.screenInit();
 
     //This is LE - so backwards ABGR

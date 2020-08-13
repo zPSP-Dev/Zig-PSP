@@ -59,7 +59,7 @@ var vertices : [36]Vertex align(16) = [_]Vertex{
 var logo_start = @embedFile("./ferris.bin");
 
 pub fn main() !void {
-    psp.utils.enableHomeButton();
+    psp.utils.enable_home_callback();
     
     var fbp0 = psp.utils.allocVramRelative(psp.SCR_BUF_WIDTH, psp.SCREEN_HEIGHT, psp.GuPixelMode.Psm8888);
     var fbp1 = psp.utils.allocVramRelative(psp.SCR_BUF_WIDTH, psp.SCREEN_HEIGHT, psp.GuPixelMode.Psm8888);
