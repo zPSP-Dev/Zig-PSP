@@ -5,6 +5,7 @@ const io = std.io;
 const mem = std.mem;
 const fs = std.fs;
 
+//This reads and validates the header
 fn validateHeader(file : fs.File) !SFOHeader {
     var sfoh : SFOHeader = undefined;
 
@@ -74,10 +75,12 @@ pub fn readSFO() !void {
     }
     std.debug.warn("SFO Header End\n\n", .{});
 
+    //Print key pairs
     i = 0;
     while(i < header.count) : (i += 1){
         var nameStr : [32]u8 = undefined;
         
+        //Go to keys table
         try inFile.seekTo(entries[i].nameofs + header.keyofs);
 
         var size : usize = 0;
@@ -87,14 +90,18 @@ pub fn readSFO() !void {
             size = 10;
         }
 
+        //Read the key
         _ = try inFile.inStream().read(nameStr[0..size]);
         std.debug.warn("Pair {}: {} = ", .{i, nameStr[0..size]});
 
+        //Go to the data table
         try inFile.seekTo(entries[i].dataofs + header.valofs);
         if(entries[i].typec == PSP_TYPE_VAL){
+            //Read a value
             var val = try inFile.inStream().readIntNative(u32);
             std.debug.warn("{}\n", .{val});
         }else{
+            //Read a string
             var str : [32]u8 = undefined;
             _ = try inFile.inStream().read(str[0..entries[i].valsize]);
             std.debug.warn("\"{}\"\n", .{str[0..entries[i].valsize]});
