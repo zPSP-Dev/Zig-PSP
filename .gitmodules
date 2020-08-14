@@ -1,0 +1,7 @@
+[submodule "tools/pbp"]
+	path = tools/pbp
+	url = https://github.com/zPSP-Dev/zPBPTool.git
+
+[submodule "tools/sfo"]
+	path = tools/sfo
+	url = https://github.com/zPSP-Dev/zSFOTool.git
