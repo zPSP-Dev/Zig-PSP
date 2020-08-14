@@ -1,6 +1,6 @@
-usingnamespace @import("sys/pspthreadman.zig");
-usingnamespace @import("sys/psploadexec.zig");
-usingnamespace @import("sys/psptypes.zig");
+usingnamespace @import("../sys/pspthreadman.zig");
+usingnamespace @import("../sys/psploadexec.zig");
+usingnamespace @import("../sys/psptypes.zig");
 
 pub usingnamespace @import("allocator.zig");
 pub usingnamespace @import("vram.zig");

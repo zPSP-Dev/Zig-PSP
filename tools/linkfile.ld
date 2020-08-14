@@ -34,67 +34,49 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ENTRY(module_start)
 SECTIONS
 {
-    .text 0 : { *(.text .text.*) }
-    .sceStub.text     : { *(.sceStub.text) *(SORT(.sceStub.text.*)) }
+   .text 0 : { *(.text .text.*) }
+   /* PSP library stub functions. */
+   .sceStub.text : { *(.sceStub.text) *(SORT(.sceStub.text.*)) }
 
-    /* PSP library entry table and library stub table. */
-    .lib.ent.top    : { *(.lib.ent.top) }
-    .lib.ent        : { *(.lib.ent) }
-    .lib.ent.btm    : { *(.lib.ent.btm) }
-    .lib.stub.top   : { *(.lib.stub.top) }
-    .lib.stub       : { *(.lib.stub) }
-    .lib.stub.btm   : { *(.lib.stub.btm) }
+   /* PSP library entry table and library stub table. */
+   .lib.ent.top    : { *(.lib.ent.top) }
+   .lib.ent        : { *(.lib.ent) }
+   .lib.ent.btm    : { *(.lib.ent.btm) }
+   .lib.stub.top   : { *(.lib.stub.top) }
+   .lib.stub       : { *(.lib.stub) }
+   .lib.stub.btm   : { *(.lib.stub.btm) }
 
-    /* Stabs debugging sections.  */
-    .stab          0 : { *(.stab) }
-    .stabstr       0 : { *(.stabstr) }
-    .stab.excl     0 : { *(.stab.excl) }
-    .stab.exclstr  0 : { *(.stab.exclstr) }
-    .stab.index    0 : { *(.stab.index) }
-    .stab.indexstr 0 : { *(.stab.indexstr) }
-    .comment       0 : { *(.comment) }
-  
-    /* DWARF debug sections.
-       Symbols in the DWARF debugging sections are relative to the beginning
-       of the section so we begin them at 0.  */
-    /* DWARF 1 */
-    .debug          0 : { *(.debug) }
-    .line           0 : { *(.line) }
-    /* GNU DWARF 1 extensions */
-    .debug_srcinfo  0 : { *(.debug_srcinfo) }
-    .debug_sfnames  0 : { *(.debug_sfnames) }
-    /* DWARF 1.1 and DWARF 2 */
-    .debug_aranges  0 : { *(.debug_aranges) }
-    .debug_pubnames 0 : { *(.debug_pubnames) }
-    /* DWARF 2 */
-    .debug_info     0 : { *(.debug_info .gnu.linkonce.wi.*) }
-    .debug_abbrev   0 : { *(.debug_abbrev) }
-    .debug_line     0 : { *(.debug_line) }
-    .debug_frame    0 : { *(.debug_frame) }
-    .debug_str      0 : { *(.debug_str) }
-    .debug_loc      0 : { *(.debug_loc) }
-    .debug_macinfo  0 : { *(.debug_macinfo) }
-    /* SGI/MIPS DWARF 2 extensions */
-    .debug_weaknames 0 : { *(.debug_weaknames) }
-    .debug_funcnames 0 : { *(.debug_funcnames) }
-    .debug_typenames 0 : { *(.debug_typenames) }
-    .debug_varnames  0 : { *(.debug_varnames) }
-
-    //TODO: Cover up to DWARF 5!
-
-    /DISCARD/ : { *(.comment) *(.pdr) }
-    
-    /* PSP read-only data for module info, NIDs, and Vstubs.  The
-     .rodata.sceModuleInfo section must appear before the .rodata section
+   /* PSP read-only data for module info, NIDs, and Vstubs.  The
+    .rodata.sceModuleInfo section must appear before the .rodata section
      otherwise it would get absorbed into .rodata and the PSP bootloader
      would be unable to locate the module info structure. */
-    .rodata.sceModuleInfo    : { *(.rodata.sceModuleInfo) }
-    .rodata.sceResident      : { *(.rodata.sceResident) }
-    .rodata.sceNid           : { KEEP (*(.rodata.sceNid)) }
-    .rodata.sceVstub         : { *(.rodata.sceVstub) *(SORT(.rodata.sceVstub.*)) }
-    .rodata         : { *(.rodata .rodata.* .gnu.linkonce.r.*) }
-    .rodata1        : { *(.rodata1) }
-    .sdata2         : { *(.sdata2 .sdata2.* .gnu.linkonce.s2.*) }
-    .sbss2          : { *(.sbss2 .sbss2.* .gnu.linkonce.sb2.*) }
-    .eh_frame_hdr : { *(.eh_frame_hdr) }
+   .rodata.sceModuleInfo    : { *(.rodata.sceModuleInfo) }
+   .rodata.sceResident      : { *(.rodata.sceResident) }
+   .rodata.sceNid           : { *(.rodata.sceNid) *(SORT(.rodata.sceNid.*)) }
+   .rodata.sceVstub         : { *(.rodata.sceVstub) *(SORT(.rodata.sceVstub.*)) }
+
+   /*Debug Data*/
+   /* Stabs debugging sections.  */
+   .stab          0 : { *(.stab) }
+   .stabstr       0 : { *(.stabstr) }
+   .stab.excl     0 : { *(.stab.excl) }
+   .stab.exclstr  0 : { *(.stab.exclstr) }
+   .stab.index    0 : { *(.stab.index) }
+   .stab.indexstr 0 : { *(.stab.indexstr) }
+   .comment       0 : { *(.comment) }
+
+   /* DWARF debug sections.
+     Symbols in the DWARF debugging sections are relative to the beginning
+     of the section so we begin them at 0.  */
+   /* DWARF 5 section */
+   .debug_info 0 : { *(.debug_info) }
+   .debug_pubnames 0 : { *(.debug_pubnames) }
+   .debug_pubtypes 0 : { *(.debug_pubtypes) }
+   .debug_frame 0 : { *(.debug_frame) }
+   .debug_line 0 : { *(.debug_line) }
+   .debug_loc 0 : { *(.debug_loc) }
+   .debug_aranges 0 : { *(.debug_aranges) }
+   .debug_ranges 0 : { *(.debug_ranges) }
+
+   /DISCARD/ : { *(.comment) *(.pdr) }
 }

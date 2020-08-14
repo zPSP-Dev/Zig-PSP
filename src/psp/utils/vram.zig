@@ -1,4 +1,4 @@
-usingnamespace @import("sys/pspgu.zig");
+usingnamespace @import("../sys/pspgu.zig");
 
 //This isn't an actual "allocator" per se
 //It allocates static chunks of VRAM

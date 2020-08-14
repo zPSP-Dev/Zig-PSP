@@ -1,10 +1,10 @@
 usingnamespace @import("constants.zig");
-usingnamespace @import("sys/pspge.zig");
-usingnamespace @import("sys/pspdisplay.zig");
-usingnamespace @import("sys/pspstdio.zig");
-usingnamespace @import("sys/pspiofilemgr.zig");
-usingnamespace @import("sys/pspthreadman.zig");
-usingnamespace @import("sys/psploadexec.zig");
+usingnamespace @import("../sys/pspge.zig");
+usingnamespace @import("../sys/pspdisplay.zig");
+usingnamespace @import("../sys/pspstdio.zig");
+usingnamespace @import("../sys/pspiofilemgr.zig");
+usingnamespace @import("../sys/pspthreadman.zig");
+usingnamespace @import("../sys/psploadexec.zig");
 const builtin = @import("builtin");
 
 //Internal variables for the screen
@@ -185,7 +185,7 @@ pub fn panic(message: []const u8, stack_trace: ?*builtin.StackTrace) noreturn {
 var current_time : u64 = 0;
 var tickRate : u32 = 0;
 
-usingnamespace @import("sys/psprtc.zig");
+usingnamespace @import("../sys/psprtc.zig");
 
 //Starts a benchmark
 pub fn benchmark_start() void {

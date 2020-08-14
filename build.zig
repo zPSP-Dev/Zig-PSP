@@ -39,14 +39,14 @@ pub fn build(b: *Builder) void {
     //Set mode & target
     exe.setTarget(target);
     exe.setBuildMode(mode);
-    exe.setLinkerScriptPath("lib/linkfile.ld");
+    exe.setLinkerScriptPath("tools/linkfile.ld");
     exe.link_eh_frame_hdr = true;
     
     //New step to link the object
     //Hopefully can be removed (https://github.com/ziglang/zig/issues/5986)
     const link_to_elf = b.addSystemCommand(&[_][]const u8{
-        "ld.lld", "-L./lib",
-        "-Tlib/linkfile.ld",
+        "ld.lld", "-L./tools",
+        "-Ttools/linkfile.ld",
         "-lpsp",
         exe.getOutputPath(),
         "-o",
@@ -57,37 +57,9 @@ pub fn build(b: *Builder) void {
 
     //Post-build actions
     
-    var prxgen_path : []const u8 = "lib/tools/linux/prxgen";
-    var mksfo_path : []const u8 = "lib/tools/linux/mksfo";
-    var pack_pbp_path : []const u8 = "lib/tools/linux/pack-pbp";
-
-    switch (builtin.os.tag) {
-        .linux => {
-            prxgen_path = "lib/tools/linux/prxgen";
-            mksfo_path = "lib/tools/linux/mksfo";
-            pack_pbp_path = "lib/tools/linux/pack-pbp";
-        },
-
-        .macosx => {
-            prxgen_path = "lib/tools/mac/prxgen";
-            mksfo_path = "lib/tools/mac/mksfo";
-            pack_pbp_path = "lib/tools/mac/pack-pbp";
-        },
-
-        .windows => {
-            prxgen_path = "lib/tools/win/prxgen";
-            mksfo_path = "lib/tools/win/mksfo";
-            pack_pbp_path = "lib/tools/win/pack-pbp";
-        },
-
-        else => {
-            @compileError("No PSP tools for this system!");
-        }
-    }
-
-    //Generate a PRX
+    //Generate a PRX TODO: Replace!!!
     const generate_prx = b.addSystemCommand(&[_][]const u8{
-        prxgen_path,
+        "prxgen",
         "zig-cache/app.elf",
         "app.prx"
     });
@@ -95,7 +67,7 @@ pub fn build(b: *Builder) void {
 
     //Make the SFO file
     const mk_sfo = b.addSystemCommand(&[_][]const u8{
-        mksfo_path,
+        "tools/bin/sfotool", "write",
         psp_app_name,
         "zig-cache/PARAM.SFO"
     });
@@ -103,7 +75,7 @@ pub fn build(b: *Builder) void {
 
     //Pack the PBP executable
     const pack_pbp = b.addSystemCommand(&[_][]const u8{
-        pack_pbp_path,
+        "tools/bin/pbptool", "pack",
         "EBOOT.PBP",
         "zig-cache/PARAM.SFO",
         icon0,
