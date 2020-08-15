@@ -9,7 +9,7 @@ In the PSP programming community, many libraries, tools, and other features are 
 
 The only other program required to use Zig-PSP is the lld linker for LLVM. This is required purely because the build script cannot pass the -emit-relocs flag to generate an ELF. [See The Issue Here](https://github.com/ziglang/zig/issues/5986)
 
-Zig-PSP also relies on binary tools included as submodules from the zPSP-Dev team.
+Zig-PSP also relies on binary tools included as submodules from the zPSP-Dev team, and one tool from PSPSDK.
 
 ## Usage
 

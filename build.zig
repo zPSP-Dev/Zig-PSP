@@ -49,7 +49,6 @@ pub fn build(b: *Builder) void {
     const link_to_elf = b.addSystemCommand(&[_][]const u8{
         "ld.lld", "-L./tools",
         "-Ttools/linkfile.ld",
-        "-lpsp",
         exe.getOutputPath(),
         "-o",
         "zig-cache/app.elf",
