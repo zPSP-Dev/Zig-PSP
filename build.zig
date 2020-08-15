@@ -35,8 +35,9 @@ pub fn build(b: *Builder) void {
 
     //Output to zig cache for now
     exe.setOutputDir("zig-cache/");
-    
+
     //Set mode & target
+    std.debug.warn("Building PSP ELF...\n", .{});
     exe.setTarget(target);
     exe.setBuildMode(mode);
     exe.setLinkerScriptPath("tools/linkfile.ld");
@@ -44,6 +45,7 @@ pub fn build(b: *Builder) void {
     
     //New step to link the object
     //Hopefully can be removed (https://github.com/ziglang/zig/issues/5986)
+    std.debug.warn("Linking...\n", .{});
     const link_to_elf = b.addSystemCommand(&[_][]const u8{
         "ld.lld", "-L./tools",
         "-Ttools/linkfile.ld",
@@ -57,7 +59,10 @@ pub fn build(b: *Builder) void {
 
     //Post-build actions
     
+    const hostTarget = b.standardTargetOptions(.{});
+
     //Generate a PRX TODO: Replace!!!
+    std.debug.warn("Generating PRX...\n", .{});
     const generate_prx = b.addSystemCommand(&[_][]const u8{
         "prxgen",
         "zig-cache/app.elf",
@@ -65,13 +70,29 @@ pub fn build(b: *Builder) void {
     });
     generate_prx.step.dependOn(&link_to_elf.step);
 
+    //Build SFO
+    const sfo = b.addExecutable("sfotool", "tools/sfo/src/main.zig");
+    sfo.setTarget(hostTarget);
+    sfo.setBuildMode(builtin.Mode.ReleaseFast);
+    sfo.setOutputDir("tools/bin");
+    sfo.install();
+
     //Make the SFO file
     const mk_sfo = b.addSystemCommand(&[_][]const u8{
         "tools/bin/sfotool", "write",
         psp_app_name,
         "zig-cache/PARAM.SFO"
     });
-    mk_sfo.step.dependOn(&generate_prx.step);
+    mk_sfo.step.dependOn(&sfo.step);
+
+
+    //Build PBP
+    const PBP = b.addExecutable("pbptool", "tools/pbp/src/main.zig");
+    PBP.setTarget(hostTarget);
+    PBP.setBuildMode(builtin.Mode.ReleaseFast);
+    PBP.setOutputDir("tools/bin");
+    PBP.install();
+    PBP.step.dependOn(&mk_sfo.step);
 
     //Pack the PBP executable
     const pack_pbp = b.addSystemCommand(&[_][]const u8{
@@ -86,7 +107,7 @@ pub fn build(b: *Builder) void {
         "app.prx",
         "NULL" //DATA.PSAR not necessary.
     });
-    pack_pbp.step.dependOn(&mk_sfo.step);
+    pack_pbp.step.dependOn(&PBP.step);
 
     //Enable the build
     b.default_step.dependOn(&pack_pbp.step);
