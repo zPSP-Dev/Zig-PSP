@@ -149,5 +149,5 @@ pub fn writeSFO() !void {
     _ = try of.writeAll(keys[0..key_size]);
     _ = try of.writeAll(data[0..data_size]);
 
-    std.debug.warn("Finished!\n", .{});
+    std.debug.warn("SFO Saved!\n", .{});
 }
