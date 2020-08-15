@@ -8,6 +8,7 @@ pub fn build(b: *Builder) void {
     const exe = b.addExecutable("sfotool", "src/main.zig");
     exe.setTarget(target);
     exe.setBuildMode(mode);
+    exe.setOutputDir("../bin/");
     exe.install();
 
     const run_cmd = exe.run();
