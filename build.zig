@@ -37,7 +37,6 @@ pub fn build(b: *Builder) void {
     exe.setOutputDir("zig-cache/");
 
     //Set mode & target
-    std.debug.warn("Building PSP ELF...\n", .{});
     exe.setTarget(target);
     exe.setBuildMode(mode);
     exe.setLinkerScriptPath("tools/linkfile.ld");
@@ -45,7 +44,6 @@ pub fn build(b: *Builder) void {
     
     //New step to link the object
     //Hopefully can be removed (https://github.com/ziglang/zig/issues/5986)
-    std.debug.warn("Linking...\n", .{});
     const link_to_elf = b.addSystemCommand(&[_][]const u8{
         "ld.lld", "-L./tools",
         "-Ttools/linkfile.ld",
@@ -69,7 +67,6 @@ pub fn build(b: *Builder) void {
     prx.install();
     prx.step.dependOn(&link_to_elf.step);
 
-    std.debug.warn("Generating PRX...\n", .{});
     const generate_prx = b.addSystemCommand(&[_][]const u8{
         "tools/bin/prxgen",
         "zig-cache/app.elf",
