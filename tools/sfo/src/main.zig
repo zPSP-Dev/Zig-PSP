@@ -5,8 +5,6 @@ const write = @import("write.zig");
 const read = @import("read.zig");
 
 pub fn main() !void {
-    std.debug.warn("zSFOTool Utility made by zPSP-Dev!\n\n", .{});
-
     //Get args
     var arg_it = process.args();
     // Skip executable
@@ -27,7 +25,8 @@ pub fn main() !void {
         return;
     }
     
-    if(std.mem.eql(u8, optionSelected, "-v")){
+    if(std.mem.eql(u8, optionSelected, "-v")){    
+        std.debug.warn("zSFOTool Utility made by zPSP-Dev!\n\n", .{});
         std.debug.warn("Version 1.0\n", .{});
         return;
     }
