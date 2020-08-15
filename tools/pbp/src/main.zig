@@ -5,8 +5,6 @@ const analyze = @import("analyze.zig");
 const unpack = @import("unpack.zig");
 
 pub fn main() !void {
-    std.debug.warn("zPBPTool Utility made by zPSP-Dev!\n\n", .{});
-
     //Get args
     var arg_it = process.args();
     // Skip executable
@@ -28,6 +26,7 @@ pub fn main() !void {
     }
     
     if(std.mem.eql(u8, optionSelected, "-v")){
+        std.debug.warn("zPBPTool Utility made by zPSP-Dev!\n\n", .{});
         std.debug.warn("Version 1.0\n", .{});
         return;
     }
