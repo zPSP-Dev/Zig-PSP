@@ -52,7 +52,7 @@ SECTIONS
      would be unable to locate the module info structure. */
    .rodata.sceModuleInfo    : { *(.rodata.sceModuleInfo) }
    .rodata.sceResident      : { *(.rodata.sceResident) }
-   .rodata.sceNid           : { *(.rodata.sceNid) *(SORT(.rodata.sceNid.*)) }
+   .rodata.sceNid           : { KEEP (*(.rodata.sceNid)) }
    .rodata.sceVstub         : { *(.rodata.sceVstub) *(SORT(.rodata.sceVstub.*)) }
 
    /*Debug Data*/
