@@ -61,14 +61,22 @@ pub fn build(b: *Builder) void {
     
     const hostTarget = b.standardTargetOptions(.{});
 
-    //Generate a PRX TODO: Replace!!!
+    const prx = b.addExecutable("prxgen", "tools/prxgen/stub.zig");
+    prx.setTarget(hostTarget);
+    prx.addCSourceFile("tools/prxgen/psp-prxgen.c", &[_][]const u8{"-std=c99", "-Wno-address-of-packed-member"});
+    prx.linkLibC();
+    prx.setBuildMode(builtin.Mode.ReleaseFast);
+    prx.setOutputDir("tools/bin");
+    prx.install();
+    prx.step.dependOn(&link_to_elf.step);
+
     std.debug.warn("Generating PRX...\n", .{});
     const generate_prx = b.addSystemCommand(&[_][]const u8{
-        "prxgen",
+        "tools/bin/prxgen",
         "zig-cache/app.elf",
         "app.prx"
     });
-    generate_prx.step.dependOn(&link_to_elf.step);
+    generate_prx.step.dependOn(&prx.step);
 
     //Build SFO
     const sfo = b.addExecutable("sfotool", "tools/sfo/src/main.zig");
@@ -76,6 +84,7 @@ pub fn build(b: *Builder) void {
     sfo.setBuildMode(builtin.Mode.ReleaseFast);
     sfo.setOutputDir("tools/bin");
     sfo.install();
+    sfo.step.dependOn(&generate_prx.step);
 
     //Make the SFO file
     const mk_sfo = b.addSystemCommand(&[_][]const u8{
