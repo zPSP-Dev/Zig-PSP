@@ -32,13 +32,15 @@ pub fn analyzePBP() !void {
         return;
     }
 
+    //Open File
     var inFile = try fs.cwd().openFile(inputName, fs.File.OpenFlags{.read = true});
     defer inFile.close();
 
+    //Get header
     var header = try readHeader(inFile);
-
     var size = try inFile.getEndPos();
 
+    //Print entries
     std.debug.warn("PBP Entry Table: \n",.{});
 
     var i : usize = 0;
@@ -59,10 +61,12 @@ pub fn analyzePBP() !void {
     }
     std.debug.warn("PBP Entry Table End\n\n", .{});
 
+    //Read Version
     try inFile.seekTo(4);
     var ver_maj = inFile.inStream().readIntNative(u16);
     var ver_min = inFile.inStream().readIntNative(u16);
 
+    //Finish Print
     std.debug.warn("PBP Version: {}.{}\n", .{ver_maj, ver_min});
     std.debug.warn("Size: {} bytes.\n", .{size});
 }

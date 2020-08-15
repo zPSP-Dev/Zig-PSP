@@ -37,12 +37,15 @@ pub fn unpackPBP() !void {
         return;
     });
 
+    //Read
     var inFile = try fs.cwd().openFile(inputName, fs.File.OpenFlags{.read = true});
     defer inFile.close();
 
+    //Validate header
     var header = try readHeader(inFile);
     var size = try inFile.getEndPos();
 
+    //Read each
     var i : usize = 0;
     while(i < 8) : (i += 1){
         var calcSize : usize = 0;
@@ -53,6 +56,7 @@ pub fn unpackPBP() !void {
             calcSize = header.offset[i + 1] - header.offset[i];
         }
 
+        //Make a file!
         if(calcSize != 0){
             std.debug.warn("Creating {} with {} bytes... ", .{default_file_names[i], calcSize});
 
@@ -61,6 +65,7 @@ pub fn unpackPBP() !void {
             mem.copy(u8, result[0..], dirName);
             mem.copy(u8, result[dirName.len..], default_file_names[i]);
 
+            //Open
             var outputFile = try fs.cwd().createFile(result, fs.File.CreateFlags {.truncate = true});
             defer outputFile.close();
 
