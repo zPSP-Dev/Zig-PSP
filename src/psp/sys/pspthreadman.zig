@@ -65,7 +65,6 @@ pub const enum_PspThreadStatus = extern enum(c_int) {
     PSP_THREAD_KILLED = 32,
     _,
 };
-pub extern fn sceKernelCreateThread(name: [*c]const u8, entry: SceKernelThreadEntry, initPriority: c_int, stackSize: c_int, attr: SceUInt, option: [*c]SceKernelThreadOptParam) SceUID;
 pub extern fn sceKernelDeleteThread(thid: SceUID) c_int;
 pub extern fn sceKernelStartThread(thid: SceUID, arglen: SceSize, argp: ?*c_void) c_int;
 pub extern fn sceKernelExitThread(status: c_int) c_int;
@@ -366,6 +365,7 @@ pub extern fn sceKernelReleaseThreadEventHandler(uid: SceUID) c_int;
 pub extern fn sceKernelReferThreadEventHandlerStatus(uid: SceUID, info: [*c]struct_SceKernelThreadEventHandlerInfo) c_int;
 pub extern fn sceKernelReferThreadProfiler() [*c]PspDebugProfilerRegs;
 pub extern fn sceKernelReferGlobalProfiler() [*c]PspDebugProfilerRegs;
+pub extern fn sceKernelCreateThread(name: [*c]const u8, entry: SceKernelThreadEntry, initPriority: c_int, stackSize: c_int, attr: SceUInt, option: [*c]SceKernelThreadOptParam) SceUID;
 
 pub const PspModuleInfoAttr = enum_PspModuleInfoAttr;
 pub const PspThreadAttributes = enum_PspThreadAttributes;
@@ -483,7 +483,7 @@ comptime{
     asm(macro.import_function2("ThreadManForUser", "0x53B00E9A", "sceKernelSetVTimerHandlerWide"));
     asm(macro.import_function2("ThreadManForUser", "0xD2D615EF", "sceKernelCancelVTimerHandler"));
     asm(macro.import_function2("ThreadManForUser", "0x5F32BEAA", "sceKernelReferVTimerStatus"));
-    asm(macro.import_function2("ThreadManForUser", "0x446D8DE6", "sceKernelCreateThread"));
+    asm(macro.import_function2("ThreadManForUser", "0x446D8DE6", "sceKernelCreateThread_2"));
     asm(macro.import_function2("ThreadManForUser", "0x9FA03CD3", "sceKernelDeleteThread"));
     asm(macro.import_function2("ThreadManForUser", "0xF475845D", "sceKernelStartThread"));
     asm(macro.import_function2("ThreadManForUser", "0x532A522E", "_sceKernelExitThread"));
@@ -509,4 +509,25 @@ comptime{
     asm(macro.import_function2("ThreadManForUser", "0x57CF62DD", "sceKernelGetThreadmanIdType"));
     asm(macro.import_function2("ThreadManForUser", "0x64D4540E", "sceKernelReferThreadProfiler"));
     asm(macro.import_function2("ThreadManForUser", "0x8218B4DD", "sceKernelReferGlobalProfiler"));
+
+   
+    //TODO: Wrap other functions - currently this is just the critical part.
+    //TODO: Possibly make a generic wrapper with comptime macros?
+    //INFO: https://people.eecs.berkeley.edu/~pattrsn/61CS99/lectures/lec24-args.pdf
+    //Excellent source where I first learned this while making: https://github.com/NT-Bourgeois-Iridescence-Technologies/PSP-ASM-Example
+    //TODO: Optimize this? Possibly there may be more efficient ways of doing this...
+    asm(
+        \\.section .text
+        \\.global sceKernelCreateThread
+        \\sceKernelCreateThread: 
+        \\add   $sp,$sp,-28 //How to calculate: 4 bytes * (num args + ra)
+        \\sw    $ra,0($sp)  //Preserve return
+        \\lw    $t0,16($sp) //Store arg5
+        \\lw    $t1,20($sp) //Store arg6
+        \\jal   sceKernelCreateThread_2 //Call the alias
+        \\lw    $ra, 0($sp) //Was clobbered - needs to be restored
+        \\add   $sp,$sp,24 //Fix up our stacks
+        \\jr    $ra //Return
+    );
 }
+

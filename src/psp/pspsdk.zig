@@ -57,3 +57,4 @@ pub usingnamespace @import("sys/pspwlan.zig");
 pub usingnamespace @import("utils/constants.zig");
 pub const debug =  @import("utils/debug.zig");
 pub const utils =  @import("utils/utils.zig");
+pub usingnamespace @import("utils/mem-fix.zig");
