@@ -81,7 +81,6 @@ module_info:
 
 .section .rodata.sceResident, "a", @progbits
 __syslib_exports:
-    .align 5
     .word 0xD632ACDB
     .word 0xF01D73A7
     .word module_start

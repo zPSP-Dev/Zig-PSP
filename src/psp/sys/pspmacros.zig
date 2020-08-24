@@ -1,16 +1,10 @@
 const std = @import("std");
 
-fn intToString(comptime int: u32, comptime buf: []u8) ![]const u8 {
-    return std.fmt.bufPrint(buf, "0x{x}", .{int});
-}
-
-pub fn import_module_start(comptime module: []const u8, comptime flags_ver: u32) []const u8{
-    var buf: [40]u8 = undefined;
-    var str = try intToString(flags_ver, &buf);
+pub fn import_module_start(comptime module: []const u8, comptime flags_ver: []const u8, comptime count: []const u8) []const u8{
     return (
     \\.set push
+    \\.set noreorder
     \\.section .rodata.sceResident, "a"
-    \\.word   0
 \\__stub_modulestr_
     ++ module ++ ":\n" ++ 
     \\.asciz  "
@@ -24,18 +18,25 @@ pub fn import_module_start(comptime module: []const u8, comptime flags_ver: u32)
     \\.word   __stub_modulestr_
     ++ module ++ "\n" ++
     \\.word   
-    ++ str ++ "\n" ++
-    \\.word   0x5
-    \\.word   __executable_start
-    \\.word   __executable_start
+    ++ flags_ver ++ "\n" ++
+    \\.hword   0x5
+    \\.hword 
+    ++ count ++ "\n" ++
+    \\.word   __stub_idtable_
+    ++ module ++ "\n" ++
+    \\.word   __stub_text_
+    ++ module ++ "\n" ++
+    \\.section .rodata.sceNid, "a"
+\\__stub_idtable_
+    ++ module ++ ":\n" ++
+    \\.section .sceStub.text, "ax", @progbits
+\\__stub_text_
+    ++ module ++ ":\n" ++
     \\.set pop
     );
 }
 
-pub fn import_function(comptime module: []const u8, comptime func_id: u32, comptime funcname: []const u8) []const u8{
-    var buf: [20]u8 = undefined;
-    var str = try intToString(func_id, &buf);
-
+pub fn import_function(comptime module: []const u8, comptime func_id: []const u8, comptime funcname: []const u8) []const u8{
     return (
     \\.set push
     \\.set noreorder
@@ -53,7 +54,7 @@ funcname ++ ":\n" ++
     \\.word   __stub_module_
     ++ module ++ "\n" ++
     \\.word   
-    ++ str ++ "\n" ++
+    ++ func_id ++ "\n" ++
     \\.end    
     ++ funcname ++ "\n" ++
     \\.size   
@@ -64,16 +65,11 @@ funcname ++ ":\n" ++
     \\.set pop
     );
 }
-pub fn import_function2(comptime module: []const u8, comptime func_id: u32, comptime funcname: []const u8) []const u8{
-    var buf: [20]u8 = undefined;
-    var str = try intToString(func_id, &buf);
-
+pub fn import_function2(comptime module: []const u8, comptime func_id: []const u8, comptime funcname: []const u8) []const u8{
     return (
     \\.set push
     \\.set noreorder
 
-    \\.extern __stub_module_
-    ++ module ++ "\n" ++
     \\.section .sceStub.text, "ax", @progbits
     \\.globl 
     ++ funcname ++ "\n" ++
@@ -90,7 +86,7 @@ funcname ++ ":\n" ++
     ++ funcname ++ ", .-" ++ funcname ++ "\n" ++
     \\.section .rodata.sceNid, "a"
     \\.word   
-    ++ str ++ "\n" ++
+    ++ func_id ++ "\n" ++
     \\.set pop
     );
 }

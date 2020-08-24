@@ -1,5 +1,8 @@
 //See LICENSE for copyright information
 
+//Smaller utilities
+pub usingnamespace @import("utils/module.zig");
+
 //Import all of the PSP's modules
 pub usingnamespace @import("sys/pspasfparser.zig");
 pub usingnamespace @import("sys/pspatrac3.zig");
@@ -53,8 +56,6 @@ pub usingnamespace @import("sys/psputils.zig");
 pub usingnamespace @import("sys/pspvideocodec.zig");
 pub usingnamespace @import("sys/pspwlan.zig");
 
-//Smaller utilities
-pub usingnamespace @import("utils/module.zig");
 pub usingnamespace @import("utils/constants.zig");
 //pub usingnamespace @import("utils/mem-fix.zig");
 pub const debug =  @import("utils/debug.zig");

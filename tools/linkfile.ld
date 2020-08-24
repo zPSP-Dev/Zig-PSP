@@ -35,62 +35,6 @@ ENTRY(module_start)
 SECTIONS
 {
    PROVIDE (__executable_start = 0x0); 
-   
-  .interp         : { *(.interp) }
-  .dynamic        : { *(.dynamic) }
-  .hash           : { *(.hash) }
-  .dynsym         : { *(.dynsym) }
-  .dynstr         : { *(.dynstr) }
-  .gnu.version    : { *(.gnu.version) }
-  .gnu.version_d  : { *(.gnu.version_d) }
-  .gnu.version_r  : { *(.gnu.version_r) }
-  .rel.text       : { *(.rel.text .rel.text.* .rel.gnu.linkonce.t.*) }
-  .rela.text      : { *(.rela.text .rela.text.* .rela.gnu.linkonce.t.*) }
-  .rel.init       : { *(.rel.init) }
-  .rela.init      : { *(.rela.init) }
-  .rel.fini       : { *(.rel.fini) }
-  .rela.fini      : { *(.rela.fini) }
-  /* PSP-specific relocations. */
-  .rel.sceStub.text   : { *(.rel.sceStub.text) *(SORT(.rel.sceStub.text.*)) }
-  .rel.lib.ent.top    : { *(.rel.lib.ent.top) }
-  .rel.lib.ent        : { *(.rel.lib.ent) }
-  .rel.lib.ent.btm    : { *(.rel.lib.ent.btm) }
-  .rel.lib.stub.top   : { *(.rel.lib.stub.top) }
-  .rel.lib.stub       : { *(.rel.lib.stub) }
-  .rel.lib.stub.btm   : { *(.rel.lib.stub.btm) }
-  .rel.rodata.sceModuleInfo   : { *(.rel.rodata.sceModuleInfo) }
-  .rel.rodata.sceResident     : { *(.rel.rodata.sceResident) }
-  .rel.rodata.sceNid          : { *(.rel.rodata.sceNid) }
-  .rel.rodata.sceVstub        : { *(.rel.rodata.sceVstub) *(SORT(.rel.rodata.sceVstub.*)) }
-  .rel.rodata     : { *(.rel.rodata .rel.rodata.* .rel.gnu.linkonce.r.*) }
-  .rela.rodata    : { *(.rela.rodata .rela.rodata.* .rela.gnu.linkonce.r.*) }
-  .rel.data.rel.ro   : { *(.rel.data.rel.ro*) }
-  .rela.data.rel.ro   : { *(.rel.data.rel.ro*) }
-  .rel.data       : { *(.rel.data .rel.data.* .rel.gnu.linkonce.d.*) }
-  .rela.data      : { *(.rela.data .rela.data.* .rela.gnu.linkonce.d.*) }
-  .rel.tdata	  : { *(.rel.tdata .rel.tdata.* .rel.gnu.linkonce.td.*) }
-  .rela.tdata	  : { *(.rela.tdata .rela.tdata.* .rela.gnu.linkonce.td.*) }
-  .rel.tbss	  : { *(.rel.tbss .rel.tbss.* .rel.gnu.linkonce.tb.*) }
-  .rela.tbss	  : { *(.rela.tbss .rela.tbss.* .rela.gnu.linkonce.tb.*) }
-  .rel.ctors      : { *(.rel.ctors) }
-  .rela.ctors     : { *(.rela.ctors) }
-  .rel.dtors      : { *(.rel.dtors) }
-  .rela.dtors     : { *(.rela.dtors) }
-  .rel.got        : { *(.rel.got) }
-  .rela.got       : { *(.rela.got) }
-  .rel.sdata      : { *(.rel.sdata .rel.sdata.* .rel.gnu.linkonce.s.*) }
-  .rela.sdata     : { *(.rela.sdata .rela.sdata.* .rela.gnu.linkonce.s.*) }
-  .rel.sbss       : { *(.rel.sbss .rel.sbss.* .rel.gnu.linkonce.sb.*) }
-  .rela.sbss      : { *(.rela.sbss .rela.sbss.* .rela.gnu.linkonce.sb.*) }
-  .rel.sdata2     : { *(.rel.sdata2 .rel.sdata2.* .rel.gnu.linkonce.s2.*) }
-  .rela.sdata2    : { *(.rela.sdata2 .rela.sdata2.* .rela.gnu.linkonce.s2.*) }
-  .rel.sbss2      : { *(.rel.sbss2 .rel.sbss2.* .rel.gnu.linkonce.sb2.*) }
-  .rela.sbss2     : { *(.rela.sbss2 .rela.sbss2.* .rela.gnu.linkonce.sb2.*) }
-  .rel.bss        : { *(.rel.bss .rel.bss.* .rel.gnu.linkonce.b.*) }
-  .rela.bss       : { *(.rela.bss .rela.bss.* .rela.gnu.linkonce.b.*) }
-  .rel.plt        : { *(.rel.plt) }
-  .rela.plt       : { *(.rela.plt) }
-
    .text 0 : { *(.text .text.*) }
    /* PSP library stub functions. */
    .sceStub.text : { *(.sceStub.text) *(SORT(.sceStub.text.*)) }
