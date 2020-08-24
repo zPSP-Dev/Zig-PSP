@@ -45,7 +45,7 @@ pub fn build(b: *Builder) void {
     //New step to link the object
     //Hopefully can be removed (https://github.com/ziglang/zig/issues/5986)
     const link_to_elf = b.addSystemCommand(&[_][]const u8{
-        "ld.lld", "-L./tools",
+        "ld.lld", "-L./tools", //"-lpsp",
         "-Ttools/linkfile.ld",
         exe.getOutputPath(),
         "-o",

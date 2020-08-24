@@ -79,7 +79,9 @@ pub const module_start_struct = struct {
     //Entry point - launches main through the thread above.
     export fn module_start(argc: c_uint, argv: ?*c_void) c_int {
         var thid : SceUID = 0;
-        thid = sceKernelCreateThread("user_main", _module_main_thread, 0x20, 256 * 1024, 0b10000000000000000100000000000000, 0);
-        return sceKernelStartThread(thid, argc, argv);   
+        //thid = sceKernelCreateThread("user_main", _module_main_thread, 0x20, 256 * 1024, 0b10000000000000000100000000000000, 0);
+        //return sceKernelStartThread(thid, argc, argv);   
+        sceKernelExitGame();
+        return 0;
     }
 };

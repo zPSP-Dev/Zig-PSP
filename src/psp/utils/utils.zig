@@ -23,14 +23,16 @@ export fn altCB(arg1 : c_int, arg2 : c_int, common: ?*c_void) c_int{
 }
 
 //Exit
-export fn exitCB(arg1 : c_int, arg2 : c_int, common: ?*c_void) c_int{
+//export 
+fn exitCB(arg1 : c_int, arg2 : c_int, common: ?*c_void) c_int{
     requestedExit = true;
     sceKernelExitGame();
     return 0;
 }
 
 //Thread for home button exit thread.
-export fn cbThread(args: SceSize, argp: ?*c_void) c_int{
+//export 
+fn cbThread(args: SceSize, argp: ?*c_void) c_int{
 
     var cbID : i32 = -1;
     
