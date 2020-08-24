@@ -13,8 +13,6 @@ pub usingnamespace @import("sys/pspctrl.zig");
 pub usingnamespace @import("sys/pspdisplay.zig");
 pub usingnamespace @import("sys/pspexception.zig");
 pub usingnamespace @import("sys/pspge.zig");
-pub usingnamespace @import("sys/pspgu.zig");
-pub usingnamespace @import("sys/pspgum.zig");
 pub usingnamespace @import("sys/psphprm.zig");
 pub usingnamespace @import("sys/psphttp.zig");
 pub usingnamespace @import("sys/pspidstorage.zig");
@@ -57,6 +55,5 @@ pub usingnamespace @import("sys/pspvideocodec.zig");
 pub usingnamespace @import("sys/pspwlan.zig");
 
 pub usingnamespace @import("utils/constants.zig");
-//pub usingnamespace @import("utils/mem-fix.zig");
 pub const debug =  @import("utils/debug.zig");
 pub const utils =  @import("utils/utils.zig");
