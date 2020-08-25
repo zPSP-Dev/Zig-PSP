@@ -78,20 +78,19 @@ comptime{
 pub const module_start_struct = struct {
     //Entry point - launches main through the thread above.
     export fn module_start(argc: c_uint, argv: ?*c_void) c_int {
-        //var thid : SceUID = sceKernelCreateThread("user_main", _module_main_thread, 0x20, 256 * 1024, 0b10000000000000000100000000000000, 0);
+        var thid : SceUID = sceKernelCreateThread("user_main", _module_main_thread, 0x20, 256 * 1024, 0b10000000000000000100000000000000, 0);
         
-        //if(thid < 0){
-        //    screenInit();
-        //    print("\nZig Init Failed!\n");
-        //    
-        //    var buf: [20]u8 = undefined;
-        //    printFormat("\n{d}\n", .{thid}) catch unreachable;
-        //    print("Exiting in 10 seconds...");
-        //    exitErr();
-        //    return 1;
-        //}
+        if(thid < 0){
+            screenInit();
+            print("\nZig Init Failed!\n");
+            
+            var buf: [20]u8 = undefined;
+            printFormat("\n{d}\n", .{thid}) catch unreachable;
+            print("Exiting in 10 seconds...");
+            exitErr();
+            return 1;
+        }
 
-        //return sceKernelStartThread(thid, argc, argv);
-        return _module_main_thread(argc, argv);
+        return sceKernelStartThread(thid, argc, argv);
     }
 };

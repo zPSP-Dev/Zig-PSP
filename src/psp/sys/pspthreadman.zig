@@ -510,23 +510,21 @@ comptime{
     asm(macro.import_function2("ThreadManForUser", "0x64D4540E", "sceKernelReferThreadProfiler"));
     asm(macro.import_function2("ThreadManForUser", "0x8218B4DD", "sceKernelReferGlobalProfiler"));
 
-   
-    //TODO: Wrap other functions - currently this is just the critical part.
-    //TODO: Possibly make a generic wrapper with comptime macros?
-    //INFO: https://people.eecs.berkeley.edu/~pattrsn/61CS99/lectures/lec24-args.pdf
-    //Excellent source where I first learned this while making: https://github.com/NT-Bourgeois-Iridescence-Technologies/PSP-ASM-Example
-    //TODO: Optimize this? Possibly there may be more efficient ways of doing this...
+   //TODO: Wrap other functions - currently this is just the critical part.
+   //TODO: Possibly make a generic wrapper with comptime macros?
+   //INFO: https://people.eecs.berkeley.edu/~pattrsn/61CS99/lectures/lec24-args.pdf
+   //Excellent source on >4 MIPS calls. All of these seem generic... maybe a macro for this?
     asm(
-        \\.section .text
+        \\.section .text, "a"
         \\.global sceKernelCreateThread
         \\sceKernelCreateThread: 
-        \\add   $sp,$sp,-28 //How to calculate: 4 bytes * (num args + ra)
+        \\lw    $t0,16($sp) //Store arg5 from stack to t0
+        \\lw    $t1,20($sp) //Store arg6 from stack to t1
+        \\add   $sp,$sp,-28 //Add new stack space... How to calculate: 4 bytes * (num args + ra)
         \\sw    $ra,0($sp)  //Preserve return
-        \\lw    $t0,16($sp) //Store arg5
-        \\lw    $t1,20($sp) //Store arg6
         \\jal   sceKernelCreateThread_2 //Call the alias
-        \\lw    $ra, 0($sp) //Was clobbered - needs to be restored
-        \\add   $sp,$sp,24 //Fix up our stacks
+        \\lw    $ra, 0($sp) //Set correct return address
+        \\add   $sp,$sp,28 //Get rid of extra stack space
         \\jr    $ra //Return
     );
 }
