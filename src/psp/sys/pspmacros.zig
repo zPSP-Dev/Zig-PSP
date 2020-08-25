@@ -41,35 +41,6 @@ pub fn import_function(comptime module: []const u8, comptime func_id: []const u8
     \\.set push
     \\.set noreorder
 
-    \\.extern __stub_module_
-    ++ module ++ "\n" ++
-    \\.section .sceStub.text, "ax", @progbits
-    \\.globl 
-    ++ funcname ++ "\n" ++
-    \\.type   
-    ++ funcname ++ ", @function\n" ++
-    \\.ent    
-    ++ funcname ++ ", 0\n" ++
-funcname ++ ":\n" ++
-    \\.word   __stub_module_
-    ++ module ++ "\n" ++
-    \\.word   
-    ++ func_id ++ "\n" ++
-    \\.end    
-    ++ funcname ++ "\n" ++
-    \\.size   
-    ++ funcname ++ ", .-" ++ funcname ++ "\n" ++
-    \\.section .rodata.sceNid, "a"
-    \\.word   
-    ++ str ++ "\n" ++
-    \\.set pop
-    );
-}
-pub fn import_function2(comptime module: []const u8, comptime func_id: []const u8, comptime funcname: []const u8) []const u8{
-    return (
-    \\.set push
-    \\.set noreorder
-
     \\.section .sceStub.text, "ax", @progbits
     \\.globl 
     ++ funcname ++ "\n" ++
@@ -88,5 +59,62 @@ funcname ++ ":\n" ++
     \\.word   
     ++ func_id ++ "\n" ++
     \\.set pop
+    );
+}
+
+
+//INFO: https://people.eecs.berkeley.edu/~pattrsn/61CS99/lectures/lec24-args.pdf
+//Excellent source on >4 MIPS calls. All of these seem generic... maybe a macro for this?    
+pub fn generic_abi_wrapper(comptime funcname: []const u8, comptime argc: u8) []const u8{
+
+    //Add new stack space... How to calculate: 4 bytes * (num args + ra)
+    var stackAlloc : []const u8 = undefined;
+    //Conversely free it
+    var stackFree : []const u8 = undefined;
+
+    //Load the registers depending on arg count
+    var regLoad : []const u8 = undefined;
+
+    if(argc == 5){
+        stackAlloc = "add   $sp,$sp,-24\n";
+        stackFree  = "add   $sp,$sp,24\n";
+        regLoad = (
+        \\lw    $t0,16($sp) //Store arg5 from stack to t0
+        );
+    }else if(argc == 6){
+        stackAlloc = "add   $sp,$sp,-28\n";
+        stackFree  = "add   $sp,$sp,28\n";
+        regLoad = (
+        \\lw    $t0,16($sp) //Store arg5 from stack to t0
+        \\lw    $t1,20($sp) //Store arg6 from stack to t1
+        );
+    }else if(argc == 7){
+        stackAlloc = "add   $sp,$sp,-32\n";
+        stackFree  = "add   $sp,$sp,32\n";
+        regLoad = (
+        \\lw    $t0,16($sp) //Store arg5 from stack to t0
+        \\lw    $t1,20($sp) //Store arg6 from stack to t1
+        \\lw    $t2,24($sp) //Store arg7 from stack to t2
+        );
+    }else{
+        @compileError("Bad argc for generic ABI wrapper");
+    }
+
+    return(
+        \\.section .text, "a"
+        \\.global 
+        ++ funcname ++ "\n" ++ funcname ++ ":\n"
+        ++ regLoad ++ "\n"
+        ++ stackAlloc ++
+        //Preserve return
+        \\sw    $ra,0($sp)  
+        \\jal 
+        //Call the alias
+        ++ funcname ++ "_stub\n" ++ "\n" ++
+        //Set correct return address
+        \\lw    $ra, 0($sp) 
+        ++ "\n" ++ stackFree ++
+        //Return
+        \\jr    $ra 
     );
 }
