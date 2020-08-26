@@ -762,7 +762,7 @@ void output_sh(unsigned char *data)
 				
 				if (g_elfsections[i].pRef){
 
-					SW(&shdr->sh_info, (&g_elfsections[g_elfsections[i].iInfo])->iIndex);
+					SW(&shdr->sh_info, g_elfsections[i].pRef->iIndex);
 				}
 				else{
 					SW(&shdr->sh_info, 0);

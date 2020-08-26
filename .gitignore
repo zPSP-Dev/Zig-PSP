@@ -8,4 +8,6 @@ zig-cache
 .DS_STORE
 .DS_Store
 *.a
-bin
+prxgen
+pbptool
+sfotool
