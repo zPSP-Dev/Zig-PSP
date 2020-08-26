@@ -18,7 +18,7 @@ pub const PspGeCallbackData = struct_PspGeCallbackData;
 pub const struct_PspGeListArgs = extern struct {
     size: c_uint,
     context: [*c]PspGeContext,
-    numStacks: u32_3,
+    numStacks: u32,
     stacks: [*c]SceGeStack,
 };
 pub const PspGeListArgs = struct_PspGeListArgs;
@@ -46,7 +46,7 @@ pub const enum_PspGeMatrixTypes = extern enum(c_int) {
     _,
 };
 pub const PspGeMatrixTypes = enum_PspGeMatrixTypes;
-pub extern fn sceGeGetMtx(type: c_int, matrix: ?*c_void) c_int;
+pub extern fn sceGeGetMtx(typec: c_int, matrix: ?*c_void) c_int;
 const struct_unnamed_6 = extern struct {
     stack: [8]c_uint,
 };

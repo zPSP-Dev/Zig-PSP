@@ -18,3 +18,15 @@ pub extern fn sceChnnlsv_21BE78B4(ctx: [*c]pspChnnlsvContext2) c_int;
 
 pub const _pspChnnlsvContext1 = struct__pspChnnlsvContext1;
 pub const _pspChnnlsvContext2 = struct__pspChnnlsvContext2;
+
+const macro = @import("pspmacros.zig");
+
+comptime{
+    asm(macro.import_module_start("sceChnnlsv", "0x40010000", "6"));
+    asm(macro.import_function("sceChnnlsv", "0xE7833020", "sceChnnlsv_E7833020"));
+    asm(macro.import_function("sceChnnlsv", "0xF21A1FCA", "sceChnnlsv_F21A1FCA"));
+    asm(macro.import_function("sceChnnlsv", "0xC4C494F8", "sceChnnlsv_C4C494F8"));
+    asm(macro.import_function("sceChnnlsv", "0xABFDFC8B", "sceChnnlsv_ABFDFC8B"));
+    asm(macro.import_function("sceChnnlsv", "0x850A7FA1", "sceChnnlsv_850A7FA1"));
+    asm(macro.import_function("sceChnnlsv", "0x21BE78B4", "sceChnnlsv_21BE78B4"));
+}

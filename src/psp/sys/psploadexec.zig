@@ -20,4 +20,3 @@ comptime{
     asm(macro.import_function("LoadExecForUser","0x05572A5F", "sceKernelExitGame"));
     asm(macro.import_function("LoadExecForUser","0x4AC57943", "sceKernelRegisterExitCallback"));
 }
-

@@ -64,7 +64,8 @@ funcname ++ ":\n" ++
 
 
 //INFO: https://people.eecs.berkeley.edu/~pattrsn/61CS99/lectures/lec24-args.pdf
-//Excellent source on >4 MIPS calls. All of these seem generic... maybe a macro for this?    
+//Excellent source on >4 MIPS calls. 
+//This is a generic wrapper for 5-7 func calls  
 pub fn generic_abi_wrapper(comptime funcname: []const u8, comptime argc: u8) []const u8{
 
     //Add new stack space... How to calculate: 4 bytes * (num args + ra)
@@ -95,6 +96,25 @@ pub fn generic_abi_wrapper(comptime funcname: []const u8, comptime argc: u8) []c
         \\lw    $t0,16($sp) //Store arg5 from stack to t0
         \\lw    $t1,20($sp) //Store arg6 from stack to t1
         \\lw    $t2,24($sp) //Store arg7 from stack to t2
+        );
+    }else if(argc == 8){
+        stackAlloc = "add   $sp,$sp,-36\n";
+        stackFree  = "add   $sp,$sp,36\n";
+        regLoad = (
+        \\lw    $t0,16($sp) //Store arg5 from stack to t0
+        \\lw    $t1,20($sp) //Store arg6 from stack to t1
+        \\lw    $t2,24($sp) //Store arg7 from stack to t2
+        \\lw    $t3,28($sp) //Store arg8 from stack to t3
+        );
+    }else if(argc == 9){
+        stackAlloc = "add   $sp,$sp,-40\n";
+        stackFree  = "add   $sp,$sp,40\n";
+        regLoad = (
+        \\lw    $t0,16($sp) //Store arg5 from stack to t0
+        \\lw    $t1,20($sp) //Store arg6 from stack to t1
+        \\lw    $t2,24($sp) //Store arg7 from stack to t2
+        \\lw    $t3,28($sp) //Store arg8 from stack to t3
+        \\lw    $t4,32($sp) //Store arg9 from stack to t4 TODO: CHECK THIS!!!
         );
     }else{
         @compileError("Bad argc for generic ABI wrapper");

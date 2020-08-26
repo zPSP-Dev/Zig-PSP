@@ -95,16 +95,16 @@ pub const struct_PspUsbCamSetupStillParam = extern struct {
 pub const PspUsbCamSetupStillParam = struct_PspUsbCamSetupStillParam;
 pub const struct_PspUsbCamSetupStillExParam = extern struct {
     size: c_int,
-    unk: u32_3,
+    unk: u32,
     resolution: c_int,
     jpegsize: c_int,
     complevel: c_int,
-    unk2: u32_3,
-    unk3: u32_3,
+    unk2: u32,
+    unk3: u32,
     flip: c_int,
     mirror: c_int,
     delay: c_int,
-    unk4: [5]u32_3,
+    unk4: [5]u32,
 };
 pub const PspUsbCamSetupStillExParam = struct_PspUsbCamSetupStillExParam;
 pub const struct_PspUsbCamSetupVideoParam = extern struct {
@@ -118,40 +118,40 @@ pub const struct_PspUsbCamSetupVideoParam = extern struct {
     sharpness: c_int,
     effectmode: c_int,
     framesize: c_int,
-    unk: u32_3,
+    unk: u32,
     evlevel: c_int,
 };
 pub const PspUsbCamSetupVideoParam = struct_PspUsbCamSetupVideoParam;
 pub const struct_PspUsbCamSetupVideoExParam = extern struct {
     size: c_int,
-    unk: u32_3,
+    unk: u32,
     resolution: c_int,
     framerate: c_int,
-    unk2: u32_3,
-    unk3: u32_3,
+    unk2: u32,
+    unk3: u32,
     wb: c_int,
     saturation: c_int,
     brightness: c_int,
     contrast: c_int,
     sharpness: c_int,
-    unk4: u32_3,
-    unk5: u32_3,
-    unk6: [3]u32_3,
+    unk4: u32,
+    unk5: u32,
+    unk6: [3]u32,
     effectmode: c_int,
-    unk7: u32_3,
-    unk8: u32_3,
-    unk9: u32_3,
-    unk10: u32_3,
-    unk11: u32_3,
+    unk7: u32,
+    unk8: u32,
+    unk9: u32,
+    unk10: u32,
+    unk11: u32,
     framesize: c_int,
-    unk12: u32_3,
+    unk12: u32,
     evlevel: c_int,
 };
 pub const PspUsbCamSetupVideoExParam = struct_PspUsbCamSetupVideoExParam;
 pub extern fn sceUsbCamSetupStill(param: [*c]PspUsbCamSetupStillParam) c_int;
 pub extern fn sceUsbCamSetupStillEx(param: [*c]PspUsbCamSetupStillExParam) c_int;
-pub extern fn sceUsbCamStillInputBlocking(buf: [*c]u8_1, size: SceSize) c_int;
-pub extern fn sceUsbCamStillInput(buf: [*c]u8_1, size: SceSize) c_int;
+pub extern fn sceUsbCamStillInputBlocking(buf: [*c]u8, size: SceSize) c_int;
+pub extern fn sceUsbCamStillInput(buf: [*c]u8, size: SceSize) c_int;
 pub extern fn sceUsbCamStillWaitInputEnd() c_int;
 pub extern fn sceUsbCamStillPollInputEnd() c_int;
 pub extern fn sceUsbCamStillCancelInput() c_int;
@@ -160,8 +160,8 @@ pub extern fn sceUsbCamSetupVideo(param: [*c]PspUsbCamSetupVideoParam, workarea:
 pub extern fn sceUsbCamSetupVideoEx(param: [*c]PspUsbCamSetupVideoExParam, workarea: ?*c_void, wasize: c_int) c_int;
 pub extern fn sceUsbCamStartVideo() c_int;
 pub extern fn sceUsbCamStopVideo() c_int;
-pub extern fn sceUsbCamReadVideoFrameBlocking(buf: [*c]u8_1, size: SceSize) c_int;
-pub extern fn sceUsbCamReadVideoFrame(buf: [*c]u8_1, size: SceSize) c_int;
+pub extern fn sceUsbCamReadVideoFrameBlocking(buf: [*c]u8, size: SceSize) c_int;
+pub extern fn sceUsbCamReadVideoFrame(buf: [*c]u8, size: SceSize) c_int;
 pub extern fn sceUsbCamWaitReadVideoFrameEnd() c_int;
 pub extern fn sceUsbCamPollReadVideoFrameEnd() c_int;
 pub extern fn sceUsbCamGetReadVideoFrameSize() c_int;
@@ -196,3 +196,64 @@ pub const PspUsbCamFrameRate = enum_PspUsbCamFrameRate;
 pub const PspUsbCamWB = enum_PspUsbCamWB;
 pub const PspUsbCamEffectMode = enum_PspUsbCamEffectMode;
 pub const PspUsbCamEVLevel = enum_PspUsbCamEVLevel;
+
+
+const macro = @import("pspmacros.zig");
+
+comptime{
+    asm(macro.import_module_start("sceUsbCam", "0x40090000", "54"));
+    asm(macro.import_function("sceUsbCam", "0x03ED7A82", "sceUsbCamSetupMic"));
+    asm(macro.import_function("sceUsbCam", "0x08AEE98A", "sceUsbCamSetMicGain"));
+    asm(macro.import_function("sceUsbCam", "0x09C26C7E", "sceUsbCamSetContrast"));
+    asm(macro.import_function("sceUsbCam", "0x0A41A298", "sceUsbCamSetupStillEx"));
+    asm(macro.import_function("sceUsbCam", "0x11A1F128", "sceUsbCamGetAutoImageReverseState"));
+    asm(macro.import_function("sceUsbCam", "0x17F7B2FB", "sceUsbCamSetupVideo"));
+    asm(macro.import_function("sceUsbCam", "0x1A46CFE7", "sceUsbCamStillPollInputEnd"));
+    asm(macro.import_function("sceUsbCam", "0x1D686870", "sceUsbCamSetEvLevel"));
+    asm(macro.import_function("sceUsbCam", "0x1E958148", "sceUsbCam_1E958148"));
+    asm(macro.import_function("sceUsbCam", "0x2BCD50C0", "sceUsbCamGetEvLevel"));
+    asm(macro.import_function("sceUsbCam", "0x2E930264", "sceUsbCamSetupMicEx"));
+    asm(macro.import_function("sceUsbCam", "0x36636925", "sceUsbCamReadMicBlocking"));
+    asm(macro.import_function("sceUsbCam", "0x383E9FA8", "sceUsbCamGetSaturation"));
+    asm(macro.import_function("sceUsbCam", "0x3DC0088E", "sceUsbCamReadMic"));
+    asm(macro.import_function("sceUsbCam", "0x3F0CF289", "sceUsbCamSetupStill"));
+    asm(macro.import_function("sceUsbCam", "0x41E73E95", "sceUsbCamPollReadVideoFrameEnd"));
+    asm(macro.import_function("sceUsbCam", "0x41EE8797", "sceUsbCamUnregisterLensRotationCallback"));
+    asm(macro.import_function("sceUsbCam", "0x4C34F553", "sceUsbCamGetLensDirection"));
+    asm(macro.import_function("sceUsbCam", "0x4F3D84D5", "sceUsbCamSetBrightness"));
+    asm(macro.import_function("sceUsbCam", "0x5145868A", "sceUsbCamStopMic"));
+    asm(macro.import_function("sceUsbCam", "0x574A8C3F", "sceUsbCamStartVideo"));
+    asm(macro.import_function("sceUsbCam", "0x5778B452", "sceUsbCamGetMicDataLength"));
+    asm(macro.import_function("sceUsbCam", "0x61BE5CAC", "sceUsbCamStillInputBlocking"));
+    asm(macro.import_function("sceUsbCam", "0x622F83CC", "sceUsbCamSetSharpness"));
+    asm(macro.import_function("sceUsbCam", "0x6784E6A8", "sceUsbCamSetAntiFlicker"));
+    asm(macro.import_function("sceUsbCam", "0x6CF32CB9", "sceUsbCamStopVideo"));
+    asm(macro.import_function("sceUsbCam", "0x6E205974", "sceUsbCamSetSaturation"));
+    asm(macro.import_function("sceUsbCam", "0x70F522C5", "sceUsbCamGetBrightness"));
+    asm(macro.import_function("sceUsbCam", "0x7563AFA1", "sceUsbCamStillWaitInputEnd"));
+    asm(macro.import_function("sceUsbCam", "0x7DAC0C71", "sceUsbCamReadVideoFrameBlocking"));
+    asm(macro.import_function("sceUsbCam", "0x82A64030", "sceUsbCamStartMic"));
+    asm(macro.import_function("sceUsbCam", "0x951BEDF5", "sceUsbCamSetReverseMode"));
+    asm(macro.import_function("sceUsbCam", "0x95F8901E", "sceUsbCam_95F8901E"));
+    asm(macro.import_function("sceUsbCam", "0x994471E0", "sceUsbCamGetImageEffectMode"));
+    asm(macro.import_function("sceUsbCam", "0x99D86281", "sceUsbCamReadVideoFrame"));
+    asm(macro.import_function("sceUsbCam", "0x9E8AAF8D", "sceUsbCamGetZoom"));
+    asm(macro.import_function("sceUsbCam", "0xA063A957", "sceUsbCamGetContrast"));
+    asm(macro.import_function("sceUsbCam", "0xA720937C", "sceUsbCamStillCancelInput"));
+    asm(macro.import_function("sceUsbCam", "0xAA7D94BA", "sceUsbCamGetAntiFlicker"));
+    asm(macro.import_function("sceUsbCam", "0xB048A67D", "sceUsbCamWaitReadMicEnd"));
+    asm(macro.import_function("sceUsbCam", "0xC484901F", "sceUsbCamSetZoom"));
+    asm(macro.import_function("sceUsbCam", "0xC72ED6D3", "sceUsbCam_C72ED6D3"));
+    asm(macro.import_function("sceUsbCam", "0xCFE9E999", "sceUsbCamSetupVideoEx"));
+    asm(macro.import_function("sceUsbCam", "0xD293A100", "sceUsbCamRegisterLensRotationCallback"));
+    asm(macro.import_function("sceUsbCam", "0xD4876173", "sceUsbCamSetImageEffectMode"));
+    asm(macro.import_function("sceUsbCam", "0xD5279339", "sceUsbCamGetReverseMode"));
+    asm(macro.import_function("sceUsbCam", "0xD865997B", "sceUsbCam_D865997B"));
+    asm(macro.import_function("sceUsbCam", "0xDF9D0C92", "sceUsbCamGetReadVideoFrameSize"));
+    asm(macro.import_function("sceUsbCam", "0xE5959C36", "sceUsbCamStillGetInputLength"));
+    asm(macro.import_function("sceUsbCam", "0xF8847F60", "sceUsbCamPollReadMicEnd"));
+    asm(macro.import_function("sceUsbCam", "0xF90B2293", "sceUsbCamWaitReadVideoFrameEnd"));
+    asm(macro.import_function("sceUsbCam", "0xF93C4669", "sceUsbCamAutoImageReverseSW"));
+    asm(macro.import_function("sceUsbCam", "0xFB0A6C5D", "sceUsbCamStillInput"));
+    asm(macro.import_function("sceUsbCam", "0xFDB68C23", "sceUsbCamGetSharpness"));
+}

@@ -141,11 +141,11 @@ pub const enum_PspEventFlagWaitTypes = extern enum(c_int) {
     _,
 };
 pub extern fn sceKernelCreateEventFlag(name: [*c]const u8, attr: c_int, bits: c_int, opt: [*c]SceKernelEventFlagOptParam) SceUID;
-pub extern fn sceKernelSetEventFlag(evid: SceUID, bits: u32_3) c_int;
-pub extern fn sceKernelClearEventFlag(evid: SceUID, bits: u32_3) c_int;
-pub extern fn sceKernelPollEventFlag(evid: c_int, bits: u32_3, wait: u32_3, outBits: [*c]u32_3) c_int;
-pub extern fn sceKernelWaitEventFlag(evid: c_int, bits: u32_3, wait: u32_3, outBits: [*c]u32_3, timeout: [*c]SceUInt) c_int;
-pub extern fn sceKernelWaitEventFlagCB(evid: c_int, bits: u32_3, wait: u32_3, outBits: [*c]u32_3, timeout: [*c]SceUInt) c_int;
+pub extern fn sceKernelSetEventFlag(evid: SceUID, bits: u32) c_int;
+pub extern fn sceKernelClearEventFlag(evid: SceUID, bits: u32) c_int;
+pub extern fn sceKernelPollEventFlag(evid: c_int, bits: u32, wait: u32, outBits: [*c]u32) c_int;
+pub extern fn sceKernelWaitEventFlag(evid: c_int, bits: u32, wait: u32, outBits: [*c]u32, timeout: [*c]SceUInt) c_int;
+pub extern fn sceKernelWaitEventFlagCB(evid: c_int, bits: u32, wait: u32, outBits: [*c]u32, timeout: [*c]SceUInt) c_int;
 pub extern fn sceKernelDeleteEventFlag(evid: c_int) c_int;
 pub extern fn sceKernelReferEventFlagStatus(event: SceUID, status: [*c]SceKernelEventFlagInfo) c_int;
 pub const struct_SceKernelMbxOptParam = extern struct {
@@ -223,7 +223,7 @@ pub const enum_SceKernelIdListType = extern enum(c_int) {
     SCE_KERNEL_TMID_DormantThread = 67,
     _,
 };
-pub extern fn sceKernelGetThreadmanIdList(type: enum_SceKernelIdListType, readbuf: [*c]SceUID, readbufsize: c_int, idcount: [*c]c_int) c_int;
+pub extern fn sceKernelGetThreadmanIdList(typec: enum_SceKernelIdListType, readbuf: [*c]SceUID, readbufsize: c_int, idcount: [*c]c_int) c_int;
 pub const struct_SceKernelSystemStatus = extern struct {
     size: SceSize,
     status: SceUInt,
@@ -384,7 +384,7 @@ const macro = @import("pspmacros.zig");
 comptime{
     asm(macro.import_module_start("ThreadManForUser", "0x40010000", "126"));
     asm(macro.import_function("ThreadManForUser", "0x6E9EA350", "_sceKernelReturnFromCallback"));
-    asm(macro.import_function("ThreadManForUser", "0x0C106E53", "sceKernelRegisterThreadEventHandler"));
+    asm(macro.import_function("ThreadManForUser", "0x0C106E53", "sceKernelRegisterThreadEventHandler_stub"));
     asm(macro.import_function("ThreadManForUser", "0x72F3C145", "sceKernelReleaseThreadEventHandler"));
     asm(macro.import_function("ThreadManForUser", "0x369EEB6B", "sceKernelReferThreadEventHandlerStatus"));
     asm(macro.import_function("ThreadManForUser", "0xE81CAF8F", "sceKernelCreateCallback"));
@@ -406,7 +406,7 @@ comptime{
     asm(macro.import_function("ThreadManForUser", "0x68DA9E36", "sceKernelDelayThreadCB"));
     asm(macro.import_function("ThreadManForUser", "0xBD123D9E", "sceKernelDelaySysClockThread"));
     asm(macro.import_function("ThreadManForUser", "0x1181E963", "sceKernelDelaySysClockThreadCB"));
-    asm(macro.import_function("ThreadManForUser", "0xD6DA4BA1", "sceKernelCreateSema"));
+    asm(macro.import_function("ThreadManForUser", "0xD6DA4BA1", "sceKernelCreateSema_stub"));
     asm(macro.import_function("ThreadManForUser", "0x28B6489C", "sceKernelDeleteSema"));
     asm(macro.import_function("ThreadManForUser", "0x3F53E640", "sceKernelSignalSema"));
     asm(macro.import_function("ThreadManForUser", "0x4E3A1105", "sceKernelWaitSema"));
@@ -418,8 +418,8 @@ comptime{
     asm(macro.import_function("ThreadManForUser", "0xEF9E4C70", "sceKernelDeleteEventFlag"));
     asm(macro.import_function("ThreadManForUser", "0x1FB15A32", "sceKernelSetEventFlag"));
     asm(macro.import_function("ThreadManForUser", "0x812346E4", "sceKernelClearEventFlag"));
-    asm(macro.import_function("ThreadManForUser", "0x402FCF22", "sceKernelWaitEventFlag"));
-    asm(macro.import_function("ThreadManForUser", "0x328C546A", "sceKernelWaitEventFlagCB"));
+    asm(macro.import_function("ThreadManForUser", "0x402FCF22", "sceKernelWaitEventFlag_stub"));
+    asm(macro.import_function("ThreadManForUser", "0x328C546A", "sceKernelWaitEventFlagCB_stub"));
     asm(macro.import_function("ThreadManForUser", "0x30FD48F0", "sceKernelPollEventFlag"));
     asm(macro.import_function("ThreadManForUser", "0xCD203292", "sceKernelCancelEventFlag"));
     asm(macro.import_function("ThreadManForUser", "0xA66B0120", "sceKernelReferEventFlagStatus"));
@@ -431,17 +431,17 @@ comptime{
     asm(macro.import_function("ThreadManForUser", "0x0D81716A", "sceKernelPollMbx"));
     asm(macro.import_function("ThreadManForUser", "0x87D4DD36", "sceKernelCancelReceiveMbx"));
     asm(macro.import_function("ThreadManForUser", "0xA8E8C846", "sceKernelReferMbxStatus"));
-    asm(macro.import_function("ThreadManForUser", "0x7C0DC2A0", "sceKernelCreateMsgPipe"));
+    asm(macro.import_function("ThreadManForUser", "0x7C0DC2A0", "sceKernelCreateMsgPipe_stub"));
     asm(macro.import_function("ThreadManForUser", "0xF0B7DA1C", "sceKernelDeleteMsgPipe"));
-    asm(macro.import_function("ThreadManForUser", "0x876DBFAD", "sceKernelSendMsgPipe"));
-    asm(macro.import_function("ThreadManForUser", "0x7C41F2C2", "sceKernelSendMsgPipeCB"));
+    asm(macro.import_function("ThreadManForUser", "0x876DBFAD", "sceKernelSendMsgPipe_stub"));
+    asm(macro.import_function("ThreadManForUser", "0x7C41F2C2", "sceKernelSendMsgPipeCB_stub"));
     asm(macro.import_function("ThreadManForUser", "0x884C9F90", "sceKernelTrySendMsgPipe"));
-    asm(macro.import_function("ThreadManForUser", "0x74829B76", "sceKernelReceiveMsgPipe"));
-    asm(macro.import_function("ThreadManForUser", "0xFBFA697D", "sceKernelReceiveMsgPipeCB"));
+    asm(macro.import_function("ThreadManForUser", "0x74829B76", "sceKernelReceiveMsgPipe_stub"));
+    asm(macro.import_function("ThreadManForUser", "0xFBFA697D", "sceKernelReceiveMsgPipeCB_stub"));
     asm(macro.import_function("ThreadManForUser", "0xDF52098F", "sceKernelTryReceiveMsgPipe"));
     asm(macro.import_function("ThreadManForUser", "0x349B864D", "sceKernelCancelMsgPipe"));
     asm(macro.import_function("ThreadManForUser", "0x33BE4024", "sceKernelReferMsgPipeStatus"));
-    asm(macro.import_function("ThreadManForUser", "0x56C039B5", "sceKernelCreateVpl"));
+    asm(macro.import_function("ThreadManForUser", "0x56C039B5", "sceKernelCreateVpl_stub"));
     asm(macro.import_function("ThreadManForUser", "0x89B3D48C", "sceKernelDeleteVpl"));
     asm(macro.import_function("ThreadManForUser", "0xBED27435", "sceKernelAllocateVpl"));
     asm(macro.import_function("ThreadManForUser", "0xEC0A693F", "sceKernelAllocateVplCB"));
@@ -449,7 +449,7 @@ comptime{
     asm(macro.import_function("ThreadManForUser", "0xB736E9FF", "sceKernelFreeVpl"));
     asm(macro.import_function("ThreadManForUser", "0x1D371B8A", "sceKernelCancelVpl"));
     asm(macro.import_function("ThreadManForUser", "0x39810265", "sceKernelReferVplStatus"));
-    asm(macro.import_function("ThreadManForUser", "0xC07BB470", "sceKernelCreateFpl"));
+    asm(macro.import_function("ThreadManForUser", "0xC07BB470", "sceKernelCreateFpl_stub"));
     asm(macro.import_function("ThreadManForUser", "0xED1410E0", "sceKernelDeleteFpl"));
     asm(macro.import_function("ThreadManForUser", "0xD979E9BF", "sceKernelAllocateFpl"));
     asm(macro.import_function("ThreadManForUser", "0xE7282CB6", "sceKernelAllocateFplCB"));
@@ -511,5 +511,16 @@ comptime{
     asm(macro.import_function("ThreadManForUser", "0x8218B4DD", "sceKernelReferGlobalProfiler"));
 
     asm(macro.generic_abi_wrapper("sceKernelCreateThread", 6));
+
+    asm(macro.generic_abi_wrapper("sceKernelCreateSema", 5));
+    asm(macro.generic_abi_wrapper("sceKernelWaitEventFlag", 5));
+    asm(macro.generic_abi_wrapper("sceKernelWaitEventFlagCB", 5));
+    asm(macro.generic_abi_wrapper("sceKernelCreateMsgPipe", 5));
+    asm(macro.generic_abi_wrapper("sceKernelSendMsgPipeCB", 5));
+    asm(macro.generic_abi_wrapper("sceKernelReceiveMsgPipe", 5));
+    asm(macro.generic_abi_wrapper("sceKernelReceiveMsgPipeCB", 5));
+    asm(macro.generic_abi_wrapper("sceKernelCreateVpl", 5));
+    asm(macro.generic_abi_wrapper("sceKernelCreateFpl", 5));
+    asm(macro.generic_abi_wrapper("sceKernelRegisterThreadEventHandler", 6));
 }
 

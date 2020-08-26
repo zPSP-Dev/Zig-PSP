@@ -38,32 +38,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 .globl __syslib_exports
 .globl __library_exports
 
-.set push
-
-.section .lib.ent.top, "a", @progbits
-    .align 2
-    .word 0                                             
-__lib_ent_top:
-
-.section .lib.ent.btm, "a", @progbits
-    .align 2
-__lib_ent_bottom:
-    .word 0
-
-.section .lib.stub.top, "a", @progbits
-    .align 2
-    .word 0
-__lib_stub_top:
-
-.section .lib.stub.btm, "a", @progbits
-    .align 2
-__lib_stub_bottom:
-    .word 0
-
-.set pop
-
-.text
-
 .section .rodata.sceModuleInfo, "a", @progbits
 module_info:
     .align 5

@@ -5,6 +5,7 @@ usingnamespace @import("../sys/pspstdio.zig");
 usingnamespace @import("../sys/pspiofilemgr.zig");
 usingnamespace @import("../sys/pspthreadman.zig");
 usingnamespace @import("../sys/psploadexec.zig");
+usingnamespace @import("../sys/psprtc.zig");
 const builtin = @import("builtin");
 
 //Internal variables for the screen
@@ -155,6 +156,7 @@ fn internal_putchar(cx: u32, cy: u32, ch: u8) void{
 
 usingnamespace @import("module.zig");
 
+
 //Meme panic
 pub var pancakeMode : bool = false;
 
@@ -184,8 +186,6 @@ pub fn panic(message: []const u8, stack_trace: ?*builtin.StackTrace) noreturn {
 
 var current_time : u64 = 0;
 var tickRate : u32 = 0;
-
-usingnamespace @import("../sys/psprtc.zig");
 
 //Starts a benchmark
 pub fn benchmark_start() void {

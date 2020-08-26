@@ -17,3 +17,15 @@ pub extern fn sceKernelIsRegisterSysEventHandler(handler: [*c]PspSysEventHandler
 pub extern fn sceKernelRegisterSysEventHandler(handler: [*c]PspSysEventHandler) c_int;
 pub extern fn sceKernelUnregisterSysEventHandler(handler: [*c]PspSysEventHandler) c_int;
 
+const macro = @import("pspmacros.zig");
+
+comptime{
+    asm(macro.import_module_start("sceSysEventForKernel", "0x00010000", "5"));
+    asm(macro.import_function("sceSysEventForKernel", "0xAEB300AE", "sceKernelIsRegisterSysEventHandler"));
+    asm(macro.import_function("sceSysEventForKernel", "0xCD9E4BB5", "sceKernelRegisterSysEventHandler"));
+    asm(macro.import_function("sceSysEventForKernel", "0xD7D3FDCD", "sceKernelUnregisterSysEventHandler"));
+    asm(macro.import_function("sceSysEventForKernel", "0x36331294", "sceKernelSysEventDispatch_stub"));
+    asm(macro.import_function("sceSysEventForKernel", "0x68D55505", "sceKernelReferSysEventHandler"));
+
+    asm(macro.generic_abi_wrapper("sceKernelSysEventDispatch", 7));
+}
