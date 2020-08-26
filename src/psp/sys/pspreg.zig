@@ -39,7 +39,6 @@ const macro = @import("pspmacros.zig");
 
 comptime{
     asm(macro.import_module_start("sceReg", "0x40010000", "18"));
-    asm(macro.import_function("sceReg", "0x9B25EDF1", "sceRegExit"));
     asm(macro.import_function("sceReg", "0x92E41280", "sceRegOpenRegistry"));
     asm(macro.import_function("sceReg", "0xFA8A5739", "sceRegCloseRegistry"));
     asm(macro.import_function("sceReg", "0xDEDA92BF", "sceRegRemoveRegistry"));
@@ -54,7 +53,6 @@ comptime{
     asm(macro.import_function("sceReg", "0x2C0DB9DD", "sceRegGetKeysNum"));
     asm(macro.import_function("sceReg", "0x2D211135", "sceRegGetKeys"));
     asm(macro.import_function("sceReg", "0x4CA16893", "sceRegRemoveCategory"));
-    asm(macro.import_function("sceReg", "0x3615BC87", "sceRegRemoveKey"));
     asm(macro.import_function("sceReg", "0xC5768D02", "sceRegGetKeyInfoByName"));
     asm(macro.import_function("sceReg", "0x30BE0259", "sceRegGetKeyValueByName"));
     asm(macro.generic_abi_wrapper("sceRegGetKeyInfo", 6));

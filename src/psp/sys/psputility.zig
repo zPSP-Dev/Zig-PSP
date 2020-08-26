@@ -560,7 +560,6 @@ comptime{
     asm(macro.import_function("sceUtility", "0xC629AF26", "sceUtilityLoadAvModule"));
     asm(macro.import_function("sceUtility", "0xF7D8D092", "sceUtilityUnloadAvModule"));
     asm(macro.import_function("sceUtility", "0x0D5BC6D2", "sceUtilityLoadUsbModule"));
-    asm(macro.import_function("sceUtility", "0xF64910F0", "sceUtilityUnloadUsbModule"));
     asm(macro.import_function("sceUtility", "0x4928BD96", "sceUtilityMsgDialogAbort"));
     asm(macro.import_function("sceUtility", "0x05AFB9E4", "sceUtilityHtmlViewerUpdate"));
     asm(macro.import_function("sceUtility", "0xBDA7D894", "sceUtilityHtmlViewerGetStatus"));

@@ -25,9 +25,6 @@ comptime{
     asm(macro.import_function("sceImpose", "0x8F6E3518", "sceImposeGetBacklightOffTime"));
     asm(macro.import_function("sceImpose", "0x967F6D4A", "sceImposeSetBacklightOffTime"));
     asm(macro.import_function("sceImpose", "0x9BA61B49", "sceImpose_9BA61B49"));
-    asm(macro.import_function("sceImpose", "0xA9884B00", "sceImpose_A9884B00"));
     asm(macro.import_function("sceImpose", "0xBB3F5DEC", "sceImpose_BB3F5DEC"));
     asm(macro.import_function("sceImpose", "0xE0887BC8", "sceImposeGetUMDPopup"));
-    asm(macro.import_function("sceImpose", "0xFCD44963", "sceImpose_FCD44963"));
-    asm(macro.import_function("sceImpose", "0xFF1A2F07", "sceImpose_FF1A2F07"));
 }

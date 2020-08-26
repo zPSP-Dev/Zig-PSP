@@ -85,7 +85,7 @@ comptime{
     asm(macro.import_function("sceGe_user", "0xB77905EA", "sceGeEdramSetAddrTranslation"));
     asm(macro.import_function("sceGe_user", "0xDC93CFEF", "sceGeGetCmd"));
     asm(macro.import_function("sceGe_user", "0x57C8945B", "sceGeGetMtx"));
-    asm(macro.import_function("sceGe_user", "0xE66CB92E", "sceGeGetStack"));
+    //asm(macro.import_function("sceGe_user", "0xE66CB92E", "sceGeGetStack"));
     asm(macro.import_function("sceGe_user", "0x438A385A", "sceGeSaveContext"));
     asm(macro.import_function("sceGe_user", "0x0BF608FB", "sceGeRestoreContext"));
     asm(macro.import_function("sceGe_user", "0xAB49E76A", "sceGeListEnQueue"));
@@ -98,4 +98,4 @@ comptime{
     asm(macro.import_function("sceGe_user", "0x4C06E472", "sceGeContinue"));
     asm(macro.import_function("sceGe_user", "0xA4FC06A4", "sceGeSetCallback"));
     asm(macro.import_function("sceGe_user", "0x05DB22CE", "sceGeUnsetCallback"));
-}
+} 

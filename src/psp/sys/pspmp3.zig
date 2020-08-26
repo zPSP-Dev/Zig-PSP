@@ -41,11 +41,9 @@ comptime{
     asm(macro.import_function("sceMp3", "0x3C2FA058", "sceMp3TermResource"));
     asm(macro.import_function("sceMp3", "0x3CEF484F", "sceMp3SetLoopNum"));
     asm(macro.import_function("sceMp3", "0x44E07129", "sceMp3Init"));
-    asm(macro.import_function("sceMp3", "0x732B042A", "sceMp3_732B042A"));
     asm(macro.import_function("sceMp3", "0x7F696782", "sceMp3GetMp3ChannelNum"));
     asm(macro.import_function("sceMp3", "0x87677E40", "sceMp3GetBitRate"));
     asm(macro.import_function("sceMp3", "0x87C263D1", "sceMp3GetMaxOutputSample"));
-    asm(macro.import_function("sceMp3", "0x8AB81558", "sceMp3_8AB81558"));
     asm(macro.import_function("sceMp3", "0x8F450998", "sceMp3GetSamplingRate"));
     asm(macro.import_function("sceMp3", "0xA703FE0F", "sceMp3GetInfoToAddStreamData"));
     asm(macro.import_function("sceMp3", "0xD021C0FB", "sceMp3Decode"));
