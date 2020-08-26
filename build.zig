@@ -28,10 +28,15 @@ pub fn build(b: *Builder) void {
 
     //All of the release modes work
     //Debug Mode can cause issues with trap instructions
-    const mode = builtin.Mode.ReleaseSafe;
+    const mode = builtin.Mode.ReleaseSmall;
+
+    const lib = b.addStaticLibrary("zpsp", "src/psp/libzpsp.zig");
+    lib.setTarget(target);
+    lib.setBuildMode(mode);
+    lib.setOutputDir("zig-cache/");
 
     //Build from your main file!
-    const exe = b.addObject("main", "src/main.zig");
+    const exe = b.addObject("main", "src/main.zig"); //TODO: Change to executable
 
     //Output to zig cache for now
     exe.setOutputDir("zig-cache/");
@@ -41,6 +46,7 @@ pub fn build(b: *Builder) void {
     exe.setBuildMode(mode);
     exe.setLinkerScriptPath("tools/linkfile.ld");
     exe.link_eh_frame_hdr = true;
+    exe.step.dependOn(&lib.step);
     
     //New step to link the object
     //Hopefully can be removed (https://github.com/ziglang/zig/issues/5986)
