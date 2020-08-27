@@ -1,6 +1,6 @@
-usingnamespace @import("../sys/psploadexec.zig");
-usingnamespace @import("../sys/pspthreadman.zig");
-usingnamespace @import("../sys/psptypes.zig");
+usingnamespace @import("../include/psploadexec.zig");
+usingnamespace @import("../include/pspthreadman.zig");
+usingnamespace @import("../include/psptypes.zig");
 
 usingnamespace @import("debug.zig");
 usingnamespace @import("utils.zig");

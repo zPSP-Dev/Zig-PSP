@@ -1,4 +1,4 @@
-usingnamespace @import("../sys/pspdisplay.zig");
+usingnamespace @import("../include/pspdisplay.zig");
 
 //This isn't an actual "allocator" per se
 //It allocates static chunks of VRAM

@@ -1,11 +1,11 @@
 usingnamespace @import("constants.zig");
-usingnamespace @import("../sys/pspge.zig");
-usingnamespace @import("../sys/pspdisplay.zig");
-usingnamespace @import("../sys/pspstdio.zig");
-usingnamespace @import("../sys/pspiofilemgr.zig");
-usingnamespace @import("../sys/pspthreadman.zig");
-usingnamespace @import("../sys/psploadexec.zig");
-usingnamespace @import("../sys/psprtc.zig");
+usingnamespace @import("../include/pspge.zig");
+usingnamespace @import("../include/pspdisplay.zig");
+usingnamespace @import("../include/pspstdio.zig");
+usingnamespace @import("../include/pspiofilemgr.zig");
+usingnamespace @import("../include/pspthreadman.zig");
+usingnamespace @import("../include/psploadexec.zig");
+usingnamespace @import("../include/psprtc.zig");
 const builtin = @import("builtin");
 
 //Internal variables for the screen
