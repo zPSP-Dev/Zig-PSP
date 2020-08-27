@@ -51,12 +51,12 @@ pub fn build(b: *Builder) void {
     //New step to link the object
     //Hopefully can be removed (https://github.com/ziglang/zig/issues/5986)
     const link_to_elf = b.addSystemCommand(&[_][]const u8{
-        "ld.lld", "-L./tools",
+        "ld.lld", "-L./zig-cache", "-lzpsp",
         "-Ttools/linkfile.ld",
         exe.getOutputPath(),
         "-o",
         "zig-cache/app.elf",
-        "-emit-relocs", "--eh-frame-hdr", "--no-gc-sections"
+        "-emit-relocs", "--eh-frame-hdr", "--gc-sections", 
     });
     link_to_elf.step.dependOn(&exe.step);
 
