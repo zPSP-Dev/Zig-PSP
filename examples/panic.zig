@@ -1,6 +1,6 @@
 //A brief example of PSP Panic Handling
 
-const psp = @import("psp/pspsdk.zig");
+const psp = @import("psp/utils/psp.zig");
 pub const panic = psp.debug.panic;
 
 comptime {

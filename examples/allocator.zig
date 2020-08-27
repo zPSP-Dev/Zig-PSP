@@ -1,6 +1,7 @@
 //Shows a working example of allocation and freeing
 
-const psp = @import("psp/pspsdk.zig");
+const psp = @import("psp/utils/psp.zig");
+const sysmem = @import("psp/include/pspsysmem.zig");
 
 const std = @import("std");
 const fmt = std.fmt;
@@ -10,7 +11,7 @@ comptime {
 }
 
 fn printFreeMem(alloc: *std.mem.Allocator) void {
-    var freeMem = psp.sceKernelTotalFreeMemSize();
+    var freeMem = sysmem.sceKernelTotalFreeMemSize();
     const fMem = std.fmt.allocPrint(alloc, "{} Bytes Free\n", .{freeMem}) catch unreachable;
     psp.debug.print(fMem);
     alloc.free(fMem);

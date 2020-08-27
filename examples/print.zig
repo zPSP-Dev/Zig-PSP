@@ -1,6 +1,6 @@
 //Using colors!
 
-const psp = @import("psp/pspsdk.zig");
+const psp = @import("psp/utils/psp.zig");
 
 comptime {
     _ = psp.module_start_struct;

@@ -1,6 +1,6 @@
 //Testing main error handling.
 
-const psp = @import("psp/pspsdk.zig");
+const psp = @import("psp/utils/psp.zig");
 const std = @import("std");
 const fmt = std.fmt;
 
