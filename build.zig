@@ -56,7 +56,8 @@ pub fn build(b: *Builder) void {
         exe.getOutputPath(),
         "-o",
         "zig-cache/app.elf",
-        "-emit-relocs", "--eh-frame-hdr", "--no-gc-sections"
+        "-emit-relocs", 
+        "--eh-frame-hdr", "--no-gc-sections"
     });
     link_to_elf.step.dependOn(&exe.step);
 
