@@ -30,3 +30,4 @@ pub usingnamespace @import("nids/psputility.zig");
 pub usingnamespace @import("nids/psputils.zig");
 pub usingnamespace @import("nids/pspwlan.zig");
 pub usingnamespace @import("utils/mem-fix.zig");
+pub usingnamespace @import("sdk/pspguimpl.zig");
