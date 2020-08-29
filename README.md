@@ -13,7 +13,7 @@ Zig-PSP also relies on binary tools included as submodules from the zPSP-Dev tea
 
 ## Usage
 
-Currently, using Zig-PSP is rather straight forward - one must use the psp folder in their project's src folder in order to have the extern definitions for libpsp.a alongside with some custom utilities I have created. One also must include the lib/ folder to include libpsp.a alongside with the post-build tools. To build a PSP app, use the included `build.zig` script to generate a PSP executable! (EBOOT.PBP / app.prx) This script is well commented for explanation and documentation.
+Currently, using Zig-PSP is rather straight forward - one must use the psp folder in their project's src folder in order to have the PSP's function definitions, alongside with some custom utilities I have created. One also must include the tools/ folder to use the post-build tools. To build a PSP app, use the included `build.zig` script to generate a PSP executable! (EBOOT.PBP / app.prx) This script is well commented for explanation and documentation.
 
 For a main.zig file one should include something like:
 
@@ -22,8 +22,8 @@ For a main.zig file one should include something like:
 
 //We have 2 different ways of including the PSPSDK - either the minimalist version within utils (you can later include other modules...)
 //Or the full SDK through pspsdk.zig with all libraries.
-//In a minimalist instance, binaries are 13,284 bytes on release safe versus 22,724 bytes on the full version (no GU)
-const psp = @import("psp/pspsdk.zig");
+//In a minimalist instance, binaries are 13,284 bytes on release small versus 22,724 bytes on the full version (no GU)
+const psp = @import("psp/users/psp.zig");
 
 comptime {
     _ = psp.module_start_struct;
