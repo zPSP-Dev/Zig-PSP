@@ -5,6 +5,10 @@
 
 In the PSP programming community, many libraries, tools, and other features are written in C or C++, which as we know has its problems with writing clean, reusable, and high quality code. Given that the core objectives of Zig as a language are to allow us to create well-designed and reusable software, Zig seems like a perfect fit for integrating older PSP libraries while striving to develop higher quality software!
 
+## Special Thanks
+
+Special thanks is given to the [Rust-PSP team](https://github.com/overdrivenpotato/rust-psp) whose efforts influenced and helped to get this project off the ground. No harm is intended, and it's thanks to you Rustaceans that fellow Ziguanas can program for the PSP.
+
 ## Installation Requirements
 
 The only other program required to use Zig-PSP is the lld linker for LLVM. This is required purely because the build script cannot pass the -emit-relocs flag to generate an ELF. [See The Issue Here](https://github.com/ziglang/zig/issues/5986)
