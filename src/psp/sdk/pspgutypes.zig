@@ -272,27 +272,6 @@ pub const SignalBehavior = extern enum(c_int) {
     Continue = 2,
 };
 
-pub fn abgr(a: u8, b: u8, g: u8, r: u8) u32 {
-    return @as(u32, r) | (@as(u32, g) << 8) | (@as(u32, b) << 16) | (@as(u32, a) << 24);
-}
-
-pub fn argb(a: u8, r: u8, g: u8, b: u8) u32 {
-    return abgr(a, b, g, r);
-}
-
-pub fn rgba(r: u8, g: u8, b: u8, a: u8) u32 {
-    return argb(a, r, g, b);
-}
-
-pub fn color(r: f32, g: f32, b: f32, a: f32) u32 {
-    return rgba(
-        @as(u8, (r * 255.0)),
-        @as(u8, (g * 255.0)),
-        @as(u8, (b * 255.0)),
-        @as(u8, (a * 255.0))
-    );
-}
-
 pub const ClearBitFlags = extern enum(c_int){
     ColorBuffer = 1,
     StencilBuffer = 2,
@@ -303,7 +282,9 @@ pub const ClearBitFlags = extern enum(c_int){
 pub const LightBitFlags = extern enum(c_int){
     Ambient = 1,
     Diffuse = 2,
+    AmbientDiffuse = 3,
     Specular = 4,
+    DiffuseSpecular = 6,
     Unknown = 8,
 };
 
@@ -329,3 +310,5 @@ pub const VertexTypeFlags = extern enum(c_int){
     Transform2D = 1 << 23,
     Transform3D = 0,
 };
+
+pub const GuSwapBuffersCallback = ?fn ([*c]?*c_void, [*c]?*c_void) callconv(.C) void;

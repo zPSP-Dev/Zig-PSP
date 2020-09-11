@@ -2,7 +2,6 @@ usingnamespace @import("psptypes.zig");
 usingnamespace @import("pspge.zig");
 pub usingnamespace @import("pspgutypes.zig");
 
-pub const GuSwapBuffersCallback = ?fn ([*c]?*c_void, [*c]?*c_void) callconv(.C) void;
 pub extern fn sceGuDepthBuffer(zbp: ?*c_void, zbw: c_int) void;
 pub extern fn sceGuDispBuffer(width: c_int, height: c_int, dispbp: ?*c_void, dispbw: c_int) void;
 pub extern fn sceGuDrawBuffer(psm: c_int, fbp: ?*c_void, fbw: c_int) void;
@@ -40,7 +39,7 @@ pub extern fn sceGuSetAllStatus(status: c_int) void;
 pub extern fn sceGuGetAllStatus() c_int;
 pub extern fn sceGuEnable(state: c_int) void;
 pub extern fn sceGuDisable(state: c_int) void;
-pub extern fn sceGuLight(light: c_int, type: c_int, components: c_int, position: [*c]const ScePspFVector3) void;
+pub extern fn sceGuLight(light: c_int, typec: c_int, components: c_int, position: [*c]const ScePspFVector3) void;
 pub extern fn sceGuLightAtt(light: c_int, atten0: f32, atten1: f32, atten2: f32) void;
 pub extern fn sceGuLightColor(light: c_int, component: c_int, color: c_uint) void;
 pub extern fn sceGuLightMode(mode: c_int) void;
@@ -97,3 +96,24 @@ pub extern fn sceGuMorphWeight(index: c_int, weight: f32) void;
 pub extern fn sceGuDrawArrayN(primitive_type: c_int, vertex_type: c_int, count: c_int, a3: c_int, indices: ?*const c_void, vertices: ?*const c_void) void;
 pub extern fn guSwapBuffersBehaviour(behaviour: c_int) void;
 pub extern fn guSwapBuffersCallback(callback: GuSwapBuffersCallback) void;
+
+pub fn abgr(a: u8, b: u8, g: u8, r: u8) u32 {
+    return @as(u32, r) | (@as(u32, g) << 8) | (@as(u32, b) << 16) | (@as(u32, a) << 24);
+}
+
+pub fn argb(a: u8, r: u8, g: u8, b: u8) u32 {
+    return abgr(a, b, g, r);
+}
+
+pub fn rgba(r: u8, g: u8, b: u8, a: u8) u32 {
+    return argb(a, r, g, b);
+}
+
+pub fn color(r: f32, g: f32, b: f32, a: f32) u32 {
+    return rgba(
+        @as(u8, (r * 255.0)),
+        @as(u8, (g * 255.0)),
+        @as(u8, (b * 255.0)),
+        @as(u8, (a * 255.0))
+    );
+}
