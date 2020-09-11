@@ -11,3 +11,6 @@ zig-cache
 prxgen
 pbptool
 sfotool
+*.exe
+*.pdb
+*.obj

@@ -67,22 +67,27 @@ pub fn build(b: *Builder) void {
 
     const prx = b.addExecutable("prxgen", "tools/prxgen/stub.zig");
     prx.setTarget(hostTarget);
-    prx.addCSourceFile("tools/prxgen/psp-prxgen.c", &[_][]const u8{"-std=c99", "-Wno-address-of-packed-member"});
+    prx.addCSourceFile("tools/prxgen/psp-prxgen.c", &[_][]const u8{"-std=c99", "-Wno-address-of-packed-member", "-D_CRT_SECURE_NO_WARNINGS"});
     prx.linkLibC();
     prx.setBuildMode(builtin.Mode.ReleaseFast);
     prx.setOutputDir("tools/bin");
     prx.install();
     prx.step.dependOn(&link_to_elf.step);
 
+    const append : []const u8 = switch(builtin.os.tag){
+        .windows => ".exe",
+        else => "",
+    };
+
     const generate_prx = b.addSystemCommand(&[_][]const u8{
-        "tools/bin/prxgen",
+        "tools/bin/prxgen" ++ append,
         "zig-cache/app.elf",
         "app.prx"
     });
     generate_prx.step.dependOn(&prx.step);
 
     //Build SFO
-    const sfo = b.addExecutable("sfotool", "tools/sfo/src/main.zig");
+    const sfo = b.addExecutable("sfotool", "./tools/sfo/src/main.zig");
     sfo.setTarget(hostTarget);
     sfo.setBuildMode(builtin.Mode.ReleaseFast);
     sfo.setOutputDir("tools/bin");
@@ -91,15 +96,15 @@ pub fn build(b: *Builder) void {
 
     //Make the SFO file
     const mk_sfo = b.addSystemCommand(&[_][]const u8{
-        "tools/bin/sfotool", "write",
-        psp_app_name,
-        "zig-cache/PARAM.SFO"
+        "./tools/bin/sfotool" ++ append, "write",
+        "\"" ++ psp_app_name ++ "\"",
+        "PARAM.SFO"
     });
     mk_sfo.step.dependOn(&sfo.step);
 
 
     //Build PBP
-    const PBP = b.addExecutable("pbptool", "tools/pbp/src/main.zig");
+    const PBP = b.addExecutable("pbptool", "./tools/pbp/src/main.zig");
     PBP.setTarget(hostTarget);
     PBP.setBuildMode(builtin.Mode.ReleaseFast);
     PBP.setOutputDir("tools/bin");
@@ -108,9 +113,9 @@ pub fn build(b: *Builder) void {
 
     //Pack the PBP executable
     const pack_pbp = b.addSystemCommand(&[_][]const u8{
-        "tools/bin/pbptool", "pack",
+        "tools/bin/pbptool" ++ append, "pack",
         "EBOOT.PBP",
-        "zig-cache/PARAM.SFO",
+        "PARAM.SFO",
         icon0,
         icon1,
         pic0,

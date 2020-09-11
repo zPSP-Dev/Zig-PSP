@@ -10,10 +10,8 @@
  */
 
 #include <stdio.h>
-#include <getopt.h>
 #include <string.h>
 #include <stdlib.h>
-#include <unistd.h>
 #include <assert.h>
 #include <ctype.h>
 
@@ -61,11 +59,13 @@ static int g_shstrbase = 0;
 /* Specifies that the current usage is to the print the pspsdk path */
 static int g_verbose = 0;
 
+/*
 static struct option arg_opts[] = 
 {
 	{"verbose", no_argument, NULL, 'v'},
 	{ NULL, 0, NULL, 0 }
 };
+*/
 
 /* Process the arguments */
 int process_args(int argc, char **argv)
@@ -75,34 +75,23 @@ int process_args(int argc, char **argv)
 	g_outfile = NULL;
 	g_infile = NULL;
 
-	ch = getopt_long(argc, argv, "v", arg_opts, NULL);
-	while(ch != -1)
-	{
-		switch(ch)
-		{
-			case 'v' : g_verbose = 1;
-					   break;
-			default  : break;
-		};
+	int opc = 0;
 
-		ch = getopt_long(argc, argv, "v", arg_opts, NULL);
-	}
-
-	argc -= optind;
-	argv += optind;
+	argc -= 1;
+	argv += 1;
 
 	if(argc < 2)
+	{
+		return 0;
+	}
+	
+	if(argc > 2)
 	{
 		return 0;
 	}
 
 	g_infile = argv[0];
 	g_outfile = argv[1];
-
-	if(g_verbose)
-	{
-		fprintf(stderr, "Loading %s, outputting to %s\n", g_infile, g_outfile);
-	}
 
 	return 1;
 }
