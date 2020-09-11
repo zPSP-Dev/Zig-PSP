@@ -39,9 +39,8 @@ pub fn _module_main_thread(argc: SceSize, argv: ?*c_void) callconv(.C) c_int {
                 print("ERROR CAUGHT: ");
                 print(@errorName(err));
 
-                print("\nZig-PSP doesn't support stack traces - yet.\n");
                 print("Exiting in 10 seconds...");
-                //TODO: DUMP STACK TRACE
+                //TODO: Stack Traces after STD.
                 //if (@errorReturnTrace()) |trace| {
                 //    std.debug.dumpStackTrace(trace.*);
                 //}

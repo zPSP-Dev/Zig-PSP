@@ -11,7 +11,6 @@ const builtin = @import("builtin");
 //Internal variables for the screen
 var x : u8 = 0;
 var y : u8 = 0;
-var vram_off: i32 = 0;
 var vram_base: ?[*]u32 = null;
 
 //Gets your "cursor" X position
@@ -74,13 +73,11 @@ pub fn screenSetFrontColor(color: u32) void{
 pub fn screenInit() void {
     x = 0;
     y = 0;
-    vram_off = 0;
 
     vram_base = @intToPtr(?[*]u32, 0x40000000 | @ptrToInt(sceGeEdramGetAddr()));
     
-    var stat: i32 = 0;
-    stat = sceDisplaySetMode(0, SCREEN_WIDTH, SCREEN_HEIGHT);
-    stat = sceDisplaySetFrameBuf(vram_base, SCR_BUF_WIDTH, @enumToInt(PspDisplayPixelFormats.Format8888), 1);
+    _ = sceDisplaySetMode(0, SCREEN_WIDTH, SCREEN_HEIGHT);
+    _ = sceDisplaySetFrameBuf(vram_base, SCR_BUF_WIDTH, @enumToInt(PspDisplayPixelFormats.Format8888), 1);
 
     screenClear();
 }
@@ -174,7 +171,10 @@ pub fn panic(message: []const u8, stack_trace: ?*builtin.StackTrace) noreturn {
     
     print("REASON: ");
     print(message);
-    print("\nZig-PSP doesn't support stack traces - yet.\n");
+    //TODO: Stack Traces after STD.
+    //if (@errorReturnTrace()) |trace| {
+    //    std.debug.dumpStackTrace(trace.*);
+    //}
     print("Exiting in 10 seconds...");
     
     exitErr();

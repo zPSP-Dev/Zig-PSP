@@ -28,7 +28,7 @@ pub fn build(b: *Builder) void {
 
     //All of the release modes work
     //Debug Mode can cause issues with trap instructions
-    const mode = builtin.Mode.ReleaseSmall;
+    const mode = builtin.Mode.ReleaseSafe;
 
     const lib = b.addStaticLibrary("zpsp", "src/psp/libzpsp.zig");
     lib.setTarget(target);
@@ -56,8 +56,7 @@ pub fn build(b: *Builder) void {
         exe.getOutputPath(),
         "-o",
         "zig-cache/app.elf",
-        "-emit-relocs", 
-        "--eh-frame-hdr", "--no-gc-sections"
+        "-emit-relocs",
     });
     link_to_elf.step.dependOn(&exe.step);
 
