@@ -10,7 +10,7 @@ comptime {
 }
 
 pub fn main() !void {
-    psp.utils.enable_home_callback();
+    psp.utils.enableHBCB();
     psp.debug.screenInit();
 
     psp.debug.print("Hello from Zig!");

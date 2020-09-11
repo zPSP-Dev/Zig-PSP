@@ -51,7 +51,7 @@ export fn cbThread(args: SceSize, argp: ?*c_void) c_int{
 }
 
 //This enables the home button exit callback above
-pub fn enable_home_callback() void {
+pub fn enableHBCB() void {
     var threadID : i32 = sceKernelCreateThread("zig_callback_updater", cbThread, 0x11, 0xFA0, @enumToInt(PspThreadAttributes.PSP_THREAD_ATTR_USER), null); 
     if(threadID >= 0){
         var stat: i32 = sceKernelStartThread(threadID, 0, null); //We don't know what stat does.

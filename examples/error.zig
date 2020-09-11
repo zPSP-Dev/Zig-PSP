@@ -13,7 +13,7 @@ const MyTestErrors = error{
 };
 
 pub fn main() !void {
-    psp.utils.enable_home_callback();
+    psp.utils.enableHBCB();
     psp.debug.screenInit();
 
     try psp.debug.printFormat("Hello {}!\n", .{"world"});

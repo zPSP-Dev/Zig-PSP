@@ -8,7 +8,7 @@ comptime {
 var display_list : [0x40000]u32 align(16) = [_]u32{0} ** 0x40000;
 
 pub fn main() !void {
-    psp.utils.enable_home_callback();
+    psp.utils.enableHBCB();
     
     var fbp0 = psp.utils.allocVramRelative(psp.SCR_BUF_WIDTH, psp.SCREEN_HEIGHT, psp.GuPixelMode.Psm8888);
     var fbp1 = psp.utils.allocVramRelative(psp.SCR_BUF_WIDTH, psp.SCREEN_HEIGHT, psp.GuPixelMode.Psm8888);

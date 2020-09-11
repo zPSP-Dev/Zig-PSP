@@ -13,7 +13,7 @@ fn addOne(x: u8) u8 {
 
 pub fn main() !void {
     //psp.debug.pancakeMode = true;
-    psp.utils.enable_home_callback();
+    psp.utils.enableHBCB();
     psp.debug.screenInit();
 
     _ = addOne(255);

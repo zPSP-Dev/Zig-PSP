@@ -18,7 +18,7 @@ fn printFreeMem(alloc: *std.mem.Allocator) void {
 }
 
 pub fn main() !void {
-    psp.utils.enable_home_callback();
+    psp.utils.enableHBCB();
     psp.debug.screenInit();
 
     var psp_allocator = &psp.utils.PSPAllocator.init().allocator;
