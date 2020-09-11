@@ -46,7 +46,7 @@ pub fn writeSFO() !void {
 
     //Copy the defaults into a value array
     var i : usize = 0;
-    while(i < 7) : (i += 1){
+    while(i < 8) : (i += 1){
         gVals[i] = g_defaults[i];
     }
 
@@ -79,7 +79,7 @@ pub fn writeSFO() !void {
     h.*.version = PSF_VERSION;
     
     i = 0;
-    while(i < 8) : (i += 1){
+    while(i < 9) : (i += 1){
         //Increment count
         h.*.count = @truncate(u32, i) + 1;
 
