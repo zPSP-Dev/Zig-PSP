@@ -1,4 +1,6 @@
+//This is probably broken
 usingnamespace @import("../include/pspdisplay.zig");
+usingnamespace @import("../include/pspgu.zig");
 
 //This isn't an actual "allocator" per se
 //It allocates static chunks of VRAM

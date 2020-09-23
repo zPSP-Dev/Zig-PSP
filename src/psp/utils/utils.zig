@@ -2,20 +2,11 @@ usingnamespace @import("../include/pspthreadman.zig");
 usingnamespace @import("../include/psploadexec.zig");
 usingnamespace @import("../include/psptypes.zig");
 
-//Sets requested exit instead of exiting.
-pub var altBehaviour : bool = false;
-
 var requestedExit : bool = false;
 
 //Check if exit is requested
 pub fn isRunning() bool{
     return requestedExit;
-}
-
-//Don't exit
-export fn altCB(arg1 : c_int, arg2 : c_int, common: ?*c_void) c_int{
-    requestedExit = true;
-    return 0;
 }
 
 //Exit
@@ -30,11 +21,7 @@ export fn cbThread(args: SceSize, argp: ?*c_void) c_int{
 
     var cbID : i32 = -1;
     
-    if(altBehaviour){
-        cbID = sceKernelCreateCallback("zig_exit_callback", altCB, null);
-    }else{
-        cbID = sceKernelCreateCallback("zig_exit_callback", exitCB, null);
-    }
+    cbID = sceKernelCreateCallback("zig_exit_callback", exitCB, null);
     var status = sceKernelRegisterExitCallback(cbID);
 
     if(status < 0){
