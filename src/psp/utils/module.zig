@@ -38,12 +38,7 @@ pub fn _module_main_thread(argc: SceSize, argv: ?*c_void) callconv(.C) c_int {
 
                 print("ERROR CAUGHT: ");
                 print(@errorName(err));
-
                 print("Exiting in 10 seconds...");
-                //TODO: Stack Traces after STD.
-                //if (@errorReturnTrace()) |trace| {
-                //    std.debug.dumpStackTrace(trace.*);
-                //}
                 
                 exitErr();
                 return 1;
@@ -82,9 +77,6 @@ pub const module_start_struct = struct {
         if(thid < 0){
             screenInit();
             print("\nZig Init Failed!\n");
-            
-            var buf: [20]u8 = undefined;
-            printFormat("\n{d}\n", .{thid}) catch unreachable;
             print("Exiting in 10 seconds...");
             exitErr();
             return 1;

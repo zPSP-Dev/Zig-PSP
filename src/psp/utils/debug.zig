@@ -1,11 +1,10 @@
 usingnamespace @import("constants.zig");
 usingnamespace @import("../include/pspge.zig");
 usingnamespace @import("../include/pspdisplay.zig");
-usingnamespace @import("../include/pspstdio.zig");
-usingnamespace @import("../include/pspiofilemgr.zig");
 usingnamespace @import("../include/pspthreadman.zig");
 usingnamespace @import("../include/psploadexec.zig");
-usingnamespace @import("../include/psprtc.zig");
+
+
 const builtin = @import("builtin");
 
 //Internal variables for the screen
@@ -113,7 +112,8 @@ const std = @import("std");
 
 //Print with formatting via the default PSP allocator
 pub fn printFormat(comptime fmt: []const u8, args: var) !void {
-    var psp_allocator = &PSPAllocator.init().allocator;
+    const alloc = @import("allocator.zig");
+    var psp_allocator = &alloc.PSPAllocator.init().allocator;
 
     var string = try std.fmt.allocPrint(psp_allocator, fmt, args);
     defer psp_allocator.free(string);
@@ -122,7 +122,7 @@ pub fn printFormat(comptime fmt: []const u8, args: var) !void {
 }
 
 //Our font
-const msxFont = @embedFile("./msxfont.bin");
+const msxFont = @embedFile("./msxfont2.bin");
 
 //Puts a character to screen
 fn internal_putchar(cx: u32, cy: u32, ch: u8) void{
@@ -137,7 +137,7 @@ fn internal_putchar(cx: u32, cy: u32, ch: u8) void{
 
             const mask : u32 = 128;
 
-            var idx : u32 = @as(u32, ch) * 8 + i;
+            var idx : u32 = @as(u32, ch - 32) * 8 + i;
             var glyph : u8 = msxFont[idx];
             
             if( (glyph & (mask >> @intCast(@import("std").math.Log2Int(c_int), j))) != 0 ){
@@ -181,30 +181,3 @@ pub fn panic(message: []const u8, stack_trace: ?*builtin.StackTrace) noreturn {
     while(true){}
 }
 
-//ADD MORE STUFF HERE LIKE BENCHMARKING, CPU PROFILING, ETC.
-
-
-var current_time : u64 = 0;
-var tickRate : u32 = 0;
-
-//Starts a benchmark
-pub fn benchmark_start() void {
-    tickRate = sceRtcGetTickResolution();
-    _ = sceRtcGetCurrentTick(&current_time);
-}
-
-//Ends the benchmark and reports ticks & time
-pub fn benchmark_end() !u64{
-    var oldTime = current_time;
-    _ = sceRtcGetCurrentTick(&current_time);
-
-    var delta = current_time - oldTime;
-
-    var deltaF = @intToFloat(f64, delta);
-    var tickRF = @intToFloat(f32, tickRate);
-
-    try printFormat("Method took {} ticks. ({d} ms)\n", .{delta, deltaF / tickRF * 1000});
-
-
-    return delta;
-}

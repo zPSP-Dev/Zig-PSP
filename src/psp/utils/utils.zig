@@ -2,10 +2,6 @@ usingnamespace @import("../include/pspthreadman.zig");
 usingnamespace @import("../include/psploadexec.zig");
 usingnamespace @import("../include/psptypes.zig");
 
-pub usingnamespace @import("allocator.zig");
-pub usingnamespace @import("vram.zig");
-
-
 //Sets requested exit instead of exiting.
 pub var altBehaviour : bool = false;
 
