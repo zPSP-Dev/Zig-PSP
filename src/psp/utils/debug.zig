@@ -175,7 +175,7 @@ pub fn panic(message: []const u8, stack_trace: ?*builtin.StackTrace) noreturn {
     //if (@errorReturnTrace()) |trace| {
     //    std.debug.dumpStackTrace(trace.*);
     //}
-    print("Exiting in 10 seconds...");
+    print("\nExiting in 10 seconds...");
     
     exitErr();
     while(true){}
