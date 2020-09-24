@@ -107,7 +107,6 @@ pub fn print(text: []const u8) void {
     }
 }
 
-usingnamespace @import("utils.zig");
 const std = @import("std");
 
 //Print with formatting via the default PSP allocator
