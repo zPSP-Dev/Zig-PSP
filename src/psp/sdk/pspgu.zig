@@ -78,7 +78,7 @@ pub extern fn sceGuTexOffset(u: f32, v: f32) void;
 pub extern fn sceGuTexProjMapMode(mode: c_int) void;
 pub extern fn sceGuTexScale(u: f32, v: f32) void;
 pub extern fn sceGuTexSlope(slope: f32) void;
-pub extern fn sceGuTexSync(...) void;
+pub extern fn sceGuTexSync() void;
 pub extern fn sceGuTexWrap(u: c_int, v: c_int) void;
 pub extern fn sceGuClutLoad(num_blocks: c_int, cbp: ?*const c_void) void;
 pub extern fn sceGuClutMode(cpsm: c_uint, shift: c_uint, mask: c_uint, a3: c_uint) void;

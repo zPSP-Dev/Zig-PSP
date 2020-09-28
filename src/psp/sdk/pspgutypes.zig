@@ -276,7 +276,6 @@ pub const ClearBitFlags = extern enum(c_int){
     ColorBuffer = 1,
     StencilBuffer = 2,
     DepthBuffer = 4,
-    FastClear = 16,
 };
 
 pub const LightBitFlags = extern enum(c_int){

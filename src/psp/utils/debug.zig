@@ -110,7 +110,7 @@ pub fn print(text: []const u8) void {
 const std = @import("std");
 
 //Print with formatting via the default PSP allocator
-pub fn printFormat(comptime fmt: []const u8, args: var) !void {
+pub fn printFormat(comptime fmt: []const u8, args: anytype) !void {
     const alloc = @import("allocator.zig");
     var psp_allocator = &alloc.PSPAllocator.init().allocator;
 

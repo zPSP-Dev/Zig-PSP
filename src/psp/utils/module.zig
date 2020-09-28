@@ -15,7 +15,8 @@ pub fn exitErr() void {
 
 //This calls your main function as a thread.
 pub fn _module_main_thread(argc: SceSize, argv: ?*c_void) callconv(.C) c_int {
-    switch (@typeInfo(@TypeOf(root.main).ReturnType)) {
+
+switch (@typeInfo(@typeInfo(@TypeOf(root.main)).Fn.return_type.?)) {
         .NoReturn => {
             root.main();
         },
@@ -24,7 +25,7 @@ pub fn _module_main_thread(argc: SceSize, argv: ?*c_void) callconv(.C) c_int {
             return 0;
         },
         .Int => |info| {
-            if (info.bits != 8) {
+            if (info.bits != 8 or info.is_signed) {
                 @compileError(bad_main_ret);
             }
             return root.main();
