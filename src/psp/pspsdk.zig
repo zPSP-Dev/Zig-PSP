@@ -34,6 +34,7 @@ pub usingnamespace @import("sdk/pspstdio.zig");
 pub usingnamespace @import("sdk/pspsysmem.zig");
 pub usingnamespace @import("sdk/pspthreadman.zig");
 pub usingnamespace @import("sdk/pspumd.zig");
+pub usingnamespace @import("sdk/psptypes.zig");
 pub usingnamespace @import("sdk/pspusb.zig");
 pub usingnamespace @import("sdk/psputility.zig");
 pub usingnamespace @import("sdk/psputils.zig");

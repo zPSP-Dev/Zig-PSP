@@ -162,18 +162,18 @@ export fn sceGumRotateZ(angle: f32) void{
 
 fn gumMultMatrix(result: [*c]ScePspFMatrix4, a: [*c]const ScePspFMatrix4, b: [*c]const ScePspFMatrix4) void{
     var t : ScePspFMatrix4 = undefined;
-    var i : usize = 0;
-    var j : usize = 0;
-    var k : usize = 0;
 
     const ma : [*]const f32 = @ptrCast([*]const f32, a);
     const mb : [*]const f32 = @ptrCast([*]const f32, b);
     var mr : [*]f32 = @ptrCast([*]f32, &t);
 
+    var i : usize = 0;
     while (i < 4) : (i += 1){
+        var j : usize = 0;
         while (j < 4) : (j += 1){
             var v : f32 = 0.0;
             
+            var k : usize = 0;
             while (k < 4) : (k += 1){
                 v += ma[(k << 2)+j] * mb[(i << 2)+k];
                 mr[(i << 2)+j] = v;
@@ -267,7 +267,7 @@ export fn sceGumPerspective(fovy: f32, aspect: f32, near: f32, far: f32) void{
 }
 
 //Maybe... I kinda just hate this function... it's pointless in most apps
-//Feel free to make a PR finishing this
+//Feel free to make a PR
 //export fn sceGumLookAt(eye: *ScePspFVector3, center: *ScePspFVector3, up: *ScePspFVector3) void{
 //
 //    var forward : ScePspFVector3 = undefined;

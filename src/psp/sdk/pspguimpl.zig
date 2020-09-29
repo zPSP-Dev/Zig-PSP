@@ -954,13 +954,12 @@ export fn sceGuSetDither(matrix: *const ScePspIMatrix4) void{
 }
 
 export fn sceGuSetMatrix(typec: c_int, matrix: [*c]ScePspFMatrix4) void{
-    var i : usize = 0;
-    var j : usize = 0;
 
     const fmatrix : [*]f32 = @ptrCast([*]f32, matrix);
 
     switch(typec){
         0 => {
+            var i : usize = 0;
             sendCommandf(62,0);
             while (i < 16) : (i += 1){
                 sendCommandf(63,fmatrix[i]);
@@ -968,10 +967,12 @@ export fn sceGuSetMatrix(typec: c_int, matrix: [*c]ScePspFMatrix4) void{
         },
 
         1 => {
+            var i : usize = 0;
             sendCommandf(60,0);
 
             // 4*4 -> 3*4 - view matrix?
             while (i < 4) : (i += 1){
+                var j : usize = 0;
                 while (j < 3) : (j += 1){
                     sendCommandf(61,fmatrix[j+i*4]);
                 }
@@ -979,10 +980,12 @@ export fn sceGuSetMatrix(typec: c_int, matrix: [*c]ScePspFMatrix4) void{
         },
 
         2 => {
+            var i : usize = 0;
             sendCommandf(58,0);
 
             // 4*4 -> 3*4 - view matrix?
             while (i < 4) : (i += 1){
+                var j : usize = 0;
                 while (j < 3) : (j += 1){
                     sendCommandf(59,fmatrix[j+i*4]);
                 }
@@ -990,10 +993,12 @@ export fn sceGuSetMatrix(typec: c_int, matrix: [*c]ScePspFMatrix4) void{
         },
 
         3 => {
+            var i : usize = 0;
             sendCommandf(64,0);
 
             // 4*4 -> 3*4 - view matrix?
             while (i < 4) : (i += 1){
+                var j : usize = 0;
                 while (j < 3) : (j += 1){
                     sendCommandf(65,fmatrix[j+i*4]);
                 }
@@ -1125,8 +1130,7 @@ fn getExp(val: c_int) c_int {
 export fn sceGuTexImage(mipmap: c_int, width: c_int, height: c_int, tbw: c_int, tbp: ?*const c_void) void{
     sendCommandi(tbpcmd_tbl[@intCast(usize, mipmap)], @intCast(c_int, @ptrToInt(tbp)) & 0xffffff);
     sendCommandi(tbwcmd_tbl[@intCast(usize, mipmap)],@intCast(c_int, ((@ptrToInt(tbp) >> 8) & 0x0f0000))|tbw);
-    var a : c_int = 8;
-    sendCommandi(tsizecmd_tbl[@intCast(usize, mipmap)],( (31 - @clz(c_int, height & 0x3ff)) << @intCast(u3, a))|(31 - @clz(c_int, width & 0x3ff)));
+    sendCommandi(tsizecmd_tbl[@intCast(usize, mipmap)], getExp(height) << 8 | getExp(width) );
     sceGuTexFlush();
 }
 
@@ -1232,7 +1236,7 @@ export fn sceGuInit() void{
 
     gu_settings.ge_callback_id = sceGeSetCallback(&callback);
     gu_settings.swapBuffersCallback = null;
-    gu_settings.swapBuffersBehaviour = 0;
+    gu_settings.swapBuffersBehaviour = 1;
 
     ge_edram_address = sceGeEdramGetAddr();
 
