@@ -25,10 +25,10 @@ pub fn main() !void {
     psp.sceGuScissor(0, 0, psp.SCREEN_WIDTH, psp.SCREEN_HEIGHT);
     psp.sceGuEnable(@enumToInt(psp.GuState.ScissorTest));
     
-    var displayListSize = psp.sceGuFinish();
-    var unk1 = psp.sceGuSync(@enumToInt(psp.GuSyncMode.Finish), @enumToInt(psp.GuSyncBehavior.Wait));
-    var v = psp.sceDisplayWaitVblankStart();
-    var lastState = psp.sceGuDisplay(1);
+    _ = psp.sceGuFinish();
+    _ = psp.sceGuSync(@enumToInt(psp.GuSyncMode.Finish), @enumToInt(psp.GuSyncBehavior.Wait));
+    _ = psp.sceDisplayWaitVblankStart();
+    _ = psp.sceGuDisplay(1);
 
     var i : u32 = 0;
     while(true) : (i += 1) {
@@ -42,10 +42,10 @@ pub fn main() !void {
         );
         
         
-        
-        displayListSize = psp.sceGuFinish();
-        unk1 = psp.sceGuSync(@enumToInt(psp.GuSyncMode.Finish), @enumToInt(psp.GuSyncBehavior.Wait));
-        v = psp.sceDisplayWaitVblankStart();
-        var buf = psp.sceGuSwapBuffers();
+
+        _ = psp.sceGuFinish();
+        _ = psp.sceGuSync(@enumToInt(psp.GuSyncMode.Finish), @enumToInt(psp.GuSyncBehavior.Wait));
+        _ = psp.sceDisplayWaitVblankStart();
+        _ = psp.sceGuSwapBuffers();
     }
 }
