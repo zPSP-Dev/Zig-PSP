@@ -2,8 +2,11 @@
 
 //Smaller utilities
 pub usingnamespace @import("utils/psp.zig");
+
+//Implementations
 pub usingnamespace @import("libzpsp.zig");
 
+//Basic outlines
 pub usingnamespace @import("sdk/pspatrac3.zig");
 pub usingnamespace @import("sdk/pspaudio.zig");
 pub usingnamespace @import("sdk/pspaudiocodec.zig");

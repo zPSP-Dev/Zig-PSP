@@ -34,12 +34,13 @@ pub fn main() !void {
     while(true) : (i += 1) {
         psp.sceGuStart(@enumToInt(psp.GuContextType.Direct), @ptrCast(*c_void, &display_list));
         
-        psp.sceGuClearColor(psp.rgba(0xFF, @truncate(u8, i), 0xFF, 0xFF));
+        psp.sceGuClearColor(psp.rgba(0xFF, 0xFF, 0, 0xFF));
         psp.sceGuClearDepth(0);
         psp.sceGuClear(
             @enumToInt(psp.ClearBitFlags.ColorBuffer) |
             @enumToInt(psp.ClearBitFlags.DepthBuffer)
         );
+        
         
         
         displayListSize = psp.sceGuFinish();

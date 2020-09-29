@@ -1125,7 +1125,8 @@ fn getExp(val: c_int) c_int {
 export fn sceGuTexImage(mipmap: c_int, width: c_int, height: c_int, tbw: c_int, tbp: ?*const c_void) void{
     sendCommandi(tbpcmd_tbl[@intCast(usize, mipmap)], @intCast(c_int, @ptrToInt(tbp)) & 0xffffff);
     sendCommandi(tbwcmd_tbl[@intCast(usize, mipmap)],@intCast(c_int, ((@ptrToInt(tbp) >> 8) & 0x0f0000))|tbw);
-    sendCommandi(tsizecmd_tbl[@intCast(usize, mipmap)],(getExp(height) << 8)|(getExp(width)));
+    var a : c_int = 8;
+    sendCommandi(tsizecmd_tbl[@intCast(usize, mipmap)],( (31 - @clz(c_int, height & 0x3ff)) << @intCast(u3, a))|(31 - @clz(c_int, width & 0x3ff)));
     sceGuTexFlush();
 }
 
