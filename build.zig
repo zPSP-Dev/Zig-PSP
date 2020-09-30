@@ -7,7 +7,7 @@ const builtin = @import("builtin");
 const psp_app_name = "Zig Test App";
 
 //Optional customizations
-const icon0 = "NULL"; //REPLACE WITH PATH TO ICON0.PNG 144 x 80 Thumbnail
+const icon0 = "ICON0.PNG"; //REPLACE WITH PATH TO ICON0.PNG 144 x 80 Thumbnail
 const icon1 = "NULL"; //REPLACE WITH PATH TO ICON1.PMF 144 x 80 animation
 const pic0 = "NULL"; //REPLACE WITH PATH TO PIC0.PNG 480 x 272 Background
 const pic1 = "NULL"; //REPLACE WITH PATH TO PIC1.PMF 480 x 272 Animation
