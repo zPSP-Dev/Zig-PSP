@@ -2,7 +2,7 @@
 const psp = @import("psp/pspsdk.zig");
 
 comptime {
-    _ = psp.module_start_struct;
+    asm(psp.module_info("Zig PSP App", 0, 1, 0));
 }
 
 var display_list : [0x40000]u32 align(16) = [_]u32{0} ** 0x40000;

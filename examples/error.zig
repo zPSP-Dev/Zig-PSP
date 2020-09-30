@@ -5,7 +5,7 @@ const std = @import("std");
 const fmt = std.fmt;
 
 comptime {
-    _ = psp.module_start_struct;
+    asm(psp.module_info("Zig PSP App", 0, 1, 0));
 }
 
 const MyTestErrors = error{

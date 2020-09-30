@@ -9,7 +9,7 @@ usingnamespace @import("psp/utils/mem-fix.zig");
 const utils = @import("psp/utils/utils.zig");
 
 comptime {
-    _ = mod.module_start_struct;
+    asm(mod.module_info("Zig PSP App", 0, 1, 0));
 }
 
 pub fn main() !void {

@@ -1,8 +1,16 @@
 //A quick graphics initialization
-const psp = @import("psp/pspsdk.zig");
+const mod = @import("psp/utils/module.zig");
+usingnamespace @import("psp/utils/mem-fix.zig");
+usingnamespace @import("psp/utils/constants.zig");
+usingnamespace @import("psp/include/psptypes.zig");
+const utils = @import("psp/utils/utils.zig");
+const vram = @import("psp/utils/vram.zig");
+const psp = @import("psp/include/pspgu.zig");
+const disp = @import("psp/include/pspdisplay.zig");
+const gum = @import("psp/include/pspgum.zig");
 
 comptime {
-    asm(psp.module_info("Zig PSP App", 0, 1, 0));
+    asm(mod.module_info("Zig PSP App", 0, 1, 0));
 }
 
 var display_list : [0x40000]u32 align(16) = [_]u32{0} ** 0x40000;
@@ -57,22 +65,21 @@ var vertices : [36]Vertex = [_]Vertex{
 };
 
 pub fn main() !void {
-    psp.utils.enableHBCB();
-    psp.debug.screenInit();
+    utils.enableHBCB();
     
-    var fbp0 = psp.vram.allocVramRelative(psp.SCR_BUF_WIDTH, psp.SCREEN_HEIGHT, psp.GuPixelMode.Psm8888);
-    var fbp1 = psp.vram.allocVramRelative(psp.SCR_BUF_WIDTH, psp.SCREEN_HEIGHT, psp.GuPixelMode.Psm8888);
-    var zbp = psp.vram.allocVramRelative(psp.SCR_BUF_WIDTH, psp.SCREEN_HEIGHT, psp.GuPixelMode.Psm4444);
+    var fbp0 = vram.allocVramRelative(SCR_BUF_WIDTH, SCREEN_HEIGHT, psp.GuPixelMode.Psm8888);
+    var fbp1 = vram.allocVramRelative(SCR_BUF_WIDTH, SCREEN_HEIGHT, psp.GuPixelMode.Psm8888);
+    var zbp = vram.allocVramRelative(SCR_BUF_WIDTH, SCREEN_HEIGHT, psp.GuPixelMode.Psm4444);
 
     psp.sceGuInit();
     psp.sceGuStart(@enumToInt(psp.GuContextType.Direct), @ptrCast(*c_void, &display_list));
-    psp.sceGuDrawBuffer(@enumToInt(psp.GuPixelMode.Psm8888), fbp0, psp.SCR_BUF_WIDTH);
-    psp.sceGuDispBuffer(psp.SCREEN_WIDTH, psp.SCREEN_HEIGHT, fbp1, psp.SCR_BUF_WIDTH);
-    psp.sceGuDepthBuffer(zbp, psp.SCR_BUF_WIDTH);
-    psp.sceGuOffset(2048 - (psp.SCREEN_WIDTH/2), 2048 - (psp.SCREEN_HEIGHT/2));
-    psp.sceGuViewport(2048, 2048, psp.SCREEN_WIDTH, psp.SCREEN_HEIGHT);
+    psp.sceGuDrawBuffer(@enumToInt(psp.GuPixelMode.Psm8888), fbp0, SCR_BUF_WIDTH);
+    psp.sceGuDispBuffer(SCREEN_WIDTH, SCREEN_HEIGHT, fbp1, SCR_BUF_WIDTH);
+    psp.sceGuDepthBuffer(zbp, SCR_BUF_WIDTH);
+    psp.sceGuOffset(2048 - (SCREEN_WIDTH/2), 2048 - (SCREEN_HEIGHT/2));
+    psp.sceGuViewport(2048, 2048, SCREEN_WIDTH, SCREEN_HEIGHT);
     psp.sceGuDepthRange(50000, 0);
-    psp.sceGuScissor(0, 0, psp.SCREEN_WIDTH, psp.SCREEN_HEIGHT);
+    psp.sceGuScissor(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
     psp.sceGuEnable(@enumToInt(psp.GuState.ScissorTest));
     psp.sceGuDepthFunc(@enumToInt(psp.DepthFunc.GreaterOrEqual));
     psp.sceGuEnable(@enumToInt(psp.GuState.DepthTest));
@@ -84,7 +91,7 @@ pub fn main() !void {
     
     _ = psp.sceGuFinish();
     _ = psp.sceGuSync(@enumToInt(psp.GuSyncMode.Finish), @enumToInt(psp.GuSyncBehavior.Wait));
-    _ = psp.sceDisplayWaitVblankStart();
+    _ = disp.sceDisplayWaitVblankStart();
     _ = psp.sceGuDisplay(1);
 
     var i : u32 = 0;
@@ -98,26 +105,26 @@ pub fn main() !void {
             @enumToInt(psp.ClearBitFlags.DepthBuffer)
         );
         
-        psp.sceGumMatrixMode(@enumToInt(psp.MatrixMode.Projection));
-        psp.sceGumLoadIdentity();
-        psp.sceGumPerspective(75.0,16.0/9.0,0.5,1000.0);
+        gum.sceGumMatrixMode(@enumToInt(psp.MatrixMode.Projection));
+        gum.sceGumLoadIdentity();
+        gum.sceGumPerspective(75.0,16.0/9.0,0.5,1000.0);
         
-        psp.sceGumMatrixMode(@enumToInt(psp.MatrixMode.View));
-        psp.sceGumLoadIdentity();
+        gum.sceGumMatrixMode(@enumToInt(psp.MatrixMode.View));
+        gum.sceGumLoadIdentity();
         
-        psp.sceGumMatrixMode(@enumToInt(psp.MatrixMode.Model));
-        psp.sceGumLoadIdentity();
+        gum.sceGumMatrixMode(@enumToInt(psp.MatrixMode.Model));
+        gum.sceGumLoadIdentity();
 
         //Rotate
-        var pos : psp.ScePspFVector3 = psp.ScePspFVector3{ .x=0, .y=0, .z=-2.5 };
-        var rot : psp.ScePspFVector3 = psp.ScePspFVector3{ .x= @intToFloat(f32, i) * 0.79 * (3.14159/180.0), .y= @intToFloat(f32, i) * 0.98 * (3.14159/180.0), .z= @intToFloat(f32, i) * 1.32 * (3.14159/180.0) };
-        psp.sceGumTranslate(&pos);
-        psp.sceGumRotateXYZ(&rot);
+        var pos : ScePspFVector3 = ScePspFVector3{ .x=0, .y=0, .z=-2.5 };
+        var rot : ScePspFVector3 = ScePspFVector3{ .x= @intToFloat(f32, i) * 0.79 * (3.14159/180.0), .y= @intToFloat(f32, i) * 0.98 * (3.14159/180.0), .z= @intToFloat(f32, i) * 1.32 * (3.14159/180.0) };
+        gum.sceGumTranslate(&pos);
+        gum.sceGumRotateXYZ(&rot);
 
         
-        psp.sceGuTexMode(@enumToInt(psp.GuPixelMode.Psm8888),0,0,0);
-        psp.sceGuTexImage(0,128,128,128, &logo_start);
-        psp.sceGuTexFunc(@enumToInt(psp.TextureEffect.Replace),@enumToInt(psp.TextureColorComponent.Rgba));
+        psp.sceGuTexMode(@enumToInt(psp.GuPixelMode.Psm4444),0,0,0);
+        psp.sceGuTexImage(0,64,64,64, &logo_start);
+        psp.sceGuTexFunc(@enumToInt(psp.TextureEffect.Add),@enumToInt(psp.TextureColorComponent.Rgba));
         psp.sceGuTexFilter(@enumToInt(psp.TextureFilter.Linear),@enumToInt(psp.TextureFilter.Linear));
         psp.sceGuTexScale(1.0,1.0);
         psp.sceGuTexOffset(0.0 ,0.0);
@@ -125,13 +132,13 @@ pub fn main() !void {
 
         // draw cube
 
-        psp.sceGumDrawArray(@enumToInt(psp.GuPrimitive.Triangles),@enumToInt(psp.VertexTypeFlags.Texture32Bitf)|@enumToInt(psp.VertexTypeFlags.Color8888)|@enumToInt(psp.VertexTypeFlags.Vertex32Bitf)|@enumToInt(psp.VertexTypeFlags.Transform3D),12*3,null,@ptrCast(*c_void, &vertices));
+        gum.sceGumDrawArray(@enumToInt(psp.GuPrimitive.Triangles),@enumToInt(psp.VertexTypeFlags.Texture32Bitf)|@enumToInt(psp.VertexTypeFlags.Color8888)|@enumToInt(psp.VertexTypeFlags.Vertex32Bitf)|@enumToInt(psp.VertexTypeFlags.Transform3D),12*3,null,@ptrCast(*c_void, &vertices));
 
         _ = psp.sceGuFinish();
         _ = psp.sceGuSync(@enumToInt(psp.GuSyncMode.Finish), @enumToInt(psp.GuSyncBehavior.Wait));
-        _ = psp.sceDisplayWaitVblankStart();
+        _ = disp.sceDisplayWaitVblankStart();
         _ = psp.sceGuSwapBuffers();
     }
 }
 
-const logo_start align(16) = @embedFile("ziggy.bin").*;
+const logo_start align(16) = @embedFile("logo.raw").*;
