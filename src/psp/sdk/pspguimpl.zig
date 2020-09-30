@@ -117,6 +117,7 @@ var light_settings : [4]GuLightSettings = [_]GuLightSettings{
 
 usingnamespace @import("pspthreadman.zig");
 pub export fn callbackSig(id : c_int, arg : ?*c_void) void{
+    @setRuntimeSafety(false);
     var settings : ?*GuSettings = @intToPtr(?*GuSettings, @ptrToInt(arg));
     settings.?.signal_history[ @intCast(usize, (settings.?.signal_offset)) & 15] = @intCast(u16, id) & 0xffff;
     settings.?.signal_offset += 1;
@@ -128,6 +129,7 @@ pub export fn callbackSig(id : c_int, arg : ?*c_void) void{
 }
 
 pub export fn callbackFin(id : c_int, arg : ?*c_void) void{
+    @setRuntimeSafety(false);
     var settings : ?*GuSettings = @intToPtr(?*GuSettings, @ptrToInt(arg));
     if (settings.?.fin != null){
         settings.?.fin.?(id & 0xffff);
@@ -135,6 +137,7 @@ pub export fn callbackFin(id : c_int, arg : ?*c_void) void{
 }
 
 pub fn resetValues() void {
+    @setRuntimeSafety(false);
     var i : usize = 0;
 
     gu_init = 0;
@@ -185,11 +188,13 @@ pub fn resetValues() void {
 
 
 pub fn sendCommandi(cmd : c_int, argument : c_int) void {
+    @setRuntimeSafety(false);
     gu_list.?.current[0] = (@intCast(u32, cmd) << 24) | (@intCast(u32, argument) & 0xffffff);
     gu_list.?.current += 1;
 }
 
 pub fn sendCommandiStall(cmd : c_int, argument : c_int) void {
+    @setRuntimeSafety(false);
     sendCommandi(cmd, argument);
     if (gu_object_stack_depth == 0 and gu_curr_context == 0){
         _ = sceGeListUpdateStallAddr(ge_list_executed[0], @ptrCast(*c_void, gu_list.?.current));
@@ -197,6 +202,7 @@ pub fn sendCommandiStall(cmd : c_int, argument : c_int) void {
 }
 
 pub fn sendCommandf(cmd : c_int, argument : f32) void {
+    @setRuntimeSafety(false);
     sendCommandi(cmd, @bitCast(c_int, argument) >> 8);
 }
 
@@ -204,33 +210,40 @@ pub fn sendCommandf(cmd : c_int, argument : f32) void {
 //GU IMPLEMENTATION
 
 pub fn sceGuAlphaFunc(func: c_int, value: c_int, mask: c_int) void{
+    @setRuntimeSafety(false);
     var arg : c_int = func | ((value & 0xff) << 8) | ((mask & 0xff) << 16);
     sendCommandi(219,arg);
 }
 pub fn sceGuAmbient(col: c_int) void{
+    @setRuntimeSafety(false);
     sendCommandi(92,(col & 0xffffff));
     sendCommandi(93,(col >> 24));
 }
 pub fn sceGuAmbientColor(col: u32) void{
+    @setRuntimeSafety(false);
     sendCommandi(85,@intCast(c_int, col) & 0xffffff);
     sendCommandi(88,@intCast(c_int, col) >> 24);
 }
 
 pub fn sceGuBlendFunc(op: c_int, src: c_int, dest: c_int, srcfix: c_int, destfix: c_int) void{
+    @setRuntimeSafety(false);
     sendCommandi(223,src | (dest << 4) | (op << 8));
     sendCommandi(224,srcfix & 0xffffff);
     sendCommandi(225,destfix & 0xffffff);
 }
 
 pub fn sceGuBreak(a0: c_int) void{
+    @setRuntimeSafety(false);
     //Does nothing or is broken?
 }
 
 pub fn sceGuContinue() void{
+    @setRuntimeSafety(false);
     //Does nothing or is broken?   
 }
 
 pub fn sceGuCallList(list: ?*const c_void) void{
+    @setRuntimeSafety(false);
     var list_addr : c_int = @intCast(c_int, @ptrToInt(list));
 
     if (gu_call_mode == 1)
@@ -247,6 +260,7 @@ pub fn sceGuCallList(list: ?*const c_void) void{
 }
 
 pub fn sceGuCallMode(mode: c_int) void{
+    @setRuntimeSafety(false);
     gu_call_mode = mode;
 }
 
@@ -255,18 +269,22 @@ pub fn sceGuCheckList() c_int{
 }
 
 pub fn sceGuClearColor(col: c_uint) void{
+    @setRuntimeSafety(false);
     gu_contexts[@intCast(usize, gu_curr_context)].clear_color = col;
 }
 
 pub fn sceGuClearDepth(depth: c_uint) void{
+    @setRuntimeSafety(false);
     gu_contexts[@intCast(usize, gu_curr_context)].clear_depth = depth;
 }
 
 pub fn sceGuClearStencil(stencil: c_uint) void{
+    @setRuntimeSafety(false);
     gu_contexts[@intCast(usize, gu_curr_context)].clear_stencil = stencil;
 }
 
 pub fn sceGuClutLoad(num_blocks: c_int, cbp: ?*const c_void) void{
+    @setRuntimeSafety(false);
     var a = @intCast(c_int, @ptrToInt(cbp));
     sendCommandi(176,(a) & 0xffffff);
     sendCommandi(177,((a) >> 8) & 0xf0000);
@@ -274,15 +292,18 @@ pub fn sceGuClutLoad(num_blocks: c_int, cbp: ?*const c_void) void{
 }
 
 pub fn sceGuClutMode(cpsm: c_int, shift: c_int, mask: c_int, a3: c_int) void{
+    @setRuntimeSafety(false);
     var argument : c_int = (cpsm) | (shift << 2) | (mask << 8) | (a3 << 16);
     sendCommandi(197,argument);
 }
 
 pub fn sceGuColor(col: c_int) void{
+    @setRuntimeSafety(false);
     sceGuMaterial(7,col);
 }
 
 pub fn sceGuMaterial(mode: c_int, col: c_int) void{
+    @setRuntimeSafety(false);
     if (mode & 0x01 != 0){
         sendCommandi(85, col & 0xffffff);
         sendCommandi(88, col >> 24);
@@ -296,16 +317,18 @@ pub fn sceGuMaterial(mode: c_int, col: c_int) void{
 }
 
 pub fn sceGuColorFunc(func: c_int, color: c_int, mask: c_int) void{
+    @setRuntimeSafety(false);
     sendCommandi(216,func & 0x03);
     sendCommandi(217,color & 0xffffff);
     sendCommandi(218,mask);
 }
 
 pub fn sceGuColorMaterial(components: c_int) void{
+    @setRuntimeSafety(false);
     sendCommandi(83,components);
 }
 
-pub fn sceGuCopyImage(psm: c_int, sx: c_int, sy: c_int, width: c_int, height: c_int, srcw: c_int, src: ?*c_void, dx: c_int, dy: c_int, destw: c_int, dest: ?*c_void) void{
+pub fn sceGuCopyImage(psm: c_int, sx: c_int, sy: c_int, width: c_int, height: c_int, srcw: c_int, src: ?*c_void, dx: c_int, dy: c_int, destw: c_int, dest: ?*c_void) void{@setRuntimeSafety(false);
     var sr = @intCast(c_uint, @ptrToInt(src));
     var ds = @intCast(c_uint, @ptrToInt(dest));
     sendCommandi(178, @intCast(c_int, (sr) & 0xffffff));
@@ -323,6 +346,7 @@ pub fn sceGuCopyImage(psm: c_int, sx: c_int, sy: c_int, width: c_int, height: c_
 }
 
 pub fn sceGuDepthBuffer(zbp: ?*c_void, zbw: c_int) void{
+    @setRuntimeSafety(false);
     gu_draw_buffer.depth_buffer = zbp;
 
     if (gu_draw_buffer.depth_width != 0 or (gu_draw_buffer.depth_width != zbw))
@@ -333,19 +357,23 @@ pub fn sceGuDepthBuffer(zbp: ?*c_void, zbw: c_int) void{
 }
 
 pub fn sceGuDepthFunc(function: c_int) void{
+    @setRuntimeSafety(false);
     sendCommandi(222,function);
 }
 
 pub fn sceGuDepthMask(mask: c_int) void{
+    @setRuntimeSafety(false);
     sendCommandi(231,mask);
 }
 
 pub fn sceGuDepthOffset(offset: c_uint) void{
+    @setRuntimeSafety(false);
     gu_contexts[@intCast(usize, gu_curr_context)].depth_offset = @intCast(i32, offset);
     sceGuDepthRange(gu_contexts[@intCast(usize, gu_curr_context)].near_plane,gu_contexts[@intCast(usize, gu_curr_context)].far_plane);
 }
 
 pub fn sceGuDepthRange(near: c_int, far: c_int) void{
+    @setRuntimeSafety(false);
     var max = near + far;
     var val = ((max >> 31) + max);
     var z : f32 = @bitCast(f32, (val >> 1));
@@ -366,6 +394,7 @@ pub fn sceGuDepthRange(near: c_int, far: c_int) void{
 }
 
 pub fn sceGuDisable(state: c_int) void{
+    @setRuntimeSafety(false);
     switch(@intToEnum(GuState, state)){
         .AlphaTest => {
             sendCommandi(34,0);
@@ -450,7 +479,7 @@ fn drawRegion(x: c_int, y: c_int, width: c_int, height: c_int) void
   sendCommandi(22,(((y + height)-1) << 10) | ((x + width)-1));
 }
 
-pub fn sceGuDispBuffer(width: c_int, height: c_int, dispbp: ?*c_void, dispbw: c_int) void{
+pub fn sceGuDispBuffer(width: c_int, height: c_int, dispbp: ?*c_void, dispbw: c_int) void{@setRuntimeSafety(false);
     gu_draw_buffer.width = width;
     gu_draw_buffer.height = height;
     gu_draw_buffer.disp_buffer = dispbp;
@@ -476,7 +505,7 @@ pub fn sceGuDisplay(state: c_int) c_int{
     return state;
 }
 
-pub fn sceGuDrawArray(prim: c_int, vtype: c_int, count: c_int, indices: ?*const c_void, vertices: ?*const c_void) void{
+pub fn sceGuDrawArray(prim: c_int, vtype: c_int, count: c_int, indices: ?*const c_void, vertices: ?*const c_void) void{@setRuntimeSafety(false);
     if (vtype != 0)
         sendCommandi(18,vtype);
 
@@ -492,7 +521,7 @@ pub fn sceGuDrawArray(prim: c_int, vtype: c_int, count: c_int, indices: ?*const 
     sendCommandiStall(4,(prim << 16)|count);
 }
 
-pub fn sceGuDrawArrayN(primitive_type: c_int, vertex_type: c_int, count: c_int, a3: c_int, indices: ?*const c_void, vertices: ?*const c_void) void{
+pub fn sceGuDrawArrayN(primitive_type: c_int, vertex_type: c_int, count: c_int, a3: c_int, indices: ?*const c_void, vertices: ?*const c_void) void{@setRuntimeSafety(false);
     if (vertex_type != 0)
         sendCommandi(18,vertex_type);
 
@@ -515,7 +544,7 @@ pub fn sceGuDrawArrayN(primitive_type: c_int, vertex_type: c_int, count: c_int, 
     }
 }
 
-pub fn sceGuDrawBezier(vtype: c_int, ucount: c_int, vcount: c_int, indices: ?*const c_void, vertices: ?*const c_void) void{
+pub fn sceGuDrawBezier(vtype: c_int, ucount: c_int, vcount: c_int, indices: ?*const c_void, vertices: ?*const c_void) void{@setRuntimeSafety(false);
     if (vtype != 0)
         sendCommandi(18,vtype);
 
@@ -532,7 +561,7 @@ pub fn sceGuDrawBezier(vtype: c_int, ucount: c_int, vcount: c_int, indices: ?*co
     sendCommandi(5,(vcount << 8)|ucount);
 }
 
-pub fn sceGuDrawBuffer(psm: c_int, fbp: ?*c_void, fbw: c_int) void{
+pub fn sceGuDrawBuffer(psm: c_int, fbp: ?*c_void, fbw: c_int) void{@setRuntimeSafety(false);
     gu_draw_buffer.pixel_size = psm;
     gu_draw_buffer.frame_width = fbw;
     gu_draw_buffer.frame_buffer = fbp;
@@ -550,13 +579,13 @@ pub fn sceGuDrawBuffer(psm: c_int, fbp: ?*c_void, fbw: c_int) void{
     sendCommandi(159,@intCast(c_int, ((@intCast(c_uint, @ptrToInt(gu_draw_buffer.depth_buffer)) & 0xff000000) >> 8))|gu_draw_buffer.depth_width);
 }
 
-pub fn sceGuDrawBufferList(psm: c_int, fbp: ?*c_void, fbw: c_int) void{
+pub fn sceGuDrawBufferList(psm: c_int, fbp: ?*c_void, fbw: c_int) void{@setRuntimeSafety(false);
     sendCommandi(210,psm);
     sendCommandi(156, @intCast(c_int, @ptrToInt(fbp) ) & 0xffffff);
     sendCommandi(157, @intCast(c_int, (@intCast(c_uint, @ptrToInt(fbp)) & 0xff000000) >> 8) | fbw);
 }
 
-pub fn sceGuDrawSpline(vtype: c_int, ucount: c_int, vcount: c_int, uedge: c_int, vedge: c_int, indices: ?*const c_void, vertices: ?*const c_void) void{
+pub fn sceGuDrawSpline(vtype: c_int, ucount: c_int, vcount: c_int, uedge: c_int, vedge: c_int, indices: ?*const c_void, vertices: ?*const c_void) void{@setRuntimeSafety(false);
     if (vtype != 0)
         sendCommandi(18,vtype);
 
@@ -573,7 +602,7 @@ pub fn sceGuDrawSpline(vtype: c_int, ucount: c_int, vcount: c_int, uedge: c_int,
     sendCommandi(6,(vedge << 18)|(uedge << 16)|(vcount << 8)|ucount);
 }
 
-pub fn sceGuEnable(state: c_int) void{
+pub fn sceGuEnable(state: c_int) void{@setRuntimeSafety(false);
     switch(@intToEnum(GuState, state)){
         .AlphaTest => {
             sendCommandi(34,1);
@@ -651,7 +680,7 @@ pub fn sceGuEnable(state: c_int) void{
         gu_states |= @intCast(i32, (one << @intCast(u5, state)));
 }
 
-pub fn sceGuEndObject() void{
+pub fn sceGuEndObject() void{@setRuntimeSafety(false);
 
     var current : [*]u32 = gu_list.?.current;
     gu_list.?.current = @ptrCast([*]u32, &gu_object_stack[@intCast(usize, gu_object_stack_depth)-1]);
@@ -663,7 +692,7 @@ pub fn sceGuEndObject() void{
     gu_object_stack_depth -= 1;
 }
 
-pub fn sceGuBeginObject(vtype: c_int, count: c_int, indices: ?*const c_void, vertices: ?*const c_void) void{
+pub fn sceGuBeginObject(vtype: c_int, count: c_int, indices: ?*const c_void, vertices: ?*const c_void) void{@setRuntimeSafety(false);
     if (vtype != 0)
         sendCommandi(18,vtype);
 
@@ -737,7 +766,7 @@ pub fn sceGuFinishId(id: c_int) c_int{
     return @intCast(c_int, size);
 }
 
-pub fn sceGuFog(near: f32, far: f32, col: c_uint) void{
+pub fn sceGuFog(near: f32, far: f32, col: c_uint) void{@setRuntimeSafety(false);
     var distance : f32 = far-near;
     if (distance > 0)
         distance = 1.0 / distance;
@@ -747,7 +776,7 @@ pub fn sceGuFog(near: f32, far: f32, col: c_uint) void{
     sendCommandf(206,distance);
 }
 
-pub fn sceGuFrontFace(order: c_int) void{
+pub fn sceGuFrontFace(order: c_int) void{@setRuntimeSafety(false);
     if (order != 0){
         sendCommandi(155,0);
     }else{
@@ -765,7 +794,7 @@ pub fn sceGuGetStatus(state: c_int) c_int{
     return 0;
 }
 
-pub fn sceGuLight(light: usize, typec: c_int, components: c_int, position: [*c]const ScePspFVector3) void{
+pub fn sceGuLight(light: usize, typec: c_int, components: c_int, position: [*c]const ScePspFVector3) void{@setRuntimeSafety(false);
     
     sendCommandf(light_settings[light].xpos,position.*.x);
     sendCommandf(light_settings[light].ypos,position.*.y);
@@ -783,13 +812,13 @@ pub fn sceGuLight(light: usize, typec: c_int, components: c_int, position: [*c]c
     sendCommandi(light_settings[light].typec,((typec & 0x03) << 8)|kind);
 }
 
-pub fn sceGuLightAtt(light: usize, atten0: f32, atten1: f32, atten2: f32) void{
+pub fn sceGuLightAtt(light: usize, atten0: f32, atten1: f32, atten2: f32) void{@setRuntimeSafety(false);
     sendCommandf(light_settings[light].constant,atten0);
     sendCommandf(light_settings[light].linear,atten1);
     sendCommandf(light_settings[light].quadratic,atten2);
 }
 
-pub fn sceGuLightColor(light: usize, component: c_int, col: c_int) void{
+pub fn sceGuLightColor(light: usize, component: c_int, col: c_int) void{@setRuntimeSafety(false);
     switch(@intToEnum(LightBitFlags, component)){
         .Ambient => {
             sendCommandi(light_settings[light].ambient, col & 0xffffff);
@@ -813,11 +842,11 @@ pub fn sceGuLightColor(light: usize, component: c_int, col: c_int) void{
     }
 }
 
-pub fn sceGuLightMode(mode: c_int) void{
+pub fn sceGuLightMode(mode: c_int) void{@setRuntimeSafety(false);
     sendCommandi(94,mode);
 }
 
-pub fn sceGuLightSpot(light: usize, direction: [*c]const ScePspFVector3, exponent: f32, cutoff: f32) void{
+pub fn sceGuLightSpot(light: usize, direction: [*c]const ScePspFVector3, exponent: f32, cutoff: f32) void{@setRuntimeSafety(false);
     sendCommandf(light_settings[light].exponent,exponent);
     sendCommandf(light_settings[light].cutoff,cutoff);
     sendCommandf(light_settings[light].xdir,direction.*.x);
@@ -825,35 +854,35 @@ pub fn sceGuLightSpot(light: usize, direction: [*c]const ScePspFVector3, exponen
     sendCommandf(light_settings[light].zdir,direction.*.z);
 }
 
-pub fn sceGuLogicalOp(op: c_int) void{
+pub fn sceGuLogicalOp(op: c_int) void{@setRuntimeSafety(false);
     sendCommandi(230,op & 0x0f);
 }
 
-pub fn sceGuModelColor(emissive: c_int, ambient: c_int, diffuse: c_int, specular: c_int) void{
+pub fn sceGuModelColor(emissive: c_int, ambient: c_int, diffuse: c_int, specular: c_int) void{@setRuntimeSafety(false);
     sendCommandi(84, emissive & 0xffffff);
     sendCommandi(86, diffuse & 0xffffff);
     sendCommandi(85, ambient & 0xffffff);
     sendCommandi(87, specular & 0xffffff);
 }
 
-pub fn sceGuMorphWeight(index: c_int, weight: f32) void{
+pub fn sceGuMorphWeight(index: c_int, weight: f32) void{@setRuntimeSafety(false);
     sendCommandf(44 + index,weight);
 }
 
-pub fn sceGuOffset(x: c_int, y: c_int) void{
+pub fn sceGuOffset(x: c_int, y: c_int) void{@setRuntimeSafety(false);
     sendCommandi(76,x << 4);
     sendCommandi(77,y << 4);
 }
 
-pub fn sceGuPatchDivide(ulevel: c_int, vlevel: c_int) void{
+pub fn sceGuPatchDivide(ulevel: c_int, vlevel: c_int) void{@setRuntimeSafety(false);
     sendCommandi(54,(vlevel << 8)|ulevel);
 }
 
-pub fn sceGuPatchFrontFace(a0: c_int) void{
+pub fn sceGuPatchFrontFace(a0: c_int) void{@setRuntimeSafety(false);
     sendCommandi(56,a0);
 }
 
-pub fn sceGuPatchPrim(prim: c_int) void{
+pub fn sceGuPatchPrim(prim: c_int) void{@setRuntimeSafety(false);
     switch(@intToEnum(GuPrimitive, prim)){
         .Points => {
             sendCommandi(55,2);
@@ -870,12 +899,12 @@ pub fn sceGuPatchPrim(prim: c_int) void{
     }
 }
 
-pub fn sceGuPixelMask(mask: c_int) void{
+pub fn sceGuPixelMask(mask: c_int) void{@setRuntimeSafety(false);
     sendCommandi(232,mask & 0xffffff);
     sendCommandi(233,mask >> 24);
 }
 
-pub fn sceGuScissor(x: c_int, y: c_int, w: c_int, h: c_int) void{
+pub fn sceGuScissor(x: c_int, y: c_int, w: c_int, h: c_int) void{@setRuntimeSafety(false);
     gu_contexts[@intCast(usize, gu_curr_context)].scissor_start[0] = x;
     gu_contexts[@intCast(usize, gu_curr_context)].scissor_start[1] = y;
     gu_contexts[@intCast(usize, gu_curr_context)].scissor_end[0] = w-1;
@@ -888,15 +917,15 @@ pub fn sceGuScissor(x: c_int, y: c_int, w: c_int, h: c_int) void{
 }
 
 
-pub fn sceGuSendCommandf(cmd: c_int, argument: f32) void{
+pub fn sceGuSendCommandf(cmd: c_int, argument: f32) void{@setRuntimeSafety(false);
     sendCommandf(cmd,argument);
 }
 
-pub fn sceGuSendCommandi(cmd: c_int, argument: c_int) void{
+pub fn sceGuSendCommandi(cmd: c_int, argument: c_int) void{@setRuntimeSafety(false);
     sendCommandi(cmd,argument);
 }
 
-pub fn sceGuSendList(mode: c_int, list: ?*const c_void, context: [*c]PspGeContext) void{
+pub fn sceGuSendList(mode: c_int, list: ?*const c_void, context: [*c]PspGeContext) void{@setRuntimeSafety(false);
     gu_settings.signal_offset = 0;
     var args : PspGeListArgs = undefined;
     args.size = 8;
@@ -917,7 +946,7 @@ pub fn sceGuSendList(mode: c_int, list: ?*const c_void, context: [*c]PspGeContex
     ge_list_executed[1] = list_id;
 }
 
-pub fn sceGuSetAllStatus(status: c_int) void{
+pub fn sceGuSetAllStatus(status: c_int) void{@setRuntimeSafety(false);
     var i : c_int = 0;
     while(i < 22) : (i += 1){
         if ((status >> @intCast(u5, i))&1 != 0){
@@ -946,14 +975,14 @@ pub fn sceGuSetCallback(signal: c_int, callback: ?fn (c_int) callconv(.C) void) 
     return old_callback;
 }
 
-pub fn sceGuSetDither(matrix: *const ScePspIMatrix4) void{
+pub fn sceGuSetDither(matrix: *const ScePspIMatrix4) void{@setRuntimeSafety(false);
     sendCommandi(226,(matrix.x.x & 0x0f)|((matrix.x.y & 0x0f) << 4)|((matrix.x.z & 0x0f) << 8)|((matrix.x.w & 0x0f) << 12));
     sendCommandi(227,(matrix.y.x & 0x0f)|((matrix.y.y & 0x0f) << 4)|((matrix.y.z & 0x0f) << 8)|((matrix.y.w & 0x0f) << 12));
     sendCommandi(228,(matrix.z.x & 0x0f)|((matrix.z.y & 0x0f) << 4)|((matrix.z.z & 0x0f) << 8)|((matrix.z.w & 0x0f) << 12));
     sendCommandi(229,(matrix.w.x & 0x0f)|((matrix.w.y & 0x0f) << 4)|((matrix.w.z & 0x0f) << 8)|((matrix.w.w & 0x0f) << 12));
 }
 
-pub fn sceGuSetMatrix(typec: c_int, matrix: [*c]ScePspFMatrix4) void{
+pub fn sceGuSetMatrix(typec: c_int, matrix: [*c]ScePspFMatrix4) void{@setRuntimeSafety(false);
 
     const fmatrix : [*]f32 = @ptrCast([*]f32, matrix);
 
@@ -1009,7 +1038,7 @@ pub fn sceGuSetMatrix(typec: c_int, matrix: [*c]ScePspFMatrix4) void{
     }
 }
 
-pub fn sceGuSetStatus(state: c_int, status: c_int) void{
+pub fn sceGuSetStatus(state: c_int, status: c_int) void{@setRuntimeSafety(false);
     if(status != 0){
         sceGuEnable(state);
     }else{
@@ -1017,7 +1046,7 @@ pub fn sceGuSetStatus(state: c_int, status: c_int) void{
     }
 }
 
-pub fn sceGuShadeModel(mode: c_int) void{
+pub fn sceGuShadeModel(mode: c_int) void{@setRuntimeSafety(false);
     if(mode == 1){
         sendCommandi(80,1);
     }else{
@@ -1025,7 +1054,7 @@ pub fn sceGuShadeModel(mode: c_int) void{
     }
 }
 
-pub fn sceGuSignal(signal: c_int, behavior: c_int) void{
+pub fn sceGuSignal(signal: c_int, behavior: c_int) void{@setRuntimeSafety(false);
     sendCommandi(14,((signal & 0xff) << 16) | (behavior & 0xffff));
     sendCommandi(12,0);
 
@@ -1038,19 +1067,19 @@ pub fn sceGuSignal(signal: c_int, behavior: c_int) void{
     sendCommandiStall(0,0);
 }
 
-pub fn sceGuSpecular(power: f32) void{
+pub fn sceGuSpecular(power: f32) void{@setRuntimeSafety(false);
     sendCommandf(91,power);
 }
 
-pub fn sceGuStencilFunc(func: c_int, ref: c_int, mask: c_int) void{
+pub fn sceGuStencilFunc(func: c_int, ref: c_int, mask: c_int) void{@setRuntimeSafety(false);
     sendCommandi(220,func | ((ref & 0xff) << 8) | ((mask & 0xff) << 16));
 }
 
-pub fn sceGuStencilOp(fail: c_int, zfail: c_int, zpass: c_int) void{
+pub fn sceGuStencilOp(fail: c_int, zfail: c_int, zpass: c_int) void{@setRuntimeSafety(false);
     sendCommandi(221,fail | (zfail << 8) | (zpass << 16));
 }
 
-pub fn sceGuSwapBuffers() ?*c_void{
+pub fn sceGuSwapBuffers() ?*c_void{@setRuntimeSafety(false);
     if (gu_settings.swapBuffersCallback != null){
         gu_settings.swapBuffersCallback.?(&gu_draw_buffer.disp_buffer,&gu_draw_buffer.frame_buffer);
     }else{
@@ -1067,11 +1096,11 @@ pub fn sceGuSwapBuffers() ?*c_void{
     return gu_draw_buffer.frame_buffer;
 }
 
-pub fn guSwapBuffersBehaviour(behaviour: c_int) void{
+pub fn guSwapBuffersBehaviour(behaviour: c_int) void{@setRuntimeSafety(false);
     gu_settings.swapBuffersBehaviour = behaviour;
 }
 
-pub fn guSwapBuffersCallback(callback: GuSwapBuffersCallback) void{
+pub fn guSwapBuffersCallback(callback: GuSwapBuffersCallback) void{@setRuntimeSafety(false);
     gu_settings.swapBuffersCallback = callback;
 }
 
@@ -1086,24 +1115,24 @@ pub fn sceGuSync(mode: c_int, what: c_int) c_int{
     }
 }
 
-pub fn sceGuTerm() void{
+pub fn sceGuTerm() void{@setRuntimeSafety(false);
     _ = sceKernelDeleteEventFlag(gu_settings.kernel_event_flag);
     _ = sceGeUnsetCallback(gu_settings.ge_callback_id);
 }
 
-pub fn sceGuTexEnvColor(color: c_int) void{
+pub fn sceGuTexEnvColor(color: c_int) void{@setRuntimeSafety(false);
     sendCommandi(202, color & 0xffffff);
 }
 
-pub fn sceGuTexFilter(min: c_int, mag: c_int) void{
+pub fn sceGuTexFilter(min: c_int, mag: c_int) void{@setRuntimeSafety(false);
     sendCommandi(198,(mag << 8)|min);
 }
 
-pub fn sceGuTexFlush() void{
+pub fn sceGuTexFlush() void{@setRuntimeSafety(false);
     sendCommandf(203,0.0);
 }
 
-pub fn sceGuTexFunc(tfx: c_int, tcc: c_int) void{
+pub fn sceGuTexFunc(tfx: c_int, tcc: c_int) void{@setRuntimeSafety(false);
     gu_contexts[@intCast(usize, gu_curr_context)].texture_function = (tcc << 8) | tfx;
     sendCommandi(201,((tcc << 8)|tfx)|gu_contexts[@intCast(usize, gu_curr_context)].fragment_2x);
 }
@@ -1113,6 +1142,7 @@ const tbwcmd_tbl = [_]u8{0xa8, 0xa9, 0xaa, 0xab, 0xac, 0xad, 0xae, 0xaf};
 const tsizecmd_tbl = [_]u8{0xb8, 0xb9, 0xba, 0xbb, 0xbc, 0xbd, 0xbe, 0xbf};
 
 fn getExp(val: c_int) c_int {
+    @setRuntimeSafety(false);
     var v : c_uint = @intCast(c_uint, val);
     var r : c_uint = ((0xFFFF-v)>>31) << 4; v >>= @intCast(u5, r);
     var shift : c_uint = ((0xFF-v)>>31) << 3; 
@@ -1128,13 +1158,14 @@ fn getExp(val: c_int) c_int {
 }
 
 pub fn sceGuTexImage(mipmap: c_int, width: c_int, height: c_int, tbw: c_int, tbp: ?*const c_void) void{
+    @setRuntimeSafety(false);
     sendCommandi(tbpcmd_tbl[@intCast(usize, mipmap)], @intCast(c_int, @ptrToInt(tbp)) & 0xffffff);
     sendCommandi(tbwcmd_tbl[@intCast(usize, mipmap)],@intCast(c_int, ((@ptrToInt(tbp) >> 8) & 0x0f0000))|tbw);
     sendCommandi(tsizecmd_tbl[@intCast(usize, mipmap)], getExp(height) << 8 | getExp(width) );
     sceGuTexFlush();
 }
 
-pub fn sceGuTexLevelMode(mode: c_int, bias: f32) void{
+pub fn sceGuTexLevelMode(mode: c_int, bias: f32) void{@setRuntimeSafety(false);
     var offset : c_int = @floatToInt(c_int, bias * 16.0);
 
     if (offset >= 128){
@@ -1145,13 +1176,13 @@ pub fn sceGuTexLevelMode(mode: c_int, bias: f32) void{
     sendCommandi(200, ((offset) << 16) | mode );
 }
 
-pub fn sceGuTexMapMode(mode: c_int, a1: c_int, a2: c_int) void{    
+pub fn sceGuTexMapMode(mode: c_int, a1: c_int, a2: c_int) void{@setRuntimeSafety(false);    
     gu_contexts[@intCast(usize, gu_curr_context)].texture_map_mode = mode & 0x03;    
     sendCommandi(192,gu_contexts[@intCast(usize, gu_curr_context)].texture_proj_map_mode | (mode & 0x03));   
     sendCommandi(193,(a2 << 8)|(a1 & 0x03));
 }
 
-pub fn sceGuTexMode(tpsm: c_int, maxmips: c_int, a2: c_int, swizzle: c_int) void{
+pub fn sceGuTexMode(tpsm: c_int, maxmips: c_int, a2: c_int, swizzle: c_int) void{@setRuntimeSafety(false);
     gu_contexts[@intCast(usize, gu_curr_context)].texture_mode = tpsm;
 
     sendCommandi(194,(maxmips << 16) | (a2 << 8) | (swizzle));
@@ -1159,34 +1190,34 @@ pub fn sceGuTexMode(tpsm: c_int, maxmips: c_int, a2: c_int, swizzle: c_int) void
     sceGuTexFlush();
 }
 
-pub fn sceGuTexOffset(u: f32, v: f32) void{
+pub fn sceGuTexOffset(u: f32, v: f32) void{@setRuntimeSafety(false);
     sendCommandf(74,u);
     sendCommandf(75,v);
 }
 
-pub fn sceGuTexProjMapMode(mode: c_int) void{
+pub fn sceGuTexProjMapMode(mode: c_int) void{@setRuntimeSafety(false);
     gu_contexts[@intCast(usize, gu_curr_context)].texture_proj_map_mode = ((mode & 0x03) << 8);
     sendCommandi(192,((mode & 0x03) << 8) | gu_contexts[@intCast(usize, gu_curr_context)].texture_map_mode);
 }
 
-pub fn sceGuTexScale(u: f32, v: f32) void{
+pub fn sceGuTexScale(u: f32, v: f32) void{@setRuntimeSafety(false);
     sendCommandf(72,u);
     sendCommandf(73,v);
 }
 
-pub fn sceGuTexSlope(slope: f32) void{
+pub fn sceGuTexSlope(slope: f32) void{@setRuntimeSafety(false);
     sendCommandf(208,slope);
 }
 
-pub fn sceGuTexSync() void{
+pub fn sceGuTexSync() void{@setRuntimeSafety(false);
     sendCommandi(204,0);
 }
 
-pub fn sceGuTexWrap(u: c_int, v: c_int) void{
+pub fn sceGuTexWrap(u: c_int, v: c_int) void{@setRuntimeSafety(false);
     sendCommandi(199,(v << 8)|(u));
 }
 
-pub fn sceGuViewport(cx: c_int, cy: c_int, width: c_int, height: c_int) void{
+pub fn sceGuViewport(cx: c_int, cy: c_int, width: c_int, height: c_int) void{@setRuntimeSafety(false);
     sendCommandf(66,@intToFloat(f32, width>>1));
     sendCommandf(67,@intToFloat(f32, (-height)>>1));
     sendCommandf(69,@intToFloat(f32, cx));
@@ -1227,7 +1258,7 @@ const ge_init_list = [_]c_uint{
 };
 
 
-pub fn sceGuInit() void{
+pub fn sceGuInit() void{@setRuntimeSafety(false);
     var callback : PspGeCallbackData = undefined;
     callback.signal_func = callbackSig;
     callback.signal_arg = &gu_settings;
@@ -1248,7 +1279,7 @@ pub fn sceGuInit() void{
     _ = sceGeListSync(ge_list_executed[0],0);
 }
 
-pub fn sceGuStart(cid: c_int, list: ?*c_void) void{
+pub fn sceGuStart(cid: c_int, list: ?*c_void) void{@setRuntimeSafety(false);
     var local_list : [*]u32 = @intToPtr([*]u32, (@intCast(usize, @ptrToInt(list)) | 0x40000000));
     
 
@@ -1298,7 +1329,7 @@ const Vertex = packed struct{
 };
 
 
-pub fn sceGuClear(flags: c_int) void{
+pub fn sceGuClear(flags: c_int) void{@setRuntimeSafety(false);
     var context: *GuContext = &gu_contexts[@intCast(usize, gu_curr_context)];
 
     var filter : u32 = 0;
@@ -1334,7 +1365,7 @@ pub fn sceGuClear(flags: c_int) void{
     sendCommandi(211,0);
 }
 
-pub fn sceGuGetMemory(size: c_uint) *c_void{
+pub fn sceGuGetMemory(size: c_uint) *c_void{@setRuntimeSafety(false);
     var siz = size;
 
     siz += 3;
