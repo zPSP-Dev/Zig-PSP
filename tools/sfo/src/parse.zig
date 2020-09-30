@@ -125,9 +125,9 @@ pub fn parseSFO() !void {
                 std.debug.warn("Overwriting {}!\n", .{r.properties[z].key});
                 gVals[f] = EntryContainer{
                     .name = r.properties[z].key,
-                    .typec = val.?.value,
-                    .value = if(val.?.value == PSP_TYPE_VAL) r.properties[z].val.dw else 0,
-                    .data = if(val.?.value == PSP_TYPE_STR) r.properties[z].val.str else null,
+                    .typec = val.?,
+                    .value = if(val.? == PSP_TYPE_VAL) r.properties[z].val.dw else 0,
+                    .data = if(val.? == PSP_TYPE_STR) r.properties[z].val.str else null,
                 };
                 overwrit = true;
                 break;
@@ -142,9 +142,9 @@ pub fn parseSFO() !void {
         if(val != null){
             gVals[i] = EntryContainer{
                 .name = r.properties[z].key,
-                .typec = val.?.value,
-                .value = if(val.?.value == PSP_TYPE_VAL) r.properties[z].val.dw else 0,
-                .data = if(val.?.value == PSP_TYPE_STR) r.properties[z].val.str else null,
+                .typec = val.?,
+                .value = if(val.? == PSP_TYPE_VAL) r.properties[z].val.dw else 0,
+                .data = if(val.? == PSP_TYPE_STR) r.properties[z].val.str else null,
             };
             i += 1;
             totalProps += 1;
