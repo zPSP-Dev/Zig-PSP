@@ -1,144 +1,20 @@
-//A quick graphics initialization
+//A simple hello world
+
+//We have 2 different ways of including the PSPSDK - either the minimalist version within utils (you can later include other modules...)
+//Or the full SDK through pspsdk.zig with all libraries.
+//In a minimalist instance, binaries are 6674 bytes on release small versus 22,724 bytes on the full version (no GU)
 const mod = @import("psp/utils/module.zig");
+const debug = @import("psp/utils/debug.zig");
 usingnamespace @import("psp/utils/mem-fix.zig");
-usingnamespace @import("psp/utils/constants.zig");
-usingnamespace @import("psp/include/psptypes.zig");
 const utils = @import("psp/utils/utils.zig");
-const vram = @import("psp/utils/vram.zig");
-const psp = @import("psp/include/pspgu.zig");
-const disp = @import("psp/include/pspdisplay.zig");
-const gum = @import("psp/include/pspgum.zig");
 
 comptime {
     asm(mod.module_info("Zig PSP App", 0, 1, 0));
 }
 
-var display_list : [0x40000]u32 align(16) = [_]u32{0} ** 0x40000;
-
-
-const Vertex = packed struct{
-    u : f32,
-    v : f32,
-    c: u32,
-    x : f32,
-    y : f32,
-    z : f32,
-};
-
-var vertices : [36]Vertex = [_]Vertex{
-    Vertex{.u = 0, .v = 0, .c = 0xff7f0000, .x = -1, .y = -1, .z =  1}, // 0
-    Vertex{.u = 1, .v = 0, .c = 0xff7f0000, .x = -1, .y =  1, .z =  1}, // 4
-    Vertex{.u = 1, .v = 1, .c = 0xff7f0000, .x =  1, .y =  1, .z =  1}, // 5
-    Vertex{.u = 0, .v = 0, .c = 0xff7f0000, .x = -1, .y = -1, .z =  1}, // 0
-    Vertex{.u = 1, .v = 1, .c = 0xff7f0000, .x =  1, .y =  1, .z =  1}, // 5
-    Vertex{.u = 0, .v = 1, .c = 0xff7f0000, .x =  1, .y = -1, .z =  1}, // 1
-    Vertex{.u = 0, .v = 0, .c = 0xff7f0000, .x = -1, .y = -1, .z = -1}, // 3
-    Vertex{.u = 1, .v = 0, .c = 0xff7f0000, .x =  1, .y = -1, .z = -1}, // 2
-    Vertex{.u = 1, .v = 1, .c = 0xff7f0000, .x =  1, .y =  1, .z = -1}, // 6
-    Vertex{.u = 0, .v = 0, .c = 0xff7f0000, .x = -1, .y = -1, .z = -1}, // 3
-    Vertex{.u = 1, .v = 1, .c = 0xff7f0000, .x =  1, .y =  1, .z = -1}, // 6
-    Vertex{.u = 0, .v = 1, .c = 0xff7f0000, .x = -1, .y =  1, .z = -1}, // 7
-    Vertex{.u = 0, .v = 0, .c = 0xff007f00, .x =  1, .y = -1, .z = -1}, // 0
-    Vertex{.u = 1, .v = 0, .c = 0xff007f00, .x =  1, .y = -1, .z =  1}, // 3
-    Vertex{.u = 1, .v = 1, .c = 0xff007f00, .x =  1, .y =  1, .z =  1}, // 7
-    Vertex{.u = 0, .v = 0, .c = 0xff007f00, .x =  1, .y = -1, .z = -1}, // 0
-    Vertex{.u = 1, .v = 1, .c = 0xff007f00, .x =  1, .y =  1, .z =  1}, // 7
-    Vertex{.u = 0, .v = 1, .c = 0xff007f00, .x =  1, .y =  1, .z = -1}, // 4
-    Vertex{.u = 0, .v = 0, .c = 0xff007f00, .x = -1, .y = -1, .z = -1}, // 0
-    Vertex{.u = 1, .v = 0, .c = 0xff007f00, .x = -1, .y =  1, .z = -1}, // 3
-    Vertex{.u = 1, .v = 1, .c = 0xff007f00, .x = -1, .y =  1, .z =  1}, // 7
-    Vertex{.u = 0, .v = 0, .c = 0xff007f00, .x = -1, .y = -1, .z = -1}, // 0
-    Vertex{.u = 1, .v = 1, .c = 0xff007f00, .x = -1, .y =  1, .z =  1}, // 7
-    Vertex{.u = 0, .v = 1, .c = 0xff007f00, .x = -1, .y = -1, .z =  1}, // 4
-    Vertex{.u = 0, .v = 0, .c = 0xff00007f, .x = -1, .y =  1, .z = -1}, // 0
-    Vertex{.u = 1, .v = 0, .c = 0xff00007f, .x =  1, .y =  1, .z = -1}, // 1
-    Vertex{.u = 1, .v = 1, .c = 0xff00007f, .x =  1, .y =  1, .z =  1}, // 2
-    Vertex{.u = 0, .v = 0, .c = 0xff00007f, .x = -1, .y =  1, .z = -1}, // 0
-    Vertex{.u = 1, .v = 1, .c = 0xff00007f, .x =  1, .y =  1, .z =  1}, // 2
-    Vertex{.u = 0, .v = 1, .c = 0xff00007f, .x = -1, .y =  1, .z =  1}, // 3
-    Vertex{.u = 0, .v = 0, .c = 0xff00007f, .x = -1, .y = -1, .z = -1}, // 4
-    Vertex{.u = 1, .v = 0, .c = 0xff00007f, .x = -1, .y = -1, .z =  1}, // 7
-    Vertex{.u = 1, .v = 1, .c = 0xff00007f, .x =  1, .y = -1, .z =  1}, // 6
-    Vertex{.u = 0, .v = 0, .c = 0xff00007f, .x = -1, .y = -1, .z = -1}, // 4
-    Vertex{.u = 1, .v = 1, .c = 0xff00007f, .x =  1, .y = -1, .z =  1}, // 6
-    Vertex{.u = 0, .v = 1, .c = 0xff00007f, .x =  1, .y = -1, .z = -1}, // 5
-};
-
 pub fn main() !void {
     utils.enableHBCB();
-    
-    var fbp0 = vram.allocVramRelative(SCR_BUF_WIDTH, SCREEN_HEIGHT, psp.GuPixelMode.Psm8888);
-    var fbp1 = vram.allocVramRelative(SCR_BUF_WIDTH, SCREEN_HEIGHT, psp.GuPixelMode.Psm8888);
-    var zbp = vram.allocVramRelative(SCR_BUF_WIDTH, SCREEN_HEIGHT, psp.GuPixelMode.Psm4444);
+    debug.screenInit();
 
-    psp.sceGuInit();
-    psp.sceGuStart(@enumToInt(psp.GuContextType.Direct), @ptrCast(*c_void, &display_list));
-    psp.sceGuDrawBuffer(@enumToInt(psp.GuPixelMode.Psm8888), fbp0, SCR_BUF_WIDTH);
-    psp.sceGuDispBuffer(SCREEN_WIDTH, SCREEN_HEIGHT, fbp1, SCR_BUF_WIDTH);
-    psp.sceGuDepthBuffer(zbp, SCR_BUF_WIDTH);
-    psp.sceGuOffset(2048 - (SCREEN_WIDTH/2), 2048 - (SCREEN_HEIGHT/2));
-    psp.sceGuViewport(2048, 2048, SCREEN_WIDTH, SCREEN_HEIGHT);
-    psp.sceGuDepthRange(50000, 0);
-    psp.sceGuScissor(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
-    psp.sceGuEnable(@enumToInt(psp.GuState.ScissorTest));
-    psp.sceGuDepthFunc(@enumToInt(psp.DepthFunc.GreaterOrEqual));
-    psp.sceGuEnable(@enumToInt(psp.GuState.DepthTest));
-    psp.sceGuFrontFace(@enumToInt(psp.FrontFaceDirection.Clockwise));
-    psp.sceGuShadeModel(@enumToInt(psp.ShadeModel.Smooth));
-    psp.sceGuEnable(@enumToInt(psp.GuState.CullFace));
-    psp.sceGuEnable(@enumToInt(psp.GuState.Texture2D));
-    
-    
-    _ = psp.sceGuFinish();
-    _ = psp.sceGuSync(@enumToInt(psp.GuSyncMode.Finish), @enumToInt(psp.GuSyncBehavior.Wait));
-    _ = disp.sceDisplayWaitVblankStart();
-    _ = psp.sceGuDisplay(1);
-
-    var i : u32 = 0;
-    while(true) : (i += 1) {
-        psp.sceGuStart(@enumToInt(psp.GuContextType.Direct), @ptrCast(*c_void, &display_list));
-        
-        psp.sceGuClearColor(psp.rgba(32, 32, 32, 0xFF));
-        psp.sceGuClearDepth(0);
-        psp.sceGuClear(
-            @enumToInt(psp.ClearBitFlags.ColorBuffer) |
-            @enumToInt(psp.ClearBitFlags.DepthBuffer)
-        );
-        
-        gum.sceGumMatrixMode(@enumToInt(psp.MatrixMode.Projection));
-        gum.sceGumLoadIdentity();
-        gum.sceGumPerspective(75.0,16.0/9.0,0.5,1000.0);
-        
-        gum.sceGumMatrixMode(@enumToInt(psp.MatrixMode.View));
-        gum.sceGumLoadIdentity();
-        
-        gum.sceGumMatrixMode(@enumToInt(psp.MatrixMode.Model));
-        gum.sceGumLoadIdentity();
-
-        //Rotate
-        var pos : ScePspFVector3 = ScePspFVector3{ .x=0, .y=0, .z=-2.5 };
-        var rot : ScePspFVector3 = ScePspFVector3{ .x= @intToFloat(f32, i) * 0.79 * (3.14159/180.0), .y= @intToFloat(f32, i) * 0.98 * (3.14159/180.0), .z= @intToFloat(f32, i) * 1.32 * (3.14159/180.0) };
-        gum.sceGumTranslate(&pos);
-        gum.sceGumRotateXYZ(&rot);
-
-        
-        psp.sceGuTexMode(@enumToInt(psp.GuPixelMode.Psm4444),0,0,0);
-        psp.sceGuTexImage(0,64,64,64, &logo_start);
-        psp.sceGuTexFunc(@enumToInt(psp.TextureEffect.Add),@enumToInt(psp.TextureColorComponent.Rgba));
-        psp.sceGuTexFilter(@enumToInt(psp.TextureFilter.Linear),@enumToInt(psp.TextureFilter.Linear));
-        psp.sceGuTexScale(1.0,1.0);
-        psp.sceGuTexOffset(0.0 ,0.0);
-        psp.sceGuAmbientColor(0xffffffff);
-
-        // draw cube
-
-        gum.sceGumDrawArray(@enumToInt(psp.GuPrimitive.Triangles),@enumToInt(psp.VertexTypeFlags.Texture32Bitf)|@enumToInt(psp.VertexTypeFlags.Color8888)|@enumToInt(psp.VertexTypeFlags.Vertex32Bitf)|@enumToInt(psp.VertexTypeFlags.Transform3D),12*3,null,@ptrCast(*c_void, &vertices));
-
-        _ = psp.sceGuFinish();
-        _ = psp.sceGuSync(@enumToInt(psp.GuSyncMode.Finish), @enumToInt(psp.GuSyncBehavior.Wait));
-        _ = disp.sceDisplayWaitVblankStart();
-        _ = psp.sceGuSwapBuffers();
-    }
+    debug.print("Hello from Zig!");
 }
-
-const logo_start align(16) = @embedFile("logo.raw").*;
