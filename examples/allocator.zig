@@ -21,7 +21,7 @@ pub fn main() !void {
     psp.utils.enableHBCB();
     psp.debug.screenInit();
 
-    var psp_allocator = &psp.utils.PSPAllocator.init().allocator;
+    var psp_allocator = &psp.PSPAllocator.init().allocator;
 
     printFreeMem(psp_allocator);
 

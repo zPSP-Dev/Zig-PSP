@@ -28,7 +28,7 @@ pub fn build(b: *Builder) void {
 
     //All of the release modes work
     //Debug Mode can cause issues with trap instructions - use ReleaseSafe for "Debug" builds
-    const mode = builtin.Mode.ReleaseSmall;
+    const mode = builtin.Mode.ReleaseSafe;
 
     const lib = b.addStaticLibrary("zpsp", "src/psp/libzpsp.zig");
     lib.setTarget(target);

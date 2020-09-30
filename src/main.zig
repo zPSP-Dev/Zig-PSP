@@ -1,20 +1,42 @@
-//A simple hello world
+//Shows a working example of allocation and freeing
 
-//We have 2 different ways of including the PSPSDK - either the minimalist version within utils (you can later include other modules...)
-//Or the full SDK through pspsdk.zig with all libraries.
-//In a minimalist instance, binaries are 6674 bytes on release small versus 22,724 bytes on the full version (no GU)
-const mod = @import("psp/utils/module.zig");
-const debug = @import("psp/utils/debug.zig");
-usingnamespace @import("psp/utils/mem-fix.zig");
-const utils = @import("psp/utils/utils.zig");
+const psp = @import("psp/utils/psp.zig");
+const sysmem = @import("psp/include/pspsysmem.zig");
+
+const std = @import("std");
+const fmt = std.fmt;
 
 comptime {
-    asm(mod.module_info("Zig PSP App", 0, 1, 0));
+    asm(psp.module_info("Zig PSP App", 0, 1, 0));
+}
+
+fn printFreeMem(alloc: *std.mem.Allocator) void {
+    var freeMem = sysmem.sceKernelTotalFreeMemSize();
+    const fMem = std.fmt.allocPrint(alloc, "{} Bytes Free\n", .{freeMem}) catch unreachable;
+    psp.debug.print(fMem);
+    alloc.free(fMem);
 }
 
 pub fn main() !void {
-    utils.enableHBCB();
-    debug.screenInit();
+    psp.utils.enableHBCB();
+    psp.debug.screenInit();
 
-    debug.print("Hello from Zig!");
+    var psp_allocator = &psp.PSPAllocator.init().allocator;
+
+    printFreeMem(psp_allocator);
+
+    const string : []const u8 = try std.fmt.allocPrint(
+        psp_allocator,
+        "{} {} {}\n",
+        .{ "Hello", "from", "Zig!" },
+    );
+    
+    psp.debug.print(string);
+    
+    printFreeMem(psp_allocator);
+    psp_allocator.free(string); //Explicit free
+    
+    printFreeMem(psp_allocator);
+
+    psp.debug.print("\nKTHXBYE!");
 }
