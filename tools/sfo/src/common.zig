@@ -29,7 +29,7 @@ pub const EntryContainer = struct{
     data: ?[]const u8
 };
 
-pub var g_defaults : [8]EntryContainer = [8]EntryContainer{
+pub const g_defaults : [8]EntryContainer = [8]EntryContainer{
     EntryContainer{ .name = "BOOTABLE",         .typec = PSP_TYPE_VAL, .value  = 1,         .data = null },
     EntryContainer{ .name = "CATEGORY",         .typec = PSP_TYPE_STR, .value  = 0,         .data = "MG"},
     EntryContainer{ .name = "DISC_ID",          .typec = PSP_TYPE_STR, .value  = 0,         .data = "UCJS10041"},

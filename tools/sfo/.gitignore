@@ -8,3 +8,4 @@ zig-cache
 *.log
 .DS_STORE
 .DS_Store
+*.json
