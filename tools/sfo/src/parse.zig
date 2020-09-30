@@ -64,6 +64,7 @@ pub fn parseSFO() !void {
     _ = try map.put("TITLE_7", PSP_TYPE_STR);
     _ = try map.put("TITLE_8", PSP_TYPE_STR);
     _ = try map.put("UPDATER_VER", PSP_TYPE_STR);
+    _ = try map.put("MEMSIZE", PSP_TYPE_VAL);
 
     var inputFile = try (arg_it.next(allocator) orelse{
         std.debug.warn("Usage: sfotool parse <input.json> <output.SFO>\n", .{});
@@ -111,7 +112,7 @@ pub fn parseSFO() !void {
         .data  = r.title,
     };
     i += 1;
-    
+
     var z : usize = 0;
     while(z < r.properties.len) : (z += 1){
         var val = map.get(r.properties[z].key);

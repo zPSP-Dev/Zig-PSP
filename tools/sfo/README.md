@@ -14,3 +14,22 @@ To use it standalone, you can use `sfotool read` and `sfotool write`.
 To use write, you'll want to supply it: `sfotool write TITLE <output.SFO>`
 
 To use read, you'll need to supply: `sfotool read <input.SFO>`
+
+To use the JSON layout, you'll need to supply: `sfotool parse <input.json> <output.SFO>`
+The JSON file must have a title, and properties. Every property has a key and a val.
+```json
+{
+    "title": "Hello World",
+    "properties": [
+        {
+            "key": "PARENTAL_LEVEL",
+            "val": 0
+        },
+        {
+            "key": "TITLE_0",
+            "val": "MyTitle"
+        }
+    ]
+}
+```
+The parser also will stop you from entering invalid properties!
