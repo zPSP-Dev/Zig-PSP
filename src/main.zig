@@ -72,14 +72,15 @@ pub fn main() !void {
     psp.sceGuDepthBuffer(zbp, psp.SCR_BUF_WIDTH);
     psp.sceGuOffset(2048 - (psp.SCREEN_WIDTH/2), 2048 - (psp.SCREEN_HEIGHT/2));
     psp.sceGuViewport(2048, 2048, psp.SCREEN_WIDTH, psp.SCREEN_HEIGHT);
-    psp.sceGuDepthRange(50000, 0);
+    psp.sceGuDepthRange(65535, 0);
     psp.sceGuScissor(0, 0, psp.SCREEN_WIDTH, psp.SCREEN_HEIGHT);
     psp.sceGuEnable(@enumToInt(psp.GuState.ScissorTest));
     psp.sceGuDepthFunc(@enumToInt(psp.DepthFunc.GreaterOrEqual));
     psp.sceGuEnable(@enumToInt(psp.GuState.DepthTest));
-    psp.sceGuFrontFace(@enumToInt(psp.FrontFaceDirection.Clockwise));
     psp.sceGuShadeModel(@enumToInt(psp.ShadeModel.Smooth));
+    psp.sceGuFrontFace(@enumToInt(psp.FrontFaceDirection.Clockwise));
     psp.sceGuEnable(@enumToInt(psp.GuState.CullFace));
+    psp.sceGuDisable(@enumToInt(psp.GuState.ClipPlanes));
     psp.sceGuEnable(@enumToInt(psp.GuState.Texture2D));
     
     
@@ -101,7 +102,7 @@ pub fn main() !void {
         
         psp.sceGumMatrixMode(@enumToInt(psp.MatrixMode.Projection));
         psp.sceGumLoadIdentity();
-        psp.sceGumPerspective(75.0,16.0/9.0,0.5,1000.0);
+        psp.sceGumPerspective(90.0,16.0/9.0,0.2,10.0);
         
         psp.sceGumMatrixMode(@enumToInt(psp.MatrixMode.View));
         psp.sceGumLoadIdentity();
