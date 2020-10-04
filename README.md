@@ -9,12 +9,6 @@ In the PSP programming community, many libraries, tools, and other features are 
 
 Special thanks is given to the [Rust-PSP team](https://github.com/overdrivenpotato/rust-psp) whose efforts influenced and helped to get this project off the ground. No harm is intended, and it's thanks to you Rustaceans that fellow Ziguanas can program for the PSP.
 
-## Installation Requirements
-
-The only other program required to use Zig-PSP is the lld linker for LLVM. This is required purely because the build script cannot pass the -emit-relocs flag to generate an ELF. [See The Issue Here](https://github.com/ziglang/zig/issues/5986)
-
-Zig-PSP also relies on binary tools included as submodules from the zPSP-Dev team, and one tool from PSPSDK (for now).
-
 ## Usage
 
 Currently, using Zig-PSP is rather straight forward - one must use the psp folder in their project's src folder in order to have the PSP's function definitions, alongside with some custom utilities I have created. One also must include the tools/ folder to use the post-build tools. To build a PSP app, use the included `build.zig` script to generate a PSP executable! (EBOOT.PBP / app.prx) This script is well commented for explanation and documentation.
