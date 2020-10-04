@@ -14,3 +14,7 @@ sfotool
 *.exe
 *.pdb
 *.obj
+
+*.id
+builtin.zig
+libs.txt

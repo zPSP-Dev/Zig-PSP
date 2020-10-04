@@ -37,24 +37,24 @@ SECTIONS
    PROVIDE (__executable_start = 0x0); 
    .text 0 : { *(.text .text.*) }
    /* PSP library stub functions. */
-   .sceStub.text : { *(.sceStub.text) *(SORT(.sceStub.text.*)) }
+   .sceStub.text : { KEEP(*(.sceStub.text)) KEEP(*(SORT(.sceStub.text.*))) }
 
    /* PSP library entry table and library stub table. */
-   .lib.ent.top    : { *(.lib.ent.top) }
-   .lib.ent        : { *(.lib.ent) }
-   .lib.ent.btm    : { *(.lib.ent.btm) }
-   .lib.stub.top   : { *(.lib.stub.top) }
-   .lib.stub       : { *(.lib.stub) }
-   .lib.stub.btm   : { *(.lib.stub.btm) }
+   .lib.ent.top    : { KEEP(*(.lib.ent.top)) }
+   .lib.ent        : { KEEP(*(.lib.ent)) }
+   .lib.ent.btm    : { KEEP(*(.lib.ent.btm)) }
+   .lib.stub.top   : { KEEP(*(.lib.stub.top)) }
+   .lib.stub       : { KEEP(*(.lib.stub)) }
+   .lib.stub.btm   : { KEEP(*(.lib.stub.btm)) }
 
    /* PSP read-only data for module info, NIDs, and Vstubs.  The
     .rodata.sceModuleInfo section must appear before the .rodata section
      otherwise it would get absorbed into .rodata and the PSP bootloader
      would be unable to locate the module info structure. */
-   .rodata.sceModuleInfo    : { *(.rodata.sceModuleInfo) }
-   .rodata.sceResident      : { *(.rodata.sceResident) }
+   .rodata.sceModuleInfo    : { KEEP(*(.rodata.sceModuleInfo)) }
+   .rodata.sceResident      : { KEEP(*(.rodata.sceResident)) }
    .rodata.sceNid           : { KEEP (*(.rodata.sceNid)) }
-   .rodata.sceVstub         : { *(.rodata.sceVstub) *(SORT(.rodata.sceVstub.*)) }
+   .rodata.sceVstub         : { KEEP(*(.rodata.sceVstub)) KEEP(*(SORT(.rodata.sceVstub.*))) }
 
    /*Debug Data*/
    /* Stabs debugging sections.  */

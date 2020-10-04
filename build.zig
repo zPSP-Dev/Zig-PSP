@@ -36,8 +36,7 @@ pub fn build(b: *Builder) void {
     lib.setOutputDir("zig-cache/");
 
     //Build from your main file!
-    const exe = b.addObject("main", "src/main.zig"); //TODO: Change to executable
-
+    const exe = b.addExecutable("main", "src/main.zig"); //TODO: Change to executable
     //Output to zig cache for now
     exe.setOutputDir("zig-cache/");
 
@@ -46,19 +45,8 @@ pub fn build(b: *Builder) void {
     exe.setBuildMode(mode);
     exe.setLinkerScriptPath("tools/linkfile.ld");
     exe.link_eh_frame_hdr = true;
+    exe.link_emit_relocs = true;
     exe.step.dependOn(&lib.step);
-    
-    //New step to link the object
-    //Hopefully can be removed (https://github.com/ziglang/zig/issues/5986)
-    const link_to_elf = b.addSystemCommand(&[_][]const u8{
-        "ld.lld", "-L./zig-cache",
-        "-Ttools/linkfile.ld",
-        exe.getOutputPath(),
-        "-o",
-        "zig-cache/app.elf",
-        "-emit-relocs",
-    });
-    link_to_elf.step.dependOn(&exe.step);
 
     //Post-build actions
     
@@ -71,7 +59,7 @@ pub fn build(b: *Builder) void {
     prx.setBuildMode(builtin.Mode.ReleaseFast);
     prx.setOutputDir("tools/bin");
     prx.install();
-    prx.step.dependOn(&link_to_elf.step);
+    prx.step.dependOn(&exe.step);
 
     const append : []const u8 = switch(builtin.os.tag){
         .windows => ".exe",
@@ -80,7 +68,7 @@ pub fn build(b: *Builder) void {
 
     const generate_prx = b.addSystemCommand(&[_][]const u8{
         "tools/bin/prxgen" ++ append,
-        "zig-cache/app.elf",
+        "zig-cache/main",
         "app.prx"
     });
     generate_prx.step.dependOn(&prx.step);
