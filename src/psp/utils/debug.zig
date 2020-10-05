@@ -121,7 +121,7 @@ pub fn printFormat(comptime fmt: []const u8, args: anytype) !void {
 }
 
 //Our font
-const msxFont = @embedFile("./msxfont2.bin");
+pub const msxFont = @embedFile("./msxfont2.bin");
 
 //Puts a character to screen
 fn internal_putchar(cx: u32, cy: u32, ch: u8) void{
