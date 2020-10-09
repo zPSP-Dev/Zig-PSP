@@ -130,15 +130,16 @@ pub fn writeSFO() !void {
     var key_size : usize = (@ptrToInt(k) - @ptrToInt(&keys));
     var data_size : usize = (@ptrToInt(d) - @ptrToInt(&data));
     
-    //Value offset is after headers and keys
-    h.*.valofs = @truncate(u32, head_size + key_size);
-    
     //Align keys
     var @"align" : u32 = 3 - @truncate(u32, key_size & 3);
     while (@"align" < 3) {
         k += 1;
         @"align" -%= 1;
     }
+    key_size = (@ptrToInt(k) - @ptrToInt(&keys));
+
+    //Value offset is after headers and keys
+    h.*.valofs = @truncate(u32, h.*.keyofs + key_size);
     
     //Open File
     var of = try fs.cwd().createFile(outputFile, fs.File.CreateFlags {.truncate = true});
