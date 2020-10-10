@@ -17,8 +17,8 @@ pub fn exitErr() void {
 
 //This calls your main function as a thread.
 pub fn _module_main_thread(argc: SceSize, argv: ?*c_void) callconv(.C) c_int {
-
-switch (@typeInfo(@typeInfo(@TypeOf(root.main)).Fn.return_type.?)) {
+    pspos.system.__pspOsInit();
+    switch (@typeInfo(@typeInfo(@TypeOf(root.main)).Fn.return_type.?)) {
         .NoReturn => {
             root.main();
         },
@@ -183,6 +183,7 @@ pub fn module_info(comptime name: []const u8, comptime attrib: u16 , comptime ma
             );
 }
 
+const pspos = @import("../pspos.zig");
 //Entry point - launches main through the thread above.
 pub export fn module_start(argc: c_uint, argv: ?*c_void) c_int {
     var thid : SceUID = sceKernelCreateThread("zig_user_main", _module_main_thread, 0x20, 256 * 1024, 0b10000000000000000100000000000000, 0);
