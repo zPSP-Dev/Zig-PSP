@@ -1,6 +1,7 @@
 usingnamespace @import("bits.zig");
 usingnamespace @import("fdman.zig");
-var errno : u32 = 0;
+usingnamespace @import("cwd.zig");
+pub var errno : u32 = 0;
 
 fn pspErrToErrno(code: u32) i32{
     if ((code & 0x80010000) == 0x80010000) {
@@ -62,8 +63,9 @@ pub fn write(fd: fd_t, ptr: [*]const u8, len: usize) i32 {
     return -1;
 }
 
-pub fn __pspOsInit() void {
+pub fn __pspOsInit(arg: ?*c_void) void {
     __psp_fdman_init();
+    __psp_init_cwd(arg);
 }
 
 usingnamespace @import("../include/pspthreadman.zig");
@@ -76,3 +78,73 @@ usingnamespace @import("../include/psputils.zig");
 pub fn _times (t: *time_t) time_t {
     return pspErrToErrno(sceKernelLibcTime(t));
 } 
+
+pub fn flock(f: fd_t, op: c_int) c_int{
+    return 0;
+}
+const std = @import("std");
+
+pub fn openat(dir: fd_t, path: [*:0]const u8, flags: u32, mode: u32) c_int{
+    if(dir != AT_FDCWD){
+        @panic("Non-FDCWD Not Supported");
+    }else{
+        //Do stuff;
+        
+        var scefd : c_int = 0;
+        var fd : c_int = 0;
+        var dest : [PATH_MAX + 1]u8 = undefined;
+
+        var stat = __psp_path_absolute(path, dest[0..], PATH_MAX);
+        if(stat < 0) {
+            errno = ENAMETOOLONG;
+            return -1;
+        }
+
+        scefd = sceIoOpen(dest[0..], @bitCast(c_int, flags), mode);
+        if (scefd >= 0) {
+            fd = __psp_fdman_get_new_descriptor();
+            if (fd != -1) {
+                __psp_descriptormap[@intCast(usize, fd)].?.sce_descriptor = scefd;
+                __psp_descriptormap[@intCast(usize, fd)].?.ftype = __psp_fdman_type.File;
+                __psp_descriptormap[@intCast(usize, fd)].?.flags = flags;
+                __psp_descriptormap[@intCast(usize, fd)].?.filename = dest[0..];
+                return fd;
+            }else{
+                _ = sceIoClose(scefd);
+                errno = ENOMEM;
+                return -1;
+            }
+        }else{
+            return pspErrToErrno(@bitCast(u32, scefd));
+        }
+
+        errno = EBADF;
+        return -1;
+    }
+}
+
+pub fn close(fd: fd_t) c_int {
+    var ret: c_int = 0;
+
+    if(!__psp_fdman_fdValid(fd)){
+        errno = EBADF;
+        return -1;
+    }
+
+    switch(__psp_descriptormap[fd].?.ftype){
+        .File, .Tty => {
+            if (__psp_descriptormap[fd].?.ref_count == 1) {
+                ret = pspErrToErrno(@bitCast(u32, sceIoClose(__psp_descriptormap[fd].?.sce_descriptor)));
+            }
+            __psp_fdman_release_descriptor(fd);
+            return ret;
+        },
+
+        else =>{
+            @panic("PIPES & SOCKETS ARE NOT IMPLEMENTED YET!");
+        }
+    }
+    
+    errno = EBADF;
+    return -1;
+}

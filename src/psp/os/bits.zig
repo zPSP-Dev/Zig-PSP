@@ -8,7 +8,9 @@ pub const timespec = struct{
 };
 
 pub const fd_t = usize;
-pub const time_t = i64;
+pub const mode_t = u32;
+
+pub const PATH_MAX = 1024;
 
 pub const EPERM = 1; // Not super-user 
 pub const ENOENT = 2; // No such file or directory 
@@ -150,3 +152,57 @@ pub const CLOCK_REALTIME_ALARM = 8;
 pub const CLOCK_BOOTTIME_ALARM = 9;
 pub const CLOCK_SGI_CYCLE = 10;
 pub const CLOCK_TAI = 11;
+
+pub const O_TRUNC = 0x0400;
+pub const O_RDWR = O_RDONLY | O_WRONLY;
+pub const SEEK_END = 2;
+pub const O_EXCL = 0x0800;
+pub const O_RDONLY = 0x0001;
+pub const O_NBLOCK = 0x0004;
+pub const SEEK_CUR = 1;
+pub const O_DIROPEN = 0x0008;
+pub const O_CREAT = 0x0200;
+pub const O_WRONLY = 0x0002;
+pub const O_NOWAIT = 0x8000;
+pub const SEEK_SET = 0;
+pub const O_APPEND = 0x0100;
+pub const O_CLOEXEC = 0; //Don't do anything
+
+pub const LOCK_SH = 1;
+pub const LOCK_EX = 2;
+pub const LOCK_UN = 8;
+pub const LOCK_NB = 4;
+
+
+/// Special value used to indicate openat should use the current working directory
+pub const AT_FDCWD = 0x1234;
+
+/// Do not follow symbolic links
+pub const AT_SYMLINK_NOFOLLOW = 0x100;
+
+/// Remove directory instead of unlinking file
+pub const AT_REMOVEDIR = 0x200;
+
+/// Follow symbolic links.
+pub const AT_SYMLINK_FOLLOW = 0x400;
+
+/// Suppress terminal automount traversal
+pub const AT_NO_AUTOMOUNT = 0x800;
+
+/// Allow empty relative pathname
+pub const AT_EMPTY_PATH = 0x1000;
+
+/// Type of synchronisation required from statx()
+pub const AT_STATX_SYNC_TYPE = 0x6000;
+
+/// - Do whatever stat() does
+pub const AT_STATX_SYNC_AS_STAT = 0x0000;
+
+/// - Force the attributes to be sync'd with the server
+pub const AT_STATX_FORCE_SYNC = 0x2000;
+
+/// - Don't sync attributes with the server
+pub const AT_STATX_DONT_SYNC = 0x4000;
+
+/// Apply to the entire subtree
+pub const AT_RECURSIVE = 0x8000;

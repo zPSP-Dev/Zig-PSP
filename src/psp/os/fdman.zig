@@ -9,7 +9,7 @@ pub const __psp_fdman_type = enum(u8){
 };
 
 pub const __psp_fdman_descriptor = struct{
-    filename: []const u8,
+    filename: ?[]u8,
     ftype: __psp_fdman_type,
     sce_descriptor: c_int,
     flags: u32,
@@ -28,14 +28,15 @@ comptime{
     asm(@embedFile("interrupt.S"));
 }
 
-extern fn pspDisableInterrupts() void;
-extern fn pspEnableInterrupts(en: c_int) void;
+extern fn pspDisableInterrupts() u32;
+extern fn pspEnableInterrupts(en: u32) void;
 
 pub var __psp_descriptor_data_pool: [__psp_max_fd]__psp_fdman_descriptor = undefined;
 pub var __psp_descriptormap : [__psp_max_fd]?*__psp_fdman_descriptor = undefined;
 
 usingnamespace @import("../include/pspiofilemgr.zig");
 usingnamespace @import("../include/pspstdio.zig");
+usingnamespace @import("system.zig");
 
 pub fn __psp_fdman_init() void {
     @memset(@ptrCast([*]u8, &__psp_descriptor_data_pool), 0, __psp_max_fd * @sizeOf(__psp_fdman_descriptor));
@@ -73,11 +74,11 @@ pub fn __psp_fdman_get_new_descriptor() i32 {
     inten = pspDisableInterrupts();
 
     while (i < __psp_max_fd) : (i += 1) {
-        if (__psp_descriptormap[i] == NULL) {
+        if (__psp_descriptormap[i] == null) {
             __psp_descriptormap[i] = &__psp_descriptor_data_pool[i];
             __psp_descriptormap[i].?.ref_count += 1;
             pspEnableInterrupts(inten);
-            return i;
+            return @intCast(i32, i);
         }
     }
     //Unlock
@@ -114,7 +115,7 @@ pub fn __psp_fdman_get_dup_descriptor(fd: fd_t) i32
 
 pub fn __psp_fdman_release_descriptor(fd: fd_t) void
 {
-    if (!__PSP_IS_FD_VALID(fd)) {
+    if (!__psp_fdman_fdValid(fd)) {
         errno = EBADF;
         return;
     }
@@ -122,13 +123,9 @@ pub fn __psp_fdman_release_descriptor(fd: fd_t) void
     __psp_descriptormap[fd].?.ref_count -= 1;
     
     if (__psp_descriptormap[fd].?.ref_count == 0) {
-        
-        if (__psp_descriptormap[fd].?.filename != NULL) {
-            free(__psp_descriptormap[fd].?.filename);
-        }
-        __psp_descriptormap[fd].?.filename        = NULL;
         __psp_descriptormap[fd].?.sce_descriptor  = 0;
-        __psp_descriptormap[fd].?.ftype           = 0;
+        __psp_descriptormap[fd].?.filename        = null;
+        __psp_descriptormap[fd].?.ftype           = @intToEnum(__psp_fdman_type, 0);
         __psp_descriptormap[fd].?.flags           = 0;
         
     }

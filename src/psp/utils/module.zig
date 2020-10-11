@@ -17,7 +17,8 @@ pub fn exitErr() void {
 
 //This calls your main function as a thread.
 pub fn _module_main_thread(argc: SceSize, argv: ?*c_void) callconv(.C) c_int {
-    pspos.system.__pspOsInit();
+    pspos.system.__pspOsInit(argv);
+    
     switch (@typeInfo(@typeInfo(@TypeOf(root.main)).Fn.return_type.?)) {
         .NoReturn => {
             root.main();

@@ -71,8 +71,8 @@ pub const enum_IoAssignPerms = extern enum(c_int) {
     IOASSIGN_RDONLY = 1,
     _,
 };
-pub extern fn sceIoOpen(file: [*c]const u8, flags: c_int, mode: SceMode) SceUID;
-pub extern fn sceIoOpenAsync(file: [*c]const u8, flags: c_int, mode: SceMode) SceUID;
+pub extern fn sceIoOpen(file: [*c]const u8, flags: c_int, mode: u32) SceUID;
+pub extern fn sceIoOpenAsync(file: [*c]const u8, flags: c_int, mode: u32) SceUID;
 pub extern fn sceIoClose(fd: SceUID) c_int;
 pub extern fn sceIoCloseAsync(fd: SceUID) c_int;
 pub extern fn sceIoRead(fd: SceUID, data: ?*c_void, size: SceSize) c_int;
