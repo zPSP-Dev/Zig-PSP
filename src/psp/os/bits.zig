@@ -8,7 +8,7 @@ pub const timespec = struct{
 };
 
 pub const fd_t = usize;
-
+pub const time_t = i64;
 
 pub const EPERM = 1; // Not super-user 
 pub const ENOENT = 2; // No such file or directory 

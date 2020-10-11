@@ -72,3 +72,7 @@ pub fn nanosleep(req: *const timespec, rem: ?*timespec) c_int {
     return 0;
 }
 
+usingnamespace @import("../include/psputils.zig");
+pub fn _times (t: *time_t) time_t {
+    return pspErrToErrno(sceKernelLibcTime(t));
+} 
