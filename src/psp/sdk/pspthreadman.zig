@@ -81,7 +81,7 @@ pub extern fn sceKernelSuspendThread(thid: SceUID) c_int;
 pub extern fn sceKernelResumeThread(thid: SceUID) c_int;
 pub extern fn sceKernelWaitThreadEnd(thid: SceUID, timeout: [*c]SceUInt) c_int;
 pub extern fn sceKernelWaitThreadEndCB(thid: SceUID, timeout: [*c]SceUInt) c_int;
-pub extern fn sceKernelDelayThread(delay: SceUInt) c_int;
+pub extern fn sceKernelDelayThread(delay: u32) c_int;
 pub extern fn sceKernelDelayThreadCB(delay: SceUInt) c_int;
 pub extern fn sceKernelDelaySysClockThread(delay: [*c]SceKernelSysClock) c_int;
 pub extern fn sceKernelDelaySysClockThreadCB(delay: [*c]SceKernelSysClock) c_int;
