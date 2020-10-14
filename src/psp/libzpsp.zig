@@ -5,6 +5,7 @@ pub usingnamespace @import("nids/pspaudio.zig");
 pub usingnamespace @import("nids/pspaudiocodec.zig");
 pub usingnamespace @import("nids/pspctrl.zig");
 pub usingnamespace @import("nids/pspdisplay.zig");
+pub usingnamespace @import("nids/pspdmac.zig");
 pub usingnamespace @import("nids/pspge.zig");
 pub usingnamespace @import("nids/psphprm.zig");
 pub usingnamespace @import("nids/psphttp.zig");

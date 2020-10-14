@@ -12,6 +12,7 @@ pub usingnamespace @import("sdk/pspaudio.zig");
 pub usingnamespace @import("sdk/pspaudiocodec.zig");
 pub usingnamespace @import("sdk/pspctrl.zig");
 pub usingnamespace @import("sdk/pspdisplay.zig");
+pub usingnamespace @import("sdk/pspdmac.zig");
 pub usingnamespace @import("sdk/pspge.zig");
 pub usingnamespace @import("sdk/pspgu.zig");
 pub usingnamespace @import("sdk/pspgum.zig");

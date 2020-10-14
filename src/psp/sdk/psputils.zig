@@ -180,7 +180,7 @@ pub fn kernelUtilsSha1BlockInit(ctx: *SceKernelUtilsSha1Context) !i32{
 //
 // @return < 0 on error.
 pub extern fn sceKernelUtilsSha1BlockUpdate(ctx: *SceKernelUtilsSha1Context, data: [*]u8, size: u32) c_int;
-pub extern fn kernelUtilsSha1BlockUpdate(ctx: *SceKernelUtilsSha1Context, data: [*]u8, size: u32) !i32{
+pub fn kernelUtilsSha1BlockUpdate(ctx: *SceKernelUtilsSha1Context, data: [*]u8, size: u32) !i32{
     var res = sceKernelUtilsSha1BlockUpdate(ctx, data, size);
     if(res < 0){
         return error.Unexpected;
