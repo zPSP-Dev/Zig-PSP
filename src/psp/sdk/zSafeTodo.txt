@@ -1,0 +1,31 @@
+- audio
+- audiocodec
+- ctrl
+- display
+- ge
+- gutypes
+- hprm
+- http
+- impose
+- iofilemgr
+- jpeg
+- kerror
+- loadexec
+- modulemgr
+- mp3
+- mpeg
+- net
+- psid
+- power
+- reg
+- rtc
+- ssl
+- stdio
+- sysmem
+- threadman
+- umd
+- usb
+- utility
+
+Post-Merge: 
+- GU/GUM
