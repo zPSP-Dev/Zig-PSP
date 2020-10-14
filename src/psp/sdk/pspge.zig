@@ -1,77 +1,195 @@
 
-pub const struct_PspGeContext = extern struct {
+pub const PspGeContext = extern struct {
     context: [512]c_uint,
 };
-pub const PspGeContext = struct_PspGeContext;
-const struct_unnamed_5 = extern struct {
+
+pub const SceGeStack = extern struct {
     stack: [8]c_uint,
 };
-pub const SceGeStack = struct_unnamed_5;
+
 pub const PspGeCallback = ?fn (c_int, ?*c_void) callconv(.C) void;
-pub const struct_PspGeCallbackData = extern struct {
+pub const PspGeCallbackData = extern struct {
     signal_func: PspGeCallback,
     signal_arg: ?*c_void,
     finish_func: PspGeCallback,
     finish_arg: ?*c_void,
 };
-pub const PspGeCallbackData = struct_PspGeCallbackData;
-pub const struct_PspGeListArgs = extern struct {
+
+pub const PspGeListArgs = extern struct {
     size: c_uint,
     context: [*c]PspGeContext,
     numStacks: u32,
     stacks: [*c]SceGeStack,
 };
-pub const PspGeListArgs = struct_PspGeListArgs;
-pub const struct_PspGeBreakParam = extern struct {
+
+pub const PspGeBreakParam = extern struct {
     buf: [4]c_uint,
 };
-pub const PspGeBreakParam = struct_PspGeBreakParam;
-pub extern fn sceGeEdramGetSize() c_uint;
-pub extern fn sceGeEdramGetAddr() ?*c_void;
-pub extern fn sceGeGetCmd(cmd: c_int) c_uint;
 
-pub const enum_PspGeMatrixTypes = extern enum(c_int) {
-    PSP_GE_MATRIX_BONE0 = 0,
-    PSP_GE_MATRIX_BONE1 = 1,
-    PSP_GE_MATRIX_BONE2 = 2,
-    PSP_GE_MATRIX_BONE3 = 3,
-    PSP_GE_MATRIX_BONE4 = 4,
-    PSP_GE_MATRIX_BONE5 = 5,
-    PSP_GE_MATRIX_BONE6 = 6,
-    PSP_GE_MATRIX_BONE7 = 7,
-    PSP_GE_MATRIX_WORLD = 8,
-    PSP_GE_MATRIX_VIEW = 9,
-    PSP_GE_MATRIX_PROJECTION = 10,
-    PSP_GE_MATRIX_TEXGEN = 11,
-    _,
+pub const PspGeMatrixTypes = extern enum(c_int) {
+    Bone0 = 0,
+    Bone1 = 1,
+    Bone2 = 2,
+    Bone3 = 3,
+    Bone4 = 4,
+    Bone5 = 5,
+    Bone6 = 6,
+    Bone7 = 7,
+    World = 8,
+    View = 9,
+    Projection = 10,
+    Texgen = 11,
 };
-pub const PspGeMatrixTypes = enum_PspGeMatrixTypes;
-pub extern fn sceGeGetMtx(typec: c_int, matrix: ?*c_void) c_int;
-const struct_unnamed_6 = extern struct {
+
+pub const PspGeStack = extern struct {
     stack: [8]c_uint,
 };
-pub const PspGeStack = struct_unnamed_6;
-pub extern fn sceGeGetStack(stackId: c_int, stack: [*c]PspGeStack) c_int;
+
+pub const PspGeListState = extern enum(c_int) {
+    Done = 0,
+    Queued = 1,
+    DrawingDone = 2,
+    StallReached = 3,
+    CancelDone = 4,
+};
+
+
+// Get the size of VRAM.
+//
+// @return The size of VRAM (in bytes).
+pub extern fn sceGeEdramGetSize() c_uint;
+
+// Get the eDRAM address.
+//
+// @return A pointer to the base of the eDRAM.
+pub extern fn sceGeEdramGetAddr() ?*c_void;
+
+
+// Retrieve the current value of a GE command.
+//
+// @param cmd - The GE command register to retrieve (0 to 0xFF, both included).
+//
+// @return The value of the GE command, < 0 on error.
+pub extern fn sceGeGetCmd(cmd: c_int) c_uint;
+
+
+// Retrieve a matrix of the given type.
+//
+// @param type - One of ::PspGeMatrixTypes.
+// @param matrix - Pointer to a variable to store the matrix.
+//
+// @return < 0 on error.
+pub extern fn sceGeGetMtx(typec: c_int, matrix: ?*c_void) c_int;
+
+
+// Save the GE's current state.
+//
+// @param context - Pointer to a ::PspGeContext.
+//
+// @return < 0 on error.
 pub extern fn sceGeSaveContext(context: [*c]PspGeContext) c_int;
+
+
+// Restore a previously saved GE context.
+//
+// @param context - Pointer to a ::PspGeContext.
+//
+// @return < 0 on error.
 pub extern fn sceGeRestoreContext(context: [*c]const PspGeContext) c_int;
+
+
+// Enqueue a display list at the tail of the GE display list queue.
+//
+// @param list - The head of the list to queue.
+// @param stall - The stall address.
+// If NULL then no stall address is set and the list is transferred immediately.
+// @param cbid - ID of the callback set by calling sceGeSetCallback
+// @param arg - Structure containing GE context buffer address
+//
+// @return The ID of the queue, < 0 on error.
 pub extern fn sceGeListEnQueue(list: ?*const c_void, stall: ?*c_void, cbid: c_int, arg: [*c]PspGeListArgs) c_int;
+
+
+// Enqueue a display list at the head of the GE display list queue.
+//
+// @param list - The head of the list to queue.
+// @param stall - The stall address.
+// If NULL then no stall address is set and the list is transferred immediately.
+// @param cbid - ID of the callback set by calling sceGeSetCallback
+// @param arg - Structure containing GE context buffer address
+//
+// @return The ID of the queue, < 0 on error.
 pub extern fn sceGeListEnQueueHead(list: ?*const c_void, stall: ?*c_void, cbid: c_int, arg: [*c]PspGeListArgs) c_int;
+
+
+// Cancel a queued or running list.
+//
+// @param qid - The ID of the queue.
+//
+// @return < 0 on error.
 pub extern fn sceGeListDeQueue(qid: c_int) c_int;
+
+
+// Update the stall address for the specified queue.
+//
+// @param qid - The ID of the queue.
+// @param stall - The new stall address.
+//
+// @return < 0 on error
 pub extern fn sceGeListUpdateStallAddr(qid: c_int, stall: ?*c_void) c_int;
 
-pub const enum_PspGeListState = extern enum(c_int) {
-    PSP_GE_LIST_DONE = 0,
-    PSP_GE_LIST_QUEUED = 1,
-    PSP_GE_LIST_DRAWING_DONE = 2,
-    PSP_GE_LIST_STALL_REACHED = 3,
-    PSP_GE_LIST_CANCEL_DONE = 4,
-    _,
-};
-pub const PspGeListState = enum_PspGeListState;
+
+// Wait for syncronisation of a list.
+//
+// @param qid - The queue ID of the list to sync.
+// @param syncType - 0 if you want to wait for the list to be completed, or 1 if you just want to peek the actual state.
+//
+// @return The specified queue status, one of ::PspGeListState.
 pub extern fn sceGeListSync(qid: c_int, syncType: c_int) c_int;
+
+
+// Wait for drawing to complete.
+//
+// @param syncType - 0 if you want to wait for the drawing to be completed, or 1 if you just want to peek the state of the display list currently being executed.
+//
+// @return The current queue status, one of ::PspGeListState.
 pub extern fn sceGeDrawSync(syncType: c_int) c_int;
-pub extern fn sceGeSetCallback(cb: [*c]PspGeCallbackData) c_int;
+
+
+// Register callback handlers for the the GE.
+//
+// @param cb - Configured callback data structure.
+//
+// @return The callback ID, < 0 on error.
+pub extern fn sceGeSetCallback(cb: *PspGeCallbackData) c_int;
+
+
+// Unregister the callback handlers.
+//
+// @param cbid - The ID of the callbacks, returned by sceGeSetCallback().
+//
+// @return < 0 on error
 pub extern fn sceGeUnsetCallback(cbid: c_int) c_int;
+
+
+// Interrupt drawing queue.
+//
+// @param mode - If set to 1, reset all the queues.
+// @param pParam - Unused (just K1-checked).
+//
+// @return The stopped queue ID if mode isn't set to 0, otherwise 0, and < 0 on error.
 pub extern fn sceGeBreak(mode: c_int, pParam: [*c]PspGeBreakParam) c_int;
+
+
+// Restart drawing queue.
+//
+// @return < 0 on error.
 pub extern fn sceGeContinue() c_int;
+
+
+// Set the eDRAM address translation mode.
+//
+// @param width - 0 to not set the translation width, otherwise 512, 1024, 2048 or 4096.
+//
+// @return The previous width if it was set, otherwise 0, < 0 on error.
 pub extern fn sceGeEdramSetAddrTranslation(width: c_int) c_int;
