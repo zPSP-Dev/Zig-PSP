@@ -28,7 +28,7 @@ pub fn build(b: *Builder) void {
 
     //All of the release modes work
     //Debug Mode can cause issues with trap instructions - use ReleaseSafe for "Debug" builds
-    const mode = builtin.Mode.ReleaseFast;
+    const mode = builtin.Mode.ReleaseSmall;
 
     const lib = b.addStaticLibrary("zpsp", "src/psp/libzpsp.zig");
     lib.setTarget(target);
@@ -46,6 +46,8 @@ pub fn build(b: *Builder) void {
     exe.setLinkerScriptPath("tools/linkfile.ld");
     exe.link_eh_frame_hdr = true;
     exe.link_emit_relocs = true;
+    exe.strip = true;
+    exe.single_threaded = true;
     exe.step.dependOn(&lib.step);
 
     //Post-build actions
