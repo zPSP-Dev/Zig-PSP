@@ -1,4 +1,4 @@
-const psp = @import("psp/utils/psp.zig");
+const psp = @import("psp/pspsdk.zig");
 
 comptime{
     asm(psp.module_info("Zig PSP", 0, 1, 0));
