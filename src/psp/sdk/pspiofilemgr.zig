@@ -48,7 +48,7 @@ pub const PSP_O_NOWAIT = 0x8000;
 pub const PSP_SEEK_SET = 0;
 pub const PSP_O_APPEND = 0x0100;
 
-pub const struct_SceIoStat = extern struct {
+pub const SceIoStat = extern struct {
     st_mode: SceMode,
     st_attr: c_uint,
     st_size: SceOff,
@@ -57,7 +57,7 @@ pub const struct_SceIoStat = extern struct {
     st_mtime: ScePspDateTime,
     st_private: [6]c_uint,
 };
-pub const SceIoStat = struct_SceIoStat;
+
 pub const struct_SceIoDirent = extern struct {
     d_stat: SceIoStat,
     d_name: [256]u8,
@@ -79,12 +79,12 @@ pub extern fn sceIoRead(fd: SceUID, data: ?*c_void, size: SceSize) c_int;
 pub extern fn sceIoReadAsync(fd: SceUID, data: ?*c_void, size: SceSize) c_int;
 pub extern fn sceIoWrite(fd: SceUID, data: ?*const c_void, size: SceSize) c_int;
 pub extern fn sceIoWriteAsync(fd: SceUID, data: ?*const c_void, size: SceSize) c_int;
-pub extern fn sceIoLseek(fd: SceUID, offset: SceOff, whence: c_int) SceOff;
+pub extern fn sceIoLseek(fd: SceUID, offset: SceOff, whence: c_int) i64;
 pub extern fn sceIoLseekAsync(fd: SceUID, offset: SceOff, whence: c_int) c_int;
 pub extern fn sceIoLseek32(fd: SceUID, offset: c_int, whence: c_int) c_int;
 pub extern fn sceIoLseek32Async(fd: SceUID, offset: c_int, whence: c_int) c_int;
 pub extern fn sceIoRemove(file: [*c]const u8) c_int;
-pub extern fn sceIoMkdir(dir: [*c]const u8, mode: SceMode) c_int;
+pub extern fn sceIoMkdir(dir: [*c]const u8, mode: u32) c_int;
 pub extern fn sceIoRmdir(path: [*c]const u8) c_int;
 pub extern fn sceIoChdir(path: [*c]const u8) c_int;
 pub extern fn sceIoRename(oldname: [*c]const u8, newname: [*c]const u8) c_int;

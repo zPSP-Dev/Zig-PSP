@@ -42,7 +42,7 @@ pub fn _module_main_thread(argc: SceSize, argv: ?*c_void) callconv(.C) c_int {
 
                 print("ERROR CAUGHT: ");
                 print(@errorName(err));
-                print("Exiting in 10 seconds...");
+                print("\nExiting in 10 seconds...");
                 
                 exitErr();
                 return 1;

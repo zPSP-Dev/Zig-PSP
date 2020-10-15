@@ -8,6 +8,7 @@ pub const timespec = struct{
 };
 
 pub const fd_t = usize;
+pub const ino_t = u64;
 pub const mode_t = u32;
 
 pub const PATH_MAX = 1024;
@@ -167,6 +168,11 @@ pub const O_NOWAIT = 0x8000;
 pub const SEEK_SET = 0;
 pub const O_APPEND = 0x0100;
 pub const O_CLOEXEC = 0; //Don't do anything
+pub const O_NOCTTY = 0; //Don't do anything
+pub const R_OK = 1;
+pub const W_OK = 1;
+pub const F_OK = 1;
+pub const X_OK = 1;
 
 pub const LOCK_SH = 1;
 pub const LOCK_EX = 2;
@@ -206,3 +212,51 @@ pub const AT_STATX_DONT_SYNC = 0x4000;
 
 /// Apply to the entire subtree
 pub const AT_RECURSIVE = 0x8000;
+
+usingnamespace @import("../sdk/pspiofilemgr.zig");
+usingnamespace @import("../sdk/psptypes.zig");
+pub const Stat = struct {
+    mode: u32,
+    st_attr: c_uint,
+    size: u64,
+    st_ctime: ScePspDateTime,
+    st_atime: ScePspDateTime,
+    st_mtime: ScePspDateTime,
+    st_private: [6]c_uint,
+    ino: ino_t,
+
+    pub fn atime(self: Stat) timespec {
+        return timespec{.tv_sec = self.st_atime.second, .tv_nsec = @bitCast(isize, self.st_atime.microsecond)*1000};
+    }
+    pub fn mtime(self: Stat) timespec {
+        return timespec{.tv_sec = self.st_mtime.second, .tv_nsec = @bitCast(isize, self.st_mtime.microsecond)*1000};
+    }
+    pub fn ctime(self: Stat) timespec {
+        return timespec{.tv_sec = self.st_ctime.second, .tv_nsec = @bitCast(isize, self.st_ctime.microsecond)*1000};
+    }
+};
+
+
+pub const S_IFBLK = 524288;
+pub const S_IFCHR = 262144;
+pub const S_IFIFO = 131072;
+pub const S_IFSOCK = 65536;
+pub const S_IFMT = 61440;
+pub const S_IFLNK = 16384;
+pub const S_IFDIR = 4096;
+pub const S_IFREG = 8192;
+pub const S_ISUID = 2048;
+pub const S_ISGID = 1024;
+pub const S_ISVTX = 512;
+pub const S_IRWXU = 448;
+pub const S_IRUSR = 256;
+pub const S_IWUSR = 128;
+pub const S_IXUSR = 64;
+pub const S_IRWXG = 56;
+pub const S_IRGRP = 32;
+pub const S_IWGRP = 16;
+pub const S_IXGRP = 8;
+pub const S_IRWXO = 7;
+pub const S_IROTH = 4;
+pub const S_IWOTH = 2;
+pub const S_IXOTH = 1;
