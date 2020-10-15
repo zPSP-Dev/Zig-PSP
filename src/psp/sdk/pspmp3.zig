@@ -1,6 +1,6 @@
 usingnamespace @import("psptypes.zig");
 
-pub const struct_SceMp3InitArg = extern struct {
+pub const SceMp3InitArg = extern struct {
     mp3StreamStart: SceUInt32,
     unk1: SceUInt32,
     mp3StreamEnd: SceUInt32,
@@ -10,7 +10,7 @@ pub const struct_SceMp3InitArg = extern struct {
     pcmBuf: ?*SceVoid,
     pcmBufSize: SceInt32,
 };
-pub const SceMp3InitArg = struct_SceMp3InitArg;
+
 pub extern fn sceMp3ReserveMp3Handle(args: [*c]SceMp3InitArg) SceInt32;
 pub extern fn sceMp3ReleaseMp3Handle(handle: SceInt32) SceInt32;
 pub extern fn sceMp3InitResource(...) SceInt32;

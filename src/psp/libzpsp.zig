@@ -9,7 +9,6 @@ pub usingnamespace @import("nids/pspdmac.zig");
 pub usingnamespace @import("nids/pspge.zig");
 pub usingnamespace @import("nids/psphprm.zig");
 pub usingnamespace @import("nids/psphttp.zig");
-pub usingnamespace @import("nids/pspimpose.zig");
 pub usingnamespace @import("nids/pspiofilemgr.zig");
 pub usingnamespace @import("nids/pspjpeg.zig");
 pub usingnamespace @import("nids/psploadexec.zig");

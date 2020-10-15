@@ -18,7 +18,6 @@ pub usingnamespace @import("sdk/pspgu.zig");
 pub usingnamespace @import("sdk/pspgum.zig");
 pub usingnamespace @import("sdk/psphprm.zig");
 pub usingnamespace @import("sdk/psphttp.zig");
-pub usingnamespace @import("sdk/pspimpose.zig");
 pub usingnamespace @import("sdk/pspiofilemgr.zig");
 pub usingnamespace @import("sdk/pspjpeg.zig");
 pub usingnamespace @import("sdk/psploadexec.zig");
