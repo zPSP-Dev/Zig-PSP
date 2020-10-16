@@ -16,7 +16,7 @@ pub fn exitErr() void {
 }
 
 const has_std_os = if(@hasDecl(root, "os")) true else false;
-
+const std = @import("std");
 //This calls your main function as a thread.
 pub fn _module_main_thread(argc: SceSize, argv: ?*c_void) callconv(.C) c_int {
     if(has_std_os){
@@ -42,6 +42,15 @@ pub fn _module_main_thread(argc: SceSize, argv: ?*c_void) callconv(.C) c_int {
 
                 print("ERROR CAUGHT: ");
                 print(@errorName(err));
+
+                if(has_std_os){
+                    var it = std.debug.StackIterator.init(null, @frameAddress());
+                    while (it.next()) |return_address| {
+                        if (return_address == 0) break;
+                        std.debug.warn("0x{x}\n", .{return_address - 4});
+                    }
+                }
+                
                 print("\nExiting in 10 seconds...");
                 
                 exitErr();

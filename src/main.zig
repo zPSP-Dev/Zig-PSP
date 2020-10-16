@@ -8,11 +8,14 @@ comptime {
     asm (psp.module_info("Zig PSP", 0, 1, 0));
 }
 
+fn addOne(x: u8) u8 {
+    return x + 1;
+}
+
 pub fn main() !void {
     psp.utils.enableHBCB();
     psp.debug.screenInit();
     psp.debug.print("Hi!");
-
-    var f = try std.fs.cwd().openFile("hello.zig", .{.write = true});
-    std.debug.warn("{}", .{f.isTty()});
+    
+    @panic("Heelo");
 }

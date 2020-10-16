@@ -156,27 +156,30 @@ usingnamespace @import("module.zig");
 //Meme panic
 pub var pancakeMode : bool = false;
 
+const root = @import("root");
+const has_std_os = if(@hasDecl(root, "os")) true else false;
+
 //Panic handler
 //Import this in main to use!
-pub fn panic(message: []const u8, stack_trace: ?*builtin.StackTrace) noreturn {
+pub fn panic(message: []const u8, strace: ?*std.builtin.StackTrace) noreturn {
+    @setCold(true);
+    const first_trace_addr = @returnAddress();
+
     screenInit();
-    
-    if(pancakeMode){
-        //For @mrneo240
-        print("!!! PSP HAS PANCAKED !!!\n");
-    }else{
-        print("!!! PSP HAS PANICKED !!!\n");
-    }
-    
+    print("!!! PSP HAS PANICKED !!!\n");
     print("REASON: ");
     print(message);
-    //TODO: Stack Traces after STD.
-    //if (@errorReturnTrace()) |trace| {
-    //    std.debug.dumpStackTrace(trace.*);
-    //}
+
+    if(has_std_os){    
+        var it = std.debug.StackIterator.init(null, @frameAddress());
+        while (it.next()) |return_address| {
+            if (return_address == 0) break;
+            std.debug.warn("Addr: 0x{x}\n", .{return_address - 0x8804000});
+        }
+    }
+
     print("\nExiting in 10 seconds...");
-    
     exitErr();
-    while(true){}
+    unreachable;
 }
 
