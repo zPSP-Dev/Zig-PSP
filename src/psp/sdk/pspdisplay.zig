@@ -76,15 +76,27 @@ pub extern fn sceDisplayGetVcount() c_uint;
 
 //Wait for vertical blank start
 pub extern fn sceDisplayWaitVblankStart() c_int;
+pub fn displayWaitVblankStart() void {
+    _ = sceDisplayWaitVblankStart();
+}
 
 //Wait for vertical blank start with callback
 pub extern fn sceDisplayWaitVblankStartCB() c_int;
+pub fn displayWaitVblankStartCB() void {
+    _ = sceDisplayWaitVblankStartCB();
+}
 
 //Wait for vertical blank
 pub extern fn sceDisplayWaitVblank() c_int;
+pub fn displayWaitVblank() void {
+    _ = sceDisplayWaitVblank();
+}
 
 //Wait for vertical blank with callback
 pub extern fn sceDisplayWaitVblankCB() c_int;
+pub fn displayWaitVblankCB() void {
+    _ = sceDisplayWaitVblankCB();
+}
 
 //Get accumlated HSYNC count
 pub extern fn sceDisplayGetAccumulatedHcount() c_int;

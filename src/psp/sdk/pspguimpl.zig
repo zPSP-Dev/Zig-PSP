@@ -209,9 +209,9 @@ pub fn sendCommandf(cmd : c_int, argument : f32) void {
 
 //GU IMPLEMENTATION
 
-pub fn sceGuAlphaFunc(func: c_int, value: c_int, mask: c_int) void{
+pub fn sceGuAlphaFunc(func: AlphaFunc, value: c_int, mask: c_int) void{
     @setRuntimeSafety(false);
-    var arg : c_int = func | ((value & 0xff) << 8) | ((mask & 0xff) << 16);
+    var arg : c_int = @enumToInt(func) | ((value & 0xff) << 8) | ((mask & 0xff) << 16);
     sendCommandi(219,arg);
 }
 pub fn sceGuAmbient(col: c_int) void{
@@ -225,7 +225,12 @@ pub fn sceGuAmbientColor(col: u32) void{
     sendCommandi(88,@intCast(c_int, col) >> 24);
 }
 
-pub fn sceGuBlendFunc(op: c_int, src: c_int, dest: c_int, srcfix: c_int, destfix: c_int) void{
+pub fn sceGuBlendFunc(bop: BlendOp, sc: BlendArg, dst: BlendArg, srcfix: c_int, destfix: c_int) void{
+    var op : c_int = @enumToInt(bop);
+
+    var src: c_int = @enumToInt(sc);
+    var dest: c_int = @enumToInt(dst);
+
     @setRuntimeSafety(false);
     sendCommandi(223,src | (dest << 4) | (op << 8));
     sendCommandi(224,srcfix & 0xffffff);
@@ -356,9 +361,9 @@ pub fn sceGuDepthBuffer(zbp: ?*c_void, zbw: c_int) void{
     sendCommandi(159,@intCast(c_int, ((@intCast(c_uint, (@ptrToInt(zbp))) & 0xff000000) >> 8))|zbw);
 }
 
-pub fn sceGuDepthFunc(function: c_int) void{
+pub fn sceGuDepthFunc(function: DepthFunc) void{
     @setRuntimeSafety(false);
-    sendCommandi(222,function);
+    sendCommandi(222, @enumToInt(function));
 }
 
 pub fn sceGuDepthMask(mask: c_int) void{
@@ -393,9 +398,9 @@ pub fn sceGuDepthRange(near: c_int, far: c_int) void{
     }
 }
 
-pub fn sceGuDisable(state: c_int) void{
+pub fn sceGuDisable(state: GuState) void{
     @setRuntimeSafety(false);
-    switch(@intToEnum(GuState, state)){
+    switch(state){
         .AlphaTest => {
             sendCommandi(34,0);
         },
@@ -469,8 +474,8 @@ pub fn sceGuDisable(state: c_int) void{
 
     var one : u32 = 1;
 
-    if (state < 22)
-        gu_states &= @intCast(i32, ~(one << @intCast(u5, state)));
+    if (@enumToInt(state) < 22)
+        gu_states &= @intCast(i32, ~(one << @intCast(u5, @enumToInt(state))));
 }
 
 fn drawRegion(x: c_int, y: c_int, width: c_int, height: c_int) void
@@ -494,15 +499,14 @@ pub fn sceGuDispBuffer(width: c_int, height: c_int, dispbp: ?*c_void, dispbw: c_
         _ = sceDisplaySetFrameBuf( @intToPtr(*c_void, @ptrToInt(ge_edram_address) + @ptrToInt(gu_draw_buffer.disp_buffer)), dispbw, gu_draw_buffer.pixel_size, @enumToInt(PspDisplaySetBufSync.Nextframe));
 }
 
-pub fn sceGuDisplay(state: c_int) c_int{
-    if (state != 0){
+pub fn sceGuDisplay(state: bool) void{
+    if (state){
         _ = sceDisplaySetFrameBuf( @intToPtr(*c_void, @ptrToInt(ge_edram_address) + @ptrToInt(gu_draw_buffer.disp_buffer)), gu_draw_buffer.frame_width, gu_draw_buffer.pixel_size, @enumToInt(PspDisplaySetBufSync.Nextframe));
     }else{
         _ = sceDisplaySetFrameBuf(null,0,0,@enumToInt(PspDisplaySetBufSync.Nextframe));
     }
     
-    gu_display_on = state;
-    return state;
+    gu_display_on = @boolToInt(state);
 }
 
 pub fn sceGuDrawArray(prim: c_int, vtype: c_int, count: c_int, indices: ?*const c_void, vertices: ?*const c_void) void{@setRuntimeSafety(false);
@@ -561,7 +565,9 @@ pub fn sceGuDrawBezier(vtype: c_int, ucount: c_int, vcount: c_int, indices: ?*co
     sendCommandi(5,(vcount << 8)|ucount);
 }
 
-pub fn sceGuDrawBuffer(psm: c_int, fbp: ?*c_void, fbw: c_int) void{@setRuntimeSafety(false);
+pub fn sceGuDrawBuffer(pix: GuPixelMode, fbp: ?*c_void, fbw: c_int) void{@setRuntimeSafety(false);
+    var psm = @enumToInt(pix);
+
     gu_draw_buffer.pixel_size = psm;
     gu_draw_buffer.frame_width = fbw;
     gu_draw_buffer.frame_buffer = fbp;
@@ -602,8 +608,8 @@ pub fn sceGuDrawSpline(vtype: c_int, ucount: c_int, vcount: c_int, uedge: c_int,
     sendCommandi(6,(vedge << 18)|(uedge << 16)|(vcount << 8)|ucount);
 }
 
-pub fn sceGuEnable(state: c_int) void{@setRuntimeSafety(false);
-    switch(@intToEnum(GuState, state)){
+pub fn sceGuEnable(state: GuState) void{@setRuntimeSafety(false);
+    switch(state){
         .AlphaTest => {
             sendCommandi(34,1);
         },
@@ -676,8 +682,8 @@ pub fn sceGuEnable(state: c_int) void{@setRuntimeSafety(false);
     }
 
     var one : u32 = 1;
-    if (state < 22)
-        gu_states |= @intCast(i32, (one << @intCast(u5, state)));
+    if (@enumToInt(state) < 22)
+        gu_states |= @intCast(i32, (one << @intCast(u5, @enumToInt(state))));
 }
 
 pub fn sceGuEndObject() void{@setRuntimeSafety(false);
@@ -740,6 +746,10 @@ pub fn sceGuFinish() c_int{
     return @intCast(c_int, size);
 }
 
+pub fn guFinish() void {
+    _ = sceGuFinish();
+}
+
 pub fn sceGuFinishId(id: c_int) c_int{
     switch (@intToEnum(GuContextType, gu_curr_context)){
         .Direct, .Send =>{
@@ -776,8 +786,8 @@ pub fn sceGuFog(near: f32, far: f32, col: c_uint) void{@setRuntimeSafety(false);
     sendCommandf(206,distance);
 }
 
-pub fn sceGuFrontFace(order: c_int) void{@setRuntimeSafety(false);
-    if (order != 0){
+pub fn sceGuFrontFace(order: FrontFaceDirection) void{@setRuntimeSafety(false);
+    if (order != FrontFaceDirection.Clockwise){
         sendCommandi(155,0);
     }else{
         sendCommandi(155,1);
@@ -1046,8 +1056,8 @@ pub fn sceGuSetStatus(state: c_int, status: c_int) void{@setRuntimeSafety(false)
     }
 }
 
-pub fn sceGuShadeModel(mode: c_int) void{@setRuntimeSafety(false);
-    if(mode == 1){
+pub fn sceGuShadeModel(mode: ShadeModel) void{@setRuntimeSafety(false);
+    if(mode == ShadeModel.Smooth){
         sendCommandi(80,1);
     }else{
         sendCommandi(80,0);
@@ -1071,12 +1081,12 @@ pub fn sceGuSpecular(power: f32) void{@setRuntimeSafety(false);
     sendCommandf(91,power);
 }
 
-pub fn sceGuStencilFunc(func: c_int, ref: c_int, mask: c_int) void{@setRuntimeSafety(false);
-    sendCommandi(220,func | ((ref & 0xff) << 8) | ((mask & 0xff) << 16));
+pub fn sceGuStencilFunc(func: StencilFunc, ref: c_int, mask: c_int) void{@setRuntimeSafety(false);
+    sendCommandi(220,@enumToInt(func) | ((ref & 0xff) << 8) | ((mask & 0xff) << 16));
 }
 
-pub fn sceGuStencilOp(fail: c_int, zfail: c_int, zpass: c_int) void{@setRuntimeSafety(false);
-    sendCommandi(221,fail | (zfail << 8) | (zpass << 16));
+pub fn sceGuStencilOp(fail: StencilOperation, zfail: StencilOperation, zpass: StencilOperation) void{@setRuntimeSafety(false);
+    sendCommandi(221,@enumToInt(fail) | (@enumToInt(zfail) << 8) | (@enumToInt(zpass) << 16));
 }
 
 pub fn sceGuSwapBuffers() ?*c_void{@setRuntimeSafety(false);
@@ -1104,13 +1114,12 @@ pub fn guSwapBuffersCallback(callback: GuSwapBuffersCallback) void{@setRuntimeSa
     gu_settings.swapBuffersCallback = callback;
 }
 
-pub fn sceGuSync(mode: c_int, what: c_int) c_int{
+pub fn sceGuSync(mode: GuSyncMode, what: GuSyncBehavior) c_int{
     switch (mode)
     {
-        0 => {return sceGeDrawSync(what);},
-        3 => {return sceGeListSync(ge_list_executed[0],what);},
-        4 => {return sceGeListSync(ge_list_executed[1],what);},
-        1, 2 => {return 0;},
+        .Finish => {return sceGeDrawSync(@enumToInt(what));},
+        .List => {return sceGeListSync(ge_list_executed[0],@enumToInt(what));},
+        .Send => {return sceGeListSync(ge_list_executed[1],@enumToInt(what));},
         else => {return 0;}
     }
 }
@@ -1124,8 +1133,8 @@ pub fn sceGuTexEnvColor(color: c_int) void{@setRuntimeSafety(false);
     sendCommandi(202, color & 0xffffff);
 }
 
-pub fn sceGuTexFilter(min: c_int, mag: c_int) void{@setRuntimeSafety(false);
-    sendCommandi(198,(mag << 8)|min);
+pub fn sceGuTexFilter(min: TextureFilter, mag: TextureFilter) void{@setRuntimeSafety(false);
+    sendCommandi(198,(@enumToInt(mag) << 8)|@enumToInt(min));
 }
 
 pub fn sceGuTexFlush() void{@setRuntimeSafety(false);
@@ -1279,9 +1288,10 @@ pub fn sceGuInit() void{@setRuntimeSafety(false);
     _ = sceGeListSync(ge_list_executed[0],0);
 }
 
-pub fn sceGuStart(cid: c_int, list: ?*c_void) void{@setRuntimeSafety(false);
+pub fn sceGuStart(cont: GuContextType, list: ?*c_void) void{@setRuntimeSafety(false);
     var local_list : [*]u32 = @intToPtr([*]u32, (@intCast(usize, @ptrToInt(list)) | 0x40000000));
     
+    var cid : c_int = @enumToInt(cont);
 
     gu_contexts[@intCast(usize, cid)].list.start = local_list;
     gu_contexts[@intCast(usize, cid)].list.current = local_list;
