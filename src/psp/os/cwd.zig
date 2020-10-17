@@ -192,6 +192,20 @@ pub fn __psp_safe_strcat(out: [*]u8, in: [*]const u8, maxlen: usize) c_int
     return __psp_safe_strcpy(ptr, in, len);
 }
 
+const psp = @import("../utils/psp.zig");
+pub fn strdup(s: []const u8) []u8{
+    var psp_allocator = &psp.PSPAllocator.init().allocator;
+    var dup = psp_allocator.alloc(u8, strlen(s.ptr) + 1) catch unreachable;
+    
+    var i : usize = 0;
+    while(i < strlen(s.ptr)) : (i += 1){
+        dup[i] = s[i];
+    }
+    dup[i] = 0;
+
+    return dup;
+}
+
 pub fn __psp_path_normalize(out: [*]u8, len: usize) c_int{
     var i : isize = 0; 
     var j : isize = 0;

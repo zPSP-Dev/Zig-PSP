@@ -1141,9 +1141,9 @@ pub fn sceGuTexFlush() void{@setRuntimeSafety(false);
     sendCommandf(203,0.0);
 }
 
-pub fn sceGuTexFunc(tfx: c_int, tcc: c_int) void{@setRuntimeSafety(false);
-    gu_contexts[@intCast(usize, gu_curr_context)].texture_function = (tcc << 8) | tfx;
-    sendCommandi(201,((tcc << 8)|tfx)|gu_contexts[@intCast(usize, gu_curr_context)].fragment_2x);
+pub fn sceGuTexFunc(tfx: TextureEffect, tcc: TextureColorComponent) void{@setRuntimeSafety(false);
+    gu_contexts[@intCast(usize, gu_curr_context)].texture_function = (@enumToInt(tcc) << 8) | @enumToInt(tfx);
+    sendCommandi(201,((@enumToInt(tcc) << 8)|@enumToInt(tfx))|gu_contexts[@intCast(usize, gu_curr_context)].fragment_2x);
 }
 
 const tbpcmd_tbl = [_]u8{0xa0, 0xa1, 0xa2, 0xa3, 0xa4, 0xa5, 0xa6, 0xa7};
@@ -1191,11 +1191,11 @@ pub fn sceGuTexMapMode(mode: c_int, a1: c_int, a2: c_int) void{@setRuntimeSafety
     sendCommandi(193,(a2 << 8)|(a1 & 0x03));
 }
 
-pub fn sceGuTexMode(tpsm: c_int, maxmips: c_int, a2: c_int, swizzle: c_int) void{@setRuntimeSafety(false);
-    gu_contexts[@intCast(usize, gu_curr_context)].texture_mode = tpsm;
+pub fn sceGuTexMode(tpsm: GuPixelMode, maxmips: c_int, a2: c_int, swizzle: c_int) void{@setRuntimeSafety(false);
+    gu_contexts[@intCast(usize, gu_curr_context)].texture_mode = @enumToInt(tpsm);
 
     sendCommandi(194,(maxmips << 16) | (a2 << 8) | (swizzle));
-    sendCommandi(195,tpsm);
+    sendCommandi(195,@enumToInt(tpsm));
     sceGuTexFlush();
 }
 
@@ -1222,8 +1222,8 @@ pub fn sceGuTexSync() void{@setRuntimeSafety(false);
     sendCommandi(204,0);
 }
 
-pub fn sceGuTexWrap(u: c_int, v: c_int) void{@setRuntimeSafety(false);
-    sendCommandi(199,(v << 8)|(u));
+pub fn sceGuTexWrap(u: GuTexWrapMode, v: GuTexWrapMode) void{@setRuntimeSafety(false);
+    sendCommandi(199,(@enumToInt(v) << 8)|(@enumToInt(u)));
 }
 
 pub fn sceGuViewport(cx: c_int, cy: c_int, width: c_int, height: c_int) void{@setRuntimeSafety(false);

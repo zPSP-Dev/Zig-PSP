@@ -21,6 +21,7 @@ usingnamespace @import("../include/pspstdio.zig");
 usingnamespace @import("../include/psprtc.zig");
 
 pub fn read(fd: fd_t, ptr: [*]u8, len: usize) i32 {
+    @setRuntimeSafety(false);
     if(!__psp_fdman_fdValid(fd)){
         errno = EBADF;
         return -1;
@@ -44,6 +45,7 @@ pub fn read(fd: fd_t, ptr: [*]u8, len: usize) i32 {
 }
 
 pub fn write(fd: fd_t, ptr: [*]const u8, len: usize) i32 {
+    @setRuntimeSafety(false);
     if(!__psp_fdman_fdValid(fd)){
         errno = EBADF;
         return -1;
@@ -62,29 +64,33 @@ pub fn write(fd: fd_t, ptr: [*]const u8, len: usize) i32 {
     errno = EBADF;
     return -1;
 }
-
 pub fn __pspOsInit(arg: ?*c_void) void {
+    @setRuntimeSafety(false);
     __psp_fdman_init();
     __psp_init_cwd(arg);
 }
 
 usingnamespace @import("../include/pspthreadman.zig");
 pub fn nanosleep(req: *const timespec, rem: ?*timespec) c_int {
+    @setRuntimeSafety(false);
     _ = sceKernelDelayThread(@intCast(c_uint, 1000 * 1000 * req.tv_sec + @divTrunc(req.tv_nsec, 1000)));
     return 0;
 }
 
 usingnamespace @import("../include/psputils.zig");
 pub fn _times (t: *time_t) time_t {
+    @setRuntimeSafety(false);
     return pspErrToErrno(sceKernelLibcTime(t));
 } 
 
 pub fn flock(f: fd_t, op: c_int) c_int{
+    @setRuntimeSafety(false);
     return 0;
 }
 const std = @import("std");
 
 pub fn openat(dir: fd_t, path: [*:0]const u8, flags: u32, mode: u32) c_int{
+    @setRuntimeSafety(false);
     if(dir != AT_FDCWD){
         @panic("Non-FDCWD Not Supported");
     }else{
@@ -107,7 +113,7 @@ pub fn openat(dir: fd_t, path: [*:0]const u8, flags: u32, mode: u32) c_int{
                 __psp_descriptormap[@intCast(usize, fd)].?.sce_descriptor = scefd;
                 __psp_descriptormap[@intCast(usize, fd)].?.ftype = __psp_fdman_type.File;
                 __psp_descriptormap[@intCast(usize, fd)].?.flags = flags;
-                __psp_descriptormap[@intCast(usize, fd)].?.filename = dest[0..];
+                __psp_descriptormap[@intCast(usize, fd)].?.filename = strdup(dest[0..]);
                 return fd;
             }else{
                 _ = sceIoClose(scefd);
@@ -124,6 +130,7 @@ pub fn openat(dir: fd_t, path: [*:0]const u8, flags: u32, mode: u32) c_int{
 }
 
 pub fn close(fd: fd_t) c_int {
+    @setRuntimeSafety(false);
     var ret: c_int = 0;
 
     if(!__psp_fdman_fdValid(fd)){
@@ -150,6 +157,7 @@ pub fn close(fd: fd_t) c_int {
 }
 
 pub fn unlinkat(dir: fd_t, path: [*:0]const u8, flags: u32) c_int{
+    @setRuntimeSafety(false);
     if(dir != AT_FDCWD){
         @panic("Non-FDCWD Not Supported");
     }
@@ -174,6 +182,7 @@ pub fn unlinkat(dir: fd_t, path: [*:0]const u8, flags: u32) c_int{
 }
 
 pub fn mkdirat(dir: fd_t, path: [*:0]const u8, mode: u32) c_int{
+    @setRuntimeSafety(false);
     if(dir != AT_FDCWD){
         @panic("Non-FDCWD Not Supported");
     }
@@ -193,14 +202,16 @@ pub fn fstat(fd: fd_t, stat: *Stat) c_int {
     var dest : [PATH_MAX + 1]u8 = undefined;
     var ret : i32 = 0;
 
-    var status = __psp_path_absolute(@ptrCast([*]const u8, &__psp_descriptormap[fd].?.filename.?), dest[0..], PATH_MAX);
+    var status = __psp_path_absolute(__psp_descriptormap[fd].?.filename.?.ptr, dest[0..], PATH_MAX);
     if(status < 0) {
         errno = ENAMETOOLONG;
         return -1;
     }
 
     @memset(@ptrCast([*]u8, stat), 0, @sizeOf(Stat));
+
     ret = sceIoGetstat(dest[0..], &psp_stat);
+    
     if (ret < 0) {
         return pspErrToErrno(@bitCast(u32, ret));
     }
