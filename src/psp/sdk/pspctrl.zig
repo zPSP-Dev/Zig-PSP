@@ -1,4 +1,4 @@
-pub const PspCtrlButtons = extern enum(c_int) {
+pub const PspCtrlButtons = extern enum(c_uint) {
     Select = 1,
     Start = 8,
     Up = 16,
@@ -29,8 +29,8 @@ pub const PspCtrlMode = extern enum(c_int) {
 };
 
 pub const SceCtrlData = extern struct {
-    TimeStamp: c_uint,
-    Buttons: c_uint,
+    timeStamp: c_uint,
+    buttons: c_uint,
     Lx: u8,
     Ly: u8,
     Rsrv: [6]u8,
