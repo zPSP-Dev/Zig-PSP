@@ -1,6 +1,6 @@
 usingnamespace @import("psptypes.zig");
 
-pub const PSPPowerCB = extern enum(u32){
+pub const PSPPowerCB = extern enum(u32) {
     Battpower = 0x0000007f,
     BatteryExist = 0x00000080,
     BatteryLow = 0x00000100,
@@ -13,10 +13,8 @@ pub const PSPPowerCB = extern enum(u32){
     PowerSwitch = 0x80000000,
 };
 
-pub const PSPPowerTick = extern enum(u32){
-    All = 0,
-    Suspend = 1,
-    Display = 6
+pub const PSPPowerTick = extern enum(u32) {
+    All = 0, Suspend = 1, Display = 6
 };
 
 pub const powerCallback_t = ?fn (c_int, c_int) callconv(.C) void;
@@ -30,7 +28,7 @@ pub const powerCallback_t = ?fn (c_int, c_int) callconv(.C) void;
 pub extern fn scePowerRegisterCallback(slot: c_int, cbid: SceUID) c_int;
 pub fn powerRegisterCallback(slot: c_int, cbid: SceUID) !i32 {
     var res = scePowerRegisterCallback(slot, cbid);
-    if(res < 0){
+    if (res < 0) {
         return error.Unexpected;
     }
     return res;
@@ -44,7 +42,7 @@ pub fn powerRegisterCallback(slot: c_int, cbid: SceUID) !i32 {
 pub extern fn scePowerUnregisterCallback(slot: c_int) c_int;
 pub fn powerUnregisterCallback(slot: c_int) !void {
     var res = scePowerUnregisterCallback(slot);
-    if(res < 0){
+    if (res < 0) {
         return error.Unexpected;
     }
 }
@@ -55,7 +53,7 @@ pub fn powerUnregisterCallback(slot: c_int) !void {
 pub extern fn scePowerIsPowerOnline() c_int;
 pub fn powerIsPowerOnline() !bool {
     var res = scePowerIsPowerOnline();
-    if(res < 0){
+    if (res < 0) {
         return error.Unexpected;
     }
     return res == 1;
@@ -67,7 +65,7 @@ pub fn powerIsPowerOnline() !bool {
 pub extern fn scePowerIsBatteryExist() c_int;
 pub fn powerIsBatteryExist() !bool {
     var res = scePowerIsBatteryExist();
-    if(res < 0){
+    if (res < 0) {
         return error.Unexpected;
     }
     return res == 1;
@@ -79,7 +77,7 @@ pub fn powerIsBatteryExist() !bool {
 pub extern fn scePowerIsBatteryCharging() c_int;
 pub fn powerIsBatteryCharging() !bool {
     var res = scePowerIsBatteryCharging();
-    if(res < 0){
+    if (res < 0) {
         return error.Unexpected;
     }
     return res == 1;
@@ -88,14 +86,13 @@ pub fn powerIsBatteryCharging() !bool {
 // Get the status of the battery charging
 pub extern fn scePowerGetBatteryChargingStatus() c_int;
 
-
 // Check if the battery is low
 //
 // @return 1 if the battery is low, 0 if the battery is not low, < 0 on error.
 pub extern fn scePowerIsLowBattery() c_int;
 pub fn powerIsLowBattery() !bool {
     var res = scePowerIsLowBattery();
-    if(res < 0){
+    if (res < 0) {
         return error.Unexpected;
     }
     return res == 1;
@@ -107,7 +104,7 @@ pub fn powerIsLowBattery() !bool {
 pub extern fn scePowerGetBatteryLifePercent() c_int;
 pub fn powerGetBatteryLifePercent() !i32 {
     var res = scePowerGetBatteryLifePercent();
-    if(res < 0){
+    if (res < 0) {
         return error.Unexpected;
     }
     return res;
@@ -119,7 +116,7 @@ pub fn powerGetBatteryLifePercent() !i32 {
 pub extern fn scePowerGetBatteryLifeTime() c_int;
 pub fn powerGetBatteryLifeTime() !i32 {
     var res = scePowerGetBatteryLifeTime();
-    if(res < 0){
+    if (res < 0) {
         return error.Unexpected;
     }
     return res;
@@ -168,9 +165,9 @@ pub extern fn scePowerGetBusClockFrequencyFloat() f32;
 // @param pllfreq - pll frequency, valid from 19-333
 // @param cpufreq - cpu frequency, valid from 1-333
 // @param busfreq - bus frequency, valid from 1-167
-// 
+//
 // and:
-// 
+//
 // cpufreq <= pllfreq
 // busfreq*2 <= pllfreq
 //
@@ -187,7 +184,7 @@ pub extern fn scePowerSetClockFrequency(pllfreq: c_int, cpufreq: c_int, busfreq:
 pub extern fn scePowerLock(unknown: c_int) c_int;
 pub fn powerLock(unknown: c_int) !void {
     var res = scePowerLock(unknown);
-    if(res < 0){
+    if (res < 0) {
         return error.Unexpected;
     }
 }
@@ -200,12 +197,12 @@ pub fn powerLock(unknown: c_int) !void {
 pub extern fn scePowerUnlock(unknown: c_int) c_int;
 pub fn powerUnlock(unknown: c_int) !void {
     var res = scePowerUnlock(unknown);
-    if(res < 0){
+    if (res < 0) {
         return error.Unexpected;
     }
 }
 
-// Generate a power tick, preventing unit from 
+// Generate a power tick, preventing unit from
 // powering off and turning off display.
 //
 // @param type - Either PSP_POWER_TICK_ALL, PSP_POWER_TICK_SUSPEND or PSP_POWER_TICK_DISPLAY
@@ -214,7 +211,7 @@ pub fn powerUnlock(unknown: c_int) !void {
 pub extern fn scePowerTick(typec: c_int) c_int;
 pub fn powerTick(typec: PSPPowerTick) !void {
     var res = scePowerTick(@enumToInt(typec));
-    if(res < 0){
+    if (res < 0) {
         return error.Unexpected;
     }
 }

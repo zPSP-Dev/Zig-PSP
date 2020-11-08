@@ -19,7 +19,7 @@ pub const SceMp3InitArg = extern struct {
 pub extern fn sceMp3ReserveMp3Handle(args: *SceMp3InitArg) SceInt32;
 pub fn mp3ReserveMp3Handle(args: *SceMp3InitArg) !SceInt32 {
     var res = sceMp3ReserveMp3Handle(args);
-    if(res < 0){
+    if (res < 0) {
         return error.Unexpected;
     }
     return res;
@@ -33,7 +33,7 @@ pub fn mp3ReserveMp3Handle(args: *SceMp3InitArg) !SceInt32 {
 pub extern fn sceMp3ReleaseMp3Handle(handle: SceInt32) SceInt32;
 pub fn mp3ReleaseMp3Handle(handle: SceInt32) !void {
     var res = sceMp3ReleaseMp3Handle(handle);
-    if(res < 0){
+    if (res < 0) {
         return error.Unexpected;
     }
 }
@@ -44,7 +44,7 @@ pub fn mp3ReleaseMp3Handle(handle: SceInt32) !void {
 pub extern fn sceMp3InitResource() SceInt32;
 pub fn mp3InitResource() !void {
     var res = sceMp3InitResource();
-    if(res < 0){
+    if (res < 0) {
         return error.Unexpected;
     }
 }
@@ -55,7 +55,7 @@ pub fn mp3InitResource() !void {
 pub extern fn sceMp3TermResource() SceInt32;
 pub fn mp3TermResource() !void {
     var res = sceMp3TermResource();
-    if(res < 0){
+    if (res < 0) {
         return error.Unexpected;
     }
 }
@@ -68,7 +68,7 @@ pub fn mp3TermResource() !void {
 pub extern fn sceMp3Init(handle: SceInt32) SceInt32;
 pub fn mp3Init(handle: SceInt32) !void {
     var res = sceMp3Init(handle);
-    if(res < 0){
+    if (res < 0) {
         return error.Unexpected;
     }
 }
@@ -82,7 +82,7 @@ pub fn mp3Init(handle: SceInt32) !void {
 pub extern fn sceMp3Decode(handle: SceInt32, dst: *[]SceShort16) SceInt32;
 pub fn mp3Decode(handle: SceInt32, dst: *[]SceShort16) !i32 {
     var res = sceMp3Decode(handle, dst);
-    if(res < 0){
+    if (res < 0) {
         return error.Unexpected;
     }
     return res;
@@ -99,7 +99,7 @@ pub fn mp3Decode(handle: SceInt32, dst: *[]SceShort16) !i32 {
 pub extern fn sceMp3GetInfoToAddStreamData(handle: SceInt32, dst: *[]SceUChar8, towrite: *SceInt32, srcpos: *SceInt32) SceInt32;
 pub fn mp3GetInfoToAddStreamData(handle: SceInt32, dst: *[]SceUChar8, towrite: *SceInt32, srcpos: *SceInt32) !void {
     var res = sceMp3GetInfoToAddStreamData(handle, dst, towrite, srcpos);
-    if(res < 0){
+    if (res < 0) {
         return error.Unexpected;
     }
 }
@@ -113,7 +113,7 @@ pub fn mp3GetInfoToAddStreamData(handle: SceInt32, dst: *[]SceUChar8, towrite: *
 pub extern fn sceMp3NotifyAddStreamData(handle: SceInt32, size: SceInt32) SceInt32;
 pub fn mp3NotifyAddStreamData(handle: SceInt32, size: SceInt32) !void {
     var res = sceMp3NotifyAddStreamData(handle, size);
-    if(res < 0){
+    if (res < 0) {
         return error.Unexpected;
     }
 }
@@ -134,7 +134,7 @@ pub extern fn sceMp3CheckStreamDataNeeded(handle: SceInt32) SceInt32;
 pub extern fn sceMp3SetLoopNum(handle: SceInt32, loop: SceInt32) SceInt32;
 pub fn mp3SetLoopNum(handle: SceInt32, loop: SceInt32) !void {
     var res = sceMp3SetLoopNum(handle, loop);
-    if(res < 0){
+    if (res < 0) {
         return error.Unexpected;
     }
 }
@@ -189,7 +189,7 @@ pub extern fn sceMp3GetMp3ChannelNum(handle: SceInt32) SceInt32;
 pub extern fn sceMp3ResetPlayPosition(handle: SceInt32) SceInt32;
 pub fn mp3ResetPlayPosition(handle: SceInt32) !void {
     var res = sceMp3ResetPlayPosition(handle);
-    if(res < 0){
+    if (res < 0) {
         return error.Unexpected;
     }
 }

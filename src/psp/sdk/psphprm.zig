@@ -7,9 +7,8 @@ pub const PspHprmKeys = extern enum(u8) {
     Hold = 128,
 };
 
-
 // Peek at the current being pressed on the remote.
-// 
+//
 // @param key - Pointer to the u32 to receive the key bitmap, should be one or
 // more of ::PspHprmKeys
 //
@@ -17,7 +16,7 @@ pub const PspHprmKeys = extern enum(u8) {
 pub extern fn sceHprmPeekCurrentKey(key: [*]u32) c_int;
 pub fn hprmPeekCurrentKey(latch: [*]u32) !i32 {
     var res = sceHprmPeekCurrentKey(latch);
-    if(res < 0){
+    if (res < 0) {
         return error.Unexpected;
     }
     return res;
@@ -31,7 +30,7 @@ pub fn hprmPeekCurrentKey(latch: [*]u32) !i32 {
 pub extern fn sceHprmPeekLatch(latch: [*]u32) c_int;
 pub fn hprmPeekLatch(latch: [*]u32) !i32 {
     var res = sceHprmPeekLatch(latch);
-    if(res < 0){
+    if (res < 0) {
         return error.Unexpected;
     }
     return res;
@@ -45,7 +44,7 @@ pub fn hprmPeekLatch(latch: [*]u32) !i32 {
 pub extern fn sceHprmReadLatch(latch: [*]u32) c_int;
 pub fn hprmReadLatch(latch: [*]u32) !i32 {
     var res = sceHprmReadLatch(latch);
-    if(res < 0){
+    if (res < 0) {
         return error.Unexpected;
     }
     return res;

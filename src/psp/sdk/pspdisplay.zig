@@ -16,7 +16,6 @@ pub const PspDisplayErrorCodes = extern enum(c_int) {
     Argument = 2147483911,
 };
 
-
 // Set display mode
 //
 // @param mode - Display mode, normally 0.
@@ -28,7 +27,6 @@ pub extern fn sceDisplaySetMode(mode: c_int, width: c_int, height: c_int) c_int;
 pub fn displaySetMode(mode: c_int, width: c_int, height: c_int) void {
     _ = sceDisplaySetMode(mode, width, height);
 }
-
 
 // Get display mode
 //

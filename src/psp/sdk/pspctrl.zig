@@ -43,7 +43,6 @@ pub const SceCtrlLatch = extern struct {
     uiRelease: c_uint,
 };
 
-
 // Set the controller cycle setting.
 //
 // @param cycle - Cycle.  Normally set to 0.
@@ -51,14 +50,12 @@ pub const SceCtrlLatch = extern struct {
 // @return The previous cycle setting.
 pub extern fn sceCtrlSetSamplingCycle(cycle: c_int) c_int;
 
-
 // Get the controller current cycle setting.
 //
 // @param pcycle - Return value.
 //
 // @return 0.
 pub extern fn sceCtrlGetSamplingCycle(pcycle: *c_int) c_int;
-
 
 // Set the controller mode.
 //
@@ -82,7 +79,6 @@ pub extern fn sceCtrlGetSamplingMode(pmode: *c_int) c_int;
 
 pub extern fn sceCtrlPeekBufferPositive(pad_data: *SceCtrlData, count: c_int) c_int;
 pub extern fn sceCtrlPeekBufferNegative(pad_data: *SceCtrlData, count: c_int) c_int;
-
 
 // Read buffer positive
 // C Example:
@@ -111,7 +107,7 @@ pub extern fn sceCtrlReadLatch(latch_data: *SceCtrlLatch) c_int;
 pub extern fn sceCtrlSetIdleCancelThreshold(idlereset: c_int, idleback: c_int) c_int;
 pub fn ctrlSetIdleCancelThreshold(idlereset: c_int, idleback: c_int) !i32 {
     var res = sceCtrlSetIdleCancelThreshold(idlereset, idleback);
-    if(res < 0){
+    if (res < 0) {
         return error.Unexpected;
     }
     return res;
@@ -126,7 +122,7 @@ pub fn ctrlSetIdleCancelThreshold(idlereset: c_int, idleback: c_int) !i32 {
 pub extern fn sceCtrlGetIdleCancelThreshold(idlerest: *c_int, idleback: *c_int) c_int;
 pub fn ctrlGetIdleCancelThreshold(idlerest: *c_int, idleback: *c_int) !i32 {
     var res = sceCtrlGetIdleCancelThreshold(idlereset, idleback);
-    if(res < 0){
+    if (res < 0) {
         return error.Unexpected;
     }
     return res;

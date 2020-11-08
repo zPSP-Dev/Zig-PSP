@@ -1,4 +1,4 @@
-const psp = @import("psp/pspsdk.zig");
+const psp = @import("psp/utils/psp.zig");
 pub const os = @import("psp/pspos.zig");
 pub const panic = @import("psp/utils/debug.zig").panic;
 
@@ -13,6 +13,6 @@ pub fn main() !void {
     psp.debug.screenInit();
     psp.debug.print("Hi!");
 
-    var f = try std.fs.cwd().openFile("hello.zig", .{.write = true});
+    var f = try std.fs.cwd().openFile("hello.txt", .{ .write = true });
     std.debug.warn("{}", .{f.isTty()});
 }

@@ -39,9 +39,9 @@ pub const PSP_MEMORY_PARTITION_KERNEL = 1;
 pub const PSP_MEMORY_PARTITION_USER = 2;
 
 // Load a module.
-// @note This function restricts where it can load from (such as from flash0) 
+// @note This function restricts where it can load from (such as from flash0)
 // unless you call it in kernel mode. It also must be called from a thread.
-// 
+//
 // @param path - The path to the module to load.
 // @param flags - Unused, always 0 .
 // @param option  - Pointer to a mod_param_t structure. Can be NULL.
@@ -49,17 +49,15 @@ pub const PSP_MEMORY_PARTITION_USER = 2;
 // @return The UID of the loaded module on success, otherwise one of ::PspKernelErrorCodes.
 pub extern fn sceKernelLoadModule(path: []const u8, flags: c_int, option: *SceKernelLMOption) SceUID;
 
-
 // Load a module from MS.
 // @note This function restricts what it can load, e.g. it wont load plain executables.
-// 
+//
 // @param path - The path to the module to load.
 // @param flags - Unused, set to 0.
 // @param option  - Pointer to a mod_param_t structure. Can be NULL.
 //
 // @return The UID of the loaded module on success, otherwise one of ::PspKernelErrorCodes.
 pub extern fn sceKernelLoadModuleMs(path: []const u8, flags: c_int, option: *SceKernelLMOption) SceUID;
-
 
 // Load a module from the given file UID.
 //
@@ -133,13 +131,13 @@ pub extern fn sceKernelStopUnloadSelfModule(argsize: SceSize, argp: ?*c_void, st
 
 // Query the information about a loaded module from its UID.
 // @note This fails on v1.0 firmware (and even it worked has a limited structure)
-// so if you want to be compatible with both 1.5 and 1.0 (and you are running in 
-// kernel mode) then call this function first then ::pspSdkQueryModuleInfoV1 
+// so if you want to be compatible with both 1.5 and 1.0 (and you are running in
+// kernel mode) then call this function first then ::pspSdkQueryModuleInfoV1
 // if it fails, or make separate v1 and v1.5+ builds.
 //
 // @param modid - The UID of the loaded module.
 // @param info - Pointer to a ::SceKernelModuleInfo structure.
-// 
+//
 // @return 0 on success, otherwise one of ::PspKernelErrorCodes.
 pub extern fn sceKernelQueryModuleInfo(modid: SceUID, info: *SceKernelModuleInfo) c_int;
 

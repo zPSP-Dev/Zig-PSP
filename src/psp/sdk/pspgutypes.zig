@@ -1,4 +1,4 @@
-pub const GuPixelMode = extern enum(c_int){
+pub const GuPixelMode = extern enum(c_int) {
     Psm5650 = 0,
     Psm5551 = 1,
     Psm4444 = 2,
@@ -272,13 +272,13 @@ pub const SignalBehavior = extern enum(c_int) {
     Continue = 2,
 };
 
-pub const ClearBitFlags = extern enum(c_int){
+pub const ClearBitFlags = extern enum(c_int) {
     ColorBuffer = 1,
     StencilBuffer = 2,
     DepthBuffer = 4,
 };
 
-pub const LightBitFlags = extern enum(c_int){
+pub const LightBitFlags = extern enum(c_int) {
     Ambient = 1,
     Diffuse = 2,
     AmbientDiffuse = 3,
@@ -287,7 +287,7 @@ pub const LightBitFlags = extern enum(c_int){
     Unknown = 8,
 };
 
-pub const VertexTypeFlags = extern enum(c_int){
+pub const VertexTypeFlags = extern enum(c_int) {
     Texture8Bit = 1,
     Texture16Bit = 2,
     Texture32Bitf = 3,

@@ -33,7 +33,6 @@ pub const SceKernelUtilsSha1Context = extern struct {
     buf: [64]u8,
 };
 
-
 // Function to initialise a mersenne twister context.
 //
 // @param ctx - Pointer to a context
@@ -50,19 +49,17 @@ pub const SceKernelUtilsSha1Context = extern struct {
 pub extern fn sceKernelUtilsMt19937Init(ctx: *SceKernelUtilsMt19937Context, seed: u32) c_int;
 pub fn kernelUtilsMt19937Init(ctx: *SceKernelUtilsMt19937Context, seed: u32) !i32 {
     var res = sceKernelUtilsMt19937Init(ctx, seed);
-    if(res < 0){
+    if (res < 0) {
         return error.Unexpected;
     }
     return res;
 }
-
 
 // Function to return a new psuedo random number.
 //
 // @param ctx - Pointer to a pre-initialised context.
 // @return A pseudo random number (between 0 and MAX_INT).
 pub extern fn sceKernelUtilsMt19937UInt(ctx: *SceKernelUtilsMt19937Context) u32;
-
 
 // Function to perform an MD5 digest of a data block.
 //
@@ -74,7 +71,7 @@ pub extern fn sceKernelUtilsMt19937UInt(ctx: *SceKernelUtilsMt19937Context) u32;
 pub extern fn sceKernelUtilsMd5Digest(data: [*]u8, size: u32, digest: [*]u8) c_int;
 pub fn kernelUtilsMd5Digest(data: [*]u8, size: u32, digest: [*]u8) !i32 {
     var res = sceKernelUtilsMd5Digest(data, size, digest);
-    if(res < 0){
+    if (res < 0) {
         return error.Unexpected;
     }
     return res;
@@ -93,14 +90,13 @@ pub fn kernelUtilsMd5Digest(data: [*]u8, size: u32, digest: [*]u8) !i32 {
 // sceKernelUtilsMd5BlockUpdate(&ctx, (u8*) "Hello", 5);
 // sceKernelUtilsMd5BlockResult(&ctx, digest);
 pub extern fn sceKernelUtilsMd5BlockInit(ctx: *SceKernelUtilsMd5Context) c_int;
-pub fn kernelUtilsMd5BlockInit(ctx: *SceKernelUtilsMd5Context) !i32{
+pub fn kernelUtilsMd5BlockInit(ctx: *SceKernelUtilsMd5Context) !i32 {
     var res = sceKernelUtilsMd5BlockInit(ctx);
-    if(res < 0){
+    if (res < 0) {
         return error.Unexpected;
     }
     return res;
 }
-
 
 // Function to update the MD5 digest with a block of data.
 //
@@ -112,12 +108,11 @@ pub fn kernelUtilsMd5BlockInit(ctx: *SceKernelUtilsMd5Context) !i32{
 pub extern fn sceKernelUtilsMd5BlockUpdate(ctx: *SceKernelUtilsMd5Context, data: [*]u8, size: u32) c_int;
 pub fn kernelUtilsMd5BlockUpdate(ctx: *SceKernelUtilsMd5Context, data: [*]u8, size: u32) !i32 {
     var res = sceKernelUtilsMd5BlockUpdate(ctx, data, size);
-    if (res < 0){
+    if (res < 0) {
         return error.Unexpected;
     }
     return res;
 }
-
 
 // Function to get the digest result of the MD5 hash.
 //
@@ -128,12 +123,11 @@ pub fn kernelUtilsMd5BlockUpdate(ctx: *SceKernelUtilsMd5Context, data: [*]u8, si
 pub extern fn sceKernelUtilsMd5BlockResult(ctx: *SceKernelUtilsMd5Context, digest: [*]u8) c_int;
 pub fn kernelUtilsMd5BlockResult(ctx: *SceKernelUtilsMd5Context, digest: [*]u8) !i32 {
     var res = sceKernelUtilsMd5BlockResult(ctx, digest);
-    if(res < 0){
+    if (res < 0) {
         return error.Unexpected;
     }
     return res;
 }
-
 
 // Function to SHA1 hash a data block.
 //
@@ -143,9 +137,9 @@ pub fn kernelUtilsMd5BlockResult(ctx: *SceKernelUtilsMd5Context, digest: [*]u8) 
 //
 // @return < 0 on error.
 pub extern fn sceKernelUtilsSha1Digest(data: [*]u8, size: u32, digest: [*]u8) c_int;
-pub fn kernelUtilsSha1Digest(data: [*]u8, size: u32, digest: [*]u8) !i32{
+pub fn kernelUtilsSha1Digest(data: [*]u8, size: u32, digest: [*]u8) !i32 {
     var res = sceKernelUtilsSha1Digest(data, size, digest);
-    if(res < 0){
+    if (res < 0) {
         return error.Unexpected;
     }
     return res;
@@ -164,9 +158,9 @@ pub fn kernelUtilsSha1Digest(data: [*]u8, size: u32, digest: [*]u8) !i32{
 // sceKernelUtilsSha1BlockUpdate(&ctx, (u8*) "Hello", 5);
 // sceKernelUtilsSha1BlockResult(&ctx, digest);
 pub extern fn sceKernelUtilsSha1BlockInit(ctx: *SceKernelUtilsSha1Context) c_int;
-pub fn kernelUtilsSha1BlockInit(ctx: *SceKernelUtilsSha1Context) !i32{
+pub fn kernelUtilsSha1BlockInit(ctx: *SceKernelUtilsSha1Context) !i32 {
     var res = sceKernelUtilsSha1BlockInit(ctx);
-    if(res < 0){
+    if (res < 0) {
         return error.Unexpected;
     }
     return res;
@@ -180,9 +174,9 @@ pub fn kernelUtilsSha1BlockInit(ctx: *SceKernelUtilsSha1Context) !i32{
 //
 // @return < 0 on error.
 pub extern fn sceKernelUtilsSha1BlockUpdate(ctx: *SceKernelUtilsSha1Context, data: [*]u8, size: u32) c_int;
-pub fn kernelUtilsSha1BlockUpdate(ctx: *SceKernelUtilsSha1Context, data: [*]u8, size: u32) !i32{
+pub fn kernelUtilsSha1BlockUpdate(ctx: *SceKernelUtilsSha1Context, data: [*]u8, size: u32) !i32 {
     var res = sceKernelUtilsSha1BlockUpdate(ctx, data, size);
-    if(res < 0){
+    if (res < 0) {
         return error.Unexpected;
     }
     return res;
@@ -195,9 +189,9 @@ pub fn kernelUtilsSha1BlockUpdate(ctx: *SceKernelUtilsSha1Context, data: [*]u8, 
 //
 // @return < 0 on error.
 pub extern fn sceKernelUtilsSha1BlockResult(ctx: *SceKernelUtilsSha1Context, digest: [*]u8) c_int;
-pub fn kernelUtilsSha1BlockResult(ctx: *SceKernelUtilsSha1Context, digest: [*]u8) !i32{
+pub fn kernelUtilsSha1BlockResult(ctx: *SceKernelUtilsSha1Context, digest: [*]u8) !i32 {
     var res = sceKernelUtilsSha1BlockResult(ctx, digest);
-    if(res < 0){
+    if (res < 0) {
         return error.Unexpected;
     }
     return res;

@@ -62,7 +62,6 @@ pub extern fn sceMpegBaseCscInit(width: SceInt32) SceInt32;
 pub extern fn sceMpegBaseCscVme(pRGBbuffer: ScePVoid, pRGBbuffer2: ScePVoid, width: SceInt32, pYCrCbBuffer: [*c]SceMpegYCrCbBuffer) SceInt32;
 pub extern fn sceMpegbase_BEA18F91(pLLI: [*c]SceMpegLLI) SceInt32;
 
-
 // sceMpegInit
 //
 // @return 0 if success.
@@ -77,7 +76,6 @@ pub extern fn sceMpegFinish() SceVoid;
 //
 // @return < 0 if error else ringbuffer data size.
 pub extern fn sceMpegRingbufferQueryMemSize(iPackets: SceInt32) SceInt32;
-
 
 // sceMpegRingbufferConstruct
 //
@@ -96,7 +94,7 @@ pub extern fn sceMpegRingbufferConstruct(Ringbuffer: [*c]SceMpegRingbuffer, iPac
 // @param Ringbuffer - pointer to a sceMpegRingbuffer struct
 pub extern fn sceMpegRingbufferDestruct(Ringbuffer: [*c]SceMpegRingbuffer) SceVoid;
 
-// sceMpegQueryMemSize 
+// sceMpegQueryMemSize
 //
 // @param Ringbuffer - pointer to a sceMpegRingbuffer struct
 //

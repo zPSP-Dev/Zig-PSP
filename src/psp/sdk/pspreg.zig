@@ -16,7 +16,6 @@ pub const RegParam = extern struct {
     unk3: c_uint,
 };
 
-
 // Open the registry
 //
 // @param reg - A filled in ::RegParam structure
@@ -27,7 +26,7 @@ pub const RegParam = extern struct {
 pub extern fn sceRegOpenRegistry(reg: *RegParam, mode: c_int, h: *RegHandle) c_int;
 pub fn regOpenRegistry(reg: *RegParam, mode: c_int, h: *RegHandle) !void {
     var res = sceRegOpenRegistry(reg, mode, h);
-    if(res < 0){
+    if (res < 0) {
         return error.Unexpected;
     }
 }
@@ -40,20 +39,20 @@ pub fn regOpenRegistry(reg: *RegParam, mode: c_int, h: *RegHandle) !void {
 pub extern fn sceRegFlushRegistry(h: RegHandle) c_int;
 pub fn regFlushRegistry(h: *RegHandle) !void {
     var res = sceRegFlushRegistry(h);
-    if(res < 0){
+    if (res < 0) {
         return error.Unexpected;
     }
 }
 
-// Close the registry 
+// Close the registry
 //
 // @param h - The open registry handle
 //
 // @return 0 on success, < 0 on error
 pub extern fn sceRegCloseRegistry(h: RegHandle) c_int;
-pub fn regCloseRegistry(h: RegHandle) !void{
+pub fn regCloseRegistry(h: RegHandle) !void {
     var res = sceRegCloseRegistry(h);
-    if(res < 0){
+    if (res < 0) {
         return error.Unexpected;
     }
 }
@@ -67,9 +66,9 @@ pub fn regCloseRegistry(h: RegHandle) !void{
 //
 // @return 0 on success, < 0 on error
 pub extern fn sceRegOpenCategory(h: RegHandle, name: []const u8, mode: c_int, hd: *RegHandle) c_int;
-pub fn regOpenCategory(h: RegHandle, name: []const u8, mode: c_int, hd: *RegHandle) !void{
+pub fn regOpenCategory(h: RegHandle, name: []const u8, mode: c_int, hd: *RegHandle) !void {
     var res = sceRegOpenCategory(h, name, mode, hd);
-    if(res < 0){
+    if (res < 0) {
         return error.Unexpected;
     }
 }
@@ -81,9 +80,9 @@ pub fn regOpenCategory(h: RegHandle, name: []const u8, mode: c_int, hd: *RegHand
 //
 // @return 0 on success, < 0 on error
 pub extern fn sceRegRemoveCategory(h: RegHandle, name: []const u8) c_int;
-pub fn regRemoveCategory(h: RegHandle, name: []const u8) !void{
+pub fn regRemoveCategory(h: RegHandle, name: []const u8) !void {
     var res = sceRegRemoveCategory(h, name);
-    if(res < 0){
+    if (res < 0) {
         return error.Unexpected;
     }
 }
@@ -94,9 +93,9 @@ pub fn regRemoveCategory(h: RegHandle, name: []const u8) !void{
 //
 // @return 0 on success, < 0 on error
 pub extern fn sceRegCloseCategory(hd: RegHandle) c_int;
-pub fn regCloseCategory(hd: RegHandle) !void{
+pub fn regCloseCategory(hd: RegHandle) !void {
     var res = sceRegCloseCategory(hd);
-    if(res < 0){
+    if (res < 0) {
         return error.Unexpected;
     }
 }
@@ -107,9 +106,9 @@ pub fn regCloseCategory(hd: RegHandle) !void{
 //
 // @return 0 on success, < 0 on error
 pub extern fn sceRegFlushCategory(hd: RegHandle) c_int;
-pub fn regFlushCategory(hd: RegHandle) !void{
+pub fn regFlushCategory(hd: RegHandle) !void {
     var res = sceRegFlushCategory(hd);
-    if(res < 0){
+    if (res < 0) {
         return error.Unexpected;
     }
 }
@@ -124,9 +123,9 @@ pub fn regFlushCategory(hd: RegHandle) !void{
 //
 // @return 0 on success, < 0 on error
 pub extern fn sceRegGetKeyInfo(hd: RegHandle, name: []const u8, hk: *RegHandle, typec: *c_uint, size: *SceSize) c_int;
-pub fn regGetKeyInfo(hd: RegHandle, name: []const u8, hk: *RegHandle, typec: *c_uint, size: *SceSize) !void{
+pub fn regGetKeyInfo(hd: RegHandle, name: []const u8, hk: *RegHandle, typec: *c_uint, size: *SceSize) !void {
     var res = sceRegGetKeyInfo(hd, name, hk, typec, size);
-    if(res < 0){
+    if (res < 0) {
         return error.Unexpected;
     }
 }
@@ -140,13 +139,12 @@ pub fn regGetKeyInfo(hd: RegHandle, name: []const u8, hk: *RegHandle, typec: *c_
 //
 // @return 0 on success, < 0 on error
 pub extern fn sceRegGetKeyInfoByName(hd: RegHandle, name: []const u8, typec: *c_uint, size: *SceSize) c_int;
-pub fn regGetKeyInfoByName(hd: RegHandle, name: []const u8, typec: *c_uint, size: *SceSize) !void{
+pub fn regGetKeyInfoByName(hd: RegHandle, name: []const u8, typec: *c_uint, size: *SceSize) !void {
     var res = sceRegGetKeyInfoByName(hd, name, typec, size);
-    if(res < 0){
+    if (res < 0) {
         return error.Unexpected;
     }
 }
-
 
 // Get a key's value
 //
@@ -157,9 +155,9 @@ pub fn regGetKeyInfoByName(hd: RegHandle, name: []const u8, typec: *c_uint, size
 //
 // @return 0 on success, < 0 on error
 pub extern fn sceRegGetKeyValue(hd: RegHandle, hk: RegHandle, buf: ?*c_void, size: SceSize) c_int;
-pub fn regGetKeyValue(hd: RegHandle, hk: RegHandle, buf: ?*c_void, size: SceSize) !void{
+pub fn regGetKeyValue(hd: RegHandle, hk: RegHandle, buf: ?*c_void, size: SceSize) !void {
     var res = sceRegGetKeyValue(hd, hk, buf, size);
-    if(res < 0){
+    if (res < 0) {
         return error.Unexpected;
     }
 }
@@ -173,13 +171,12 @@ pub fn regGetKeyValue(hd: RegHandle, hk: RegHandle, buf: ?*c_void, size: SceSize
 //
 // @return 0 on success, < 0 on error
 pub extern fn sceRegGetKeyValueByName(hd: RegHandle, name: []const u8, buf: ?*c_void, size: SceSize) c_int;
-pub fn regGetKeyValueByName(hd: RegHandle, name: []const u8, buf: ?*c_void, size: SceSize) !void{
+pub fn regGetKeyValueByName(hd: RegHandle, name: []const u8, buf: ?*c_void, size: SceSize) !void {
     var res = sceRegGetKeyValueByName(hd, name, buf, size);
-    if(res < 0){
+    if (res < 0) {
         return error.Unexpected;
     }
 }
-
 
 // Set a key's value
 //
@@ -190,9 +187,9 @@ pub fn regGetKeyValueByName(hd: RegHandle, name: []const u8, buf: ?*c_void, size
 //
 // @return 0 on success, < 0 on error
 pub extern fn sceRegSetKeyValue(hd: RegHandle, name: []const u8, buf: ?*const c_void, size: SceSize) c_int;
-pub fn regSetKeyValue(hd: RegHandle, name: []const u8, buf: ?*const c_void, size: SceSize) !void{
+pub fn regSetKeyValue(hd: RegHandle, name: []const u8, buf: ?*const c_void, size: SceSize) !void {
     var res = sceRegSetKeyValue(hd, name, buf, size);
-    if(res < 0){
+    if (res < 0) {
         return error.Unexpected;
     }
 }
@@ -204,13 +201,12 @@ pub fn regSetKeyValue(hd: RegHandle, name: []const u8, buf: ?*const c_void, size
 //
 // @return 0 on success, < 0 on error
 pub extern fn sceRegGetKeysNum(hd: RegHandle, num: *c_int) c_int;
-pub fn regGetKeysNum(hd: RegHandle, num: *c_int) !void{
+pub fn regGetKeysNum(hd: RegHandle, num: *c_int) !void {
     var res = sceRegGetKeysNum(hd, num);
-    if(res < 0){
+    if (res < 0) {
         return error.Unexpected;
     }
 }
-
 
 // Get the key names in the current directory
 //
@@ -220,15 +216,15 @@ pub fn regGetKeysNum(hd: RegHandle, num: *c_int) !void{
 //
 // @return 0 on success, < 0 on error
 pub extern fn sceRegGetKeys(hd: RegHandle, buf: [*]u8, num: c_int) c_int;
-pub fn regGetKeys(hd: RegHandle, buf: [*]u8, num: c_int) !void{
+pub fn regGetKeys(hd: RegHandle, buf: [*]u8, num: c_int) !void {
     var res = sceRegGetKeys(hd, buf, num);
-    if(res < 0){
+    if (res < 0) {
         return error.Unexpected;
     }
 }
 
 // Create a key
-// 
+//
 // @param hd - The open registry dir handle
 // @param name - Name of the key to create
 // @param type - Type of key (note cannot be a directory type)
@@ -236,9 +232,9 @@ pub fn regGetKeys(hd: RegHandle, buf: [*]u8, num: c_int) !void{
 //
 // @return 0 on success, < 0 on error
 pub extern fn sceRegCreateKey(hd: RegHandle, name: []const u8, typec: c_int, size: SceSize) c_int;
-pub fn regCreateKey(hd: RegHandle, name: []const u8, typec: c_int, size: SceSize) !void{
+pub fn regCreateKey(hd: RegHandle, name: []const u8, typec: c_int, size: SceSize) !void {
     var res = sceRegCreateKey(hd, name, typec, size);
-    if(res < 0){
+    if (res < 0) {
         return error.Unexpected;
     }
 }
@@ -249,9 +245,9 @@ pub fn regCreateKey(hd: RegHandle, name: []const u8, typec: c_int, size: SceSize
 //
 // @return 0 on success, < 0 on error
 pub extern fn sceRegRemoveRegistry(reg: *RegParam) c_int;
-pub fn regRemoveRegistry(reg: *RegParam) !void{
+pub fn regRemoveRegistry(reg: *RegParam) !void {
     var res = sceRegRemoveRegistry(reg);
-    if(res < 0){
+    if (res < 0) {
         return error.Unexpected;
     }
 }

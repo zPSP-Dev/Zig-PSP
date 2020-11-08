@@ -16,10 +16,5 @@ pub fn rgba(r: u8, g: u8, b: u8, a: u8) u32 {
 }
 
 pub fn color(r: f32, g: f32, b: f32, a: f32) u32 {
-    return rgba(
-        @as(u8, (r * 255.0)),
-        @as(u8, (g * 255.0)),
-        @as(u8, (b * 255.0)),
-        @as(u8, (a * 255.0))
-    );
+    return rgba(@as(u8, (r * 255.0)), @as(u8, (g * 255.0)), @as(u8, (b * 255.0)), @as(u8, (a * 255.0)));
 }

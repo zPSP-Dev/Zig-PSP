@@ -25,7 +25,7 @@ pub const SceKernelLoadExecParam = extern struct {
 pub extern fn sceKernelRegisterExitCallback(cbid: c_int) c_int;
 
 // Execute a new game executable, limited when not running in kernel mode.
-// 
+//
 // @param file - The file to execute.
 // @param param - Pointer to a ::SceKernelLoadExecParam structure, or NULL.
 //

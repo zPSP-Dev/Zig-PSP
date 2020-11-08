@@ -56,7 +56,6 @@ pub const struct_ptpStatStruct = extern struct {
 pub const ptpStatStruct = struct_ptpStatStruct;
 pub extern fn sceNetAdhocGetPtpStat(size: [*c]c_int, stat: [*c]ptpStatStruct) c_int;
 
-
 pub const struct_productStruct = extern struct {
     unknown: c_int,
     product: [9]u8,
@@ -109,7 +108,6 @@ pub extern fn sceNetAdhocctlDelHandler(id: c_int) c_int;
 pub extern fn sceNetAdhocctlGetNameByAddr(mac: [*c]u8, nickname: [*c]u8) c_int;
 pub extern fn sceNetAdhocctlGetAddrByName(nickname: [*c]u8, length: [*c]c_int, buf: ?*c_void) c_int;
 pub extern fn sceNetAdhocctlGetParameter(params: [*c]struct_SceNetAdhocctlParams) c_int;
-
 
 pub const enum_pspAdhocMatchingEvents = extern enum(c_int) {
     PSP_ADHOC_MATCHING_EVENT_HELLO = 1,
@@ -242,7 +240,7 @@ pub const ApctlInfo = extern enum(c_int) {
     Wifisp,
 };
 
-pub const ApctlInfoSecurityType = extern enum (c_int) {
+pub const ApctlInfoSecurityType = extern enum(c_int) {
     None,
     Wep,
     Wpa,
@@ -258,7 +256,6 @@ pub const pspAdhocMatchingModes = enum_pspAdhocMatchingModes;
 pub const pspAdhocMatchingMember = struct_pspAdhocMatchingMember;
 pub const pspAdhocPoolStat = struct_pspAdhocPoolStat;
 pub const SceNetApctlInfo = union_SceNetApctlInfo;
-
 
 pub const socklen_t = u32;
 pub const sa_family_t = u8;

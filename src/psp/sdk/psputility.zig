@@ -77,7 +77,6 @@ pub extern fn sceUtilitySetNetParam(param: c_int, val: ?*const c_void) c_int;
 pub extern fn sceUtilityCopyNetParam(src: c_int, dest: c_int) c_int;
 pub extern fn sceUtilityDeleteNetParam(conf: c_int) c_int;
 
-
 const PspUtilitySavedataMode = extern enum(c_int) {
     Autoload = 0,
     Autosave = 1,
@@ -337,7 +336,6 @@ pub const PspUtilityHtmlViewerParam = extern struct {
     unknown4: [10]c_int,
 };
 
-
 pub const SceUtilityOskData = extern struct {
     unk_00: c_int,
     unk_04: c_int,
@@ -362,17 +360,11 @@ pub const SceUtilityOskParams = extern struct {
     unk_60: c_int,
 };
 
-pub const ModuleNet = extern enum(c_int){
-    Common = 1,
-    Adhoc = 2,
-    Inet = 3,
-    Parseuri = 4,
-    Parsehttp = 5,
-    Http = 6,
-    Ssl = 7
+pub const ModuleNet = extern enum(c_int) {
+    Common = 1, Adhoc = 2, Inet = 3, Parseuri = 4, Parsehttp = 5, Http = 6, Ssl = 7
 };
 
-pub const ModuleUSB = extern enum(c_int){
+pub const ModuleUSB = extern enum(c_int) {
     Pspcm = 1,
     Acc = 2,
     Mic = 3,
@@ -380,51 +372,19 @@ pub const ModuleUSB = extern enum(c_int){
     Gps = 5,
 };
 
-pub const NetParam = extern enum(c_int){
-    Name = 0,
-    Ssid = 1,
-    Secure = 2,
-    Wepkey = 3,
-    IsStaticIp = 4,
-    Ip = 5,
-    Netmask = 6,
-    Route = 7,
-    ManualDns = 8,
-    Primarydns = 9,
-    Secondarydns = 10,
-    ProxyUser = 11,
-    ProxyPass = 12,
-    UseProxy = 13,
-    ProxyServer = 14,
-    ProxyPort = 15,
-    Unknown1 = 16,
-    Unknown2 = 17
+pub const NetParam = extern enum(c_int) {
+    Name = 0, Ssid = 1, Secure = 2, Wepkey = 3, IsStaticIp = 4, Ip = 5, Netmask = 6, Route = 7, ManualDns = 8, Primarydns = 9, Secondarydns = 10, ProxyUser = 11, ProxyPass = 12, UseProxy = 13, ProxyServer = 14, ProxyPort = 15, Unknown1 = 16, Unknown2 = 17
 };
 
-pub const SystemParamID = extern enum(c_int){
-    StringNickname = 1,
-    IntAdhocChannel = 2,
-    IntWlanPowersave = 3,
-    IntDateFormat = 4,
-    IntTimeFormat = 5,
-    IntTimezone = 6,
-    IntDaylightsavings = 7,
-    IntLanguage = 8,
-    IntUnknown = 9
+pub const SystemParamID = extern enum(c_int) {
+    StringNickname = 1, IntAdhocChannel = 2, IntWlanPowersave = 3, IntDateFormat = 4, IntTimeFormat = 5, IntTimezone = 6, IntDaylightsavings = 7, IntLanguage = 8, IntUnknown = 9
 };
 
-pub const ModuleAV = extern enum(c_int){
-    Avcodec = 0,
-    Sascore = 1,
-    Atrac3plus = 2,
-    Mpegbase = 3,
-    Mp3 = 4,
-    Vaudio = 5,
-    Aac = 6,
-    G729 = 7
+pub const ModuleAV = extern enum(c_int) {
+    Avcodec = 0, Sascore = 1, Atrac3plus = 2, Mpegbase = 3, Mp3 = 4, Vaudio = 5, Aac = 6, G729 = 7
 };
 
-pub const SystemParamLanguage = extern enum(c_int){
+pub const SystemParamLanguage = extern enum(c_int) {
     Japanese = 0,
     English = 1,
     French = 2,
@@ -439,53 +399,41 @@ pub const SystemParamLanguage = extern enum(c_int){
     ChineseSimplified = 11,
 };
 
-pub const SystemParamTime = extern enum(c_int){
-    Format24Hr = 0,
-    Format12Hr = 1
+pub const SystemParamTime = extern enum(c_int) {
+    Format24Hr = 0, Format12Hr = 1
 };
 
-pub const UtilityAccept = extern enum(c_int){
-    Circle = 0,
-    Cross = 1
+pub const UtilityAccept = extern enum(c_int) {
+    Circle = 0, Cross = 1
 };
 
-pub const SystemParamAdhoc = extern enum(c_int){
+pub const SystemParamAdhoc = extern enum(c_int) {
     ChannelAutomatic = 0,
     Channel1 = 1,
     Channel6 = 6,
     Channel11 = 11,
 };
 
-pub const NetParamError = extern enum(c_int){
-    BadNetconf = 0x80110601,
-    BadParam = 0x80110604
+pub const NetParamError = extern enum(c_int) {
+    BadNetconf = 0x80110601, BadParam = 0x80110604
 };
 
-pub const SystemParamWlanPowerSave = extern enum(c_int){
-    Off = 0,
-    On = 1
+pub const SystemParamWlanPowerSave = extern enum(c_int) {
+    Off = 0, On = 1
 };
 
-pub const SystemParamDaylightSavings = extern enum(c_int){
-    Std = 0,
-    Saving = 1
+pub const SystemParamDaylightSavings = extern enum(c_int) {
+    Std = 0, Saving = 1
 };
 
-pub const SystemParamDateFormat = extern enum(c_int){
-    YYYYMMDD = 0,
-    MMDDYYYY = 1,
-    DDMMYYYY = 2
+pub const SystemParamDateFormat = extern enum(c_int) {
+    YYYYMMDD = 0, MMDDYYYY = 1, DDMMYYYY = 2
 };
 
-pub const SystemParamRetVal = extern enum(c_int){
-    Ok = 0,
-    Fail = 0x80110103
+pub const SystemParamRetVal = extern enum(c_int) {
+    Ok = 0, Fail = 0x80110103
 };
 
-pub const ModuleNP = extern enum(c_int){
-    Common = 0x0400,
-    Service = 0x0401,
-    Matching2 = 0x0402,
-    Drm = 0x0500,
-    Irda = 0x0600
+pub const ModuleNP = extern enum(c_int) {
+    Common = 0x0400, Service = 0x0401, Matching2 = 0x0402, Drm = 0x0500, Irda = 0x0600
 };

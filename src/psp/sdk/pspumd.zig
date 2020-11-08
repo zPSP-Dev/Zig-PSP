@@ -24,7 +24,6 @@ pub const UmdDriveStat = extern enum(c_int) {
 };
 pub const UmdCallback = ?fn (c_int, c_int) callconv(.C) c_int;
 
-
 // Check whether there is a disc in the UMD drive
 //
 // @return 0 if no disc present, anything else indicates a disc is inserted.
@@ -38,14 +37,14 @@ pub extern fn sceUmdCheckMedium() c_int;
 pub extern fn sceUmdGetDiscInfo(info: *PspUmdInfo) c_int;
 pub fn umdGetDiscInfo(info: *PspUmdInfo) !i32 {
     var res = sceUmdGetDiscInfo(info);
-    if(res < 0){
+    if (res < 0) {
         return error.Unexpected;
     }
     return res;
 }
 
 // Activates the UMD drive
-// 
+//
 // @param unit - The unit to initialise (probably). Should be set to 1.
 //
 // @param drive - A prefix string for the fs device to mount the UMD on (e.g. "disc0:")
@@ -68,14 +67,14 @@ pub fn umdGetDiscInfo(info: *PspUmdInfo) !i32 {
 pub extern fn sceUmdActivate(unit: c_int, drive: []const u8) c_int;
 pub fn umdActivate(unit: c_int, drive: []const u8) !i32 {
     var res = sceUmdActivate(unit, drive);
-    if(res < 0){
+    if (res < 0) {
         return error.Unexpected;
     }
     return res;
 }
 
 // Deativates the UMD drive
-// 
+//
 // @param unit - The unit to initialise (probably). Should be set to 1.
 //
 // @param drive - A prefix string for the fs device to mount the UMD on (e.g. "disc0:")
@@ -84,7 +83,7 @@ pub fn umdActivate(unit: c_int, drive: []const u8) !i32 {
 pub extern fn sceUmdDeactivate(unit: c_int, drive: []const u8) c_int;
 pub fn umdDeactivate(unit: c_int, drive: []const u8) !i32 {
     var res = sceUmdDeactivate(unit, drive);
-    if(res < 0){
+    if (res < 0) {
         return error.Unexpected;
     }
     return res;
@@ -98,7 +97,7 @@ pub fn umdDeactivate(unit: c_int, drive: []const u8) !i32 {
 pub extern fn sceUmdWaitDriveStat(stat: c_int) c_int;
 pub fn umdWaitDriveStat(stat: c_int) !i32 {
     var res = sceUmdWaitDriveStat(stat);
-    if(res < 0){
+    if (res < 0) {
         return error.Unexpected;
     }
     return res;
@@ -114,7 +113,7 @@ pub fn umdWaitDriveStat(stat: c_int) !i32 {
 pub extern fn sceUmdWaitDriveStatWithTimer(stat: c_int, timeout: c_uint) c_int;
 pub fn umdWaitDriveStatWithTimer(stat: c_int, timeout: c_uint) !i32 {
     var res = umdWaitDriveStatWithTimer(stat, timeout);
-    if(res < 0){
+    if (res < 0) {
         return error.Unexpected;
     }
     return res;
@@ -130,7 +129,7 @@ pub fn umdWaitDriveStatWithTimer(stat: c_int, timeout: c_uint) !i32 {
 pub extern fn sceUmdWaitDriveStatCB(stat: c_int, timeout: c_uint) c_int;
 pub fn umdWaitDriveStatCB(stat: c_int, timeout: c_uint) !i32 {
     var res = sceUmdWaitDriveStatCB(stat, timeout);
-    if(res < 0){
+    if (res < 0) {
         return error.Unexpected;
     }
     return res;
@@ -142,7 +141,7 @@ pub fn umdWaitDriveStatCB(stat: c_int, timeout: c_uint) !i32 {
 pub extern fn sceUmdCancelWaitDriveStat() c_int;
 pub fn umdCancelWaitDriveStat() !i32 {
     var res = sceUmdCancelWaitDriveStat();
-    if(res < 0){
+    if (res < 0) {
         return error.Unexpected;
     }
     return res;
@@ -154,7 +153,7 @@ pub fn umdCancelWaitDriveStat() !i32 {
 pub extern fn sceUmdGetDriveStat() c_int;
 pub fn umdGetDriveStat() !i32 {
     var res = sceUmdGetDriveStat();
-    if(res < 0){
+    if (res < 0) {
         return error.Unexpected;
     }
     return res;
@@ -175,14 +174,14 @@ pub extern fn sceUmdGetErrorStat() c_int;
 // int umd_callback(int unknown, int event)
 // {
 //      //do something
-// }     
+// }
 // int cbid = sceKernelCreateCallback("UMD Callback", umd_callback, NULL);
 // sceUmdRegisterUMDCallBack(cbid);
 // @endcode
 pub extern fn sceUmdRegisterUMDCallBack(cbid: c_int) c_int;
 pub fn umdRegisterUMDCallBack(cbid: c_int) !i32 {
     var res = sceUmdRegisterUMDCallBack(cbid);
-    if(res < 0){
+    if (res < 0) {
         return error.Unexpected;
     }
     return res;
@@ -196,7 +195,7 @@ pub fn umdRegisterUMDCallBack(cbid: c_int) !i32 {
 pub extern fn sceUmdUnRegisterUMDCallBack(cbid: c_int) c_int;
 pub fn umdUnRegisterUMDCallBack(cbid: c_int) !i32 {
     var res = sceUmdUnRegisterUMDCallBack(cbid);
-    if(res < 0){
+    if (res < 0) {
         return error.Unexpected;
     }
     return res;
@@ -208,7 +207,7 @@ pub fn umdUnRegisterUMDCallBack(cbid: c_int) !i32 {
 pub extern fn sceUmdReplacePermit() c_int;
 pub fn umdReplacePermit() !i32 {
     var res = sceUmdReplacePermit();
-    if(res < 0){
+    if (res < 0) {
         return error.Unexpected;
     }
     return res;
@@ -220,7 +219,7 @@ pub fn umdReplacePermit() !i32 {
 pub extern fn sceUmdReplaceProhibit() c_int;
 pub fn umdReplaceProhibit() !i32 {
     var res = sceUmdReplaceProhibit();
-    if(res < 0){
+    if (res < 0) {
         return error.Unexpected;
     }
     return res;

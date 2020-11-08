@@ -197,4 +197,3 @@ pub const PspKernelErrorCodes = extern enum(c_int) {
     CacheAlignment = 2147615820,
     Errormax = 2147615821,
 };
-

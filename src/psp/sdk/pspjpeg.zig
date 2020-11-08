@@ -1,6 +1,6 @@
 usingnamespace @import("psptypes.zig");
 
-// Inits the MJpeg library 
+// Inits the MJpeg library
 //
 // @return 0 on success, < 0 on error
 pub extern fn sceJpegInitMJpeg() c_int;
@@ -12,7 +12,7 @@ pub fn jpegInitMJpeg() bool {
 //
 // @return 0 on success, < 0 on error
 pub extern fn sceJpegFinishMJpeg() c_int;
-pub fn jpegFinishMJpeg() bool{
+pub fn jpegFinishMJpeg() bool {
     return sceJpegFinishMJpeg() == 0;
 }
 
@@ -34,8 +34,6 @@ pub extern fn sceJpegDeleteMJpeg() c_int;
 pub fn jpegDeleteMJpeg() bool {
     return sceJpegDeleteMJpeg == 0;
 }
-
-//
 // Decodes a mjpeg frame.
 //
 // @param jpegbuf - the buffer with the mjpeg frame
@@ -44,5 +42,5 @@ pub fn jpegDeleteMJpeg() bool {
 //				       It should have a size of (width * height * 4).
 // @param unk - Unknown, pass 0
 //
-// @return (width * 65536) + height on success, < 0 on error 
+// @return (width * 65536) + height on success, < 0 on error
 pub extern fn sceJpegDecodeMJpeg(jpegbuf: []u8, size: SceSize, rgba: ?*c_void, unk: u32) c_int;

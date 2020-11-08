@@ -12,32 +12,32 @@ const Allocator = mem.Allocator;
 // This Allocator is a very basic allocator for the PSP
 // It uses the PSP's kernel to allocate and free memory
 // This may not be 100% correct for alignment
-pub const PSPAllocator = struct{
+pub const PSPAllocator = struct {
     allocator: Allocator,
 
     //Initialize and send back an allocator object
     pub fn init() PSPAllocator {
-        return PSPAllocator {
+        return PSPAllocator{
             .allocator = Allocator{
                 .allocFn = psp_realloc,
-                .resizeFn = psp_shrink
-            }
+                .resizeFn = psp_shrink,
+            },
         };
     }
 
     //Our Allocator
-    fn psp_realloc (allocator: *Allocator, len: usize, alignment: u29, len_align: u29, ra: usize) std.mem.Allocator.Error![]u8{
+    fn psp_realloc(allocator: *Allocator, len: usize, alignment: u29, len_align: u29, ra: usize) std.mem.Allocator.Error![]u8 {
         //Assume alignment is less than double aligns
         assert(len > 0);
         assert(alignment <= @alignOf(c_longdouble));
 
         //If not allocated - allocate!
-        if(len > 0){
-            
-            //Gets a block of memory
-            var id : SceUID = sceKernelAllocPartitionMemory(2, "block", @enumToInt(PspSysMemBlockTypes.MemLow), len + @sizeOf(SceUID), null);
+        if (len > 0) {
 
-            if(id < 0){
+            //Gets a block of memory
+            var id: SceUID = sceKernelAllocPartitionMemory(2, "block", @enumToInt(PspSysMemBlockTypes.MemLow), len + @sizeOf(SceUID), null);
+
+            if (id < 0) {
                 //TODO: Handle error cases that aren't out of memory...
                 return Allocator.Error.OutOfMemory;
             }
@@ -59,16 +59,11 @@ pub const PSPAllocator = struct{
     }
 
     //Our de-allocator
-    fn psp_shrink(allocator: *Allocator,
-        buf_unaligned: []u8,
-        buf_align: u29,
-        new_size: usize,
-        len_align: u29,
-        return_address: usize) std.mem.Allocator.Error!usize{
-        
+    fn psp_shrink(allocator: *Allocator, buf_unaligned: []u8, buf_align: u29, new_size: usize, len_align: u29, return_address: usize) std.mem.Allocator.Error!usize {
+
         //Get ptr
         var ptr = @ptrCast([*]u8, buf_unaligned);
-        
+
         //Go back to our ID
         ptr -= @sizeOf(SceUID);
         var id = @ptrCast(*c_int, @alignCast(4, ptr)).*;

@@ -6,11 +6,11 @@ usingnamespace @import("../include/pspgu.zig");
 //It allocates static chunks of VRAM
 //TODO: Replace with dynamic VRAM allocator
 
-var vramOff : usize = 0;
+var vramOff: usize = 0;
 
 //Get the amount of memory needed
 fn getMemSize(width: u32, height: u32, format: GuPixelMode) c_uint {
-    switch(format){
+    switch (format) {
         .PsmT4 => {
             return width * height / 2;
         },
@@ -26,8 +26,8 @@ fn getMemSize(width: u32, height: u32, format: GuPixelMode) c_uint {
         .Psm8888, .PsmT32 => {
             return width * height * 4;
         },
-        
-        else => return 0
+
+        else => return 0,
     }
 }
 

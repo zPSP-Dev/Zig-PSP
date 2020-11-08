@@ -1,8 +1,7 @@
 usingnamespace @import("psptypes.zig");
 
-
 // Start a USB driver.
-// 
+//
 // @param driverName - name of the USB driver to start
 // @param size - Size of arguments to pass to USB driver start
 // @param args - Arguments to pass to USB driver start
@@ -14,7 +13,7 @@ pub fn usbStart(driverName: [*c]const u8, size: c_int, args: ?*c_void) bool {
 }
 
 // Stop a USB driver.
-// 
+//
 // @param driverName - name of the USB driver to stop
 // @param size - Size of arguments to pass to USB driver start
 // @param args - Arguments to pass to USB driver start
@@ -26,7 +25,7 @@ pub fn usbStop(driverName: [*c]const u8, size: c_int, args: ?*c_void) bool {
 }
 
 // Activate a USB driver.
-// 
+//
 // @param pid - Product ID for the default USB Driver
 //
 // @return 0 on success
@@ -35,11 +34,10 @@ pub fn usbActivate(pid: u32) bool {
     return sceUsbActivate(pid) == 0;
 }
 
-
 // Deactivate USB driver.
 //
 // @param pid - Product ID for the default USB driver
-// 
+//
 // @return 0 on success
 pub extern fn sceUsbDeactivate(pid: u32) c_int;
 pub fn usbDeactivate(pid: u32) bool {
@@ -47,13 +45,12 @@ pub fn usbDeactivate(pid: u32) bool {
 }
 
 // Get USB state
-// 
+//
 // @return OR'd PSP_USB_* constants
 pub extern fn sceUsbGetState() c_int;
 
-
 // Get state of a specific USB driver
-// 
+//
 // @param driverName - name of USB driver to get status from
 //
 // @return 1 if the driver has been started, 2 if it is stopped

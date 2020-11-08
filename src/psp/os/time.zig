@@ -24,7 +24,7 @@ pub fn sleep(nanoseconds: u64) void {
 /// before the epoch.
 /// See `std.os.clock_gettime` for a POSIX timestamp.
 pub fn timestamp() i64 {
-    var r : u64 = 0;
+    var r: u64 = 0;
     _ = sceRtcGetCurrentTick(&r);
     return @intCast(i64, r / sceRtcGetTickResolution());
 }
@@ -35,7 +35,7 @@ pub fn timestamp() i64 {
 /// before the epoch.
 /// See `std.os.clock_gettime` for a POSIX timestamp.
 pub fn milliTimestamp() i64 {
-    var r : u64 = 0;
+    var r: u64 = 0;
     _ = sceRtcGetCurrentTick(&r);
     return @intCast(i64, r / 1000);
 }
@@ -47,7 +47,7 @@ pub fn milliTimestamp() i64 {
 /// before the epoch.
 /// See `std.os.clock_gettime` for a POSIX timestamp.
 pub fn nanoTimestamp() i128 {
-    var r : u64 = 0;
+    var r: u64 = 0;
     _ = sceRtcGetCurrentTick(&r);
     return @intCast(i64, r * 1000);
 }
@@ -82,7 +82,6 @@ pub const s_per_hour = s_per_min * 60;
 pub const s_per_day = s_per_hour * 24;
 pub const s_per_week = s_per_day * 7;
 
-
 /// A monotonic high-performance timer.
 /// Timer.start() must be called to initialize the struct, which captures
 /// the counter frequency on windows and darwin, records the resolution,
@@ -111,7 +110,7 @@ pub const Timer = struct {
     /// error values into syscalls, such as using seccomp on Linux to intercept
     /// `clock_gettime`.
     pub fn start() Timer {
-        var r : u64 = 0;
+        var r: u64 = 0;
         _ = sceRtcGetCurrentTick(&r);
 
         return Timer{
@@ -142,7 +141,7 @@ pub const Timer = struct {
 
     //Gets our current ticker
     fn clockNative() u64 {
-        var r : u64 = 0;
+        var r: u64 = 0;
         _ = sceRtcGetCurrentTick(&r);
         return r;
     }

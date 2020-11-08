@@ -1,4 +1,6 @@
-test "" { @import("std").meta.refAllDecls(@This()); }
+test "" {
+    @import("std").meta.refAllDecls(@This());
+}
 
 usingnamespace @import("../include/psploadexec.zig");
 usingnamespace @import("../include/pspthreadman.zig");
@@ -15,14 +17,14 @@ pub fn exitErr() void {
     sceKernelExitGame();
 }
 
-const has_std_os = if(@hasDecl(root, "os")) true else false;
+const has_std_os = if (@hasDecl(root, "os")) true else false;
 
 //This calls your main function as a thread.
 pub fn _module_main_thread(argc: SceSize, argv: ?*c_void) callconv(.C) c_int {
-    if(has_std_os){
+    if (has_std_os) {
         pspos.system.__pspOsInit(argv);
     }
-    
+
     switch (@typeInfo(@typeInfo(@TypeOf(root.main)).Fn.return_type.?)) {
         .NoReturn => {
             root.main();
@@ -39,11 +41,10 @@ pub fn _module_main_thread(argc: SceSize, argv: ?*c_void) callconv(.C) c_int {
         },
         .ErrorUnion => {
             const result = root.main() catch |err| {
-
                 print("ERROR CAUGHT: ");
                 print(@errorName(err));
                 print("\nExiting in 10 seconds...");
-                
+
                 exitErr();
                 return 1;
             };
@@ -61,7 +62,7 @@ pub fn _module_main_thread(argc: SceSize, argv: ?*c_void) callconv(.C) c_int {
         else => @compileError(bad_main_ret),
     }
 
-    if(exitOnEnd){
+    if (exitOnEnd) {
         sceKernelExitGame();
     }
     return 0;
@@ -72,7 +73,7 @@ pub fn _module_main_thread(argc: SceSize, argv: ?*c_void) callconv(.C) c_int {
 //Modified BSD License
 //====================
 //
-//_Copyright � `2020`, `Hayden Kowalchuk`_  
+//_Copyright � `2020`, `Hayden Kowalchuk`_
 //_All rights reserved._
 //
 //Redistribution and use in source and binary forms, with or without
@@ -97,11 +98,12 @@ pub fn _module_main_thread(argc: SceSize, argv: ?*c_void) callconv(.C) c_int {
 //ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 //(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-// 
+//
 //    Thanks to mrneo240 (Hayden Kowalchuk) for the help
-// 
+//
 comptime {
-    asm(\\.data
+    asm (
+        \\.data
         \\.globl module_info
         \\.globl __syslib_exports
         \\.globl __library_exports
@@ -149,15 +151,14 @@ comptime {
     );
 }
 
-
 fn intToString(int: u32, buf: []u8) ![]const u8 {
     return try @import("std").fmt.bufPrint(buf, "{}", .{int});
 }
 
-pub fn module_info(comptime name: []const u8, comptime attrib: u16 , comptime major : u8, comptime minor : u8) []const u8{
+pub fn module_info(comptime name: []const u8, comptime attrib: u16, comptime major: u8, comptime minor: u8) []const u8 {
     @setEvalBranchQuota(10000);
     var buf: [3]u8 = undefined;
-    
+
     const maj = intToString(major, &buf) catch unreachable;
     buf = undefined;
     const min = intToString(minor, &buf) catch unreachable;
@@ -166,31 +167,32 @@ pub fn module_info(comptime name: []const u8, comptime attrib: u16 , comptime ma
     buf = undefined;
     const count = intToString(27 - name.len, &buf) catch unreachable;
 
-    return  (\\.section .rodata.sceModuleInfo, "a", @progbits
-            \\module_info:
-            \\.align 5
-            \\.hword 
-            ++ attr ++ "\n" ++
-            \\.byte 
-            ++ maj ++ "\n" ++ 
-            \\.byte 
-            ++ min ++ "\n" ++
-            \\.ascii "
-            ++ name ++ "\"\n" ++
-            \\.space 
-            ++ count ++ "\n" ++
-            \\.byte 0
-            \\.word _gp
-            \\.word __lib_ent_top
-            \\.word __lib_ent_bottom
-            \\.word __lib_stub_top
-            \\.word __lib_stub_bottom
-            );
+    return (
+        \\.section .rodata.sceModuleInfo, "a", @progbits
+        \\module_info:
+        \\.align 5
+        \\.hword 
+        ++ attr ++ "\n" ++
+        \\.byte 
+        ++ maj ++ "\n" ++
+        \\.byte 
+        ++ min ++ "\n" ++
+        \\.ascii "
+        ++ name ++ "\"\n" ++
+        \\.space 
+        ++ count ++ "\n" ++
+        \\.byte 0
+        \\.word _gp
+        \\.word __lib_ent_top
+        \\.word __lib_ent_bottom
+        \\.word __lib_stub_top
+        \\.word __lib_stub_bottom
+    );
 }
 
 const pspos = @import("../pspos.zig");
 //Entry point - launches main through the thread above.
 pub export fn module_start(argc: c_uint, argv: ?*c_void) c_int {
-    var thid : SceUID = sceKernelCreateThread("zig_user_main", _module_main_thread, 0x20, 256 * 1024, 0b10000000000000000100000000000000, 0);
+    var thid: SceUID = sceKernelCreateThread("zig_user_main", _module_main_thread, 0x20, 256 * 1024, 0b10000000000000000100000000000000, 0);
     return sceKernelStartThread(thid, argc, argv);
 }

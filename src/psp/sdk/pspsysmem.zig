@@ -18,9 +18,9 @@ pub const SceKernelSysMemAlloc_t = c_int;
 // @return The UID of the new block, or if less than 0 an error.
 pub extern fn sceKernelAllocPartitionMemory(partitionid: SceUID, name: [*c]const u8, typec: c_int, size: SceSize, addr: ?*c_void) SceUID;
 
-pub fn kernelAllocPartitionMemory(partitionid: SceUID, name: [*c]const u8, typec: c_int, size: SceSize, addr: ?*c_void) !SceUID{
+pub fn kernelAllocPartitionMemory(partitionid: SceUID, name: [*c]const u8, typec: c_int, size: SceSize, addr: ?*c_void) !SceUID {
     var res = sceKernelAllocPartitionMemory(partitionid, name, typec, size, addr);
-    if(res < 0){
+    if (res < 0) {
         return error.AllocationError;
     }
     return res;
@@ -40,7 +40,6 @@ pub extern fn sceKernelFreePartitionMemory(blockid: SceUID) c_int;
 // @return The lowest address belonging to the memory block.
 pub extern fn sceKernelGetBlockHeadAddr(blockid: SceUID) ?*c_void;
 
-
 // Get the total amount of free memory.
 //
 // @return The total amount of free memory, in bytes.
@@ -52,7 +51,7 @@ pub extern fn sceKernelTotalFreeMemSize() SceSize;
 pub extern fn sceKernelMaxFreeMemSize() SceSize;
 
 // Get the firmware version.
-// 
+//
 // @return The firmware version.
 // 0x01000300 on v1.00 unit,
 // 0x01050001 on v1.50 unit,
@@ -70,9 +69,9 @@ pub extern fn sceKernelDevkitVersion() c_int;
 //
 // @return 0 on success, < 0 on error.
 pub extern fn sceKernelSetCompiledSdkVersion(version: c_int) c_int;
-pub fn kernelSetCompiledSdkVersion(version: c_int) !void{
+pub fn kernelSetCompiledSdkVersion(version: c_int) !void {
     var res = sceKernelSetCompiledSdkVersion(version);
-    if(res < 0){
+    if (res < 0) {
         return error.Unexpected;
     }
 }
