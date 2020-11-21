@@ -105,6 +105,18 @@ pub fn print(text: []const u8) void {
     }
 }
 
+export fn pspDebugScreenInit() void {
+    screenInit();
+}
+
+export fn pspDebugScreenClear(color: u32) void {
+    screenClear(color);
+}
+
+export fn pspDebugScreenPrint(text: []const u8) void {
+    print(text);
+}
+
 const std = @import("std");
 
 //Print with formatting via the default PSP allocator
