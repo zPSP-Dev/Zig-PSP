@@ -12,7 +12,4 @@ pub fn main() !void {
     psp.utils.enableHBCB();
     psp.debug.screenInit();
     psp.debug.print("Hi!");
-
-    var f = try std.fs.cwd().openFile("hello.txt", .{ .write = true });
-    std.debug.warn("{}", .{f.isTty()});
 }
