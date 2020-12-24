@@ -3,6 +3,10 @@ usingnamespace @import("pspgutypes.zig");
 usingnamespace @import("psptypes.zig");
 usingnamespace @import("pspdisplay.zig");
 
+test "" {
+    @import("std").meta.refAllDecls(@This());
+}
+
 //Internals
 pub const GuCallback = ?fn (c_int) callconv(.C) void;
 
@@ -263,7 +267,7 @@ pub fn sceGuAlphaFunc(func: AlphaFunc, value: c_int, mask: c_int) void {
     var arg: c_int = @enumToInt(func) | ((value & 0xff) << 8) | ((mask & 0xff) << 16);
     sendCommandi(219, arg);
 }
-pub fn sceGuAmbient(col: c_int) void {
+pub fn sceGuAmbient(col: u32) void {
     @setRuntimeSafety(false);
     sendCommandi(92, (col & 0xffffff));
     sendCommandi(93, (col >> 24));
@@ -342,9 +346,9 @@ pub fn sceGuClutLoad(num_blocks: c_int, cbp: ?*const c_void) void {
     sendCommandi(196, num_blocks);
 }
 
-pub fn sceGuClutMode(cpsm: c_int, shift: c_int, mask: c_int, a3: c_int) void {
+pub fn sceGuClutMode(cpsm: GuPixelMode, shift: c_int, mask: c_int, a3: c_int) void {
     @setRuntimeSafety(false);
-    var argument: c_int = (cpsm) | (shift << 2) | (mask << 8) | (a3 << 16);
+    var argument: c_int = @enumToInt(cpsm) | (shift << 2) | (mask << 8) | (a3 << 16);
     sendCommandi(197, argument);
 }
 
@@ -367,9 +371,9 @@ pub fn sceGuMaterial(mode: c_int, col: c_int) void {
         sendCommandi(87, col & 0xffffff);
 }
 
-pub fn sceGuColorFunc(func: c_int, color: c_int, mask: c_int) void {
+pub fn sceGuColorFunc(func: ColorFunc, color: c_int, mask: c_int) void {
     @setRuntimeSafety(false);
-    sendCommandi(216, func & 0x03);
+    sendCommandi(216, @enumToInt(func) & 0x03);
     sendCommandi(217, color & 0xffffff);
     sendCommandi(218, mask);
 }
@@ -379,7 +383,7 @@ pub fn sceGuColorMaterial(components: c_int) void {
     sendCommandi(83, components);
 }
 
-pub fn sceGuCopyImage(psm: c_int, sx: c_int, sy: c_int, width: c_int, height: c_int, srcw: c_int, src: ?*c_void, dx: c_int, dy: c_int, destw: c_int, dest: ?*c_void) void {
+pub fn sceGuCopyImage(psm: GuPixelMode, sx: c_int, sy: c_int, width: c_int, height: c_int, srcw: c_int, src: ?*c_void, dx: c_int, dy: c_int, destw: c_int, dest: ?*c_void) void {
     @setRuntimeSafety(false);
     var sr = @intCast(c_uint, @ptrToInt(src));
     var ds = @intCast(c_uint, @ptrToInt(dest));
@@ -390,7 +394,7 @@ pub fn sceGuCopyImage(psm: c_int, sx: c_int, sy: c_int, width: c_int, height: c_
     sendCommandi(181, @intCast(c_int, (((ds) & 0xff000000) >> 8)) | destw);
     sendCommandi(236, (dy << 10) | dx);
     sendCommandi(238, ((height - 1) << 10) | (width - 1));
-    if (psm ^ 0x03 != 0) {
+    if (@enumToInt(psm) ^ 0x03 != 0) {
         sendCommandi(234, 0);
     } else {
         sendCommandi(234, 1);
@@ -556,7 +560,7 @@ pub fn sceGuDisplay(state: bool) void {
     gu_display_on = @boolToInt(state);
 }
 
-pub fn sceGuDrawArray(prim: c_int, vtype: c_int, count: c_int, indices: ?*const c_void, vertices: ?*const c_void) void {
+pub fn sceGuDrawArray(prim: GuPrimitive, vtype: c_int, count: c_int, indices: ?*const c_void, vertices: ?*const c_void) void {
     @setRuntimeSafety(false);
     if (vtype != 0)
         sendCommandi(18, vtype);
@@ -570,10 +574,10 @@ pub fn sceGuDrawArray(prim: c_int, vtype: c_int, count: c_int, indices: ?*const 
         sendCommandi(16, @intCast(c_int, (@ptrToInt(vertices) >> 8)) & 0xf0000);
         sendCommandi(1, @intCast(c_int, @ptrToInt(vertices)) & 0xffffff);
     }
-    sendCommandiStall(4, (prim << 16) | count);
+    sendCommandiStall(4, (@enumToInt(prim) << 16) | count);
 }
 
-pub fn sceGuDrawArrayN(primitive_type: c_int, vertex_type: c_int, count: c_int, a3: c_int, indices: ?*const c_void, vertices: ?*const c_void) void {
+pub fn sceGuDrawArrayN(primitive_type: GuPrimitive, vertex_type: c_int, count: c_int, a3: c_int, indices: ?*const c_void, vertices: ?*const c_void) void {
     @setRuntimeSafety(false);
     if (vertex_type != 0)
         sendCommandi(18, vertex_type);
@@ -591,9 +595,9 @@ pub fn sceGuDrawArrayN(primitive_type: c_int, vertex_type: c_int, count: c_int, 
     if (a3 > 0) {
         var i: usize = @intCast(usize, a3) - 1;
         while (i >= 0) : (i -= 1) {
-            sendCommandi(4, (primitive_type << 16) | count);
+            sendCommandi(4, (@enumToInt(primitive_type) << 16) | count);
         }
-        sendCommandiStall(4, (primitive_type << 16) | count);
+        sendCommandiStall(4, (@enumToInt(primitive_type) << 16) | count);
     }
 }
 
@@ -636,9 +640,9 @@ pub fn sceGuDrawBuffer(pix: GuPixelMode, fbp: ?*c_void, fbw: c_int) void {
     sendCommandi(159, @intCast(c_int, ((@intCast(c_uint, @ptrToInt(gu_draw_buffer.depth_buffer)) & 0xff000000) >> 8)) | gu_draw_buffer.depth_width);
 }
 
-pub fn sceGuDrawBufferList(psm: c_int, fbp: ?*c_void, fbw: c_int) void {
+pub fn sceGuDrawBufferList(psm: GuPixelMode, fbp: ?*c_void, fbw: c_int) void {
     @setRuntimeSafety(false);
-    sendCommandi(210, psm);
+    sendCommandi(210, @enumToInt(psm));
     sendCommandi(156, @intCast(c_int, @ptrToInt(fbp)) & 0xffffff);
     sendCommandi(157, @intCast(c_int, (@intCast(c_uint, @ptrToInt(fbp)) & 0xff000000) >> 8) | fbw);
 }
@@ -856,13 +860,13 @@ pub fn sceGuGetAllStatus() c_int {
     return gu_states;
 }
 
-pub fn sceGuGetStatus(state: c_int) c_int {
+pub fn sceGuGetStatus(state: GuState) c_int {
     if (state < 22)
-        return (gu_states >> @intCast(u5, state)) & 1;
+        return (@enumToInt(gu_states) >> @intCast(u5, state)) & 1;
     return 0;
 }
 
-pub fn sceGuLight(light: usize, typec: c_int, components: c_int, position: [*c]const ScePspFVector3) void {
+pub fn sceGuLight(light: c_int, typec: GuLightType, components: GuLightBitFlags, position: [*c]const ScePspFVector3) void {
     @setRuntimeSafety(false);
 
     sendCommandf(light_settings[light].xpos, position.*.x);
@@ -870,8 +874,8 @@ pub fn sceGuLight(light: usize, typec: c_int, components: c_int, position: [*c]c
     sendCommandf(light_settings[light].zpos, position.*.z);
 
     var kind: c_int = 2;
-    if (components != 8) {
-        if ((components ^ 6) < 1) {
+    if (@enumToInt(components) != 8) {
+        if ((@enumToInt(components) ^ 6) < 1) {
             kind = 1;
         } else {
             kind = 0;
@@ -888,9 +892,9 @@ pub fn sceGuLightAtt(light: usize, atten0: f32, atten1: f32, atten2: f32) void {
     sendCommandf(light_settings[light].quadratic, atten2);
 }
 
-pub fn sceGuLightColor(light: usize, component: c_int, col: c_int) void {
+pub fn sceGuLightColor(light: usize, component: GuLightBitFlags, col: c_int) void {
     @setRuntimeSafety(false);
-    switch (@intToEnum(LightBitFlags, component)) {
+    switch (@intToEnum(GuLightBitFlags, component)) {
         .Ambient => {
             sendCommandi(light_settings[light].ambient, col & 0xffffff);
         },
@@ -926,9 +930,9 @@ pub fn sceGuLightSpot(light: usize, direction: [*c]const ScePspFVector3, exponen
     sendCommandf(light_settings[light].zdir, direction.*.z);
 }
 
-pub fn sceGuLogicalOp(op: c_int) void {
+pub fn sceGuLogicalOp(op: GuLogicalOperation) void {
     @setRuntimeSafety(false);
-    sendCommandi(230, op & 0x0f);
+    sendCommandi(230, @enumToInt(op) & 0x0f);
 }
 
 pub fn sceGuModelColor(emissive: c_int, ambient: c_int, diffuse: c_int, specular: c_int) void {
@@ -960,9 +964,9 @@ pub fn sceGuPatchFrontFace(a0: c_int) void {
     sendCommandi(56, a0);
 }
 
-pub fn sceGuPatchPrim(prim: c_int) void {
+pub fn sceGuPatchPrim(prim: GuPrimitive) void {
     @setRuntimeSafety(false);
-    switch (@intToEnum(GuPrimitive, prim)) {
+    switch (prim) {
         .Points => {
             sendCommandi(55, 2);
         },
@@ -1122,12 +1126,12 @@ pub fn sceGuSetMatrix(typec: c_int, matrix: [*c]ScePspFMatrix4) void {
     }
 }
 
-pub fn sceGuSetStatus(state: c_int, status: c_int) void {
+pub fn sceGuSetStatus(state: GuState, status: bool) void {
     @setRuntimeSafety(false);
-    if (status != 0) {
-        sceGuEnable(state);
+    if (status) {
+        sceGuEnable(@enumToInt(state));
     } else {
-        sceGuDisable(state);
+        sceGuDisable(@enumToInt(state));
     }
 }
 
@@ -1140,9 +1144,9 @@ pub fn sceGuShadeModel(mode: ShadeModel) void {
     }
 }
 
-pub fn sceGuSignal(signal: c_int, behavior: c_int) void {
+pub fn sceGuSignal(signal: c_int, behavior: GuSignalBehavior) void {
     @setRuntimeSafety(false);
-    sendCommandi(14, ((signal & 0xff) << 16) | (behavior & 0xffff));
+    sendCommandi(14, ((signal & 0xff) << 16) | (@enumToInt(behavior) & 0xffff));
     sendCommandi(12, 0);
 
     if (signal == 3) {
@@ -1269,7 +1273,7 @@ pub fn sceGuTexImage(mipmap: c_int, width: c_int, height: c_int, tbw: c_int, tbp
     sceGuTexFlush();
 }
 
-pub fn sceGuTexLevelMode(mode: c_int, bias: f32) void {
+pub fn sceGuTexLevelMode(mode: TextureLevelMode, bias: f32) void {
     @setRuntimeSafety(false);
     var offset: c_int = @floatToInt(c_int, bias * 16.0);
 
@@ -1278,7 +1282,7 @@ pub fn sceGuTexLevelMode(mode: c_int, bias: f32) void {
     } else if (offset < -128) {
         offset = -128;
     }
-    sendCommandi(200, ((offset) << 16) | mode);
+    sendCommandi(200, ((offset) << 16) | @enumToInt(mode));
 }
 
 pub fn sceGuTexMapMode(mode: c_int, a1: c_int, a2: c_int) void {
@@ -1419,7 +1423,7 @@ pub fn sceGuStart(cont: GuContextType, list: ?*c_void) void {
 
         sceGuSetDither(@ptrCast(*ScePspIMatrix4, &dither_matrix));
         sceGuPatchDivide(16, 16);
-        sceGuColorMaterial(@enumToInt(LightBitFlags.Ambient) | @enumToInt(LightBitFlags.Diffuse) | @enumToInt(LightBitFlags.Specular));
+        sceGuColorMaterial(@enumToInt(GuLightBitFlags.Ambient) | @enumToInt(GuLightBitFlags.Diffuse) | @enumToInt(GuLightBitFlags.Specular));
 
         sceGuSpecular(1.0);
         sceGuTexScale(1.0, 1.0);
@@ -1481,7 +1485,7 @@ pub fn sceGuClear(flags: c_int) void {
     }
 
     sendCommandi(211, ((flags & (@enumToInt(ClearBitFlags.ColorBuffer) | @enumToInt(ClearBitFlags.StencilBuffer) | @enumToInt(ClearBitFlags.DepthBuffer))) << 8) | 0x01);
-    sceGuDrawArray(@enumToInt(GuPrimitive.Sprites), @enumToInt(VertexTypeFlags.Color8888) | @enumToInt(VertexTypeFlags.Vertex16Bit) | @enumToInt(VertexTypeFlags.Transform2D), @intCast(c_int, count), null, vertices);
+    sceGuDrawArray(GuPrimitive.Sprites, @enumToInt(VertexTypeFlags.Color8888) | @enumToInt(VertexTypeFlags.Vertex16Bit) | @enumToInt(VertexTypeFlags.Transform2D), @intCast(c_int, count), null, vertices);
     sendCommandi(211, 0);
 }
 

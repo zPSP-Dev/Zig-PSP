@@ -72,7 +72,7 @@ pub const ShadeModel = extern enum(c_int) {
     Smooth = 1,
 };
 
-pub const LogicalOperation = extern enum(c_int) {
+pub const GuLogicalOperation = extern enum(c_int) {
     Clear = 0,
     And = 1,
     AndReverse = 2,
@@ -101,8 +101,8 @@ pub const TextureFilter = extern enum(c_int) {
 };
 
 pub const TextureMapMode = extern enum(c_int) {
-    TextureCoords = 0,
-    TextureMatrix = 1,
+    Coords = 0,
+    Matrix = 1,
     EnvironmentMap = 2,
 };
 
@@ -228,7 +228,7 @@ pub const LightMode = extern enum(c_int) {
     SeparateSpecularColor = 1,
 };
 
-pub const LightType = extern enum(c_int) {
+pub const GuLightType = extern enum(c_int) {
     Directional = 0,
     Pointlight = 1,
     Spotlight = 2,
@@ -263,7 +263,7 @@ pub const GuCallbackId = extern enum(c_int) {
     Finish = 4,
 };
 
-pub const SignalBehavior = extern enum(c_int) {
+pub const GuSignalBehavior = extern enum(c_int) {
     Suspend = 1,
     Continue = 2,
 };
@@ -274,7 +274,7 @@ pub const ClearBitFlags = extern enum(c_int) {
     DepthBuffer = 4,
 };
 
-pub const LightBitFlags = extern enum(c_int) {
+pub const GuLightBitFlags = extern enum(c_int) {
     Ambient = 1,
     Diffuse = 2,
     AmbientDiffuse = 3,

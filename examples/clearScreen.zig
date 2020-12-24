@@ -15,24 +15,24 @@ pub fn main() !void {
     var zbp = psp.vram.allocVramRelative(psp.SCR_BUF_WIDTH, psp.SCREEN_HEIGHT, psp.GuPixelMode.Psm4444);
 
     psp.sceGuInit();
-    psp.sceGuStart(@enumToInt(psp.GuContextType.Direct), @ptrCast(*c_void, &display_list));
-    psp.sceGuDrawBuffer(@enumToInt(psp.GuPixelMode.Psm8888), fbp0, psp.SCR_BUF_WIDTH);
+    psp.sceGuStart(psp.GuContextType.Direct, @ptrCast(*c_void, &display_list));
+    psp.sceGuDrawBuffer(psp.GuPixelMode.Psm8888, fbp0, psp.SCR_BUF_WIDTH);
     psp.sceGuDispBuffer(psp.SCREEN_WIDTH, psp.SCREEN_HEIGHT, fbp1, psp.SCR_BUF_WIDTH);
     psp.sceGuDepthBuffer(zbp, psp.SCR_BUF_WIDTH);
     psp.sceGuOffset(2048 - (psp.SCREEN_WIDTH/2), 2048 - (psp.SCREEN_HEIGHT/2));
     psp.sceGuViewport(2048, 2048, psp.SCREEN_WIDTH, psp.SCREEN_HEIGHT);
     psp.sceGuDepthRange(65535, 0);
     psp.sceGuScissor(0, 0, psp.SCREEN_WIDTH, psp.SCREEN_HEIGHT);
-    psp.sceGuEnable(@enumToInt(psp.GuState.ScissorTest));
+    psp.sceGuEnable(psp.GuState.ScissorTest);
     
     _ = psp.sceGuFinish();
-    _ = psp.sceGuSync(@enumToInt(psp.GuSyncMode.Finish), @enumToInt(psp.GuSyncBehavior.Wait));
+    _ = psp.sceGuSync(psp.GuSyncMode.Finish, psp.GuSyncBehavior.Wait);
     _ = psp.sceDisplayWaitVblankStart();
-    _ = psp.sceGuDisplay(1);
+    _ = psp.sceGuDisplay(true);
 
     var i : u32 = 0;
     while(true) : (i += 1) {
-        psp.sceGuStart(@enumToInt(psp.GuContextType.Direct), @ptrCast(*c_void, &display_list));
+        psp.sceGuStart(psp.GuContextType.Direct, @ptrCast(*c_void, &display_list));
         
         psp.sceGuClearColor(psp.rgba(0xFF, 0xFF, 0, 0xFF));
         psp.sceGuClearDepth(0);
@@ -44,7 +44,7 @@ pub fn main() !void {
         
 
         _ = psp.sceGuFinish();
-        _ = psp.sceGuSync(@enumToInt(psp.GuSyncMode.Finish), @enumToInt(psp.GuSyncBehavior.Wait));
+        _ = psp.sceGuSync(psp.GuSyncMode.Finish, psp.GuSyncBehavior.Wait);
         _ = psp.sceDisplayWaitVblankStart();
         _ = psp.sceGuSwapBuffers();
     }
