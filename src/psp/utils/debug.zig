@@ -110,11 +110,12 @@ export fn pspDebugScreenInit() void {
 }
 
 export fn pspDebugScreenClear(color: u32) void {
-    screenClear(color);
+    screenSetClearColor(color);
+    screenClear();
 }
 
-export fn pspDebugScreenPrint(text: []const u8) void {
-    print(text);
+export fn pspDebugScreenPrint(text: [*c]const u8) void {
+    print(std.mem.spanZ(text));
 }
 
 const std = @import("std");
