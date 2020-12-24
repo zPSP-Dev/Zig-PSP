@@ -202,15 +202,11 @@ pub const BlendOp = extern enum(c_int) {
     Abs = 5,
 };
 
-pub const BlendSrc = extern enum(c_int) {
+pub const BlendArg = extern enum(c_int) {
     SrcColor = 0,
     OneMinusSrcColor = 1,
     SrcAlpha = 2,
     OneMinusSrcAlpha = 3,
-    Fix = 10,
-};
-
-pub const BlendDst = extern enum(c_int) {
     DstColor = 0,
     OneMinusDstColor = 1,
     DstAlpha = 4,

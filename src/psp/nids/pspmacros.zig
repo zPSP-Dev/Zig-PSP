@@ -125,7 +125,7 @@ pub fn generic_abi_wrapper(comptime funcname: []const u8, comptime argc: u8) []c
         //Preserve return
         \\sw    $ra,0($sp)  
         \\jal 
-         //Call the alias
+        //Call the alias
         ++ funcname ++ "_stub\n" ++ "\n" ++
         //Set correct return address
         \\lw    $ra, 0($sp) 
