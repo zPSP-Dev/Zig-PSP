@@ -25,10 +25,10 @@ pub fn main() !void {
     psp.sceGuScissor(0, 0, psp.SCREEN_WIDTH, psp.SCREEN_HEIGHT);
     psp.sceGuEnable(psp.GuState.ScissorTest);
     
-    _ = psp.sceGuFinish();
-    _ = psp.sceGuSync(psp.GuSyncMode.Finish, psp.GuSyncBehavior.Wait);
-    _ = psp.sceDisplayWaitVblankStart();
-    _ = psp.sceGuDisplay(true);
+    psp.guFinish();
+    psp.guSync(psp.GuSyncMode.Finish, psp.GuSyncBehavior.Wait);
+    psp.displayWaitVblankStart();
+    psp.sceGuDisplay(true);
 
     var i : u32 = 0;
     while(true) : (i += 1) {
@@ -43,9 +43,9 @@ pub fn main() !void {
         
         
 
-        _ = psp.sceGuFinish();
-        _ = psp.sceGuSync(psp.GuSyncMode.Finish, psp.GuSyncBehavior.Wait);
-        _ = psp.sceDisplayWaitVblankStart();
-        _ = psp.sceGuSwapBuffers();
+        psp.guFinish();
+        psp.guSync(psp.GuSyncMode.Finish, psp.GuSyncBehavior.Wait);
+        psp.displayWaitVblankStart();
+        psp.sceGuSwapBuffers();
     }
 }

@@ -1190,6 +1190,10 @@ pub fn sceGuSwapBuffers() ?*c_void {
     return gu_draw_buffer.frame_buffer;
 }
 
+pub fn guSwapBuffers() void {
+    _ = sceGuSwapBuffers();
+}
+
 pub fn guSwapBuffersBehaviour(behaviour: c_int) void {
     @setRuntimeSafety(false);
     gu_settings.swapBuffersBehaviour = behaviour;
@@ -1215,6 +1219,9 @@ pub fn sceGuSync(mode: GuSyncMode, what: GuSyncBehavior) c_int {
             return 0;
         },
     }
+}
+pub fn guSync(mode: GuSyncMode, what: GuSyncBehavior) void {
+    _ = sceGuSync(mode, what);
 }
 
 pub fn sceGuTerm() void {

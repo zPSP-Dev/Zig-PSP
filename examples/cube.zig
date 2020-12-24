@@ -82,10 +82,10 @@ pub fn main() !void {
     psp.sceGuDisable(psp.GuState.ClipPlanes);
     psp.sceGuEnable(psp.GuState.Texture2D);
 
-    _ = psp.sceGuFinish();
-    _ = psp.sceGuSync(psp.GuSyncMode.Finish, psp.GuSyncBehavior.Wait);
-    _ = psp.sceDisplayWaitVblankStart();
-    _ = psp.sceGuDisplay(true);
+    psp.guFinish();
+    psp.guSync(psp.GuSyncMode.Finish, psp.GuSyncBehavior.Wait);
+    psp.displayWaitVblankStart();
+    psp.sceGuDisplay(true);
 
     var i: u32 = 0;
     while (true) : (i += 1) {
@@ -124,10 +124,10 @@ pub fn main() !void {
 
         psp.sceGumDrawArray(psp.GuPrimitive.Triangles, @enumToInt(psp.VertexTypeFlags.Texture32Bitf) | @enumToInt(psp.VertexTypeFlags.Color8888) | @enumToInt(psp.VertexTypeFlags.Vertex32Bitf) | @enumToInt(psp.VertexTypeFlags.Transform3D), 12 * 3, null, @ptrCast(*c_void, &vertices));
 
-        _ = psp.sceGuFinish();
-        _ = psp.sceGuSync(psp.GuSyncMode.Finish, psp.GuSyncBehavior.Wait);
-        _ = psp.sceDisplayWaitVblankStart();
-        _ = psp.sceGuSwapBuffers();
+        psp.guFinish();
+        psp.guSync(psp.GuSyncMode.Finish, psp.GuSyncBehavior.Wait);
+        psp.displayWaitVblankStart();
+        psp.guSwapBuffers();
     }
 }
 
