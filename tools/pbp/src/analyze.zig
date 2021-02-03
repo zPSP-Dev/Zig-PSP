@@ -54,17 +54,17 @@ pub fn analyzePBP() !void {
         }
 
         if(calcSize == 0){
-            std.debug.warn("\t{}: \tNOT PRESENT\n", .{default_file_names[i]});
+            std.debug.warn("\t{s}: \tNOT PRESENT\n", .{default_file_names[i]});
         }else{
-            std.debug.warn("\t{}: \tOFFSET {} \t SIZE {}\n", .{default_file_names[i], header.offset[i], calcSize});
+            std.debug.warn("\t{s}: \tOFFSET {} \t SIZE {}\n", .{default_file_names[i], header.offset[i], calcSize});
         }
     }
     std.debug.warn("PBP Entry Table End\n\n", .{});
 
     //Read Version
     try inFile.seekTo(4);
-    var ver_maj = inFile.inStream().readIntNative(u16);
-    var ver_min = inFile.inStream().readIntNative(u16);
+    var ver_maj = inFile.reader().readIntNative(u16);
+    var ver_min = inFile.reader().readIntNative(u16);
 
     //Finish Print
     std.debug.warn("PBP Version: {}.{}\n", .{ver_maj, ver_min});

@@ -82,7 +82,7 @@ pub fn unpackPBP() !void {
                 var x : usize = 0;
                 while(x < buf.len) : (x += 1){
                     if(bytes_read < calcSize){
-                        try outputFile.outStream().writeByte(buf[x]);
+                        try outputFile.writer().writeByte(buf[x]);
                     }else{
                         break;
                     }
