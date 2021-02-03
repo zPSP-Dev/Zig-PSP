@@ -9,11 +9,11 @@ const fs = std.fs;
 fn validateHeader(file : fs.File) !SFOHeader {
     var sfoh : SFOHeader = undefined;
 
-    sfoh.magic = try file.inStream().readIntNative(u32);
-    sfoh.version = try file.inStream().readIntNative(u32);
-    sfoh.keyofs = try file.inStream().readIntNative(u32);
-    sfoh.valofs = try file.inStream().readIntNative(u32);
-    sfoh.count = try file.inStream().readIntNative(u32);
+    sfoh.magic = try file.reader().readIntNative(u32);
+    sfoh.version = try file.reader().readIntNative(u32);
+    sfoh.keyofs = try file.reader().readIntNative(u32);
+    sfoh.valofs = try file.reader().readIntNative(u32);
+    sfoh.count = try file.reader().readIntNative(u32);
     if(sfoh.magic != PSF_MAGIC_NUM){
         return error.BadMagic;
     }
@@ -64,12 +64,12 @@ pub fn readSFO() !void {
     var i : usize = 0;
     std.debug.warn("\nSFO Header: \tOFF\tALN\tTYPE\tVALS\tTOTS\tDATO\n", .{});
     while(i < header.count) : (i += 1){
-        entries[i].nameofs = try inFile.inStream().readIntNative(u16);
-        entries[i].alignment = try inFile.inStream().readIntNative(u8);
-        entries[i].typec = try inFile.inStream().readIntNative(u8);
-        entries[i].valsize = try inFile.inStream().readIntNative(u32);
-        entries[i].totalsize = try inFile.inStream().readIntNative(u32);
-        entries[i].dataofs = try inFile.inStream().readIntNative(u32);
+        entries[i].nameofs = try inFile.reader().readIntNative(u16);
+        entries[i].alignment = try inFile.reader().readIntNative(u8);
+        entries[i].typec = try inFile.reader().readIntNative(u8);
+        entries[i].valsize = try inFile.reader().readIntNative(u32);
+        entries[i].totalsize = try inFile.reader().readIntNative(u32);
+        entries[i].dataofs = try inFile.reader().readIntNative(u32);
         
         std.debug.warn("SFO Entry {}: \t{}\t{}\t{}\t{}\t{}\t{}\n", .{i, entries[i].nameofs, entries[i].alignment, entries[i].typec, entries[i].valsize, entries[i].totalsize, entries[i].dataofs});
     }
@@ -91,19 +91,19 @@ pub fn readSFO() !void {
         }
 
         //Read the key
-        _ = try inFile.inStream().read(nameStr[0..size]);
+        _ = try inFile.reader().read(nameStr[0..size]);
         std.debug.warn("Pair {}: {} = ", .{i, nameStr[0..size]});
 
         //Go to the data table
         try inFile.seekTo(entries[i].dataofs + header.valofs);
         if(entries[i].typec == PSP_TYPE_VAL){
             //Read a value
-            var val = try inFile.inStream().readIntNative(u32);
+            var val = try inFile.reader().readIntNative(u32);
             std.debug.warn("{}\n", .{val});
         }else{
             //Read a string
             var str : [32]u8 = undefined;
-            _ = try inFile.inStream().read(str[0..entries[i].valsize]);
+            _ = try inFile.reader().read(str[0..entries[i].valsize]);
             std.debug.warn("\"{}\"\n", .{str[0..entries[i].valsize]});
         }
 

@@ -98,7 +98,7 @@ pub fn parseSFO() !void {
 
     //Parse json
     var buf: [std.mem.page_size]u8 = undefined;
-    const fileSize = try inFile.inStream().readAll(buf[0..]);
+    const fileSize = try inFile.reader().readAll(buf[0..]);
     const filestr = buf[0..fileSize];
 
     const options = std.json.ParseOptions{ .allocator = allocator };
