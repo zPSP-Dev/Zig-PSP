@@ -29,7 +29,7 @@ pub var default_file_names : [8][]const u8 =  [8][]const u8{
 pub fn readHeader(file: fs.File) !PbpHeader {
     var header : PbpHeader = undefined;
 
-    var instream = file.inStream();
+    var instream = file.reader();
 
     var bytes_read = try instream.read(header.signature[0..]);
     

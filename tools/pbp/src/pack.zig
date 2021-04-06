@@ -21,7 +21,7 @@ var header = PbpHeader{
 fn writeHeader(file: fs.File) !void {
 
     //Get the output stream
-    var outputStream = file.outStream();
+    var outputStream = file.writer();
 
     //Write the signature
     var x : usize = 0;
@@ -108,7 +108,7 @@ pub fn packPBP() !void {
         header.offset[i] = @truncate(u32, header.offset[i - 1] + filesizes[i - 1]);
 
         if(filesizes[i - 1] != 0){
-            std.debug.warn("\tEntry: {} Added at {} offset.\t\t\t(Size {} bytes)\n", .{fileNames[i - 1], header.offset[i - 1], filesizes[i - 1]});   
+            std.debug.warn("\tEntry: {s} Added at {} offset.\t\t\t(Size {} bytes)\n", .{fileNames[i - 1], header.offset[i - 1], filesizes[i - 1]});
         }
     }
     std.debug.warn("PBP Entry Table End\n\n", .{});
@@ -143,7 +143,7 @@ pub fn packPBP() !void {
             //Write it now
             var x : usize = 0;
             while(x < bytes_read) : (x += 1){
-                try outputFile.outStream().writeByte(buf[x]);
+                try outputFile.writer().writeByte(buf[x]);
             }
 
             //Get the next bytes
@@ -151,5 +151,5 @@ pub fn packPBP() !void {
         }
     }
 
-    std.debug.warn("Saved to {}! (Wrote {} bytes)\n",.{outputName, header.offset[7] + filesizes[7]});
+    std.debug.warn("Saved to {s}! (Wrote {} bytes)\n",.{outputName, header.offset[7] + filesizes[7]});
 }
