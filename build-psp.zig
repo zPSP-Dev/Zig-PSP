@@ -1,7 +1,7 @@
 const Builder = @import("std").build.Builder;
 const z = @import("std").zig;
 const std = @import("std");
-const builtin = @import("builtin");
+const builtin = std.builtin;
 
 pub const PSPBuildInfo = struct{
     //SDK Path
