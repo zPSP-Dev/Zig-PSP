@@ -58,7 +58,7 @@ pub fn unpackPBP() !void {
 
         //Make a file!
         if(calcSize != 0){
-            std.debug.warn("Creating {} with {} bytes... ", .{default_file_names[i], calcSize});
+            std.debug.warn("Creating {s} with {} bytes... ", .{default_file_names[i], calcSize});
 
             var result = try allocator.alloc(u8, dirName.len+default_file_names[i].len);
             defer allocator.free(result);

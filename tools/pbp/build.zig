@@ -1,9 +1,9 @@
 const Builder = @import("std").build.Builder;
-const builtin = @import("builtin");
+const std = @import("std");
 
 pub fn build(b: *Builder) void {
     const target = b.standardTargetOptions(.{});
-    const mode = builtin.Mode.ReleaseFast;
+    const mode = std.builtin.Mode.ReleaseFast;
 
     const exe = b.addExecutable("pbptool", "src/main.zig");
     exe.setTarget(target);
