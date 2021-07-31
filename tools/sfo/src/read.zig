@@ -92,7 +92,7 @@ pub fn readSFO() !void {
 
         //Read the key
         _ = try inFile.reader().read(nameStr[0..size]);
-        std.debug.warn("Pair {}: {} = ", .{i, nameStr[0..size]});
+        std.debug.warn("Pair {}: {s} = ", .{i, nameStr[0..size]});
 
         //Go to the data table
         try inFile.seekTo(entries[i].dataofs + header.valofs);
@@ -104,7 +104,7 @@ pub fn readSFO() !void {
             //Read a string
             var str : [32]u8 = undefined;
             _ = try inFile.reader().read(str[0..entries[i].valsize]);
-            std.debug.warn("\"{}\"\n", .{str[0..entries[i].valsize]});
+            std.debug.warn("\"{s}\"\n", .{str[0..entries[i].valsize]});
         }
 
     }

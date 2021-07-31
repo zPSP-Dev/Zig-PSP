@@ -122,7 +122,7 @@ pub fn parseSFO() !void {
         
         while(f < 9) : (f += 1){
             if(std.mem.eql(u8, gVals[f].name, r.properties[z].key)){
-                std.debug.warn("Overwriting {}!\n", .{r.properties[z].key});
+                std.debug.warn("Overwriting {s}!\n", .{r.properties[z].key});
                 gVals[f] = EntryContainer{
                     .name = r.properties[z].key,
                     .typec = val.?,
@@ -149,7 +149,7 @@ pub fn parseSFO() !void {
             i += 1;
             totalProps += 1;
         }else{
-            std.debug.warn("Invalid Key: {}!\nSkipping...\n", .{r.properties[z].key});
+            std.debug.warn("Invalid Key: {s}!\nSkipping...\n", .{r.properties[z].key});
             continue;
         }
     }
