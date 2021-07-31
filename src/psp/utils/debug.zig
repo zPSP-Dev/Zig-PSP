@@ -164,7 +164,7 @@ pub var pancakeMode: bool = false;
 
 //Panic handler
 //Import this in main to use!
-pub fn panic(message: []const u8, stack_trace: ?*builtin.StackTrace) noreturn {
+pub fn panic(message: []const u8, stack_trace: ?*std.builtin.StackTrace) noreturn {
     screenInit();
 
     if (pancakeMode) {
