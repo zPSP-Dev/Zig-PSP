@@ -11,22 +11,22 @@ var gum_stack_depth: [4][*]ScePspFMatrix4 = [_][*]ScePspFMatrix4{ @ptrCast([*]Sc
 
 var gum_matrix_stack: [4][32]ScePspFMatrix4 = undefined;
 
-pub fn sceGumDrawArray(prim: GuPrimitive, vtype: c_int, count: c_int, indices: ?*const c_void, vertices: ?*const c_void) void {
+pub fn sceGumDrawArray(prim: GuPrimitive, vtype: c_int, count: c_int, indices: ?*const anyopaque, vertices: ?*const anyopaque) void {
     sceGumUpdateMatrix();
     sceGuDrawArray(prim, vtype, count, indices, vertices);
 }
 
-pub fn sceGumDrawArrayN(prim: c_int, vtype: c_int, count: c_int, a3: c_int, indices: ?*const c_void, vertices: ?*const c_void) void {
+pub fn sceGumDrawArrayN(prim: c_int, vtype: c_int, count: c_int, a3: c_int, indices: ?*const anyopaque, vertices: ?*const anyopaque) void {
     sceGumUpdateMatrix();
     sceGuDrawArrayN(prim, vtype, count, a3, indices, vertices);
 }
 
-pub fn sceGumDrawBezier(vtype: c_int, ucount: c_int, vcount: c_int, indices: ?*const c_void, vertices: ?*const c_void) void {
+pub fn sceGumDrawBezier(vtype: c_int, ucount: c_int, vcount: c_int, indices: ?*const anyopaque, vertices: ?*const anyopaque) void {
     sceGumUpdateMatrix();
     sceGuDrawBezier(vtype, ucount, vcount, indices, vertices);
 }
 
-pub fn sceGumDrawSpline(vtype: c_int, ucount: c_int, vcount: c_int, uedge: c_int, vedge: c_int, indices: ?*const c_void, vertices: ?*const c_void) void {
+pub fn sceGumDrawSpline(vtype: c_int, ucount: c_int, vcount: c_int, uedge: c_int, vedge: c_int, indices: ?*const anyopaque, vertices: ?*const anyopaque) void {
     sceGumUpdateMatrix();
     sceGuDrawSpline(vtype, ucount, vcount, uedge, vedge, indices, vertices);
 }

@@ -62,7 +62,7 @@ pub fn write(fd: fd_t, ptr: [*]const u8, len: usize) i32 {
     return -1;
 }
 
-pub fn __pspOsInit(arg: ?*c_void) void {
+pub fn __pspOsInit(arg: ?*anyopaque) void {
     __psp_fdman_init();
     __psp_init_cwd(arg);
 }

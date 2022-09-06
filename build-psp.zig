@@ -1,7 +1,7 @@
 const Builder = @import("std").build.Builder;
 const z = @import("std").zig;
 const std = @import("std");
-const builtin = std.builtin;
+const builtin = @import("builtin");
 
 pub const PSPBuildInfo = struct{
     //SDK Path
@@ -36,7 +36,7 @@ pub fn build_psp(b: *Builder, comptime build_info: PSPBuildInfo) !void {
 
     //All of the release modes work
     //Debug Mode can cause issues with trap instructions - use ReleaseSafe for "Debug" builds
-    const mode = builtin.Mode.ReleaseSmall;
+    const mode = std.builtin.Mode.ReleaseSmall;
 
     //Build from your main file!
     const exe = b.addExecutable("main", build_info.src_file);
@@ -44,10 +44,11 @@ pub fn build_psp(b: *Builder, comptime build_info: PSPBuildInfo) !void {
     //Set mode & target
     exe.setTarget(target);
     exe.setBuildMode(mode);
-    exe.setLinkerScriptPath(build_info.path_to_sdk ++ "tools/linkfile.ld");
+    exe.setLinkerScriptPath(std.build.FileSource.relative(build_info.path_to_sdk ++ "tools/linkfile.ld"));
     exe.link_eh_frame_hdr = true;
     exe.link_emit_relocs = true;
-    exe.strip = true;
+    //exe.strip = true;
+    exe.use_stage1 = true;
     exe.single_threaded = true;
     exe.install();
     exe.setOutputDir("zig-cache/");
@@ -58,7 +59,7 @@ pub fn build_psp(b: *Builder, comptime build_info: PSPBuildInfo) !void {
     prx.setTarget(hostTarget);
     prx.addCSourceFile(build_info.path_to_sdk ++ "tools/prxgen/psp-prxgen.c", &[_][]const u8{"-std=c99", "-Wno-address-of-packed-member", "-D_CRT_SECURE_NO_WARNINGS"});
     prx.linkLibC();
-    prx.setBuildMode(builtin.Mode.ReleaseFast);
+    prx.setBuildMode(std.builtin.Mode.ReleaseFast);
     prx.setOutputDir(build_info.path_to_sdk ++ "tools/bin");
     prx.install();
     prx.step.dependOn(&exe.step);
@@ -73,7 +74,7 @@ pub fn build_psp(b: *Builder, comptime build_info: PSPBuildInfo) !void {
     //Build SFO
     const sfo = b.addExecutable("sfotool", build_info.path_to_sdk ++ "tools/sfo/src/main.zig");
     sfo.setTarget(hostTarget);
-    sfo.setBuildMode(builtin.Mode.ReleaseFast);
+    sfo.setBuildMode(std.builtin.Mode.ReleaseFast);
     sfo.setOutputDir(build_info.path_to_sdk ++ "tools/bin");
     sfo.install();
     sfo.step.dependOn(&generate_prx.step);
@@ -90,7 +91,7 @@ pub fn build_psp(b: *Builder, comptime build_info: PSPBuildInfo) !void {
     //Build PBP
     const PBP = b.addExecutable("pbptool", build_info.path_to_sdk ++ "tools/pbp/src/main.zig");
     PBP.setTarget(hostTarget);
-    PBP.setBuildMode(builtin.Mode.ReleaseFast);
+    PBP.setBuildMode(std.builtin.Mode.ReleaseFast);
     PBP.setOutputDir(build_info.path_to_sdk ++ "tools/bin");
     PBP.install();
     PBP.step.dependOn(&mk_sfo.step);

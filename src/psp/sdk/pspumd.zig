@@ -3,13 +3,13 @@ pub const PspUmdInfo = extern struct {
     typec: c_uint,
 };
 
-pub const PspUmdTypes = extern enum(c_int) {
+pub const PspUmdTypes = enum(c_int) {
     Game = 16,
     Video = 32,
     Audio = 64,
 };
 
-pub const PspUmdState = extern enum(c_int) {
+pub const PspUmdState = enum(c_int) {
     NotPresent = 1,
     Present = 2,
     Changed = 4,
@@ -18,7 +18,7 @@ pub const PspUmdState = extern enum(c_int) {
     Ready = 32,
 };
 
-pub const UmdDriveStat = extern enum(c_int) {
+pub const UmdDriveStat = enum(c_int) {
     WaitForDISC = 2,
     WaitForINIT = 32,
 };

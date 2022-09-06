@@ -1,6 +1,6 @@
 usingnamespace @import("psptypes.zig");
 
-pub const PSPPowerCB = extern enum(u32) {
+pub const PSPPowerCB = enum(u32) {
     Battpower = 0x0000007f,
     BatteryExist = 0x00000080,
     BatteryLow = 0x00000100,
@@ -13,7 +13,7 @@ pub const PSPPowerCB = extern enum(u32) {
     PowerSwitch = 0x80000000,
 };
 
-pub const PSPPowerTick = extern enum(u32) {
+pub const PSPPowerTick = enum(u32) {
     All = 0, Suspend = 1, Display = 6
 };
 

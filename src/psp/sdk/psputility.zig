@@ -10,19 +10,19 @@ pub const PspUtilityDialogCommon = extern struct {
     reserved: [4]c_int,
 };
 
-pub const PspUtilityMsgDialogMode = extern enum(c_int) {
+pub const PspUtilityMsgDialogMode = enum(c_int) {
     Error = 0,
     Text = 1,
     _,
 };
-const PspUtilityMsgDialogOption = extern enum(c_int) {
+const PspUtilityMsgDialogOption = enum(c_int) {
     Error = 0,
     Text = 1,
     YesNoButtons = 16,
     DefaultNo = 256,
 };
 
-pub const PspUtilityMsgDialogPressed = extern enum(c_int) {
+pub const PspUtilityMsgDialogPressed = enum(c_int) {
     Unknown1 = 0,
     Yes = 1,
     No = 2,
@@ -43,7 +43,7 @@ pub extern fn sceUtilityMsgDialogGetStatus() c_int;
 pub extern fn sceUtilityMsgDialogUpdate(n: c_int) void;
 pub extern fn sceUtilityMsgDialogAbort() c_int;
 
-pub const PspUtilityNetconfActions = extern enum(c_int) {
+pub const PspUtilityNetconfActions = enum(c_int) {
     ConnectAp,
     DisplayStatus,
     ConnectAdhoc,
@@ -73,11 +73,11 @@ const NetData = extern union {
 pub extern fn sceUtilityCheckNetParam(id: c_int) c_int;
 pub extern fn sceUtilityGetNetParam(conf: c_int, param: c_int, data: *NetData) c_int;
 pub extern fn sceUtilityCreateNetParam(conf: c_int) c_int;
-pub extern fn sceUtilitySetNetParam(param: c_int, val: ?*const c_void) c_int;
+pub extern fn sceUtilitySetNetParam(param: c_int, val: ?*const anyopaque) c_int;
 pub extern fn sceUtilityCopyNetParam(src: c_int, dest: c_int) c_int;
 pub extern fn sceUtilityDeleteNetParam(conf: c_int) c_int;
 
-const PspUtilitySavedataMode = extern enum(c_int) {
+const PspUtilitySavedataMode = enum(c_int) {
     Autoload = 0,
     Autosave = 1,
     Load = 2,
@@ -89,7 +89,7 @@ const PspUtilitySavedataMode = extern enum(c_int) {
     _,
 };
 
-const PspUtilitySavedataFocus = extern enum(c_int) {
+const PspUtilitySavedataFocus = enum(c_int) {
     Unknown = 0,
     FirstList = 1,
     LastList = 2,
@@ -111,7 +111,7 @@ pub const PspUtilitySavedataSFOParam = extern struct {
 };
 
 pub const PspUtilitySavedataFileData = extern struct {
-    buf: ?*c_void,
+    buf: ?*anyopaque,
     bufSize: SceSize,
     size: SceSize,
     unknown: c_int,
@@ -133,7 +133,7 @@ pub const SceUtilitySavedataParam = extern struct {
     saveNameList: [*c][20]u8,
     fileName: [13]u8,
     reserved1: [3]u8,
-    dataBuf: ?*c_void,
+    dataBuf: ?*anyopaque,
     dataBufSize: SceSize,
     dataSize: SceSize,
     sfoParam: PspUtilitySavedataSFOParam,
@@ -177,7 +177,7 @@ pub extern fn sceUtilityUnloadUsbModule(module: c_int) c_int;
 pub extern fn sceUtilityLoadModule(module: c_int) c_int;
 pub extern fn sceUtilityUnloadModule(module: c_int) c_int;
 
-pub const PspUtilityDialogState = extern enum(c_int) {
+pub const PspUtilityDialogState = enum(c_int) {
     None = 0,
     Init = 1,
     Visible = 2,
@@ -185,7 +185,7 @@ pub const PspUtilityDialogState = extern enum(c_int) {
     Finished = 4,
 };
 
-pub const SceUtilityOskInputType = extern enum(c_int) {
+pub const SceUtilityOskInputType = enum(c_int) {
     All = 0,
     LatinDigit = 1,
     LatinSymbol = 2,
@@ -205,7 +205,7 @@ pub const SceUtilityOskInputType = extern enum(c_int) {
     Url = 524288,
 };
 
-pub const SceUtilityOskInputLanguage = extern enum(c_int) {
+pub const SceUtilityOskInputLanguage = enum(c_int) {
     Default = 0,
     Japanese = 1,
     English = 2,
@@ -218,7 +218,7 @@ pub const SceUtilityOskInputLanguage = extern enum(c_int) {
     Russian = 9,
     Korean = 10,
 };
-pub const SceUtilityOskState = extern enum(c_int) {
+pub const SceUtilityOskState = enum(c_int) {
     None = 0,
     Initing = 1,
     Inited = 2,
@@ -226,38 +226,38 @@ pub const SceUtilityOskState = extern enum(c_int) {
     Quit = 4,
     Finished = 5,
 };
-pub const SceUtilityOskResult = extern enum(c_int) {
+pub const SceUtilityOskResult = enum(c_int) {
     Unchanged = 0,
     Cancelled = 1,
     Changed = 2,
 };
 
-pub const PspUtilityHtmlViewerDisconnectModes = extern enum(c_int) {
+pub const PspUtilityHtmlViewerDisconnectModes = enum(c_int) {
     Enable = 0,
     Disable = 1,
     Confirm = 2,
     _,
 };
-pub const PspUtilityHtmlViewerInterfaceModes = extern enum(c_int) {
+pub const PspUtilityHtmlViewerInterfaceModes = enum(c_int) {
     Full = 0,
     Limited = 1,
     None = 2,
     _,
 };
-pub const PspUtilityHtmlViewerCookieModes = extern enum(c_int) {
+pub const PspUtilityHtmlViewerCookieModes = enum(c_int) {
     Disabled = 0,
     Enabled = 1,
     Confirm = 2,
     Default = 3,
     _,
 };
-pub const PspUtilityGameSharingMode = extern enum(c_int) {
+pub const PspUtilityGameSharingMode = enum(c_int) {
     Single = 1,
     Multiple = 2,
     _,
 };
 
-pub const PspUtilityGameSharingDataType = extern enum(c_int) {
+pub const PspUtilityGameSharingDataType = enum(c_int) {
     File = 1,
     Memory = 2,
     _,
@@ -275,29 +275,29 @@ pub const PspUtilityGameSharingParams = extern struct {
     filepath: [*c]u8,
     mode: PspUtilityGameSharingMode,
     datatype: PspUtilityGameSharingDataType,
-    data: ?*c_void,
+    data: ?*anyopaque,
     datasize: c_uint,
 };
 
-pub const PspUtilityHtmlViewerTextSizes = extern enum(c_int) {
+pub const PspUtilityHtmlViewerTextSizes = enum(c_int) {
     Large = 0,
     Normal = 1,
     Small = 2,
     _,
 };
-pub const PspUtilityHtmlViewerDisplayModes = extern enum(c_int) {
+pub const PspUtilityHtmlViewerDisplayModes = enum(c_int) {
     Normal = 0,
     Fit = 1,
     SmartFit = 2,
     _,
 };
-pub const PspUtilityHtmlViewerConnectModes = extern enum(c_int) {
+pub const PspUtilityHtmlViewerConnectModes = enum(c_int) {
     Last = 0,
     ManualOnce = 1,
     ManualAll = 2,
     _,
 };
-pub const PspUtilityHtmlViewerOptions = extern enum(c_int) {
+pub const PspUtilityHtmlViewerOptions = enum(c_int) {
     OpenSceStartPage = 1,
     DisableStartupLimits = 2,
     DisableExitDialog = 4,
@@ -313,7 +313,7 @@ pub const PspUtilityHtmlViewerOptions = extern enum(c_int) {
 };
 pub const PspUtilityHtmlViewerParam = extern struct {
     base: PspUtilityDialogCommon,
-    memaddr: ?*c_void,
+    memaddr: ?*anyopaque,
     memsize: c_uint,
     unknown1: c_int,
     unknown2: c_int,
@@ -360,11 +360,11 @@ pub const SceUtilityOskParams = extern struct {
     unk_60: c_int,
 };
 
-pub const ModuleNet = extern enum(c_int) {
+pub const ModuleNet = enum(c_int) {
     Common = 1, Adhoc = 2, Inet = 3, Parseuri = 4, Parsehttp = 5, Http = 6, Ssl = 7
 };
 
-pub const ModuleUSB = extern enum(c_int) {
+pub const ModuleUSB = enum(c_int) {
     Pspcm = 1,
     Acc = 2,
     Mic = 3,
@@ -372,19 +372,19 @@ pub const ModuleUSB = extern enum(c_int) {
     Gps = 5,
 };
 
-pub const NetParam = extern enum(c_int) {
+pub const NetParam = enum(c_int) {
     Name = 0, Ssid = 1, Secure = 2, Wepkey = 3, IsStaticIp = 4, Ip = 5, Netmask = 6, Route = 7, ManualDns = 8, Primarydns = 9, Secondarydns = 10, ProxyUser = 11, ProxyPass = 12, UseProxy = 13, ProxyServer = 14, ProxyPort = 15, Unknown1 = 16, Unknown2 = 17
 };
 
-pub const SystemParamID = extern enum(c_int) {
+pub const SystemParamID = enum(c_int) {
     StringNickname = 1, IntAdhocChannel = 2, IntWlanPowersave = 3, IntDateFormat = 4, IntTimeFormat = 5, IntTimezone = 6, IntDaylightsavings = 7, IntLanguage = 8, IntUnknown = 9
 };
 
-pub const ModuleAV = extern enum(c_int) {
+pub const ModuleAV = enum(c_int) {
     Avcodec = 0, Sascore = 1, Atrac3plus = 2, Mpegbase = 3, Mp3 = 4, Vaudio = 5, Aac = 6, G729 = 7
 };
 
-pub const SystemParamLanguage = extern enum(c_int) {
+pub const SystemParamLanguage = enum(c_int) {
     Japanese = 0,
     English = 1,
     French = 2,
@@ -399,41 +399,41 @@ pub const SystemParamLanguage = extern enum(c_int) {
     ChineseSimplified = 11,
 };
 
-pub const SystemParamTime = extern enum(c_int) {
+pub const SystemParamTime = enum(c_int) {
     Format24Hr = 0, Format12Hr = 1
 };
 
-pub const UtilityAccept = extern enum(c_int) {
+pub const UtilityAccept = enum(c_int) {
     Circle = 0, Cross = 1
 };
 
-pub const SystemParamAdhoc = extern enum(c_int) {
+pub const SystemParamAdhoc = enum(c_int) {
     ChannelAutomatic = 0,
     Channel1 = 1,
     Channel6 = 6,
     Channel11 = 11,
 };
 
-pub const NetParamError = extern enum(c_int) {
+pub const NetParamError = enum(c_int) {
     BadNetconf = 0x80110601, BadParam = 0x80110604
 };
 
-pub const SystemParamWlanPowerSave = extern enum(c_int) {
+pub const SystemParamWlanPowerSave = enum(c_int) {
     Off = 0, On = 1
 };
 
-pub const SystemParamDaylightSavings = extern enum(c_int) {
+pub const SystemParamDaylightSavings = enum(c_int) {
     Std = 0, Saving = 1
 };
 
-pub const SystemParamDateFormat = extern enum(c_int) {
+pub const SystemParamDateFormat = enum(c_int) {
     YYYYMMDD = 0, MMDDYYYY = 1, DDMMYYYY = 2
 };
 
-pub const SystemParamRetVal = extern enum(c_int) {
+pub const SystemParamRetVal = enum(c_int) {
     Ok = 0, Fail = 0x80110103
 };
 
-pub const ModuleNP = extern enum(c_int) {
+pub const ModuleNP = enum(c_int) {
     Common = 0x0400, Service = 0x0401, Matching2 = 0x0402, Drm = 0x0500, Irda = 0x0600
 };

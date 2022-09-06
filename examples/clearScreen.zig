@@ -15,7 +15,7 @@ pub fn main() !void {
     var zbp = psp.vram.allocVramRelative(psp.SCR_BUF_WIDTH, psp.SCREEN_HEIGHT, psp.GuPixelMode.Psm4444);
 
     psp.sceGuInit();
-    psp.sceGuStart(psp.GuContextType.Direct, @ptrCast(*c_void, &display_list));
+    psp.sceGuStart(psp.GuContextType.Direct, @ptrCast(*anyopaque, &display_list));
     psp.sceGuDrawBuffer(psp.GuPixelMode.Psm8888, fbp0, psp.SCR_BUF_WIDTH);
     psp.sceGuDispBuffer(psp.SCREEN_WIDTH, psp.SCREEN_HEIGHT, fbp1, psp.SCR_BUF_WIDTH);
     psp.sceGuDepthBuffer(zbp, psp.SCR_BUF_WIDTH);
@@ -32,7 +32,7 @@ pub fn main() !void {
 
     var i : u32 = 0;
     while(true) : (i += 1) {
-        psp.sceGuStart(psp.GuContextType.Direct, @ptrCast(*c_void, &display_list));
+        psp.sceGuStart(psp.GuContextType.Direct, @ptrCast(*anyopaque, &display_list));
         
         psp.sceGuClearColor(psp.rgba(0xFF, 0xFF, 0, 0xFF));
         psp.sceGuClearDepth(0);

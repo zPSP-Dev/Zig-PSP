@@ -6,7 +6,7 @@ pub const struct_SceKernelSysClock = extern struct {
 };
 pub const SceKernelSysClock = struct_SceKernelSysClock;
 
-pub const enum_PspThreadAttributes = extern enum(u32) {
+pub const enum_PspThreadAttributes = enum(u32) {
     PSP_THREAD_ATTR_VFPU = 16384,
     PSP_THREAD_ATTR_USER = 2147483648,
     PSP_THREAD_ATTR_USBWLAN = 2684354560,
@@ -16,7 +16,7 @@ pub const enum_PspThreadAttributes = extern enum(u32) {
     PSP_THREAD_ATTR_CLEAR_STACK = 2097152,
     _,
 };
-pub const SceKernelThreadEntry = ?fn (SceSize, ?*c_void) callconv(.C) c_int;
+pub const SceKernelThreadEntry = ?fn (SceSize, ?*anyopaque) callconv(.C) c_int;
 pub const struct_SceKernelThreadOptParam = extern struct {
     size: SceSize,
     stackMpid: SceUID,
@@ -28,9 +28,9 @@ pub const struct_SceKernelThreadInfo = extern struct {
     attr: SceUInt,
     status: c_int,
     entry: SceKernelThreadEntry,
-    stack: ?*c_void,
+    stack: ?*anyopaque,
     stackSize: c_int,
-    gpReg: ?*c_void,
+    gpReg: ?*anyopaque,
     initPriority: c_int,
     currentPriority: c_int,
     waitType: c_int,
@@ -56,7 +56,7 @@ pub const struct_SceKernelThreadRunStatus = extern struct {
     releaseCount: SceUInt,
 };
 pub const SceKernelThreadRunStatus = struct_SceKernelThreadRunStatus;
-pub const enum_PspThreadStatus = extern enum(c_int) {
+pub const enum_PspThreadStatus = enum(c_int) {
     PSP_THREAD_RUNNING = 1,
     PSP_THREAD_READY = 2,
     PSP_THREAD_WAITING = 4,
@@ -66,7 +66,7 @@ pub const enum_PspThreadStatus = extern enum(c_int) {
     _,
 };
 pub extern fn sceKernelDeleteThread(thid: SceUID) c_int;
-pub extern fn sceKernelStartThread(thid: SceUID, arglen: SceSize, argp: ?*c_void) c_int;
+pub extern fn sceKernelStartThread(thid: SceUID, arglen: SceSize, argp: ?*anyopaque) c_int;
 pub extern fn sceKernelExitThread(status: c_int) c_int;
 pub extern fn sceKernelExitDeleteThread(status: c_int) c_int;
 pub extern fn sceKernelTerminateThread(thid: SceUID) c_int;
@@ -130,11 +130,11 @@ pub const struct_SceKernelEventFlagOptParam = extern struct {
     size: SceSize,
 };
 pub const SceKernelEventFlagOptParam = struct_SceKernelEventFlagOptParam;
-pub const enum_PspEventFlagAttributes = extern enum(c_int) {
+pub const enum_PspEventFlagAttributes = enum(c_int) {
     PSP_EVENT_WAITMULTIPLE = 512,
     _,
 };
-pub const enum_PspEventFlagWaitTypes = extern enum(c_int) {
+pub const enum_PspEventFlagWaitTypes = enum(c_int) {
     PSP_EVENT_WAITAND = 0,
     PSP_EVENT_WAITOR = 1,
     PSP_EVENT_WAITCLEAR = 32,
@@ -158,7 +158,7 @@ pub const struct_SceKernelMbxInfo = extern struct {
     attr: SceUInt,
     numWaitThreads: c_int,
     numMessages: c_int,
-    firstMessage: ?*c_void,
+    firstMessage: ?*anyopaque,
 };
 pub const SceKernelMbxInfo = struct_SceKernelMbxInfo;
 pub const struct_SceKernelMsgPacket = extern struct {
@@ -169,43 +169,43 @@ pub const struct_SceKernelMsgPacket = extern struct {
 pub const SceKernelMsgPacket = struct_SceKernelMsgPacket;
 pub extern fn sceKernelCreateMbx(name: [*c]const u8, attr: SceUInt, option: [*c]SceKernelMbxOptParam) SceUID;
 pub extern fn sceKernelDeleteMbx(mbxid: SceUID) c_int;
-pub extern fn sceKernelSendMbx(mbxid: SceUID, message: ?*c_void) c_int;
-pub extern fn sceKernelReceiveMbx(mbxid: SceUID, pmessage: [*c]?*c_void, timeout: [*c]SceUInt) c_int;
-pub extern fn sceKernelReceiveMbxCB(mbxid: SceUID, pmessage: [*c]?*c_void, timeout: [*c]SceUInt) c_int;
-pub extern fn sceKernelPollMbx(mbxid: SceUID, pmessage: [*c]?*c_void) c_int;
+pub extern fn sceKernelSendMbx(mbxid: SceUID, message: ?*anyopaque) c_int;
+pub extern fn sceKernelReceiveMbx(mbxid: SceUID, pmessage: [*c]?*anyopaque, timeout: [*c]SceUInt) c_int;
+pub extern fn sceKernelReceiveMbxCB(mbxid: SceUID, pmessage: [*c]?*anyopaque, timeout: [*c]SceUInt) c_int;
+pub extern fn sceKernelPollMbx(mbxid: SceUID, pmessage: [*c]?*anyopaque) c_int;
 pub extern fn sceKernelCancelReceiveMbx(mbxid: SceUID, pnum: [*c]c_int) c_int;
 pub extern fn sceKernelReferMbxStatus(mbxid: SceUID, info: [*c]SceKernelMbxInfo) c_int;
-pub const SceKernelAlarmHandler = ?fn (?*c_void) callconv(.C) SceUInt;
+pub const SceKernelAlarmHandler = ?fn (?*anyopaque) callconv(.C) SceUInt;
 pub const struct_SceKernelAlarmInfo = extern struct {
     size: SceSize,
     schedule: SceKernelSysClock,
     handler: SceKernelAlarmHandler,
-    common: ?*c_void,
+    common: ?*anyopaque,
 };
 pub const SceKernelAlarmInfo = struct_SceKernelAlarmInfo;
-pub extern fn sceKernelSetAlarm(clock: SceUInt, handler: SceKernelAlarmHandler, common: ?*c_void) SceUID;
-pub extern fn sceKernelSetSysClockAlarm(clock: [*c]SceKernelSysClock, handler: SceKernelAlarmHandler, common: ?*c_void) SceUID;
+pub extern fn sceKernelSetAlarm(clock: SceUInt, handler: SceKernelAlarmHandler, common: ?*anyopaque) SceUID;
+pub extern fn sceKernelSetSysClockAlarm(clock: [*c]SceKernelSysClock, handler: SceKernelAlarmHandler, common: ?*anyopaque) SceUID;
 pub extern fn sceKernelCancelAlarm(alarmid: SceUID) c_int;
 pub extern fn sceKernelReferAlarmStatus(alarmid: SceUID, info: [*c]SceKernelAlarmInfo) c_int;
-pub const SceKernelCallbackFunction = ?fn (c_int, c_int, ?*c_void) callconv(.C) c_int;
+pub const SceKernelCallbackFunction = ?fn (c_int, c_int, ?*anyopaque) callconv(.C) c_int;
 pub const struct_SceKernelCallbackInfo = extern struct {
     size: SceSize,
     name: [32]u8,
     threadId: SceUID,
     callback: SceKernelCallbackFunction,
-    common: ?*c_void,
+    common: ?*anyopaque,
     notifyCount: c_int,
     notifyArg: c_int,
 };
 pub const SceKernelCallbackInfo = struct_SceKernelCallbackInfo;
-pub extern fn sceKernelCreateCallback(name: [*c]const u8, func: SceKernelCallbackFunction, arg: ?*c_void) c_int;
+pub extern fn sceKernelCreateCallback(name: [*c]const u8, func: SceKernelCallbackFunction, arg: ?*anyopaque) c_int;
 pub extern fn sceKernelReferCallbackStatus(cb: SceUID, status: [*c]SceKernelCallbackInfo) c_int;
 pub extern fn sceKernelDeleteCallback(cb: SceUID) c_int;
 pub extern fn sceKernelNotifyCallback(cb: SceUID, arg2: c_int) c_int;
 pub extern fn sceKernelCancelCallback(cb: SceUID) c_int;
 pub extern fn sceKernelGetCallbackCount(cb: SceUID) c_int;
 pub extern fn sceKernelCheckCallback() c_int;
-pub const enum_SceKernelIdListType = extern enum(c_int) {
+pub const enum_SceKernelIdListType = enum(c_int) {
     SCE_KERNEL_TMID_Thread = 1,
     SCE_KERNEL_TMID_Semaphore = 2,
     SCE_KERNEL_TMID_EventFlag = 3,
@@ -234,14 +234,14 @@ pub const struct_SceKernelSystemStatus = extern struct {
 };
 pub const SceKernelSystemStatus = struct_SceKernelSystemStatus;
 pub extern fn sceKernelReferSystemStatus(status: [*c]SceKernelSystemStatus) c_int;
-pub extern fn sceKernelCreateMsgPipe(name: [*c]const u8, part: c_int, attr: c_int, unk1: ?*c_void, opt: ?*c_void) SceUID;
+pub extern fn sceKernelCreateMsgPipe(name: [*c]const u8, part: c_int, attr: c_int, unk1: ?*anyopaque, opt: ?*anyopaque) SceUID;
 pub extern fn sceKernelDeleteMsgPipe(uid: SceUID) c_int;
-pub extern fn sceKernelSendMsgPipe(uid: SceUID, message: ?*c_void, size: c_uint, unk1: c_int, unk2: ?*c_void, timeout: [*c]c_uint) c_int;
-pub extern fn sceKernelSendMsgPipeCB(uid: SceUID, message: ?*c_void, size: c_uint, unk1: c_int, unk2: ?*c_void, timeout: [*c]c_uint) c_int;
-pub extern fn sceKernelTrySendMsgPipe(uid: SceUID, message: ?*c_void, size: c_uint, unk1: c_int, unk2: ?*c_void) c_int;
-pub extern fn sceKernelReceiveMsgPipe(uid: SceUID, message: ?*c_void, size: c_uint, unk1: c_int, unk2: ?*c_void, timeout: [*c]c_uint) c_int;
-pub extern fn sceKernelReceiveMsgPipeCB(uid: SceUID, message: ?*c_void, size: c_uint, unk1: c_int, unk2: ?*c_void, timeout: [*c]c_uint) c_int;
-pub extern fn sceKernelTryReceiveMsgPipe(uid: SceUID, message: ?*c_void, size: c_uint, unk1: c_int, unk2: ?*c_void) c_int;
+pub extern fn sceKernelSendMsgPipe(uid: SceUID, message: ?*anyopaque, size: c_uint, unk1: c_int, unk2: ?*anyopaque, timeout: [*c]c_uint) c_int;
+pub extern fn sceKernelSendMsgPipeCB(uid: SceUID, message: ?*anyopaque, size: c_uint, unk1: c_int, unk2: ?*anyopaque, timeout: [*c]c_uint) c_int;
+pub extern fn sceKernelTrySendMsgPipe(uid: SceUID, message: ?*anyopaque, size: c_uint, unk1: c_int, unk2: ?*anyopaque) c_int;
+pub extern fn sceKernelReceiveMsgPipe(uid: SceUID, message: ?*anyopaque, size: c_uint, unk1: c_int, unk2: ?*anyopaque, timeout: [*c]c_uint) c_int;
+pub extern fn sceKernelReceiveMsgPipeCB(uid: SceUID, message: ?*anyopaque, size: c_uint, unk1: c_int, unk2: ?*anyopaque, timeout: [*c]c_uint) c_int;
+pub extern fn sceKernelTryReceiveMsgPipe(uid: SceUID, message: ?*anyopaque, size: c_uint, unk1: c_int, unk2: ?*anyopaque) c_int;
 pub extern fn sceKernelCancelMsgPipe(uid: SceUID, psend: [*c]c_int, precv: [*c]c_int) c_int;
 pub const struct_SceKernelMppInfo = extern struct {
     size: SceSize,
@@ -259,10 +259,10 @@ pub const struct_SceKernelVplOptParam = extern struct {
 };
 pub extern fn sceKernelCreateVpl(name: [*c]const u8, part: c_int, attr: c_int, size: c_uint, opt: [*c]struct_SceKernelVplOptParam) SceUID;
 pub extern fn sceKernelDeleteVpl(uid: SceUID) c_int;
-pub extern fn sceKernelAllocateVpl(uid: SceUID, size: c_uint, data: [*c]?*c_void, timeout: [*c]c_uint) c_int;
-pub extern fn sceKernelAllocateVplCB(uid: SceUID, size: c_uint, data: [*c]?*c_void, timeout: [*c]c_uint) c_int;
-pub extern fn sceKernelTryAllocateVpl(uid: SceUID, size: c_uint, data: [*c]?*c_void) c_int;
-pub extern fn sceKernelFreeVpl(uid: SceUID, data: ?*c_void) c_int;
+pub extern fn sceKernelAllocateVpl(uid: SceUID, size: c_uint, data: [*c]?*anyopaque, timeout: [*c]c_uint) c_int;
+pub extern fn sceKernelAllocateVplCB(uid: SceUID, size: c_uint, data: [*c]?*anyopaque, timeout: [*c]c_uint) c_int;
+pub extern fn sceKernelTryAllocateVpl(uid: SceUID, size: c_uint, data: [*c]?*anyopaque) c_int;
+pub extern fn sceKernelFreeVpl(uid: SceUID, data: ?*anyopaque) c_int;
 pub extern fn sceKernelCancelVpl(uid: SceUID, pnum: [*c]c_int) c_int;
 pub const struct_SceKernelVplInfo = extern struct {
     size: SceSize,
@@ -279,10 +279,10 @@ pub const struct_SceKernelFplOptParam = extern struct {
 };
 pub extern fn sceKernelCreateFpl(name: [*c]const u8, part: c_int, attr: c_int, size: c_uint, blocks: c_uint, opt: [*c]struct_SceKernelFplOptParam) c_int;
 pub extern fn sceKernelDeleteFpl(uid: SceUID) c_int;
-pub extern fn sceKernelAllocateFpl(uid: SceUID, data: [*c]?*c_void, timeout: [*c]c_uint) c_int;
-pub extern fn sceKernelAllocateFplCB(uid: SceUID, data: [*c]?*c_void, timeout: [*c]c_uint) c_int;
-pub extern fn sceKernelTryAllocateFpl(uid: SceUID, data: [*c]?*c_void) c_int;
-pub extern fn sceKernelFreeFpl(uid: SceUID, data: ?*c_void) c_int;
+pub extern fn sceKernelAllocateFpl(uid: SceUID, data: [*c]?*anyopaque, timeout: [*c]c_uint) c_int;
+pub extern fn sceKernelAllocateFplCB(uid: SceUID, data: [*c]?*anyopaque, timeout: [*c]c_uint) c_int;
+pub extern fn sceKernelTryAllocateFpl(uid: SceUID, data: [*c]?*anyopaque) c_int;
+pub extern fn sceKernelFreeFpl(uid: SceUID, data: ?*anyopaque) c_int;
 pub extern fn sceKernelCancelFpl(uid: SceUID, pnum: [*c]c_int) c_int;
 pub const struct_SceKernelFplInfo = extern struct {
     size: SceSize,
@@ -317,10 +317,10 @@ pub extern fn sceKernelSetVTimerTime(uid: SceUID, time: [*c]SceKernelSysClock) c
 pub extern fn sceKernelSetVTimerTimeWide(uid: SceUID, time: SceInt64) SceInt64;
 pub extern fn sceKernelStartVTimer(uid: SceUID) c_int;
 pub extern fn sceKernelStopVTimer(uid: SceUID) c_int;
-pub const SceKernelVTimerHandler = ?fn (SceUID, [*c]SceKernelSysClock, [*c]SceKernelSysClock, ?*c_void) callconv(.C) SceUInt;
-pub const SceKernelVTimerHandlerWide = ?fn (SceUID, SceInt64, SceInt64, ?*c_void) callconv(.C) SceUInt;
-pub extern fn sceKernelSetVTimerHandler(uid: SceUID, time: [*c]SceKernelSysClock, handler: SceKernelVTimerHandler, common: ?*c_void) c_int;
-pub extern fn sceKernelSetVTimerHandlerWide(uid: SceUID, time: SceInt64, handler: SceKernelVTimerHandlerWide, common: ?*c_void) c_int;
+pub const SceKernelVTimerHandler = ?fn (SceUID, [*c]SceKernelSysClock, [*c]SceKernelSysClock, ?*anyopaque) callconv(.C) SceUInt;
+pub const SceKernelVTimerHandlerWide = ?fn (SceUID, SceInt64, SceInt64, ?*anyopaque) callconv(.C) SceUInt;
+pub extern fn sceKernelSetVTimerHandler(uid: SceUID, time: [*c]SceKernelSysClock, handler: SceKernelVTimerHandler, common: ?*anyopaque) c_int;
+pub extern fn sceKernelSetVTimerHandlerWide(uid: SceUID, time: SceInt64, handler: SceKernelVTimerHandlerWide, common: ?*anyopaque) c_int;
 pub extern fn sceKernelCancelVTimerHandler(uid: SceUID) c_int;
 pub const struct_SceKernelVTimerInfo = extern struct {
     size: SceSize,
@@ -330,37 +330,37 @@ pub const struct_SceKernelVTimerInfo = extern struct {
     current: SceKernelSysClock,
     schedule: SceKernelSysClock,
     handler: SceKernelVTimerHandler,
-    common: ?*c_void,
+    common: ?*anyopaque,
 };
 pub const SceKernelVTimerInfo = struct_SceKernelVTimerInfo;
 pub extern fn sceKernelReferVTimerStatus(uid: SceUID, info: [*c]SceKernelVTimerInfo) c_int;
 pub extern fn _sceKernelExitThread() void;
 pub extern fn sceKernelGetThreadmanIdType(uid: SceUID) enum_SceKernelIdListType;
-pub const SceKernelThreadEventHandler = ?fn (c_int, SceUID, ?*c_void) callconv(.C) c_int;
+pub const SceKernelThreadEventHandler = ?fn (c_int, SceUID, ?*anyopaque) callconv(.C) c_int;
 pub const struct_SceKernelThreadEventHandlerInfo = extern struct {
     size: SceSize,
     name: [32]u8,
     threadId: SceUID,
     mask: c_int,
     handler: SceKernelThreadEventHandler,
-    common: ?*c_void,
+    common: ?*anyopaque,
 };
 pub const SceKernelThreadEventHandlerInfo = struct_SceKernelThreadEventHandlerInfo;
-pub const enum_ThreadEventIds = extern enum(c_int) {
+pub const enum_ThreadEventIds = enum(c_int) {
     THREADEVENT_ALL = 4294967295,
     THREADEVENT_KERN = 4294967288,
     THREADEVENT_USER = 4294967280,
     THREADEVENT_CURRENT = 0,
     _,
 };
-pub const enum_ThreadEvents = extern enum(c_int) {
+pub const enum_ThreadEvents = enum(c_int) {
     THREAD_CREATE = 1,
     THREAD_START = 2,
     THREAD_EXIT = 4,
     THREAD_DELETE = 8,
     _,
 };
-pub extern fn sceKernelRegisterThreadEventHandler(name: [*c]const u8, threadID: SceUID, mask: c_int, handler: SceKernelThreadEventHandler, common: ?*c_void) SceUID;
+pub extern fn sceKernelRegisterThreadEventHandler(name: [*c]const u8, threadID: SceUID, mask: c_int, handler: SceKernelThreadEventHandler, common: ?*anyopaque) SceUID;
 pub extern fn sceKernelReleaseThreadEventHandler(uid: SceUID) c_int;
 pub extern fn sceKernelReferThreadEventHandlerStatus(uid: SceUID, info: [*c]struct_SceKernelThreadEventHandlerInfo) c_int;
 pub extern fn sceKernelReferThreadProfiler() [*c]PspDebugProfilerRegs;

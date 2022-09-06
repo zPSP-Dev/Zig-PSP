@@ -213,16 +213,16 @@ pub extern fn sceKernelDcacheWritebackAll() void;
 pub extern fn sceKernelDcacheWritebackInvalidateAll() void;
 
 //Write back a range of addresses from the data cache to memory
-pub extern fn sceKernelDcacheWritebackRange(p: ?*const c_void, size: c_uint) void;
+pub extern fn sceKernelDcacheWritebackRange(p: ?*const anyopaque, size: c_uint) void;
 
 //Write back and invalidate a range of addresses in the data cache
-pub extern fn sceKernelDcacheWritebackInvalidateRange(p: ?*const c_void, size: c_uint) void;
+pub extern fn sceKernelDcacheWritebackInvalidateRange(p: ?*const anyopaque, size: c_uint) void;
 
 //Invalidate a range of addresses in data cache
-pub extern fn sceKernelDcacheInvalidateRange(p: ?*const c_void, size: c_uint) void;
+pub extern fn sceKernelDcacheInvalidateRange(p: ?*const anyopaque, size: c_uint) void;
 
 //Invalidate the instruction cache
 pub extern fn sceKernelIcacheInvalidateAll() void;
 
 //Invalidate a range of addresses in the instruction cache
-pub extern fn sceKernelIcacheInvalidateRange(p: ?*const c_void, size: c_uint) void;
+pub extern fn sceKernelIcacheInvalidateRange(p: ?*const anyopaque, size: c_uint) void;

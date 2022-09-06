@@ -1,7 +1,4 @@
 usingnamespace @import("psptypes.zig");
-test "" {
-    @import("std").meta.refAllDecls(@This());
-}
 
 pub const AtracError = enum(u32) {
     ParamFail = (0x80630001),
@@ -137,9 +134,9 @@ pub fn atracGetAtracID(uiCodecType: AtracCodecType) !i32 {
 // @param bufsize - the size of the buffer pointed by buf
 //
 // @return the new atrac ID, or < 0 on error
-pub extern fn sceAtracSetDataAndGetID(buf: ?*c_void, bufsize: SceSize) c_int;
+pub extern fn sceAtracSetDataAndGetID(buf: ?*anyopaque, bufsize: SceSize) c_int;
 
-pub fn atracSetDataAndGetID(buf: *c_void, bufSize: usize) !u32 {
+pub fn atracSetDataAndGetID(buf: *anyopaque, bufSize: usize) !u32 {
     var res = sceAtracSetDataAndGetID(buf, bufSize);
     try intToError(res);
     return res;

@@ -1,16 +1,16 @@
-pub const PspDisplayPixelFormats = extern enum(c_int) {
+pub const PspDisplayPixelFormats = enum(c_int) {
     Format565 = 0,
     Format5551 = 1,
     Format4444 = 2,
     Format8888 = 3,
 };
 
-pub const PspDisplaySetBufSync = extern enum(c_int) {
+pub const PspDisplaySetBufSync = enum(c_int) {
     Immediate = 0,
     Nextframe = 1,
 };
 
-pub const PspDisplayErrorCodes = extern enum(c_int) {
+pub const PspDisplayErrorCodes = enum(c_int) {
     Ok = 0,
     Pointer = 2147483907,
     Argument = 2147483911,
@@ -49,8 +49,8 @@ pub fn displayGetMode(pmode: *c_int, pwidth: *c_int, pheight: *c_int) bool {
 // @param sync - One of ::PspDisplaySetBufSync
 //
 // @return 0 on success
-pub extern fn sceDisplaySetFrameBuf(topaddr: ?*c_void, bufferwidth: c_int, pixelformat: c_int, sync: c_int) c_int;
-pub fn displaySetFrameBuf(topaddr: ?*c_void, bufferwidth: c_int, pixelformat: c_int, sync: c_int) bool {
+pub extern fn sceDisplaySetFrameBuf(topaddr: ?*anyopaque, bufferwidth: c_int, pixelformat: c_int, sync: c_int) c_int;
+pub fn displaySetFrameBuf(topaddr: ?*anyopaque, bufferwidth: c_int, pixelformat: c_int, sync: c_int) bool {
     var res = sceDisplaySetFrameBuf(topaddr, bufferwidth, pixelformat, sync);
     return res;
 }
@@ -63,8 +63,8 @@ pub fn displaySetFrameBuf(topaddr: ?*c_void, bufferwidth: c_int, pixelformat: c_
 // @param sync - One of ::PspDisplaySetBufSync
 //
 // @return 0 on success
-pub extern fn sceDisplayGetFrameBuf(topaddr: **c_void, bufferwidth: *c_int, pixelformat: *c_int, sync: c_int) c_int;
-pub fn displayGetFrameBuf(topaddr: **c_void, bufferwidth: *c_int, pixelformat: *c_int, sync: c_int) bool {
+pub extern fn sceDisplayGetFrameBuf(topaddr: **anyopaque, bufferwidth: *c_int, pixelformat: *c_int, sync: c_int) c_int;
+pub fn displayGetFrameBuf(topaddr: **anyopaque, bufferwidth: *c_int, pixelformat: *c_int, sync: c_int) bool {
     var res = sceDisplayGetFrameBuf(topaddr, bufferwidth, pixelformat, sync);
     return res == 0;
 }

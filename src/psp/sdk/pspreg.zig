@@ -1,6 +1,6 @@
 usingnamespace @import("psptypes.zig");
 
-pub const RegKeyTypes = extern enum(c_int) {
+pub const RegKeyTypes = enum(c_int) {
     REG_TYPE_DIR = 1,
     REG_TYPE_INT = 2,
     REG_TYPE_STR = 3,
@@ -154,8 +154,8 @@ pub fn regGetKeyInfoByName(hd: RegHandle, name: []const u8, typec: *c_uint, size
 // @param size - The size of the buffer
 //
 // @return 0 on success, < 0 on error
-pub extern fn sceRegGetKeyValue(hd: RegHandle, hk: RegHandle, buf: ?*c_void, size: SceSize) c_int;
-pub fn regGetKeyValue(hd: RegHandle, hk: RegHandle, buf: ?*c_void, size: SceSize) !void {
+pub extern fn sceRegGetKeyValue(hd: RegHandle, hk: RegHandle, buf: ?*anyopaque, size: SceSize) c_int;
+pub fn regGetKeyValue(hd: RegHandle, hk: RegHandle, buf: ?*anyopaque, size: SceSize) !void {
     var res = sceRegGetKeyValue(hd, hk, buf, size);
     if (res < 0) {
         return error.Unexpected;
@@ -170,8 +170,8 @@ pub fn regGetKeyValue(hd: RegHandle, hk: RegHandle, buf: ?*c_void, size: SceSize
 // @param size - The size of the buffer
 //
 // @return 0 on success, < 0 on error
-pub extern fn sceRegGetKeyValueByName(hd: RegHandle, name: []const u8, buf: ?*c_void, size: SceSize) c_int;
-pub fn regGetKeyValueByName(hd: RegHandle, name: []const u8, buf: ?*c_void, size: SceSize) !void {
+pub extern fn sceRegGetKeyValueByName(hd: RegHandle, name: []const u8, buf: ?*anyopaque, size: SceSize) c_int;
+pub fn regGetKeyValueByName(hd: RegHandle, name: []const u8, buf: ?*anyopaque, size: SceSize) !void {
     var res = sceRegGetKeyValueByName(hd, name, buf, size);
     if (res < 0) {
         return error.Unexpected;
@@ -186,8 +186,8 @@ pub fn regGetKeyValueByName(hd: RegHandle, name: []const u8, buf: ?*c_void, size
 // @param size - The size of the buffer
 //
 // @return 0 on success, < 0 on error
-pub extern fn sceRegSetKeyValue(hd: RegHandle, name: []const u8, buf: ?*const c_void, size: SceSize) c_int;
-pub fn regSetKeyValue(hd: RegHandle, name: []const u8, buf: ?*const c_void, size: SceSize) !void {
+pub extern fn sceRegSetKeyValue(hd: RegHandle, name: []const u8, buf: ?*const anyopaque, size: SceSize) c_int;
+pub fn regSetKeyValue(hd: RegHandle, name: []const u8, buf: ?*const anyopaque, size: SceSize) !void {
     var res = sceRegSetKeyValue(hd, name, buf, size);
     if (res < 0) {
         return error.Unexpected;

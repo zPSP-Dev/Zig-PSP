@@ -1,6 +1,6 @@
 usingnamespace @import("psptypes.zig");
 
-pub const PspSysMemBlockTypes = extern enum(c_int) {
+pub const PspSysMemBlockTypes = enum(c_int) {
     MemLow = 0,
     MemHigh = 1,
     MemAddr = 2,
@@ -16,9 +16,9 @@ pub const SceKernelSysMemAlloc_t = c_int;
 // @param addr - If type is PSP_SMEM_Addr, then addr specifies the lowest address allocate the block from.
 //
 // @return The UID of the new block, or if less than 0 an error.
-pub extern fn sceKernelAllocPartitionMemory(partitionid: SceUID, name: [*c]const u8, typec: c_int, size: SceSize, addr: ?*c_void) SceUID;
+pub extern fn sceKernelAllocPartitionMemory(partitionid: SceUID, name: [*c]const u8, typec: c_int, size: SceSize, addr: ?*anyopaque) SceUID;
 
-pub fn kernelAllocPartitionMemory(partitionid: SceUID, name: [*c]const u8, typec: c_int, size: SceSize, addr: ?*c_void) !SceUID {
+pub fn kernelAllocPartitionMemory(partitionid: SceUID, name: [*c]const u8, typec: c_int, size: SceSize, addr: ?*anyopaque) !SceUID {
     var res = sceKernelAllocPartitionMemory(partitionid, name, typec, size, addr);
     if (res < 0) {
         return error.AllocationError;
@@ -38,7 +38,7 @@ pub extern fn sceKernelFreePartitionMemory(blockid: SceUID) c_int;
 // @param blockid - UID of the memory block.
 //
 // @return The lowest address belonging to the memory block.
-pub extern fn sceKernelGetBlockHeadAddr(blockid: SceUID) ?*c_void;
+pub extern fn sceKernelGetBlockHeadAddr(blockid: SceUID) ?*anyopaque;
 
 // Get the total amount of free memory.
 //

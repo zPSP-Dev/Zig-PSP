@@ -3,7 +3,7 @@ usingnamespace @import("system.zig");
 
 var __psp_cwd: [PATH_MAX + 1]u8 = [_]u8{0} ** (PATH_MAX + 1);
 
-pub fn __psp_init_cwd(path: ?*c_void) void {
+pub fn __psp_init_cwd(path: ?*anyopaque) void {
     if (path != null) {
         var base_path: [PATH_MAX + 1]u8 = undefined;
         var end: ?[*]u8 = null;
