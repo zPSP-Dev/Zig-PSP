@@ -38,6 +38,17 @@ pub fn build_psp(b: *Builder, comptime build_info: PSPBuildInfo) !void {
     //Debug Mode can cause issues with trap instructions - use ReleaseSafe for "Debug" builds
     const mode = std.builtin.Mode.ReleaseSmall;
 
+    // Build the libzpsp.a
+    const lib = b.addStaticLibrary("zpsp", build_info.path_to_sdk ++ "src/psp/libzpsp/libzpsp.zig");
+    lib.setTarget(target);
+    lib.setBuildMode(mode);
+    lib.link_eh_frame_hdr = true;
+    lib.link_emit_relocs = true;
+    lib.use_stage1 = true;
+    lib.single_threaded = true;
+    lib.install();
+    lib.setOutputDir("zig-cache/");
+
     //Build from your main file!
     const exe = b.addExecutable("main", build_info.src_file);
 
@@ -52,6 +63,7 @@ pub fn build_psp(b: *Builder, comptime build_info: PSPBuildInfo) !void {
     exe.single_threaded = true;
     exe.install();
     exe.setOutputDir("zig-cache/");
+    exe.step.dependOn(&lib.step);
 
     //Post-build actions
     const hostTarget = b.standardTargetOptions(.{});

@@ -7,7 +7,11 @@ pub usingnamespace @import("utils/psp.zig");
 pub usingnamespace @import("libzpsp.zig");
 
 //Basic outlines
-pub usingnamespace @import("sdk/pspatrac3.zig");
+pub const atrac = @import("sdk/pspatrac3.zig");
+
+/// sce.atrac.getID();
+/// psp.sceAtracGetID();
+
 pub usingnamespace @import("sdk/pspaudio.zig");
 pub usingnamespace @import("sdk/pspaudiocodec.zig");
 pub usingnamespace @import("sdk/pspctrl.zig");

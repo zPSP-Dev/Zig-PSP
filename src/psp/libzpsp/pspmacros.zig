@@ -37,6 +37,7 @@ pub fn import_module_start(comptime module: []const u8, comptime flags_ver: []co
 }
 
 pub fn import_function(comptime module: []const u8, comptime func_id: []const u8, comptime funcname: []const u8) []const u8 {
+    _ = module;
     return (
         \\.set push
         \\.set noreorder
