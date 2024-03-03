@@ -4,7 +4,7 @@
 export fn memset(ptr: [*]u8, value: u32, num: usize) [*]u8 {
     var i: usize = 0;
     while (i < num) : (i += 1) {
-        ptr[i] = @as(u8, @truncate(u8, value));
+        ptr[i] = @as(u8, @as(u8, @truncate(value)));
     }
     return ptr;
 }

@@ -1,4 +1,5 @@
-usingnamespace @import("bits.zig");
+const bits = @import("bits.zig");
+const fd_t = bits.fd_t;
 
 pub const __psp_max_fd = 1024;
 pub const __psp_fdman_type = enum(u8) {
@@ -34,32 +35,32 @@ extern fn pspEnableInterrupts(en: u32) void;
 pub var __psp_descriptor_data_pool: [__psp_max_fd]__psp_fdman_descriptor = undefined;
 pub var __psp_descriptormap: [__psp_max_fd]?*__psp_fdman_descriptor = undefined;
 
-usingnamespace @import("../include/pspiofilemgr.zig");
-usingnamespace @import("../include/pspstdio.zig");
-usingnamespace @import("system.zig");
+const pspiofilemgr = @import("../include/pspiofilemgr.zig");
+const pspstdio = @import("../include/pspstdio.zig");
+const system = @import("system.zig");
 
 pub fn __psp_fdman_init() void {
-    @memset(@ptrCast([*]u8, &__psp_descriptor_data_pool), 0, __psp_max_fd * @sizeOf(__psp_fdman_descriptor));
-    @memset(@ptrCast([*]u8, &__psp_descriptormap), 0, __psp_max_fd * @sizeOf(?*__psp_fdman_descriptor));
+    @memset(@as([*]u8, @ptrCast(&__psp_descriptor_data_pool))[__psp_max_fd * @sizeOf(__psp_fdman_descriptor)], 0);
+    @memset(@as([*]u8, @ptrCast(&__psp_descriptormap))[__psp_max_fd * @sizeOf(?*__psp_fdman_descriptor)], 0);
 
-    var scefd = sceKernelStdin();
+    var scefd = pspstdio.sceKernelStdin();
     if (scefd >= 0) {
         __psp_descriptormap[0] = &__psp_descriptor_data_pool[0];
-        __psp_descriptormap[0].?.sce_descriptor = @bitCast(u32, scefd);
+        __psp_descriptormap[0].?.sce_descriptor = @as(u32, @bitCast(scefd));
         __psp_descriptormap[0].?.ftype = __psp_fdman_type.Tty;
     }
 
-    scefd = sceKernelStdout();
+    scefd = pspstdio.sceKernelStdout();
     if (scefd >= 0) {
         __psp_descriptormap[1] = &__psp_descriptor_data_pool[1];
-        __psp_descriptormap[1].?.sce_descriptor = @bitCast(u32, scefd);
+        __psp_descriptormap[1].?.sce_descriptor = @as(u32, @bitCast(scefd));
         __psp_descriptormap[1].?.ftype = __psp_fdman_type.Tty;
     }
 
-    scefd = sceKernelStderr();
+    scefd = pspstdio.sceKernelStderr();
     if (scefd >= 0) {
         __psp_descriptormap[2] = &__psp_descriptor_data_pool[2];
-        __psp_descriptormap[2].?.sce_descriptor = @bitCast(u32, scefd);
+        __psp_descriptormap[2].?.sce_descriptor = @as(u32, @bitCast(scefd));
         __psp_descriptormap[2].?.ftype = __psp_fdman_type.Tty;
     }
 }
@@ -78,13 +79,13 @@ pub fn __psp_fdman_get_new_descriptor() i32 {
             __psp_descriptormap[i] = &__psp_descriptor_data_pool[i];
             __psp_descriptormap[i].?.ref_count += 1;
             pspEnableInterrupts(inten);
-            return @intCast(i32, i);
+            return @as(i32, @intCast(i));
         }
     }
     //Unlock
     pspEnableInterrupts(inten);
 
-    errno = ENOMEM;
+    pspiofilemgr.errno = bits.ENOMEM;
     return -1;
 }
 
@@ -92,14 +93,14 @@ pub fn __psp_fdman_get_dup_descriptor(fd: fd_t) i32 {
     var i: usize = 0;
     var inten: u32 = 0;
 
-    if (!__PSP_IS_FD_VALID(fd)) {
-        errno = EBADF;
+    if (!pspiofilemgr.__PSP_IS_FD_VALID(fd)) {
+        pspiofilemgr.errno = bits.EBADF;
         return -1;
     }
 
     inten = pspDisableInterrupts();
     while (i < __psp_max_fd) : (i += 1) {
-        if (__psp_descriptormap[i] == NULL) {
+        if (__psp_descriptormap[i] == null) {
             __psp_descriptormap[i] = &__psp_descriptor_data_pool[fd];
             __psp_descriptormap[i].?.ref_count += 1;
             pspEnableInterrupts(inten);
@@ -108,13 +109,13 @@ pub fn __psp_fdman_get_dup_descriptor(fd: fd_t) i32 {
     }
     pspEnableInterrupts(inten);
 
-    errno = ENOMEM;
+    pspiofilemgr.errno = bits.ENOMEM;
     return -1;
 }
 
 pub fn __psp_fdman_release_descriptor(fd: fd_t) void {
     if (!__psp_fdman_fdValid(fd)) {
-        errno = EBADF;
+        pspiofilemgr.errno = bits.EBADF;
         return;
     }
 
@@ -123,7 +124,7 @@ pub fn __psp_fdman_release_descriptor(fd: fd_t) void {
     if (__psp_descriptormap[fd].?.ref_count == 0) {
         __psp_descriptormap[fd].?.sce_descriptor = 0;
         __psp_descriptormap[fd].?.filename = null;
-        __psp_descriptormap[fd].?.ftype = @intToEnum(__psp_fdman_type, 0);
+        __psp_descriptormap[fd].?.ftype = @as(__psp_fdman_type, @enumFromInt(0));
         __psp_descriptormap[fd].?.flags = 0;
     }
     __psp_descriptormap[fd] = null;

@@ -3,7 +3,7 @@
 const psp = @import("psp/utils/psp.zig");
 
 comptime {
-    asm(psp.module_info("Zig PSP App", 0, 1, 0));
+    asm (psp.module_info("Zig PSP App", 0, 1, 0));
 }
 
 pub fn main() !void {

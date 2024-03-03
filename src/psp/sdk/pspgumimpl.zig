@@ -1,34 +1,34 @@
-usingnamespace @import("psptypes.zig");
-usingnamespace @import("pspgu.zig");
+const psptypes = @import("psptypes.zig");
+const pspgu = @import("pspgu.zig");
 
 //Internal
 var gum_current_mode: u8 = 0;
 var gum_matrix_update: [4]u8 = [_]u8{0} ** 4;
 var gum_current_matrix_update: u8 = 0;
 
-var gum_current_matrix: *ScePspFMatrix4 = @ptrCast(*ScePspFMatrix4, &gum_matrix_stack[0]);
-var gum_stack_depth: [4][*]ScePspFMatrix4 = [_][*]ScePspFMatrix4{ @ptrCast([*]ScePspFMatrix4, &gum_matrix_stack[0]), @ptrCast([*]ScePspFMatrix4, &gum_matrix_stack[1]), @ptrCast([*]ScePspFMatrix4, &gum_matrix_stack[2]), @ptrCast([*]ScePspFMatrix4, &gum_matrix_stack[3]) };
+var gum_current_matrix: *psptypes.ScePspFMatrix4 = @as(*psptypes.ScePspFMatrix4, @ptrCast(&gum_matrix_stack[0]));
+var gum_stack_depth: [4][*]psptypes.ScePspFMatrix4 = [_][*]psptypes.ScePspFMatrix4{ @as([*]psptypes.ScePspFMatrix4, @ptrCast(&gum_matrix_stack[0])), @as([*]psptypes.ScePspFMatrix4, @ptrCast(&gum_matrix_stack[1])), @as([*]psptypes.ScePspFMatrix4, @ptrCast(&gum_matrix_stack[2])), @as([*]psptypes.ScePspFMatrix4, @ptrCast(&gum_matrix_stack[3])) };
 
-var gum_matrix_stack: [4][32]ScePspFMatrix4 = undefined;
+var gum_matrix_stack: [4][32]psptypes.ScePspFMatrix4 = undefined;
 
-pub fn sceGumDrawArray(prim: GuPrimitive, vtype: c_int, count: c_int, indices: ?*const c_void, vertices: ?*const c_void) void {
-    sceGumUpdateMatrix();
-    sceGuDrawArray(prim, vtype, count, indices, vertices);
+pub fn sceGumDrawArray(prim: pspgu.GuPrimitive, vtype: c_int, count: c_int, indices: ?*const anyopaque, vertices: ?*const anyopaque) void {
+    pspgu.sceGumUpdateMatrix();
+    pspgu.sceGuDrawArray(prim, vtype, count, indices, vertices);
 }
 
-pub fn sceGumDrawArrayN(prim: c_int, vtype: c_int, count: c_int, a3: c_int, indices: ?*const c_void, vertices: ?*const c_void) void {
-    sceGumUpdateMatrix();
-    sceGuDrawArrayN(prim, vtype, count, a3, indices, vertices);
+pub fn sceGumDrawArrayN(prim: c_int, vtype: c_int, count: c_int, a3: c_int, indices: ?*const anyopaque, vertices: ?*const anyopaque) void {
+    pspgu.sceGumUpdateMatrix();
+    pspgu.sceGuDrawArrayN(prim, vtype, count, a3, indices, vertices);
 }
 
-pub fn sceGumDrawBezier(vtype: c_int, ucount: c_int, vcount: c_int, indices: ?*const c_void, vertices: ?*const c_void) void {
-    sceGumUpdateMatrix();
-    sceGuDrawBezier(vtype, ucount, vcount, indices, vertices);
+pub fn sceGumDrawBezier(vtype: c_int, ucount: c_int, vcount: c_int, indices: ?*const anyopaque, vertices: ?*const anyopaque) void {
+    pspgu.sceGumUpdateMatrix();
+    pspgu.sceGuDrawBezier(vtype, ucount, vcount, indices, vertices);
 }
 
-pub fn sceGumDrawSpline(vtype: c_int, ucount: c_int, vcount: c_int, uedge: c_int, vedge: c_int, indices: ?*const c_void, vertices: ?*const c_void) void {
-    sceGumUpdateMatrix();
-    sceGuDrawSpline(vtype, ucount, vcount, uedge, vedge, indices, vertices);
+pub fn sceGumDrawSpline(vtype: c_int, ucount: c_int, vcount: c_int, uedge: c_int, vedge: c_int, indices: ?*const anyopaque, vertices: ?*const anyopaque) void {
+    pspgu.sceGumUpdateMatrix();
+    pspgu.sceGuDrawSpline(vtype, ucount, vcount, uedge, vedge, indices, vertices);
 }
 
 extern fn memset(ptr: [*]u8, value: u32, num: usize) [*]u8;
@@ -36,78 +36,78 @@ extern fn memcpy(dst: [*]u8, src: [*]const u8, num: isize) [*]u8;
 extern fn memcmp(ptr1: [*]u8, ptr2: [*]u8, num: isize) i32;
 
 pub fn sceGumLoadIdentity() void {
-    _ = memset(@ptrCast([*]u8, gum_current_matrix), 0, @sizeOf(ScePspFMatrix4));
+    _ = memset(@as([*]u8, @ptrCast(gum_current_matrix)), 0, @sizeOf(psptypes.ScePspFMatrix4));
 
     var i: usize = 0;
     while (i < 4) : (i += 1) {
-        @ptrCast([*]f32, gum_current_matrix)[(i << 2) + i] = 1.0;
+        @as([*]f32, @ptrCast(gum_current_matrix))[(i << 2) + i] = 1.0;
     }
 
     gum_current_matrix_update = 1;
 }
 
-pub fn sceGumLoadMatrix(m: [*c]ScePspFMatrix4) void {
-    _ = memcpy(@ptrCast([*]u8, gum_current_matrix), @ptrCast([*]u8, m), @sizeOf(ScePspFMatrix4));
+pub fn sceGumLoadMatrix(m: [*c]psptypes.ScePspFMatrix4) void {
+    _ = memcpy(@as([*]u8, @ptrCast(gum_current_matrix)), @as([*]u8, @ptrCast(m)), @sizeOf(psptypes.ScePspFMatrix4));
     gum_current_matrix_update = 1;
 }
 
 pub fn sceGumUpdateMatrix() void {
-    gum_stack_depth[gum_current_mode] = @ptrCast([*]ScePspFMatrix4, gum_current_matrix);
+    gum_stack_depth[gum_current_mode] = @as([*]psptypes.ScePspFMatrix4, @ptrCast(gum_current_matrix));
     gum_matrix_update[gum_current_mode] = gum_current_matrix_update;
     gum_current_matrix_update = 0;
 
     var i: usize = 0;
     while (i < 4) : (i += 1) {
         if (gum_matrix_update[i] != 0) {
-            sceGuSetMatrix(@intCast(c_int, i), gum_stack_depth[i]);
+            pspgu.sceGuSetMatrix(@as(c_int, @intCast(i)), gum_stack_depth[i]);
             gum_matrix_update[i] = 0;
         }
     }
 }
 
 pub fn sceGumPopMatrix() void {
-    var t = @ptrCast([*]ScePspFMatrix4, gum_current_matrix);
+    var t = @as([*]psptypes.ScePspFMatrix4, @ptrCast(gum_current_matrix));
     t -= 1;
-    gum_current_matrix = @ptrCast(*ScePspFMatrix4, t);
+    gum_current_matrix = @as(*psptypes.ScePspFMatrix4, @ptrCast(t));
     gum_current_matrix_update = 1;
 }
 
 pub fn sceGumPushMatrix() void {
-    _ = memcpy(@ptrCast([*]u8, @ptrCast([*]ScePspFMatrix4, gum_current_matrix) + 1), @ptrCast([*]u8, @ptrCast([*]ScePspFMatrix4, gum_current_matrix)), @sizeOf(ScePspFMatrix4));
-    var t = @ptrCast([*]ScePspFMatrix4, gum_current_matrix);
+    _ = memcpy(@as([*]u8, @ptrCast(@as([*]psptypes.ScePspFMatrix4, @ptrCast(gum_current_matrix)) + 1)), @as([*]u8, @ptrCast(@as([*]psptypes.ScePspFMatrix4, @ptrCast(gum_current_matrix)))), @sizeOf(psptypes.ScePspFMatrix4));
+    var t = @as([*]psptypes.ScePspFMatrix4, @ptrCast(gum_current_matrix));
     t += 1;
-    gum_current_matrix = @ptrCast(*ScePspFMatrix4, t);
+    gum_current_matrix = @as(*psptypes.ScePspFMatrix4, @ptrCast(t));
 }
 
-pub fn sceGumRotateXYZ(v: *ScePspFVector3) void {
+pub fn sceGumRotateXYZ(v: *psptypes.ScePspFVector3) void {
     sceGumRotateX(v.x);
     sceGumRotateY(v.y);
     sceGumRotateZ(v.z);
 }
-pub fn sceGumRotateZYX(v: *ScePspFVector3) void {
+pub fn sceGumRotateZYX(v: *psptypes.ScePspFVector3) void {
     sceGumRotateZ(v.z);
     sceGumRotateY(v.y);
     sceGumRotateX(v.x);
 }
 
-pub fn sceGumStoreMatrix(m: [*c]ScePspFMatrix4) void {
-    _ = memcpy(@ptrCast([*]u8, m), @ptrCast([*]u8, gum_current_matrix), @sizeOf(ScePspFMatrix4));
+pub fn sceGumStoreMatrix(m: [*c]psptypes.ScePspFMatrix4) void {
+    _ = memcpy(@as([*]u8, @ptrCast(m)), @as([*]u8, @ptrCast(gum_current_matrix)), @sizeOf(psptypes.ScePspFMatrix4));
 }
 
 const std = @import("std");
 
 pub fn sceGumRotateX(angle: f32) void {
-    var t: ScePspFMatrix4 = undefined;
+    var t: psptypes.ScePspFMatrix4 = undefined;
 
-    _ = memset(@ptrCast([*]u8, &t), 0, @sizeOf(ScePspFMatrix4));
+    _ = memset(@as([*]u8, @ptrCast(&t)), 0, @sizeOf(psptypes.ScePspFMatrix4));
 
     var i: usize = 0;
     while (i < 4) : (i += 1) {
-        @ptrCast([*]f32, &t)[(i << 2) + i] = 1.0;
+        @as([*]f32, @ptrCast(&t))[(i << 2) + i] = 1.0;
     }
 
-    var c: f32 = @import("cos.zig").cos(angle);
-    var s: f32 = @import("sin.zig").sin(angle);
+    const c: f32 = @import("cos.zig").cos(angle);
+    const s: f32 = @import("sin.zig").sin(angle);
 
     t.y.y = c;
     t.y.z = s;
@@ -118,17 +118,17 @@ pub fn sceGumRotateX(angle: f32) void {
 }
 
 pub fn sceGumRotateY(angle: f32) void {
-    var t: ScePspFMatrix4 = undefined;
+    var t: psptypes.ScePspFMatrix4 = undefined;
 
-    _ = memset(@ptrCast([*]u8, &t), 0, @sizeOf(ScePspFMatrix4));
+    _ = memset(@as([*]u8, @ptrCast(&t)), 0, @sizeOf(psptypes.ScePspFMatrix4));
 
     var i: usize = 0;
     while (i < 4) : (i += 1) {
-        @ptrCast([*]f32, &t)[(i << 2) + i] = 1.0;
+        @as([*]f32, @ptrCast(&t))[(i << 2) + i] = 1.0;
     }
 
-    var c: f32 = @import("cos.zig").cos(angle);
-    var s: f32 = @import("sin.zig").sin(angle);
+    const c: f32 = @import("cos.zig").cos(angle);
+    const s: f32 = @import("sin.zig").sin(angle);
 
     t.x.x = c;
     t.x.z = -s;
@@ -139,17 +139,17 @@ pub fn sceGumRotateY(angle: f32) void {
 }
 
 pub fn sceGumRotateZ(angle: f32) void {
-    var t: ScePspFMatrix4 = undefined;
+    var t: psptypes.ScePspFMatrix4 = undefined;
 
-    _ = memset(@ptrCast([*]u8, &t), 0, @sizeOf(ScePspFMatrix4));
+    _ = memset(@as([*]u8, @ptrCast(&t)), 0, @sizeOf(psptypes.ScePspFMatrix4));
 
     var i: usize = 0;
     while (i < 4) : (i += 1) {
-        @ptrCast([*]f32, &t)[(i << 2) + i] = 1.0;
+        @as([*]f32, @ptrCast(&t))[(i << 2) + i] = 1.0;
     }
 
-    var c: f32 = @import("cos.zig").cos(angle);
-    var s: f32 = @import("sin.zig").sin(angle);
+    const c: f32 = @import("cos.zig").cos(angle);
+    const s: f32 = @import("sin.zig").sin(angle);
 
     t.x.x = c;
     t.x.y = s;
@@ -159,12 +159,12 @@ pub fn sceGumRotateZ(angle: f32) void {
     gumMultMatrix(gum_current_matrix, gum_current_matrix, &t);
 }
 
-fn gumMultMatrix(result: [*c]ScePspFMatrix4, a: [*c]const ScePspFMatrix4, b: [*c]const ScePspFMatrix4) void {
-    var t: ScePspFMatrix4 = undefined;
+fn gumMultMatrix(result: [*c]psptypes.ScePspFMatrix4, a: [*c]const psptypes.ScePspFMatrix4, b: [*c]const psptypes.ScePspFMatrix4) void {
+    var t: psptypes.ScePspFMatrix4 = undefined;
 
-    const ma: [*]const f32 = @ptrCast([*]const f32, a);
-    const mb: [*]const f32 = @ptrCast([*]const f32, b);
-    var mr: [*]f32 = @ptrCast([*]f32, &t);
+    const ma: [*]const f32 = @as([*]const f32, @ptrCast(a));
+    const mb: [*]const f32 = @as([*]const f32, @ptrCast(b));
+    var mr: [*]f32 = @as([*]f32, @ptrCast(&t));
 
     var i: usize = 0;
     while (i < 4) : (i += 1) {
@@ -180,27 +180,27 @@ fn gumMultMatrix(result: [*c]ScePspFMatrix4, a: [*c]const ScePspFMatrix4, b: [*c
         }
     }
 
-    _ = memcpy(@ptrCast([*]u8, result), @ptrCast([*]u8, &t), @sizeOf(ScePspFMatrix4));
+    _ = memcpy(@as([*]u8, @ptrCast(result)), @as([*]u8, @ptrCast(&t)), @sizeOf(psptypes.ScePspFMatrix4));
 }
 
-pub fn sceGumMatrixMode(mm: MatrixMode) void {
+pub fn sceGumMatrixMode(mm: pspgu.MatrixMode) void {
     @setRuntimeSafety(false);
-    var mode: c_int = @enumToInt(mm);
+    const mode: c_int = @intFromEnum(mm);
     gum_matrix_update[gum_current_mode] = gum_current_matrix_update;
-    gum_stack_depth[gum_current_mode] = @ptrCast([*]ScePspFMatrix4, gum_current_matrix);
-    var t = @ptrCast([*]ScePspFMatrix4, gum_current_matrix);
-    t = gum_stack_depth[@intCast(usize, mode)];
-    gum_current_matrix = @ptrCast(*ScePspFMatrix4, t);
-    gum_current_mode = @intCast(u8, mode);
+    gum_stack_depth[gum_current_mode] = @as([*]psptypes.ScePspFMatrix4, @ptrCast(gum_current_matrix));
+    var t = @as([*]psptypes.ScePspFMatrix4, @ptrCast(gum_current_matrix));
+    t = gum_stack_depth[@as(usize, @intCast(mode))];
+    gum_current_matrix = @as(*psptypes.ScePspFMatrix4, @ptrCast(t));
+    gum_current_mode = @as(u8, @intCast(mode));
     gum_current_matrix_update = gum_matrix_update[gum_current_mode];
 }
 
-pub fn sceGumMultMatrix(m: [*c]const ScePspFMatrix4) void {
+pub fn sceGumMultMatrix(m: [*c]const psptypes.ScePspFMatrix4) void {
     gumMultMatrix(gum_current_matrix, gum_current_matrix, m);
     gum_current_matrix_update = 1;
 }
 
-pub fn sceGumScale(v: *const ScePspFVector3) void {
+pub fn sceGumScale(v: *const psptypes.ScePspFVector3) void {
     var x: f32 = 0;
     var y: f32 = 0;
     var z: f32 = 0;
@@ -221,13 +221,13 @@ pub fn sceGumScale(v: *const ScePspFVector3) void {
     gum_current_matrix_update = 1;
 }
 
-pub fn sceGumTranslate(v: *const ScePspFVector3) void {
-    var t: ScePspFMatrix4 = undefined;
-    _ = memset(@ptrCast([*]u8, &t), 0, @sizeOf(ScePspFMatrix4));
+pub fn sceGumTranslate(v: *const psptypes.ScePspFVector3) void {
+    var t: psptypes.ScePspFMatrix4 = undefined;
+    _ = memset(@as([*]u8, @ptrCast(&t)), 0, @sizeOf(psptypes.ScePspFMatrix4));
 
     var i: usize = 0;
     while (i < 4) : (i += 1) {
-        @ptrCast([*]f32, &t)[(i << 2) + i] = 1.0;
+        @as([*]f32, @ptrCast(&t))[(i << 2) + i] = 1.0;
     }
 
     t.w.x = v.x;
@@ -238,12 +238,12 @@ pub fn sceGumTranslate(v: *const ScePspFVector3) void {
 }
 
 pub fn sceGumOrtho(left: f32, right: f32, bottom: f32, top: f32, near: f32, far: f32) void {
-    var dx: f32 = right - left;
-    var dy: f32 = top - bottom;
-    var dz: f32 = far - near;
+    const dx: f32 = right - left;
+    const dy: f32 = top - bottom;
+    const dz: f32 = far - near;
 
-    var t: ScePspFMatrix4 = undefined;
-    _ = memset(@ptrCast([*]u8, &t), 0, @sizeOf(ScePspFMatrix4));
+    var t: psptypes.ScePspFMatrix4 = undefined;
+    _ = memset(@as([*]u8, @ptrCast(&t)), 0, @sizeOf(psptypes.ScePspFMatrix4));
 
     t.x.x = 2.0 / dx;
     t.w.x = -(right + left) / dx;
@@ -257,12 +257,12 @@ pub fn sceGumOrtho(left: f32, right: f32, bottom: f32, top: f32, near: f32, far:
 }
 
 pub fn sceGumPerspective(fovy: f32, aspect: f32, near: f32, far: f32) void {
-    var angle: f32 = (fovy / 2) * (3.14159 / 180.0);
-    var cotangent: f32 = std.math.cos(angle) / std.math.sin(angle);
-    var delta_z: f32 = near - far;
+    const angle: f32 = (fovy / 2) * (3.14159 / 180.0);
+    const cotangent: f32 = std.math.cos(angle) / std.math.sin(angle);
+    const delta_z: f32 = near - far;
 
-    var t: ScePspFMatrix4 = undefined;
-    _ = memset(@ptrCast([*]u8, &t), 0, @sizeOf(ScePspFMatrix4));
+    var t: psptypes.ScePspFMatrix4 = undefined;
+    _ = memset(@as([*]u8, @ptrCast(&t)), 0, @sizeOf(psptypes.ScePspFMatrix4));
 
     t.x.x = cotangent / aspect;
     t.y.y = cotangent;
@@ -276,9 +276,9 @@ pub fn sceGumPerspective(fovy: f32, aspect: f32, near: f32, far: f32) void {
 
 //Maybe... I kinda just hate this function... it's pointless in most apps
 //Feel free to make a PR
-//pub fn sceGumLookAt(eye: *ScePspFVector3, center: *ScePspFVector3, up: *ScePspFVector3) void{
+//pub fn sceGumLookAt(eye: *psptypes.ScePspFVector3, center: *psptypes.ScePspFVector3, up: *psptypes.ScePspFVector3) void{
 //
-//    var forward : ScePspFVector3 = undefined;
+//    var forward : psptypes.ScePspFVector3 = undefined;
 //    forward.x = center.x - eye.x;
 //    forward.y = center.y - eye.y;
 //    forward.z = center.z - eye.z;
@@ -290,10 +290,10 @@ pub fn sceGumPerspective(fovy: f32, aspect: f32, near: f32, far: f32) void {
 //        forward.x *= il; forward.y *= il; forward.z *= il;
 //    }
 //
-//    var side : ScePspFVector3 = undefined;
-//    var lup : ScePspFVector3 = undefined;
-//    var ieye : ScePspFVector3 = undefined;
-//    var t : ScePspFMatrix4 = undefined;
+//    var side : psptypes.ScePspFVector3 = undefined;
+//    var lup : psptypes.ScePspFVector3 = undefined;
+//    var ieye : psptypes.ScePspFVector3 = undefined;
+//    var t : psptypes.ScePspFMatrix4 = undefined;
 //
 //    gumCrossProduct(&side,&forward,up);
 //    gumNormalize(&side);
@@ -322,7 +322,7 @@ pub fn sceGumPerspective(fovy: f32, aspect: f32, near: f32, far: f32) void {
 //}
 
 pub fn sceGumFullInverse() void {
-    var t: ScePspFMatrix4 = undefined;
+    var t: psptypes.ScePspFMatrix4 = undefined;
     var d0: f32 = 0;
     var d1: f32 = 0;
     var d2: f32 = 0;
@@ -336,11 +336,11 @@ pub fn sceGumFullInverse() void {
     d = gum_current_matrix.x.x * d0 - gum_current_matrix.x.y * d1 + gum_current_matrix.x.z * d2 - gum_current_matrix.x.w * d3;
 
     if (std.math.fabs(d) < 0.000001) {
-        _ = memset(@ptrCast([*]u8, gum_current_matrix), 0, @sizeOf(ScePspFMatrix4));
+        _ = memset(@as([*]u8, @ptrCast(gum_current_matrix)), 0, @sizeOf(psptypes.ScePspFMatrix4));
 
         var i: usize = 0;
         while (i < 4) : (i += 1) {
-            @ptrCast([*]f32, gum_current_matrix)[(i << 2) + i] = 1.0;
+            @as([*]f32, @ptrCast(gum_current_matrix))[(i << 2) + i] = 1.0;
         }
         return;
     }
@@ -367,18 +367,18 @@ pub fn sceGumFullInverse() void {
     t.w.z = -d * (gum_current_matrix.x.x * gum_current_matrix.y.y * gum_current_matrix.w.z + gum_current_matrix.x.y * gum_current_matrix.y.z * gum_current_matrix.w.x + gum_current_matrix.x.z * gum_current_matrix.y.x * gum_current_matrix.w.y - gum_current_matrix.w.x * gum_current_matrix.y.y * gum_current_matrix.x.z - gum_current_matrix.w.y * gum_current_matrix.y.z * gum_current_matrix.x.x - gum_current_matrix.w.z * gum_current_matrix.y.x * gum_current_matrix.x.y);
     t.w.w = d * (gum_current_matrix.x.x * gum_current_matrix.y.y * gum_current_matrix.z.z + gum_current_matrix.x.y * gum_current_matrix.y.z * gum_current_matrix.z.x + gum_current_matrix.x.z * gum_current_matrix.y.x * gum_current_matrix.z.y - gum_current_matrix.z.x * gum_current_matrix.y.y * gum_current_matrix.x.z - gum_current_matrix.z.y * gum_current_matrix.y.z * gum_current_matrix.x.x - gum_current_matrix.z.z * gum_current_matrix.y.x * gum_current_matrix.x.y);
 
-    _ = memcpy(@ptrCast([*]u8, gum_current_matrix), @ptrCast([*]u8, &t), @sizeOf(ScePspFMatrix4));
+    _ = memcpy(@as([*]u8, @ptrCast(gum_current_matrix)), @as([*]u8, @ptrCast(&t)), @sizeOf(psptypes.ScePspFMatrix4));
 
     gum_current_matrix_update = 1;
 }
 
-fn gumDotProduct(a: *ScePspFVector3, b: *ScePspFVector3) f32 {
+fn gumDotProduct(a: *psptypes.ScePspFVector3, b: *psptypes.ScePspFVector3) f32 {
     return (a.x * b.x) + (a.y * b.y) + (a.z * b.z);
 }
 
 pub fn sceGumFastInverse() void {
-    var t: ScePspFMatrix4 = undefined;
-    var negPos: ScePspFVector3 = ScePspFVector3{ .x = -gum_current_matrix.w.x, .y = -gum_current_matrix.w.y, .z = -gum_current_matrix.w.z };
+    var t: psptypes.ScePspFMatrix4 = undefined;
+    var negPos: psptypes.ScePspFVector3 = psptypes.ScePspFVector3{ .x = -gum_current_matrix.w.x, .y = -gum_current_matrix.w.y, .z = -gum_current_matrix.w.z };
 
     // transpose rotation
     t.x.x = gum_current_matrix.x.x;
@@ -397,11 +397,11 @@ pub fn sceGumFastInverse() void {
     t.z.w = 0;
 
     // compute inverse position
-    t.w.x = gumDotProduct(&negPos, @ptrCast(*ScePspFVector3, &gum_current_matrix.x));
-    t.w.y = gumDotProduct(&negPos, @ptrCast(*ScePspFVector3, &gum_current_matrix.y));
-    t.w.z = gumDotProduct(&negPos, @ptrCast(*ScePspFVector3, &gum_current_matrix.z));
+    t.w.x = gumDotProduct(&negPos, @as(*psptypes.ScePspFVector3, @ptrCast(&gum_current_matrix.x)));
+    t.w.y = gumDotProduct(&negPos, @as(*psptypes.ScePspFVector3, @ptrCast(&gum_current_matrix.y)));
+    t.w.z = gumDotProduct(&negPos, @as(*psptypes.ScePspFVector3, @ptrCast(&gum_current_matrix.z)));
     t.w.w = 1;
 
-    _ = memcpy(@ptrCast([*]u8, gum_current_matrix), @ptrCast([*]u8, &t), @sizeOf(ScePspFMatrix4));
+    _ = memcpy(@as([*]u8, @ptrCast(gum_current_matrix)), @as([*]u8, @ptrCast(&t)), @sizeOf(psptypes.ScePspFMatrix4));
     gum_current_matrix_update = 1;
 }

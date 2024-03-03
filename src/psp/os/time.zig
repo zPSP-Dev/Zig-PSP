@@ -15,7 +15,7 @@ usingnamespace @import("../include/pspthreadman.zig");
 /// Spurious wakeups are possible and no precision of timing is guaranteed.
 /// TODO integrate with evented I/O
 pub fn sleep(nanoseconds: u64) void {
-    _ = sceKernelDelayThread(@truncate(u32, nanoseconds / 1000));
+    _ = sceKernelDelayThread(@as(u32, @truncate(nanoseconds / 1000)));
 }
 
 /// Get a calendar timestamp, in seconds, relative to UTC 1970-01-01.
@@ -26,7 +26,7 @@ pub fn sleep(nanoseconds: u64) void {
 pub fn timestamp() i64 {
     var r: u64 = 0;
     _ = sceRtcGetCurrentTick(&r);
-    return @intCast(i64, r / sceRtcGetTickResolution());
+    return @as(i64, @intCast(r / sceRtcGetTickResolution()));
 }
 
 /// Get a calendar timestamp, in milliseconds, relative to UTC 1970-01-01.
@@ -37,7 +37,7 @@ pub fn timestamp() i64 {
 pub fn milliTimestamp() i64 {
     var r: u64 = 0;
     _ = sceRtcGetCurrentTick(&r);
-    return @intCast(i64, r / 1000);
+    return @as(i64, @intCast(r / 1000));
 }
 
 /// Get a calendar timestamp, in nanoseconds, relative to UTC 1970-01-01.
@@ -49,7 +49,7 @@ pub fn milliTimestamp() i64 {
 pub fn nanoTimestamp() i128 {
     var r: u64 = 0;
     _ = sceRtcGetCurrentTick(&r);
-    return @intCast(i64, r * 1000);
+    return @as(i64, @intCast(r * 1000));
 }
 
 // Divisions of a nanosecond.
