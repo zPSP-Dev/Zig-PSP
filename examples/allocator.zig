@@ -7,7 +7,7 @@ const std = @import("std");
 const fmt = std.fmt;
 
 comptime {
-    asm(psp.module_info("Zig PSP App", 0, 1, 0));
+    asm (psp.module_info("Zig PSP App", 0, 1, 0));
 }
 
 fn printFreeMem(alloc: *std.mem.Allocator) void {
@@ -25,17 +25,17 @@ pub fn main() !void {
 
     printFreeMem(psp_allocator);
 
-    const string : []const u8 = try std.fmt.allocPrint(
+    const string: []const u8 = try std.fmt.allocPrint(
         psp_allocator,
         "{} {} {}\n",
         .{ "Hello", "from", "Zig!" },
     );
-    
+
     psp.debug.print(string);
-    
+
     printFreeMem(psp_allocator);
     psp_allocator.free(string); //Explicit free
-    
+
     printFreeMem(psp_allocator);
 
     psp.debug.print("\nKTHXBYE!");

@@ -1,38 +1,38 @@
 pub fn _lb(arg_addr: u32) callconv(.C) u8 {
-    var addr = arg_addr;
-    return @intToPtr([*c]volatile vu8, addr).?.*;
+    const addr = arg_addr;
+    return @as([*c]volatile u8, @ptrFromInt(addr)).?.*;
 }
 pub fn _lh(arg_addr: u32) callconv(.C) u16 {
-    var addr = arg_addr;
-    return @intToPtr([*c]volatile vu16, addr).?.*;
+    const addr = arg_addr;
+    return @as([*c]volatile u16, @ptrFromInt(addr)).?.*;
 }
 pub fn _lw(arg_addr: u32) callconv(.C) u32 {
-    var addr = arg_addr;
-    return @intToPtr([*c]volatile vu32, addr).?.*;
+    const addr = arg_addr;
+    return @as([*c]volatile u32, @ptrFromInt(addr)).?.*;
 }
 pub fn _ld(arg_addr: u32) callconv(.C) u64 {
-    var addr = arg_addr;
-    return @intToPtr([*c]volatile vu64, addr).?.*;
+    const addr = arg_addr;
+    return @as([*c]volatile u64, @ptrFromInt(addr)).?.*;
 }
 pub fn _sb(arg_val: u8, arg_addr: u32) callconv(.C) void {
-    var val = arg_val;
-    var addr = arg_addr;
-    @intToPtr([*c]volatile vu8, addr).?.* = val;
+    const val = arg_val;
+    const addr = arg_addr;
+    @as([*c]volatile u8, @ptrFromInt(addr)).?.* = val;
 }
 pub fn _sh(arg_val: u16, arg_addr: u32) callconv(.C) void {
-    var val = arg_val;
-    var addr = arg_addr;
-    @intToPtr([*c]volatile vu16, addr).?.* = val;
+    const val = arg_val;
+    const addr = arg_addr;
+    @as([*c]volatile u16, @ptrFromInt(addr)).?.* = val;
 }
 pub fn _sw(arg_val: u32, arg_addr: u32) callconv(.C) void {
-    var val = arg_val;
-    var addr = arg_addr;
-    @intToPtr([*c]volatile vu32, addr).?.* = val;
+    const val = arg_val;
+    const addr = arg_addr;
+    @as([*c]volatile u32, @ptrFromInt(addr)).?.* = val;
 }
 pub fn _sd(arg_val: u64, arg_addr: u32) callconv(.C) void {
-    var val = arg_val;
-    var addr = arg_addr;
-    @intToPtr([*c]volatile vu64, addr).?.* = val;
+    const val = arg_val;
+    const addr = arg_addr;
+    @as([*c]volatile u64, @ptrFromInt(addr)).?.* = val;
 }
 
 pub const SceUChar8 = u8;
@@ -50,8 +50,8 @@ pub const SceFloat32 = f32;
 pub const SceWChar16 = c_ushort;
 pub const SceWChar32 = c_uint;
 pub const SceBool = c_int;
-pub const SceVoid = c_void;
-pub const ScePVoid = ?*c_void;
+pub const SceVoid = anyopaque;
+pub const ScePVoid = ?*anyopaque;
 pub const ScePspSRect = extern struct {
     x: c_short,
     y: c_short,

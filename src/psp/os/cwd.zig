@@ -1,16 +1,16 @@
-usingnamespace @import("bits.zig");
-usingnamespace @import("system.zig");
+const bits = @import("bits.zig");
+const system = @import("system.zig");
 
-var __psp_cwd: [PATH_MAX + 1]u8 = [_]u8{0} ** (PATH_MAX + 1);
+var __psp_cwd: [bits.PATH_MAX + 1]u8 = [_]u8{0} ** (bits.PATH_MAX + 1);
 
-pub fn __psp_init_cwd(path: ?*c_void) void {
+pub fn __psp_init_cwd(path: ?*anyopaque) void {
     if (path != null) {
-        var base_path: [PATH_MAX + 1]u8 = undefined;
+        var base_path: [bits.PATH_MAX + 1]u8 = undefined;
         var end: ?[*]u8 = null;
 
-        _ = strncpy(@ptrCast(?[*]u8, &base_path), @ptrCast([*]const u8, path), PATH_MAX);
-        base_path[PATH_MAX] = 0;
-        end = strrchr(@ptrCast([*]u8, base_path[0..]), '/');
+        _ = strncpy(@as(?[*]u8, @ptrCast(&base_path)), @as([*]const u8, @ptrCast(path)), bits.PATH_MAX);
+        base_path[bits.PATH_MAX] = 0;
+        end = strrchr(@as([*]u8, @ptrCast(base_path[0..])), '/');
         if (end != null) {
             (end.? + 1).* = 0;
             _ = chdir(base_path[0..]);
@@ -26,7 +26,7 @@ pub fn strncpy(dest: ?[*]u8, src: [*]const u8, num: usize) ?[*]u8 {
     var ptr = dest.?;
     var ptr2 = src;
 
-    var i: isize = @intCast(isize, num);
+    var i: isize = @as(isize, @intCast(num));
     while (ptr[0] != 0 and i >= 0) : (i -= 1) {
         ptr[0] = ptr2[0];
         ptr += 1;
@@ -40,37 +40,35 @@ pub fn strncpy(dest: ?[*]u8, src: [*]const u8, num: usize) ?[*]u8 {
 pub fn strrchr(c: [*]u8, tbf: u8) ?[*]u8 {
     var found: ?[*]u8 = null;
 
-    var ptr = c;
-
     var i: usize = 0;
     while (c[i] != 0) : (i += 1) {
         if (c[i] == tbf) {
-            found = @ptrCast([*]u8, &c[i]);
+            found = @as([*]u8, @ptrCast(&c[i]));
         }
     }
 
     return found;
 }
 
-usingnamespace @import("../sdk/pspiofilemgr.zig");
+const pspiofilemgr = @import("../sdk/pspiofilemgr.zig");
 
 pub fn chdir(path: [*]const u8) c_int {
-    var dest: [PATH_MAX + 1]u8 = undefined;
+    var dest: [bits.PATH_MAX + 1]u8 = undefined;
     var uid: c_int = 0;
 
-    if (__psp_path_absolute(path, dest[0..], PATH_MAX) < 0) {
-        errno = ENAMETOOLONG;
+    if (__psp_path_absolute(path, dest[0..], bits.PATH_MAX) < 0) {
+        pspiofilemgr.errno = bits.ENAMETOOLONG;
         return -1;
     }
 
-    uid = sceIoDopen(dest[0..]);
+    uid = pspiofilemgr.sceIoDopen(dest[0..]);
     if (uid < 0) {
-        errno = ENOTDIR;
+        pspiofilemgr.errno = bits.ENOTDIR;
         return -1;
     }
-    _ = sceIoDclose(uid);
+    _ = pspiofilemgr.sceIoDclose(uid);
 
-    _ = sceIoChdir(dest[0..]);
+    _ = pspiofilemgr.sceIoChdir(dest[0..]);
     _ = strcpy(__psp_cwd[0..], dest[0..]);
     return 0;
 }
@@ -99,7 +97,7 @@ pub fn __psp_path_absolute(in: [*]const u8, out: [*]u8, len: usize) c_int {
     // See what the relative URL starts with
     dr = __psp_get_drive(in);
 
-    if (dr > 0 and in[@intCast(usize, dr)] == '/') {
+    if (dr > 0 and in[@as(usize, @intCast(dr))] == '/') {
         //It starts with "drive:/", so it's already absolute
         if (__psp_safe_strcpy(out, in, len) == 0)
             return -1;
@@ -109,7 +107,7 @@ pub fn __psp_path_absolute(in: [*]const u8, out: [*]u8, len: usize) c_int {
             return -2;
         _ = strcpy(out, __psp_cwd[0..]);
         dr = __psp_get_drive(out);
-        out[@intCast(usize, dr)] = 0;
+        out[@as(usize, @intCast(dr))] = 0;
         if (__psp_safe_strcat(out, in, len) == 0)
             return -3;
     } else {
@@ -118,7 +116,7 @@ pub fn __psp_path_absolute(in: [*]const u8, out: [*]u8, len: usize) c_int {
             return -4;
         _ = strcpy(out, __psp_cwd[0..]);
 
-        var stat = __psp_safe_strcat(out, "/", len);
+        const stat = __psp_safe_strcat(out, "/", len);
         if (stat == 0) {
             return -6;
         }
@@ -129,7 +127,7 @@ pub fn __psp_path_absolute(in: [*]const u8, out: [*]u8, len: usize) c_int {
     // Now normalize the pathname portion
     dr = __psp_get_drive(out);
     if (dr < 0) dr = 0;
-    return __psp_path_normalize(out + @intCast(usize, dr), @intCast(usize, @intCast(isize, len) - dr));
+    return __psp_path_normalize(out + @as(usize, @intCast(dr)), @as(usize, @intCast(@as(isize, @intCast(len)) - dr)));
 }
 
 pub fn __psp_get_drive(d: [*]const u8) c_int {
@@ -139,7 +137,7 @@ pub fn __psp_get_drive(d: [*]const u8) c_int {
         if (!((d[i] >= 'a' and d[i] <= 'z') or (d[i] >= '0' and d[i] <= '9')))
             break;
     }
-    if (d[i] == ':') return @intCast(c_int, i + 1);
+    if (d[i] == ':') return @as(c_int, @intCast(i + 1));
     return -1;
 }
 
@@ -194,11 +192,11 @@ pub fn __psp_path_normalize(out: [*]u8, len: usize) c_int {
     if (__psp_safe_strcat(out, "/", len) == 0) return -10;
 
     // Convert "//" to "/" */
-    while (out[@intCast(usize, i) + 1] != 0) : (i += 1) {
-        if (out[@intCast(usize, i)] == '/' and out[@intCast(usize, i) + 1] == '/') {
+    while (out[@as(usize, @intCast(i)) + 1] != 0) : (i += 1) {
+        if (out[@as(usize, @intCast(i))] == '/' and out[@as(usize, @intCast(i)) + 1] == '/') {
             j = i + 1;
-            while (out[@intCast(usize, j)] != 0) : (j += 1) {
-                out[@intCast(usize, j)] = out[@intCast(usize, j + 1)];
+            while (out[@as(usize, @intCast(j))] != 0) : (j += 1) {
+                out[@as(usize, @intCast(j))] = out[@as(usize, @intCast(j + 1))];
             }
             i -= 1;
         }
@@ -206,11 +204,11 @@ pub fn __psp_path_normalize(out: [*]u8, len: usize) c_int {
 
     // Convert "/./" to "/" */
     i = 0;
-    while (out[@intCast(usize, i)] != 0 and out[@intCast(usize, i + 1)] != 0 and out[@intCast(usize, i + 2)] != 0) : (i += 1) {
-        if (out[@intCast(usize, i)] == '/' and out[@intCast(usize, i + 1)] == '.' and out[@intCast(usize, i + 2)] == '/') {
+    while (out[@as(usize, @intCast(i))] != 0 and out[@as(usize, @intCast(i + 1))] != 0 and out[@as(usize, @intCast(i + 2))] != 0) : (i += 1) {
+        if (out[@as(usize, @intCast(i))] == '/' and out[@as(usize, @intCast(i + 1))] == '.' and out[@as(usize, @intCast(i + 2))] == '/') {
             j = i + 1;
-            while (out[@intCast(usize, j)] != 0) : (j += 1) {
-                out[@intCast(usize, j)] = out[@intCast(usize, j + 2)];
+            while (out[@as(usize, @intCast(j))] != 0) : (j += 1) {
+                out[@as(usize, @intCast(j))] = out[@as(usize, @intCast(j + 2))];
             }
             i -= 1;
         }
@@ -228,8 +226,8 @@ pub fn __psp_path_normalize(out: [*]u8, len: usize) c_int {
             out[next + 3] != 0 and out[next + 3] == '/')
         {
             j = 0;
-            while (out[first + @intCast(usize, j + 1)] != 0) : (j += 1) {
-                out[first + @intCast(usize, j + 1)] = out[next + @intCast(usize, j + 4)];
+            while (out[first + @as(usize, @intCast(j + 1))] != 0) : (j += 1) {
+                out[first + @as(usize, @intCast(j + 1))] = out[next + @as(usize, @intCast(j + 4))];
             }
             first = 0;
             next = 0;
@@ -247,12 +245,12 @@ pub fn __psp_path_normalize(out: [*]u8, len: usize) c_int {
 
     // Remove trailing "/" */
     i = 1;
-    while (out[@intCast(usize, i)] != 0) : (i += 1) {
+    while (out[@as(usize, @intCast(i))] != 0) : (i += 1) {
         continue;
     }
 
-    if (i >= 1 and out[@intCast(usize, i - 1)] == '/')
-        out[@intCast(usize, i - 1)] = 0;
+    if (i >= 1 and out[@as(usize, @intCast(i - 1))] == '/')
+        out[@as(usize, @intCast(i - 1))] = 0;
 
     return 0;
 }

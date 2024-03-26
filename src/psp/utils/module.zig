@@ -1,26 +1,31 @@
-test "" {
+test {
     @import("std").meta.refAllDecls(@This());
 }
 
-usingnamespace @import("../include/psploadexec.zig");
-usingnamespace @import("../include/pspthreadman.zig");
-usingnamespace @import("../include/psptypes.zig");
-usingnamespace @import("debug.zig");
+const psploadexec = @import("../include/psploadexec.zig");
+const pspthreadman = @import("../include/pspthreadman.zig");
+const psptypes = @import("../include/psptypes.zig");
+const debug = @import("debug.zig");
 
 const root = @import("root");
+
+const SceUID = psptypes.SceUID;
 
 //If there's an issue this is the internal exit (wait 10 seconds and exit).
 pub fn exitErr() void {
     //Hang for 10 seconds for error reporting
-    var stat = sceKernelDelayThread(10 * 1000 * 1000);
+    const stat = pspthreadman.sceKernelDelayThread(10 * 1000 * 1000);
+    _ = stat;
     //Exit out.
-    sceKernelExitGame();
+    psploadexec.sceKernelExitGame();
 }
 
 const has_std_os = if (@hasDecl(root, "os")) true else false;
+const bad_main_ret = @compileError("Where is this from?!");
 
 //This calls your main function as a thread.
-pub fn _module_main_thread(argc: SceSize, argv: ?*c_void) callconv(.C) c_int {
+pub fn _module_main_thread(argc: psptypes.SceSize, argv: ?*anyopaque) callconv(.C) c_int {
+    _ = argc;
     if (has_std_os) {
         pspos.system.__pspOsInit(argv);
     }
@@ -41,9 +46,9 @@ pub fn _module_main_thread(argc: SceSize, argv: ?*c_void) callconv(.C) c_int {
         },
         .ErrorUnion => {
             const result = root.main() catch |err| {
-                print("ERROR CAUGHT: ");
-                print(@errorName(err));
-                print("\nExiting in 10 seconds...");
+                debug.print("ERROR CAUGHT: ");
+                debug.print(@errorName(err));
+                debug.print("\nExiting in 10 seconds...");
 
                 exitErr();
                 return 1;
@@ -62,8 +67,8 @@ pub fn _module_main_thread(argc: SceSize, argv: ?*c_void) callconv(.C) c_int {
         else => @compileError(bad_main_ret),
     }
 
-    if (exitOnEnd) {
-        sceKernelExitGame();
+    if (debug.exitOnEnd) {
+        psploadexec.sceKernelExitGame();
     }
     return 0;
 }
@@ -172,15 +177,15 @@ pub fn module_info(comptime name: []const u8, comptime attrib: u16, comptime maj
         \\module_info:
         \\.align 5
         \\.hword 
-        ++ attr ++ "\n" ++
+    ++ attr ++ "\n" ++
         \\.byte 
-        ++ maj ++ "\n" ++
+    ++ maj ++ "\n" ++
         \\.byte 
-        ++ min ++ "\n" ++
+    ++ min ++ "\n" ++
         \\.ascii "
-        ++ name ++ "\"\n" ++
+    ++ name ++ "\"\n" ++
         \\.space 
-        ++ count ++ "\n" ++
+    ++ count ++ "\n" ++
         \\.byte 0
         \\.word _gp
         \\.word __lib_ent_top
@@ -192,7 +197,7 @@ pub fn module_info(comptime name: []const u8, comptime attrib: u16, comptime maj
 
 const pspos = @import("../pspos.zig");
 //Entry point - launches main through the thread above.
-pub export fn module_start(argc: c_uint, argv: ?*c_void) c_int {
-    var thid: SceUID = sceKernelCreateThread("zig_user_main", _module_main_thread, 0x20, 256 * 1024, 0b10000000000000000100000000000000, 0);
-    return sceKernelStartThread(thid, argc, argv);
+pub export fn module_start(argc: c_uint, argv: ?*anyopaque) c_int {
+    const thid: SceUID = pspthreadman.sceKernelCreateThread("zig_user_main", _module_main_thread, 0x20, 256 * 1024, 0b10000000000000000100000000000000, 0);
+    return pspthreadman.sceKernelStartThread(thid, argc, argv);
 }

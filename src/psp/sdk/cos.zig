@@ -61,7 +61,7 @@ fn cos_(comptime T: type, x_: T) T {
     x = math.fabs(x);
 
     var y = math.floor(x * m4pi);
-    var j = @floatToInt(I, y);
+    var j = @as(I, @intFromFloat(y));
 
     if (j & 1 == 1) {
         j += 1;

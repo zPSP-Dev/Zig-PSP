@@ -1,8 +1,8 @@
-usingnamespace @import("constants.zig");
-usingnamespace @import("../include/pspge.zig");
-usingnamespace @import("../include/pspdisplay.zig");
-usingnamespace @import("../include/pspthreadman.zig");
-usingnamespace @import("../include/psploadexec.zig");
+const constants = @import("constants.zig");
+const pspge = @import("../include/pspge.zig");
+const pspdisplay = @import("../include/pspdisplay.zig");
+const pspthreadman = @import("../include/pspthreadman.zig");
+const psploadexec = @import("../include/psploadexec.zig");
 
 const builtin = @import("builtin");
 
@@ -30,7 +30,7 @@ pub fn screenSetXY(sX: u8, sY: u8) void {
 //Clears the screen to the clear color (default is black)
 pub fn screenClear() void {
     var i: usize = 0;
-    while (i < SCR_BUF_WIDTH * SCREEN_HEIGHT) : (i += 1) {
+    while (i < constants.constants.SCR_BUF_WIDTH * constants.constants.SCREEN_HEIGHT) : (i += 1) {
         vram_base.?[i] = cl_col;
     }
 }
@@ -72,10 +72,10 @@ pub fn screenInit() void {
     x = 0;
     y = 0;
 
-    vram_base = @intToPtr(?[*]u32, 0x40000000 | @ptrToInt(sceGeEdramGetAddr()));
+    vram_base = @as(?[*]u32, @ptrFromInt(0x40000000 | @intFromPtr(pspge.sceGeEdramGetAddr())));
 
-    _ = sceDisplaySetMode(0, SCREEN_WIDTH, SCREEN_HEIGHT);
-    _ = sceDisplaySetFrameBuf(vram_base, SCR_BUF_WIDTH, @enumToInt(PspDisplayPixelFormats.Format8888), 1);
+    _ = pspdisplay.sceDisplaySetMode(0, constants.SCREEN_WIDTH, constants.SCREEN_HEIGHT);
+    _ = pspdisplay.sceDisplaySetFrameBuf(vram_base, constants.SCR_BUF_WIDTH, @intFromEnum(pspdisplay.PspDisplayPixelFormats.Format8888), 1);
 
     screenClear();
 }
@@ -125,7 +125,7 @@ pub fn printFormat(comptime fmt: []const u8, args: anytype) !void {
     const alloc = @import("allocator.zig");
     var psp_allocator = &alloc.PSPAllocator.init().allocator;
 
-    var string = try std.fmt.allocPrint(psp_allocator, fmt, args);
+    const string = try std.fmt.allocPrint(psp_allocator, fmt, args);
     defer psp_allocator.free(string);
 
     print(string);
@@ -136,7 +136,7 @@ pub const msxFont = @embedFile("./msxfont2.bin");
 
 //Puts a character to screen
 fn internal_putchar(cx: u32, cy: u32, ch: u8) void {
-    var off: usize = cx + (cy * SCR_BUF_WIDTH);
+    const off: usize = cx + (cy * constants.SCR_BUF_WIDTH);
 
     var i: usize = 0;
     while (i < 8) : (i += 1) {
@@ -145,19 +145,19 @@ fn internal_putchar(cx: u32, cy: u32, ch: u8) void {
         while (j < 8) : (j += 1) {
             const mask: u32 = 128;
 
-            var idx: u32 = @as(u32, ch - 32) * 8 + i;
-            var glyph: u8 = msxFont[idx];
+            const idx: u32 = @as(u32, ch - 32) * 8 + i;
+            const glyph: u8 = msxFont[idx];
 
-            if ((glyph & (mask >> @intCast(@import("std").math.Log2Int(c_int), j))) != 0) {
-                vram_base.?[j + i * SCR_BUF_WIDTH + off] = fg_col;
+            if ((glyph & (mask >> @as(@import("std").math.Log2Int(c_int), @intCast(j)))) != 0) {
+                vram_base.?[j + i * constants.SCR_BUF_WIDTH + off] = fg_col;
             } else if (back_col_enable) {
-                vram_base.?[j + i * SCR_BUF_WIDTH + off] = bg_col;
+                vram_base.?[j + i * constants.SCR_BUF_WIDTH + off] = bg_col;
             }
         }
     }
 }
 
-usingnamespace @import("module.zig");
+const module = @import("module.zig");
 
 //Meme panic
 pub var pancakeMode: bool = false;
@@ -165,6 +165,7 @@ pub var pancakeMode: bool = false;
 //Panic handler
 //Import this in main to use!
 pub fn panic(message: []const u8, stack_trace: ?*std.builtin.StackTrace) noreturn {
+    _ = stack_trace;
     screenInit();
 
     if (pancakeMode) {
@@ -182,6 +183,6 @@ pub fn panic(message: []const u8, stack_trace: ?*std.builtin.StackTrace) noretur
     //}
     print("\nExiting in 10 seconds...");
 
-    exitErr();
+    module.exitErr();
     while (true) {}
 }

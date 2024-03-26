@@ -1,6 +1,6 @@
 //This is probably broken
-usingnamespace @import("../include/pspdisplay.zig");
-usingnamespace @import("../include/pspgu.zig");
+const display = @import("../include/pspdisplay.zig");
+const gu = @import("../include/pspgu.zig");
 
 //This isn't an actual "allocator" per se
 //It allocates static chunks of VRAM
@@ -9,7 +9,7 @@ usingnamespace @import("../include/pspgu.zig");
 var vramOff: usize = 0;
 
 //Get the amount of memory needed
-fn getMemSize(width: u32, height: u32, format: GuPixelMode) c_uint {
+fn getMemSize(width: u32, height: u32, format: gu.GuPixelMode) c_uint {
     switch (format) {
         .PsmT4 => {
             return width * height / 2;
@@ -32,13 +32,13 @@ fn getMemSize(width: u32, height: u32, format: GuPixelMode) c_uint {
 }
 
 //Allocate a buffer of VRAM in VRAM-Relative pointers (0 is 0x04000000)
-pub fn allocVramRelative(width: u32, height: u32, format: GuPixelMode) ?*c_void {
-    var res = vramOff;
+pub fn allocVramRelative(width: u32, height: u32, format: gu.GuPixelMode) ?*anyopaque {
+    const res = vramOff;
     vramOff += getMemSize(width, height, format);
-    return @intToPtr(?*c_void, res);
+    return @as(?*anyopaque, @ptrFromInt(res));
 }
 
 //Allocate a buffer of VRAM in VRAM-Absolute pointers (0x04000000 start)
-pub fn allocVramAbsolute(width: u32, height: u32, format: GuPixelMode) ?*c_void {
-    return @intToPtr(?*c_void, @ptrToInt(allocVramDirect(width, height, format)) + @ptrToInt(sceGeEdramGetAddr));
+pub fn allocVramAbsolute(width: u32, height: u32, format: gu.GuPixelMode) ?*anyopaque {
+    return @as(?*anyopaque, @ptrFromInt(@intFromPtr(display.allocVramDirect(width, height, format)) + @intFromPtr(display.sceGeEdramGetAddr)));
 }

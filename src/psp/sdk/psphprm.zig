@@ -1,4 +1,4 @@
-pub const PspHprmKeys = extern enum(u8) {
+pub const PspHprmKeys = enum(u8) {
     Playpause = 1,
     Forward = 4,
     Back = 8,
@@ -15,7 +15,7 @@ pub const PspHprmKeys = extern enum(u8) {
 // @return < 0 on error
 pub extern fn sceHprmPeekCurrentKey(key: [*]u32) c_int;
 pub fn hprmPeekCurrentKey(latch: [*]u32) !i32 {
-    var res = sceHprmPeekCurrentKey(latch);
+    const res = sceHprmPeekCurrentKey(latch);
     if (res < 0) {
         return error.Unexpected;
     }
@@ -29,7 +29,7 @@ pub fn hprmPeekCurrentKey(latch: [*]u32) !i32 {
 // @return < 0 on error.
 pub extern fn sceHprmPeekLatch(latch: [*]u32) c_int;
 pub fn hprmPeekLatch(latch: [*]u32) !i32 {
-    var res = sceHprmPeekLatch(latch);
+    const res = sceHprmPeekLatch(latch);
     if (res < 0) {
         return error.Unexpected;
     }
@@ -43,7 +43,7 @@ pub fn hprmPeekLatch(latch: [*]u32) !i32 {
 // @return < 0 on error.
 pub extern fn sceHprmReadLatch(latch: [*]u32) c_int;
 pub fn hprmReadLatch(latch: [*]u32) !i32 {
-    var res = sceHprmReadLatch(latch);
+    const res = sceHprmReadLatch(latch);
     if (res < 0) {
         return error.Unexpected;
     }

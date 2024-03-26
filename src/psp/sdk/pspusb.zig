@@ -7,8 +7,8 @@ usingnamespace @import("psptypes.zig");
 // @param args - Arguments to pass to USB driver start
 //
 // @return 0 on success
-pub extern fn sceUsbStart(driverName: [*c]const u8, size: c_int, args: ?*c_void) c_int;
-pub fn usbStart(driverName: [*c]const u8, size: c_int, args: ?*c_void) bool {
+pub extern fn sceUsbStart(driverName: [*c]const u8, size: c_int, args: ?*anyopaque) c_int;
+pub fn usbStart(driverName: [*c]const u8, size: c_int, args: ?*anyopaque) bool {
     return sceUsbStart(driverName, size, args) == 0;
 }
 
@@ -19,8 +19,8 @@ pub fn usbStart(driverName: [*c]const u8, size: c_int, args: ?*c_void) bool {
 // @param args - Arguments to pass to USB driver start
 //
 // @return 0 on success
-pub extern fn sceUsbStop(driverName: [*c]const u8, size: c_int, args: ?*c_void) c_int;
-pub fn usbStop(driverName: [*c]const u8, size: c_int, args: ?*c_void) bool {
+pub extern fn sceUsbStop(driverName: [*c]const u8, size: c_int, args: ?*anyopaque) c_int;
+pub fn usbStop(driverName: [*c]const u8, size: c_int, args: ?*anyopaque) bool {
     return sceUsbStop(driverName, size, args) == 0;
 }
 

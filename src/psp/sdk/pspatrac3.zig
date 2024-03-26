@@ -1,5 +1,5 @@
-usingnamespace @import("psptypes.zig");
-test "" {
+const psptypes = @import("psptypes.zig");
+test {
     @import("std").meta.refAllDecls(@This());
 }
 
@@ -31,72 +31,73 @@ pub const AtracError = enum(u32) {
 fn intToError(res: c_int) !void {
     @setRuntimeSafety(false);
     if (res < 0) {
-        var translated = @bitCast(u32, res);
-        switch (@intToEnum(AtracError, res)) {
-            ParamFail => {
+        const translated = @as(u32, @bitCast(res));
+        _ = translated;
+        switch (@as(AtracError, @enumFromInt(res))) {
+            psptypes.ParamFail => {
                 return error.ParamFail;
             },
-            ApiFail => {
+            psptypes.ApiFail => {
                 return error.ApiFail;
             },
-            NoAtracid => {
+            psptypes.NoAtracid => {
                 return error.NoAtracid;
             },
-            BadCodectype => {
+            psptypes.BadCodectype => {
                 return error.BadCodectype;
             },
-            BadAtracid => {
+            psptypes.BadAtracid => {
                 return error.BadAtracid;
             },
-            UnknownFormat => {
+            psptypes.UnknownFormat => {
                 return error.UnknownFormat;
             },
-            UnmatchFormat => {
+            psptypes.UnmatchFormat => {
                 return error.UnmatchFormat;
             },
-            BadData => {
+            psptypes.BadData => {
                 return error.BadData;
             },
-            AlldataIsOnmemory => {
+            psptypes.AlldataIsOnmemory => {
                 return error.AlldataIsOnmemory;
             },
-            UnsetData => {
+            psptypes.UnsetData => {
                 return error.UnsetData;
             },
-            ReadSizeIsTooSmall => {
+            psptypes.ReadSizeIsTooSmall => {
                 return error.ReadSizeIsTooSmall;
             },
-            NeedSecondBuffer => {
+            psptypes.NeedSecondBuffer => {
                 return error.NeedSecondBuffer;
             },
-            ReadSizeOverBuffer => {
+            psptypes.ReadSizeOverBuffer => {
                 return error.ReadSizeOverBuffer;
             },
-            Not4byteAlignment => {
+            psptypes.Not4byteAlignment => {
                 return error.Not4byteAlignment;
             },
-            BadSample => {
+            psptypes.BadSample => {
                 return error.BadSample;
             },
-            WriteByteFirstBuffer => {
+            psptypes.WriteByteFirstBuffer => {
                 return error.WriteByteFirstBuffer;
             },
-            WriteByteSecondBuffer => {
+            psptypes.WriteByteSecondBuffer => {
                 return error.WriteByteSecondBuffer;
             },
-            AddDataIsTooBig => {
+            psptypes.AddDataIsTooBig => {
                 return error.AddDataIsTooBig;
             },
-            UnsetParam => {
+            psptypes.UnsetParam => {
                 return error.UnsetParam;
             },
-            NoNeedSecondBuffer => {
+            psptypes.NoNeedSecondBuffer => {
                 return error.NoNeedSecondBuffer;
             },
-            NoDataInBuffer => {
+            psptypes.NoDataInBuffer => {
                 return error.NoDataInBuffer;
             },
-            AllDataWasDecoded => {
+            psptypes.AllDataWasDecoded => {
                 return error.AllDataWasDecoded;
             },
         }
@@ -126,7 +127,7 @@ pub const AtracCodecType = enum(u32) {
 // Gets the ID for a certain codec.
 // Can return error for invalid ID.
 pub fn atracGetAtracID(uiCodecType: AtracCodecType) !i32 {
-    var res = sceAtracGetAtracID(@enumToInt(uiCodecType));
+    const res = sceAtracGetAtracID(@intFromEnum(uiCodecType));
     try intToError(res);
     return res;
 }
@@ -137,10 +138,10 @@ pub fn atracGetAtracID(uiCodecType: AtracCodecType) !i32 {
 // @param bufsize - the size of the buffer pointed by buf
 //
 // @return the new atrac ID, or < 0 on error
-pub extern fn sceAtracSetDataAndGetID(buf: ?*c_void, bufsize: SceSize) c_int;
+pub extern fn sceAtracSetDataAndGetID(buf: ?*anyopaque, bufsize: psptypes.SceSize) c_int;
 
-pub fn atracSetDataAndGetID(buf: *c_void, bufSize: usize) !u32 {
-    var res = sceAtracSetDataAndGetID(buf, bufSize);
+pub fn atracSetDataAndGetID(buf: *anyopaque, bufSize: usize) !u32 {
+    const res = sceAtracSetDataAndGetID(buf, bufSize);
     try intToError(res);
     return res;
 }
@@ -159,7 +160,7 @@ pub fn atracSetDataAndGetID(buf: *c_void, bufSize: usize) !u32 {
 pub extern fn sceAtracDecodeData(atracID: u32, outSamples: [*c]u16, outN: [*c]c_int, outEnd: [*c]c_int, outRemainFrame: [*c]c_int) c_int;
 
 pub fn atracDecodeData(atracID: u32, outSamples: []u16, outN: []i32, outEnd: []i32, outRemainFrame: []i32) !void {
-    var res = sceAtracDecodeData(atracID, outSamples, outN, outEnd, outRemainFrame);
+    const res = sceAtracDecodeData(atracID, outSamples, outN, outEnd, outRemainFrame);
     try intToError(res);
 }
 
@@ -173,7 +174,7 @@ pub fn atracDecodeData(atracID: u32, outSamples: []u16, outN: []i32, outEnd: []i
 pub extern fn sceAtracGetRemainFrame(atracID: u32, outRemainFrame: [*c]c_int) c_int;
 
 pub fn atracGetRemainFrame(atracID: u32, outRemainFrame: []i32) !void {
-    var res = sceAtracDecodeData(atracID, outSamples, outN, outEnd, outRemainFrame);
+    const res = sceAtracDecodeData(atracID, psptypes.outSamples, psptypes.outN, psptypes.outEnd, outRemainFrame);
     try intToError(res);
 }
 
@@ -187,7 +188,7 @@ pub fn atracGetRemainFrame(atracID: u32, outRemainFrame: []i32) !void {
 pub extern fn sceAtracGetStreamDataInfo(atracID: u32, writePointer: [*c][*c]u8, availableBytes: [*c]u32, readOffset: [*c]u32) c_int;
 
 pub fn atracGetStreamDataInfo(atracID: u32, writePointer: [*c][*c]u8, availableBytes: [*c]u32, readOffset: [*c]u32) !void {
-    var res = sceAtracGetStreamDataInfo(atracID, writePointer, availableBytes, readOffset);
+    const res = sceAtracGetStreamDataInfo(atracID, writePointer, availableBytes, readOffset);
     try intToError(res);
 }
 
@@ -199,7 +200,7 @@ pub fn atracGetStreamDataInfo(atracID: u32, writePointer: [*c][*c]u8, availableB
 pub extern fn sceAtracAddStreamData(atracID: u32, bytesToAdd: c_uint) c_int;
 
 pub fn atracAddStreamData(atracID: u32, bytesToAdd: u32) !void {
-    var res = sceAtracAddStreamData(atracID, bytesToAdd);
+    const res = sceAtracAddStreamData(atracID, bytesToAdd);
     try intToError(res);
 }
 
@@ -212,7 +213,7 @@ pub fn atracAddStreamData(atracID: u32, bytesToAdd: u32) !void {
 pub extern fn sceAtracGetBitrate(atracID: u32, outBitrate: [*c]c_int) c_int;
 
 pub fn atracGetBitrate(atracID: u32, outBitrate: [*c]c_int) !void {
-    var res = sceAtracGetBitrate(atracID, outBitrate);
+    const res = sceAtracGetBitrate(atracID, outBitrate);
     try intToError(res);
 }
 
@@ -225,7 +226,7 @@ pub fn atracGetBitrate(atracID: u32, outBitrate: [*c]c_int) !void {
 pub extern fn sceAtracSetLoopNum(atracID: u32, nloops: c_int) c_int;
 
 pub fn atracSetLoopNum(atracID: u32, nloops: c_int) !void {
-    var res = atracSetLoopNum(atracID, nloops);
+    const res = atracSetLoopNum(atracID, nloops);
     try intToError(res);
 }
 
@@ -237,7 +238,7 @@ pub fn atracSetLoopNum(atracID: u32, nloops: c_int) !void {
 pub extern fn sceAtracReleaseAtracID(atracID: u32) c_int;
 
 pub fn atracReleaseAtracID(atracID: u32) !i32 {
-    var res = sceAtracReleaseAtracID(atracID);
+    const res = sceAtracReleaseAtracID(atracID);
     try intToError(res);
     return res;
 }
@@ -251,7 +252,7 @@ pub fn atracReleaseAtracID(atracID: u32) !i32 {
 pub extern fn sceAtracGetNextSample(atracID: u32, outN: [*c]c_int) c_int;
 
 pub fn atracGetNextSample(atracID: u32, outN: [*c]c_int) !void {
-    var res = sceAtracGetNextSample(atracID, outN);
+    const res = sceAtracGetNextSample(atracID, outN);
     try intToError(res);
 }
 

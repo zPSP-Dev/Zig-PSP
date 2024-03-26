@@ -3,9 +3,12 @@ const mem = std.mem;
 const debug = std.debug;
 const assert = debug.assert;
 
-usingnamespace @import("../include/psptypes.zig");
-usingnamespace @import("../include/pspsysmem.zig");
-usingnamespace @import("../include/psploadexec.zig");
+const psptypes = @import("../include/psptypes.zig");
+const pspsysmem = @import("../include/pspsysmem.zig");
+const psploadexec = @import("../include/psploadexec.zig");
+
+const SceSize = psptypes.SceSize;
+const SceUID = psptypes.SceUID;
 
 const Allocator = mem.Allocator;
 
@@ -27,6 +30,9 @@ pub const PSPAllocator = struct {
 
     //Our Allocator
     fn psp_realloc(allocator: *Allocator, len: usize, alignment: u29, len_align: u29, ra: usize) std.mem.Allocator.Error![]u8 {
+        _ = allocator;
+        _ = len_align;
+        _ = ra;
         //Assume alignment is less than double aligns
         assert(len > 0);
         assert(alignment <= @alignOf(c_longdouble));
@@ -35,7 +41,7 @@ pub const PSPAllocator = struct {
         if (len > 0) {
 
             //Gets a block of memory
-            var id: SceUID = sceKernelAllocPartitionMemory(2, "block", @enumToInt(PspSysMemBlockTypes.MemLow), len + @sizeOf(SceUID), null);
+            const id: SceUID = psploadexec.sceKernelAllocPartitionMemory(2, "block", @intFromEnum(psploadexec.PspSysMemBlockTypes.MemLow), len + @sizeOf(SceUID), null);
 
             if (id < 0) {
                 //TODO: Handle error cases that aren't out of memory...
@@ -43,13 +49,13 @@ pub const PSPAllocator = struct {
             }
 
             //Get the head address
-            var ptr = @ptrCast([*]u32, @alignCast(4, sceKernelGetBlockHeadAddr(id)));
+            const ptr = @as([*]u32, @ptrCast(@alignCast(psploadexec.sceKernelGetBlockHeadAddr(id))));
 
             //Store our ID to free
-            @ptrCast(*c_int, ptr).* = id;
+            @as(*c_int, @ptrCast(ptr)).* = id;
 
             //Convert and return
-            var ptr2 = @ptrCast([*]u8, ptr);
+            var ptr2 = @as([*]u8, @ptrCast(ptr));
             ptr2 += @sizeOf(SceUID);
 
             return ptr2[0..len];
@@ -60,16 +66,22 @@ pub const PSPAllocator = struct {
 
     //Our de-allocator
     fn psp_shrink(allocator: *Allocator, buf_unaligned: []u8, buf_align: u29, new_size: usize, len_align: u29, return_address: usize) std.mem.Allocator.Error!usize {
+        _ = allocator;
+        _ = buf_align;
+        _ = new_size;
+        _ = len_align;
+        _ = return_address;
 
         //Get ptr
-        var ptr = @ptrCast([*]u8, buf_unaligned);
+        var ptr = @as([*]u8, @ptrCast(buf_unaligned));
 
         //Go back to our ID
         ptr -= @sizeOf(SceUID);
-        var id = @ptrCast(*c_int, @alignCast(4, ptr)).*;
+        const id = @as(*c_int, @ptrCast(@alignCast(ptr))).*;
 
         //Free the ID
-        var s = sceKernelFreePartitionMemory(id);
+        const s = psploadexec.sceKernelFreePartitionMemory(id);
+        _ = s;
 
         //Return 0
         return 0;

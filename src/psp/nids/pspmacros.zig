@@ -6,57 +6,58 @@ pub fn import_module_start(comptime module: []const u8, comptime flags_ver: []co
         \\.set noreorder
         \\.section .rodata.sceResident, "a"
         \\__stub_modulestr_
-        ++ module ++ ":\n" ++
+    ++ module ++ ":\n" ++
         \\.asciz  "
-        ++ module ++ "\"\n" ++
+    ++ module ++ "\"\n" ++
         \\.align  2
         \\.section .lib.stub, "a", @progbits
         \\.global __stub_module_
-        ++ module ++ "\n" ++
+    ++ module ++ "\n" ++
         \\__stub_module_
-        ++ module ++ ":\n" ++
+    ++ module ++ ":\n" ++
         \\.word   __stub_modulestr_
-        ++ module ++ "\n" ++
+    ++ module ++ "\n" ++
         \\.word   
-        ++ flags_ver ++ "\n" ++
+    ++ flags_ver ++ "\n" ++
         \\.hword   0x5
         \\.hword 
-        ++ count ++ "\n" ++
+    ++ count ++ "\n" ++
         \\.word   __stub_idtable_
-        ++ module ++ "\n" ++
+    ++ module ++ "\n" ++
         \\.word   __stub_text_
-        ++ module ++ "\n" ++
+    ++ module ++ "\n" ++
         \\.section .rodata.sceNid, "a"
         \\__stub_idtable_
-        ++ module ++ ":\n" ++
+    ++ module ++ ":\n" ++
         \\.section .sceStub.text, "ax", @progbits
         \\__stub_text_
-        ++ module ++ ":\n" ++
+    ++ module ++ ":\n" ++
         \\.set pop
     );
 }
 
 pub fn import_function(comptime module: []const u8, comptime func_id: []const u8, comptime funcname: []const u8) []const u8 {
+    _ = module;
     return (
         \\.set push
         \\.set noreorder
         \\.section .sceStub.text, "ax", @progbits
         \\.globl 
-        ++ funcname ++ "\n" ++
+    ++ funcname ++ "\n" ++
         \\.type   
-        ++ funcname ++ ", @function\n" ++
+    ++ funcname ++ ", @function\n" ++
         \\.ent    
-        ++ funcname ++ ", 0\n" ++
+    ++ funcname ++ ", 0\n" ++
         funcname ++ ":\n" ++
         \\jr $ra
         \\nop
         \\.end    
-        ++ funcname ++ "\n" ++
+    ++ funcname ++ "\n" ++
         \\.size   
-        ++ funcname ++ ", .-" ++ funcname ++ "\n" ++
+    ++ funcname ++ ", .-" ++ funcname ++ "\n" ++
         \\.section .rodata.sceNid, "a"
         \\.word   
-        ++ func_id ++ "\n" ++
+    ++ func_id ++ "\n" ++
         \\.set pop
     );
 }
@@ -121,15 +122,15 @@ pub fn generic_abi_wrapper(comptime funcname: []const u8, comptime argc: u8) []c
     return (
         \\.section .text, "a"
         \\.global 
-        ++ funcname ++ "\n" ++ funcname ++ ":\n" ++ regLoad ++ "\n" ++ stackAlloc ++
+    ++ funcname ++ "\n" ++ funcname ++ ":\n" ++ regLoad ++ "\n" ++ stackAlloc ++
         //Preserve return
         \\sw    $ra,0($sp)  
         \\jal 
         //Call the alias
-        ++ funcname ++ "_stub\n" ++ "\n" ++
+    ++ funcname ++ "_stub\n" ++ "\n" ++
         //Set correct return address
         \\lw    $ra, 0($sp) 
-        ++ "\n" ++ stackFree ++
+    ++ "\n" ++ stackFree ++
         //Return
         \\jr    $ra 
     );

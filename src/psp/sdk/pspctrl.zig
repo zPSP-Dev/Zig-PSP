@@ -1,4 +1,4 @@
-pub const PspCtrlButtons = extern enum(c_uint) {
+pub const PspCtrlButtons = enum(c_uint) {
     Select = 1,
     Start = 8,
     Up = 16,
@@ -23,7 +23,7 @@ pub const PspCtrlButtons = extern enum(c_uint) {
     Ms = 33554432,
 };
 
-pub const PspCtrlMode = extern enum(c_int) {
+pub const PspCtrlMode = enum(c_int) {
     Digital = 0,
     Analog = 1,
 };
@@ -66,8 +66,8 @@ pub extern fn sceCtrlSetSamplingMode(mode: c_int) c_int;
 
 pub fn ctrlSetSamplingMode(mode: PspCtrlMode) PspCtrlMode {
     @setRuntimeSafety(false);
-    var res = sceCtrlSetSamplingMode(@enumToInt(mode));
-    return @intToEnum(PspCtrlMode, res);
+    const res = sceCtrlSetSamplingMode(@intFromEnum(mode));
+    return @as(PspCtrlMode, @enumFromInt(res));
 }
 
 // Get the current controller mode.
@@ -106,7 +106,7 @@ pub extern fn sceCtrlReadLatch(latch_data: *SceCtrlLatch) c_int;
 // @return < 0 on error.
 pub extern fn sceCtrlSetIdleCancelThreshold(idlereset: c_int, idleback: c_int) c_int;
 pub fn ctrlSetIdleCancelThreshold(idlereset: c_int, idleback: c_int) !i32 {
-    var res = sceCtrlSetIdleCancelThreshold(idlereset, idleback);
+    const res = sceCtrlSetIdleCancelThreshold(idlereset, idleback);
     if (res < 0) {
         return error.Unexpected;
     }
@@ -121,7 +121,7 @@ pub fn ctrlSetIdleCancelThreshold(idlereset: c_int, idleback: c_int) !i32 {
 // @return < 0 on error.
 pub extern fn sceCtrlGetIdleCancelThreshold(idlerest: *c_int, idleback: *c_int) c_int;
 pub fn ctrlGetIdleCancelThreshold(idlerest: *c_int, idleback: *c_int) !i32 {
-    var res = sceCtrlGetIdleCancelThreshold(idlereset, idleback);
+    const res = sceCtrlGetIdleCancelThreshold(idlerest, idleback);
     if (res < 0) {
         return error.Unexpected;
     }

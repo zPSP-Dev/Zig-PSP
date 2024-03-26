@@ -1,9 +1,10 @@
-usingnamespace @import("psptypes.zig");
+const psptypes = @import("psptypes.zig");
+const SceSize = psptypes.SceSize;
 
 pub const SceKernelLoadExecParam = extern struct {
     size: SceSize,
     args: SceSize,
-    argp: ?*c_void,
+    argp: ?*anyopaque,
     key: [*c]const u8,
 };
 

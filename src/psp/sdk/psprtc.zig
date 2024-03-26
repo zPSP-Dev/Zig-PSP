@@ -12,7 +12,7 @@ const struct_unnamed_5 = extern struct {
 };
 pub const pspTime = struct_unnamed_5;
 
-pub const enum_pspRtcCheckValidErrors = extern enum(c_int) {
+pub const enum_pspRtcCheckValidErrors = enum(c_int) {
     PSP_TIME_INVALID_YEAR = -1,
     PSP_TIME_INVALID_MONTH = -2,
     PSP_TIME_INVALID_DAY = -3,

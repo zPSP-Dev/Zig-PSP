@@ -1,6 +1,12 @@
-usingnamespace @import("psptypes.zig");
+const psptypes = @import("psptypes.zig");
+const SceUID = psptypes.SceUID;
+const SceSize = psptypes.SceSize;
+const SceVoid = psptypes.SceVoid;
+const ScePVoid = psptypes.ScePVoid;
+const SceInt32 = psptypes.SceInt32;
+const SceUInt32 = psptypes.SceUInt32;
 
-pub const PspSysMemBlockTypes = extern enum(c_int) {
+pub const PspSysMemBlockTypes = enum(c_int) {
     MemLow = 0,
     MemHigh = 1,
     MemAddr = 2,
@@ -16,10 +22,10 @@ pub const SceKernelSysMemAlloc_t = c_int;
 // @param addr - If type is PSP_SMEM_Addr, then addr specifies the lowest address allocate the block from.
 //
 // @return The UID of the new block, or if less than 0 an error.
-pub extern fn sceKernelAllocPartitionMemory(partitionid: SceUID, name: [*c]const u8, typec: c_int, size: SceSize, addr: ?*c_void) SceUID;
+pub extern fn sceKernelAllocPartitionMemory(partitionid: SceUID, name: [*c]const u8, typec: c_int, size: SceSize, addr: ?*anyopaque) SceUID;
 
-pub fn kernelAllocPartitionMemory(partitionid: SceUID, name: [*c]const u8, typec: c_int, size: SceSize, addr: ?*c_void) !SceUID {
-    var res = sceKernelAllocPartitionMemory(partitionid, name, typec, size, addr);
+pub fn kernelAllocPartitionMemory(partitionid: SceUID, name: [*c]const u8, typec: c_int, size: SceSize, addr: ?*anyopaque) !SceUID {
+    const res = sceKernelAllocPartitionMemory(partitionid, name, typec, size, addr);
     if (res < 0) {
         return error.AllocationError;
     }
@@ -38,7 +44,7 @@ pub extern fn sceKernelFreePartitionMemory(blockid: SceUID) c_int;
 // @param blockid - UID of the memory block.
 //
 // @return The lowest address belonging to the memory block.
-pub extern fn sceKernelGetBlockHeadAddr(blockid: SceUID) ?*c_void;
+pub extern fn sceKernelGetBlockHeadAddr(blockid: SceUID) ?*anyopaque;
 
 // Get the total amount of free memory.
 //
@@ -70,7 +76,7 @@ pub extern fn sceKernelDevkitVersion() c_int;
 // @return 0 on success, < 0 on error.
 pub extern fn sceKernelSetCompiledSdkVersion(version: c_int) c_int;
 pub fn kernelSetCompiledSdkVersion(version: c_int) !void {
-    var res = sceKernelSetCompiledSdkVersion(version);
+    const res = sceKernelSetCompiledSdkVersion(version);
     if (res < 0) {
         return error.Unexpected;
     }
