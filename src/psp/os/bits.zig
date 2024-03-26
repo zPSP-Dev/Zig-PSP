@@ -212,26 +212,26 @@ pub const AT_STATX_DONT_SYNC = 0x4000;
 /// Apply to the entire subtree
 pub const AT_RECURSIVE = 0x8000;
 
-usingnamespace @import("../sdk/pspiofilemgr.zig");
-usingnamespace @import("../sdk/psptypes.zig");
+const pspiofilemgr = @import("../sdk/pspiofilemgr.zig");
+const psptypes = @import("../sdk/psptypes.zig");
 pub const Stat = struct {
     mode: u32,
     st_attr: c_uint,
     size: u64,
-    st_ctime: ScePspDateTime,
-    st_atime: ScePspDateTime,
-    st_mtime: ScePspDateTime,
+    st_ctime: psptypes.ScePspDateTime,
+    st_atime: psptypes.ScePspDateTime,
+    st_mtime: psptypes.ScePspDateTime,
     st_private: [6]c_uint,
     ino: ino_t,
 
     pub fn atime(self: Stat) timespec {
-        return timespec{ .tv_sec = self.st_atime.second, .tv_nsec = @bitCast(isize, self.st_atime.microsecond) * 1000 };
+        return timespec{ .tv_sec = self.st_atime.second, .tv_nsec = @as(isize, @bitCast(self.st_atime.microsecond)) * 1000 };
     }
     pub fn mtime(self: Stat) timespec {
-        return timespec{ .tv_sec = self.st_mtime.second, .tv_nsec = @bitCast(isize, self.st_mtime.microsecond) * 1000 };
+        return timespec{ .tv_sec = self.st_mtime.second, .tv_nsec = @as(isize, @bitCast(self.st_mtime.microsecond)) * 1000 };
     }
     pub fn ctime(self: Stat) timespec {
-        return timespec{ .tv_sec = self.st_ctime.second, .tv_nsec = @bitCast(isize, self.st_ctime.microsecond) * 1000 };
+        return timespec{ .tv_sec = self.st_ctime.second, .tv_nsec = @as(isize, @bitCast(self.st_ctime.microsecond)) * 1000 };
     }
 };
 

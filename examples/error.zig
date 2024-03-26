@@ -5,7 +5,7 @@ const std = @import("std");
 const fmt = std.fmt;
 
 comptime {
-    asm(psp.module_info("Zig PSP App", 0, 1, 0));
+    asm (psp.module_info("Zig PSP App", 0, 1, 0));
 }
 
 const MyTestErrors = error{
@@ -17,6 +17,6 @@ pub fn main() !void {
     psp.debug.screenInit();
 
     try psp.debug.printFormat("Hello {}!\n", .{"world"});
-    
+
     return MyTestErrors.TestError;
 }

@@ -1,4 +1,9 @@
-usingnamespace @import("psptypes.zig");
+const psptypes = @import("psptypes.zig");
+const SceUID = psptypes.SceUID;
+const SceVoid = psptypes.SceVoid;
+const ScePVoid = psptypes.ScePVoid;
+const SceInt32 = psptypes.SceInt32;
+const SceUInt32 = psptypes.SceUInt32;
 
 pub const SceMpegLLI = extern struct {
     pSrc: ScePVoid,

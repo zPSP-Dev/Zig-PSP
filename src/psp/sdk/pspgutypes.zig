@@ -1,4 +1,4 @@
-pub const GuPixelMode = extern enum(c_int) {
+pub const GuPixelMode = enum(c_int) {
     Psm5650 = 0,
     Psm5551 = 1,
     Psm4444 = 2,
@@ -12,7 +12,7 @@ pub const GuPixelMode = extern enum(c_int) {
     PsmDXT5 = 10,
 };
 
-pub const GuPrimitive = extern enum(c_int) {
+pub const GuPrimitive = enum(c_int) {
     Points = 0,
     Lines = 1,
     LineStrip = 2,
@@ -22,13 +22,13 @@ pub const GuPrimitive = extern enum(c_int) {
     Sprites = 6,
 };
 
-pub const PatchPrimitive = extern enum(c_int) {
+pub const PatchPrimitive = enum(c_int) {
     Points = 0,
     LineStrip = 2,
     TriangleStrip = 4,
 };
 
-pub const GuState = extern enum(c_int) {
+pub const GuState = enum(c_int) {
     AlphaTest = 0,
     DepthTest = 1,
     ScissorTest = 2,
@@ -53,26 +53,26 @@ pub const GuState = extern enum(c_int) {
     Fragment2X = 21,
 };
 
-pub const MatrixMode = extern enum(c_int) {
+pub const MatrixMode = enum(c_int) {
     Projection = 0,
     View = 1,
     Model = 2,
     Texture = 3,
 };
 
-pub const SplineMode = extern enum(c_int) {
+pub const SplineMode = enum(c_int) {
     FillFill = 0,
     OpenFill = 1,
     FillOpen = 2,
     OpenOpen = 3,
 };
 
-pub const ShadeModel = extern enum(c_int) {
+pub const ShadeModel = enum(c_int) {
     Flat = 0,
     Smooth = 1,
 };
 
-pub const GuLogicalOperation = extern enum(c_int) {
+pub const GuLogicalOperation = enum(c_int) {
     Clear = 0,
     And = 1,
     AndReverse = 2,
@@ -91,7 +91,7 @@ pub const GuLogicalOperation = extern enum(c_int) {
     Set = 15,
 };
 
-pub const TextureFilter = extern enum(c_int) {
+pub const TextureFilter = enum(c_int) {
     Nearest = 0,
     Linear = 1,
     NearestMipmapNearest = 4,
@@ -100,36 +100,36 @@ pub const TextureFilter = extern enum(c_int) {
     LinearMipmapLinear = 7,
 };
 
-pub const TextureMapMode = extern enum(c_int) {
+pub const TextureMapMode = enum(c_int) {
     Coords = 0,
     Matrix = 1,
     EnvironmentMap = 2,
 };
 
-pub const TextureLevelMode = extern enum(c_int) {
+pub const TextureLevelMode = enum(c_int) {
     Auto = 0,
     Const = 1,
     Slope = 2,
 };
 
-pub const TextureProjectionMapMode = extern enum(c_int) {
+pub const TextureProjectionMapMode = enum(c_int) {
     Position = 0,
     Uv = 1,
     NormalizedNormal = 2,
     Normal = 3,
 };
 
-pub const GuTexWrapMode = extern enum(c_int) {
+pub const GuTexWrapMode = enum(c_int) {
     Repeat = 0,
     Clamp = 1,
 };
 
-pub const FrontFaceDirection = extern enum(c_int) {
+pub const FrontFaceDirection = enum(c_int) {
     Clockwise = 0,
     CounterClockwise = 1,
 };
 
-pub const AlphaFunc = extern enum(c_int) {
+pub const AlphaFunc = enum(c_int) {
     Never = 0,
     Always,
     Equal,
@@ -140,7 +140,7 @@ pub const AlphaFunc = extern enum(c_int) {
     GreaterOrEqual,
 };
 
-pub const StencilFunc = extern enum(c_int) {
+pub const StencilFunc = enum(c_int) {
     Never = 0,
     Always,
     Equal,
@@ -151,14 +151,14 @@ pub const StencilFunc = extern enum(c_int) {
     GreaterOrEqual,
 };
 
-pub const ColorFunc = extern enum(c_int) {
+pub const ColorFunc = enum(c_int) {
     Never = 0,
     Always,
     Equal,
     NotEqual,
 };
 
-pub const DepthFunc = extern enum(c_int) {
+pub const DepthFunc = enum(c_int) {
     Never = 0,
     Always,
     Equal,
@@ -169,7 +169,7 @@ pub const DepthFunc = extern enum(c_int) {
     GreaterOrEqual,
 };
 
-pub const TextureEffect = extern enum(c_int) {
+pub const TextureEffect = enum(c_int) {
     Modulate = 0,
     Decal = 1,
     Blend = 2,
@@ -177,12 +177,12 @@ pub const TextureEffect = extern enum(c_int) {
     Add = 4,
 };
 
-pub const TextureColorComponent = extern enum(c_int) {
+pub const TextureColorComponent = enum(c_int) {
     Rgb = 0,
     Rgba = 1,
 };
 
-pub const MipmapLevel = extern enum(c_int) {
+pub const MipmapLevel = enum(c_int) {
     None = 0,
     Level1,
     Level2,
@@ -193,7 +193,7 @@ pub const MipmapLevel = extern enum(c_int) {
     Level7,
 };
 
-pub const BlendOp = extern enum(c_int) {
+pub const BlendOp = enum(c_int) {
     Add = 0,
     Subtract = 1,
     ReverseSubtract = 2,
@@ -202,7 +202,7 @@ pub const BlendOp = extern enum(c_int) {
     Abs = 5,
 };
 
-pub const BlendArg = extern enum(c_int) {
+pub const BlendArg = enum(c_int) {
     SrcColor = 0,
     OneMinusSrcColor = 1,
     SrcAlpha = 2,
@@ -214,7 +214,7 @@ pub const BlendArg = extern enum(c_int) {
     Fix = 10,
 };
 
-pub const StencilOperation = extern enum(c_int) {
+pub const StencilOperation = enum(c_int) {
     Keep = 0,
     Zero = 1,
     Replace = 2,
@@ -223,29 +223,29 @@ pub const StencilOperation = extern enum(c_int) {
     Decr = 5,
 };
 
-pub const LightMode = extern enum(c_int) {
+pub const LightMode = enum(c_int) {
     SingleColor = 0,
     SeparateSpecularColor = 1,
 };
 
-pub const GuLightType = extern enum(c_int) {
+pub const GuLightType = enum(c_int) {
     Directional = 0,
     Pointlight = 1,
     Spotlight = 2,
 };
 
-pub const GuContextType = extern enum(c_int) {
+pub const GuContextType = enum(c_int) {
     Direct = 0,
     Call = 1,
     Send = 2,
 };
 
-pub const GuQueueMode = extern enum(c_int) {
+pub const GuQueueMode = enum(c_int) {
     Tail = 0,
     Head = 1,
 };
 
-pub const GuSyncMode = extern enum(c_int) {
+pub const GuSyncMode = enum(c_int) {
     Finish = 0,
     Signal = 1,
     Done = 2,
@@ -253,28 +253,28 @@ pub const GuSyncMode = extern enum(c_int) {
     Send = 4,
 };
 
-pub const GuSyncBehavior = extern enum(c_int) {
+pub const GuSyncBehavior = enum(c_int) {
     Wait = 0,
     NoWait = 1,
 };
 
-pub const GuCallbackId = extern enum(c_int) {
+pub const GuCallbackId = enum(c_int) {
     Signal = 1,
     Finish = 4,
 };
 
-pub const GuSignalBehavior = extern enum(c_int) {
+pub const GuSignalBehavior = enum(c_int) {
     Suspend = 1,
     Continue = 2,
 };
 
-pub const ClearBitFlags = extern enum(c_int) {
+pub const ClearBitFlags = enum(c_int) {
     ColorBuffer = 1,
     StencilBuffer = 2,
     DepthBuffer = 4,
 };
 
-pub const GuLightBitFlags = extern enum(c_int) {
+pub const GuLightBitFlags = enum(c_int) {
     Ambient = 1,
     Diffuse = 2,
     AmbientDiffuse = 3,
@@ -283,7 +283,7 @@ pub const GuLightBitFlags = extern enum(c_int) {
     Unknown = 8,
 };
 
-pub const VertexTypeFlags = extern enum(c_int) {
+pub const VertexTypeFlags = enum(c_int) {
     Texture8Bit = 1,
     Texture16Bit = 2,
     Texture32Bitf = 3,
@@ -306,4 +306,4 @@ pub const VertexTypeFlags = extern enum(c_int) {
     Transform3D = 0,
 };
 
-pub const GuSwapBuffersCallback = ?fn ([*c]?*c_void, [*c]?*c_void) callconv(.C) void;
+pub const GuSwapBuffersCallback = ?*const fn ([*c]?*anyopaque, [*c]?*anyopaque) callconv(.C) void;

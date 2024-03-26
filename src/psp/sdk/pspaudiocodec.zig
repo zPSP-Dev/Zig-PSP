@@ -1,4 +1,4 @@
-pub const Codec = extern enum(c_int) {
+pub const Codec = enum(c_int) {
     At3Plus = 0x1000,
     At3 = 0x1001,
     Mp3 = 0x1002,

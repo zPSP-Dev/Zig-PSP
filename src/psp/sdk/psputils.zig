@@ -1,4 +1,8 @@
-usingnamespace @import("psptypes.zig");
+const psptypes = @import("psptypes.zig");
+const psprtc = @import("psptypes.zig");
+const SceUShort16 = psptypes.SceUShort16;
+const SceULong64 = psptypes.SceULong64;
+const time_t = psprtc.time_t;
 
 pub const clock_t = u32;
 pub const suseconds_t = u32;
@@ -48,7 +52,7 @@ pub const SceKernelUtilsSha1Context = extern struct {
 // @return < 0 on error.
 pub extern fn sceKernelUtilsMt19937Init(ctx: *SceKernelUtilsMt19937Context, seed: u32) c_int;
 pub fn kernelUtilsMt19937Init(ctx: *SceKernelUtilsMt19937Context, seed: u32) !i32 {
-    var res = sceKernelUtilsMt19937Init(ctx, seed);
+    const res = sceKernelUtilsMt19937Init(ctx, seed);
     if (res < 0) {
         return error.Unexpected;
     }
@@ -70,7 +74,7 @@ pub extern fn sceKernelUtilsMt19937UInt(ctx: *SceKernelUtilsMt19937Context) u32;
 // @return < 0 on error.
 pub extern fn sceKernelUtilsMd5Digest(data: [*]u8, size: u32, digest: [*]u8) c_int;
 pub fn kernelUtilsMd5Digest(data: [*]u8, size: u32, digest: [*]u8) !i32 {
-    var res = sceKernelUtilsMd5Digest(data, size, digest);
+    const res = sceKernelUtilsMd5Digest(data, size, digest);
     if (res < 0) {
         return error.Unexpected;
     }
@@ -91,7 +95,7 @@ pub fn kernelUtilsMd5Digest(data: [*]u8, size: u32, digest: [*]u8) !i32 {
 // sceKernelUtilsMd5BlockResult(&ctx, digest);
 pub extern fn sceKernelUtilsMd5BlockInit(ctx: *SceKernelUtilsMd5Context) c_int;
 pub fn kernelUtilsMd5BlockInit(ctx: *SceKernelUtilsMd5Context) !i32 {
-    var res = sceKernelUtilsMd5BlockInit(ctx);
+    const res = sceKernelUtilsMd5BlockInit(ctx);
     if (res < 0) {
         return error.Unexpected;
     }
@@ -107,7 +111,7 @@ pub fn kernelUtilsMd5BlockInit(ctx: *SceKernelUtilsMd5Context) !i32 {
 // @return < 0 on error.
 pub extern fn sceKernelUtilsMd5BlockUpdate(ctx: *SceKernelUtilsMd5Context, data: [*]u8, size: u32) c_int;
 pub fn kernelUtilsMd5BlockUpdate(ctx: *SceKernelUtilsMd5Context, data: [*]u8, size: u32) !i32 {
-    var res = sceKernelUtilsMd5BlockUpdate(ctx, data, size);
+    const res = sceKernelUtilsMd5BlockUpdate(ctx, data, size);
     if (res < 0) {
         return error.Unexpected;
     }
@@ -122,7 +126,7 @@ pub fn kernelUtilsMd5BlockUpdate(ctx: *SceKernelUtilsMd5Context, data: [*]u8, si
 // @return < 0 on error.
 pub extern fn sceKernelUtilsMd5BlockResult(ctx: *SceKernelUtilsMd5Context, digest: [*]u8) c_int;
 pub fn kernelUtilsMd5BlockResult(ctx: *SceKernelUtilsMd5Context, digest: [*]u8) !i32 {
-    var res = sceKernelUtilsMd5BlockResult(ctx, digest);
+    const res = sceKernelUtilsMd5BlockResult(ctx, digest);
     if (res < 0) {
         return error.Unexpected;
     }
@@ -138,7 +142,7 @@ pub fn kernelUtilsMd5BlockResult(ctx: *SceKernelUtilsMd5Context, digest: [*]u8) 
 // @return < 0 on error.
 pub extern fn sceKernelUtilsSha1Digest(data: [*]u8, size: u32, digest: [*]u8) c_int;
 pub fn kernelUtilsSha1Digest(data: [*]u8, size: u32, digest: [*]u8) !i32 {
-    var res = sceKernelUtilsSha1Digest(data, size, digest);
+    const res = sceKernelUtilsSha1Digest(data, size, digest);
     if (res < 0) {
         return error.Unexpected;
     }
@@ -159,7 +163,7 @@ pub fn kernelUtilsSha1Digest(data: [*]u8, size: u32, digest: [*]u8) !i32 {
 // sceKernelUtilsSha1BlockResult(&ctx, digest);
 pub extern fn sceKernelUtilsSha1BlockInit(ctx: *SceKernelUtilsSha1Context) c_int;
 pub fn kernelUtilsSha1BlockInit(ctx: *SceKernelUtilsSha1Context) !i32 {
-    var res = sceKernelUtilsSha1BlockInit(ctx);
+    const res = sceKernelUtilsSha1BlockInit(ctx);
     if (res < 0) {
         return error.Unexpected;
     }
@@ -175,7 +179,7 @@ pub fn kernelUtilsSha1BlockInit(ctx: *SceKernelUtilsSha1Context) !i32 {
 // @return < 0 on error.
 pub extern fn sceKernelUtilsSha1BlockUpdate(ctx: *SceKernelUtilsSha1Context, data: [*]u8, size: u32) c_int;
 pub fn kernelUtilsSha1BlockUpdate(ctx: *SceKernelUtilsSha1Context, data: [*]u8, size: u32) !i32 {
-    var res = sceKernelUtilsSha1BlockUpdate(ctx, data, size);
+    const res = sceKernelUtilsSha1BlockUpdate(ctx, data, size);
     if (res < 0) {
         return error.Unexpected;
     }
@@ -190,7 +194,7 @@ pub fn kernelUtilsSha1BlockUpdate(ctx: *SceKernelUtilsSha1Context, data: [*]u8, 
 // @return < 0 on error.
 pub extern fn sceKernelUtilsSha1BlockResult(ctx: *SceKernelUtilsSha1Context, digest: [*]u8) c_int;
 pub fn kernelUtilsSha1BlockResult(ctx: *SceKernelUtilsSha1Context, digest: [*]u8) !i32 {
-    var res = sceKernelUtilsSha1BlockResult(ctx, digest);
+    const res = sceKernelUtilsSha1BlockResult(ctx, digest);
     if (res < 0) {
         return error.Unexpected;
     }
@@ -213,16 +217,16 @@ pub extern fn sceKernelDcacheWritebackAll() void;
 pub extern fn sceKernelDcacheWritebackInvalidateAll() void;
 
 //Write back a range of addresses from the data cache to memory
-pub extern fn sceKernelDcacheWritebackRange(p: ?*const c_void, size: c_uint) void;
+pub extern fn sceKernelDcacheWritebackRange(p: ?*const anyopaque, size: c_uint) void;
 
 //Write back and invalidate a range of addresses in the data cache
-pub extern fn sceKernelDcacheWritebackInvalidateRange(p: ?*const c_void, size: c_uint) void;
+pub extern fn sceKernelDcacheWritebackInvalidateRange(p: ?*const anyopaque, size: c_uint) void;
 
 //Invalidate a range of addresses in data cache
-pub extern fn sceKernelDcacheInvalidateRange(p: ?*const c_void, size: c_uint) void;
+pub extern fn sceKernelDcacheInvalidateRange(p: ?*const anyopaque, size: c_uint) void;
 
 //Invalidate the instruction cache
 pub extern fn sceKernelIcacheInvalidateAll() void;
 
 //Invalidate a range of addresses in the instruction cache
-pub extern fn sceKernelIcacheInvalidateRange(p: ?*const c_void, size: c_uint) void;
+pub extern fn sceKernelIcacheInvalidateRange(p: ?*const anyopaque, size: c_uint) void;

@@ -1,4 +1,11 @@
-usingnamespace @import("psptypes.zig");
+const psptypes = @import("psptypes.zig");
+const SceUID = psptypes.SceUID;
+const SceSize = psptypes.SceSize;
+const SceVoid = psptypes.SceVoid;
+const SceInt32 = psptypes.SceInt32;
+const SceUInt32 = psptypes.SceUInt32;
+const SceShort16 = psptypes.SceShort16;
+const SceUChar8 = psptypes.SceUChar8;
 
 pub const SceMp3InitArg = extern struct {
     mp3StreamStart: SceUInt32,
@@ -18,7 +25,7 @@ pub const SceMp3InitArg = extern struct {
 // @return sceMp3 handle on success, < 0 on error.
 pub extern fn sceMp3ReserveMp3Handle(args: *SceMp3InitArg) SceInt32;
 pub fn mp3ReserveMp3Handle(args: *SceMp3InitArg) !SceInt32 {
-    var res = sceMp3ReserveMp3Handle(args);
+    const res = sceMp3ReserveMp3Handle(args);
     if (res < 0) {
         return error.Unexpected;
     }
@@ -32,7 +39,7 @@ pub fn mp3ReserveMp3Handle(args: *SceMp3InitArg) !SceInt32 {
 // @return 0 if success, < 0 on error.
 pub extern fn sceMp3ReleaseMp3Handle(handle: SceInt32) SceInt32;
 pub fn mp3ReleaseMp3Handle(handle: SceInt32) !void {
-    var res = sceMp3ReleaseMp3Handle(handle);
+    const res = sceMp3ReleaseMp3Handle(handle);
     if (res < 0) {
         return error.Unexpected;
     }
@@ -43,7 +50,7 @@ pub fn mp3ReleaseMp3Handle(handle: SceInt32) !void {
 // @return 0 if success, < 0 on error.
 pub extern fn sceMp3InitResource() SceInt32;
 pub fn mp3InitResource() !void {
-    var res = sceMp3InitResource();
+    const res = sceMp3InitResource();
     if (res < 0) {
         return error.Unexpected;
     }
@@ -54,7 +61,7 @@ pub fn mp3InitResource() !void {
 // @return 0 if success, < 0 on error.
 pub extern fn sceMp3TermResource() SceInt32;
 pub fn mp3TermResource() !void {
-    var res = sceMp3TermResource();
+    const res = sceMp3TermResource();
     if (res < 0) {
         return error.Unexpected;
     }
@@ -67,7 +74,7 @@ pub fn mp3TermResource() !void {
 // @return 0 if success, < 0 on error.
 pub extern fn sceMp3Init(handle: SceInt32) SceInt32;
 pub fn mp3Init(handle: SceInt32) !void {
-    var res = sceMp3Init(handle);
+    const res = sceMp3Init(handle);
     if (res < 0) {
         return error.Unexpected;
     }
@@ -81,7 +88,7 @@ pub fn mp3Init(handle: SceInt32) !void {
 // @return number of bytes in decoded pcm buffer, < 0 on error.
 pub extern fn sceMp3Decode(handle: SceInt32, dst: *[]SceShort16) SceInt32;
 pub fn mp3Decode(handle: SceInt32, dst: *[]SceShort16) !i32 {
-    var res = sceMp3Decode(handle, dst);
+    const res = sceMp3Decode(handle, dst);
     if (res < 0) {
         return error.Unexpected;
     }
@@ -98,7 +105,7 @@ pub fn mp3Decode(handle: SceInt32, dst: *[]SceShort16) !i32 {
 // @return 0 if success, < 0 on error.
 pub extern fn sceMp3GetInfoToAddStreamData(handle: SceInt32, dst: *[]SceUChar8, towrite: *SceInt32, srcpos: *SceInt32) SceInt32;
 pub fn mp3GetInfoToAddStreamData(handle: SceInt32, dst: *[]SceUChar8, towrite: *SceInt32, srcpos: *SceInt32) !void {
-    var res = sceMp3GetInfoToAddStreamData(handle, dst, towrite, srcpos);
+    const res = sceMp3GetInfoToAddStreamData(handle, dst, towrite, srcpos);
     if (res < 0) {
         return error.Unexpected;
     }
@@ -112,7 +119,7 @@ pub fn mp3GetInfoToAddStreamData(handle: SceInt32, dst: *[]SceUChar8, towrite: *
 // @return 0 if success, < 0 on error.
 pub extern fn sceMp3NotifyAddStreamData(handle: SceInt32, size: SceInt32) SceInt32;
 pub fn mp3NotifyAddStreamData(handle: SceInt32, size: SceInt32) !void {
-    var res = sceMp3NotifyAddStreamData(handle, size);
+    const res = sceMp3NotifyAddStreamData(handle, size);
     if (res < 0) {
         return error.Unexpected;
     }
@@ -133,7 +140,7 @@ pub extern fn sceMp3CheckStreamDataNeeded(handle: SceInt32) SceInt32;
 // @return 0 if success, < 0 on error.
 pub extern fn sceMp3SetLoopNum(handle: SceInt32, loop: SceInt32) SceInt32;
 pub fn mp3SetLoopNum(handle: SceInt32, loop: SceInt32) !void {
-    var res = sceMp3SetLoopNum(handle, loop);
+    const res = sceMp3SetLoopNum(handle, loop);
     if (res < 0) {
         return error.Unexpected;
     }
@@ -188,7 +195,7 @@ pub extern fn sceMp3GetMp3ChannelNum(handle: SceInt32) SceInt32;
 // @return < 0 on error
 pub extern fn sceMp3ResetPlayPosition(handle: SceInt32) SceInt32;
 pub fn mp3ResetPlayPosition(handle: SceInt32) !void {
-    var res = sceMp3ResetPlayPosition(handle);
+    const res = sceMp3ResetPlayPosition(handle);
     if (res < 0) {
         return error.Unexpected;
     }

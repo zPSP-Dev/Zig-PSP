@@ -16,8 +16,8 @@ pub fn benchmark_end() !u64 {
 
     var delta = current_time - oldTime;
 
-    var deltaF = @intToFloat(f64, delta);
-    var tickRF = @intToFloat(f32, tickRate);
+    var deltaF = @as(f64, @floatFromInt(delta));
+    var tickRF = @as(f32, @floatFromInt(tickRate));
 
     try printFormat("Method took {} ticks. ({d} ms)\n", .{ delta, deltaF / tickRF * 1000 });
 
