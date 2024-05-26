@@ -64,8 +64,8 @@ pub fn analyzePBP() !void {
 
     //Read Version
     try inFile.seekTo(4);
-    const ver_maj = inFile.reader().readInt(u16, .little);
-    const ver_min = inFile.reader().readInt(u16, .little);
+    const ver_maj = try inFile.reader().readInt(u16, .little);
+    const ver_min = try inFile.reader().readInt(u16, .little);
 
     //Finish Print
     std.log.warn("PBP Version: {}.{}\n", .{ ver_maj, ver_min });
