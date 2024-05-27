@@ -6,7 +6,7 @@ pub const SceGeStack = extern struct {
     stack: [8]c_uint,
 };
 
-pub const PspGeCallback = ?fn (c_int, ?*anyopaque) callconv(.C) void;
+pub const PspGeCallback = ?*const fn (c_int, ?*anyopaque) callconv(.C) void;
 pub const PspGeCallbackData = extern struct {
     signal_func: PspGeCallback,
     signal_arg: ?*anyopaque,

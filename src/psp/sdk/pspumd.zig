@@ -22,7 +22,7 @@ pub const UmdDriveStat = enum(c_int) {
     WaitForDISC = 2,
     WaitForINIT = 32,
 };
-pub const UmdCallback = ?fn (c_int, c_int) callconv(.C) c_int;
+pub const UmdCallback = ?*const fn (c_int, c_int) callconv(.C) c_int;
 
 // Check whether there is a disc in the UMD drive
 //

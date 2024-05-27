@@ -8,7 +8,7 @@ test {
 }
 
 //Internals
-pub const GuCallback = ?fn (c_int) callconv(.C) void;
+pub const GuCallback = ?*const fn (c_int) callconv(.C) void;
 
 const GuSettings = struct {
     sig: GuCallback,
@@ -1044,7 +1044,7 @@ pub fn sceGuSetAllStatus(status: c_int) void {
     }
 }
 
-pub fn sceGuSetCallback(signal: c_int, callback: ?fn (c_int) callconv(.C) void) GuCallback {
+pub fn sceGuSetCallback(signal: c_int, callback: ?*const fn (c_int) callconv(.C) void) GuCallback {
     var old_callback: GuCallback = undefined;
 
     switch (@as(pspgutypes.GuCallbackId, @enumFromInt(signal))) {
