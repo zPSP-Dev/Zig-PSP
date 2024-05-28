@@ -1472,7 +1472,7 @@ pub fn sceGuClear(flags: c_int) void {
     }
 
     const count: i32 = @divTrunc(gu_draw_buffer.width + 63, 64) * 2;
-    const vertices: [*]Vertex = @as([*]Vertex, @alignCast(@ptrCast(sceGuGetMemory(@as(c_uint, @intCast(count)) * @sizeOf(Vertex)))));
+    const vertices: [*]Vertex = @ptrCast(@alignCast(sceGuGetMemory(@as(c_uint, @intCast(count)) * @sizeOf(Vertex))));
 
     var i: usize = 0;
     var curr: [*]Vertex = vertices;
