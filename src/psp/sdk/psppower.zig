@@ -1,6 +1,11 @@
-usingnamespace @import("psptypes.zig");
+const psptypes = @import("psptypes.zig");
+const SceUID = psptypes.SceUID;
+const SceSize = psptypes.SceSize;
+const SceVoid = psptypes.SceVoid;
+const SceInt32 = psptypes.SceInt32;
+const SceUInt32 = psptypes.SceUInt32;
 
-pub const PSPPowerCB = extern enum(u32) {
+pub const PSPPowerCB = enum(u32) {
     Battpower = 0x0000007f,
     BatteryExist = 0x00000080,
     BatteryLow = 0x00000100,
@@ -13,11 +18,9 @@ pub const PSPPowerCB = extern enum(u32) {
     PowerSwitch = 0x80000000,
 };
 
-pub const PSPPowerTick = extern enum(u32) {
-    All = 0, Suspend = 1, Display = 6
-};
+pub const PSPPowerTick = enum(u32) { All = 0, Suspend = 1, Display = 6 };
 
-pub const powerCallback_t = ?fn (c_int, c_int) callconv(.C) void;
+pub const powerCallback_t = ?*const fn (c_int, c_int) callconv(.C) void;
 
 // Register Power Callback Function
 //
@@ -27,7 +30,7 @@ pub const powerCallback_t = ?fn (c_int, c_int) callconv(.C) void;
 // @return 0 on success, the slot number if -1 is passed, < 0 on error.
 pub extern fn scePowerRegisterCallback(slot: c_int, cbid: SceUID) c_int;
 pub fn powerRegisterCallback(slot: c_int, cbid: SceUID) !i32 {
-    var res = scePowerRegisterCallback(slot, cbid);
+    const res = scePowerRegisterCallback(slot, cbid);
     if (res < 0) {
         return error.Unexpected;
     }
@@ -41,7 +44,7 @@ pub fn powerRegisterCallback(slot: c_int, cbid: SceUID) !i32 {
 // @return 0 on success, < 0 on error.
 pub extern fn scePowerUnregisterCallback(slot: c_int) c_int;
 pub fn powerUnregisterCallback(slot: c_int) !void {
-    var res = scePowerUnregisterCallback(slot);
+    const res = scePowerUnregisterCallback(slot);
     if (res < 0) {
         return error.Unexpected;
     }
@@ -52,7 +55,7 @@ pub fn powerUnregisterCallback(slot: c_int) !void {
 // @return 1 if plugged in, 0 if not plugged in, < 0 on error.
 pub extern fn scePowerIsPowerOnline() c_int;
 pub fn powerIsPowerOnline() !bool {
-    var res = scePowerIsPowerOnline();
+    const res = scePowerIsPowerOnline();
     if (res < 0) {
         return error.Unexpected;
     }
@@ -64,7 +67,7 @@ pub fn powerIsPowerOnline() !bool {
 // @return 1 if battery present, 0 if battery not present, < 0 on error.
 pub extern fn scePowerIsBatteryExist() c_int;
 pub fn powerIsBatteryExist() !bool {
-    var res = scePowerIsBatteryExist();
+    const res = scePowerIsBatteryExist();
     if (res < 0) {
         return error.Unexpected;
     }
@@ -76,7 +79,7 @@ pub fn powerIsBatteryExist() !bool {
 // @return 1 if battery charging, 0 if battery not charging, < 0 on error.
 pub extern fn scePowerIsBatteryCharging() c_int;
 pub fn powerIsBatteryCharging() !bool {
-    var res = scePowerIsBatteryCharging();
+    const res = scePowerIsBatteryCharging();
     if (res < 0) {
         return error.Unexpected;
     }
@@ -91,7 +94,7 @@ pub extern fn scePowerGetBatteryChargingStatus() c_int;
 // @return 1 if the battery is low, 0 if the battery is not low, < 0 on error.
 pub extern fn scePowerIsLowBattery() c_int;
 pub fn powerIsLowBattery() !bool {
-    var res = scePowerIsLowBattery();
+    const res = scePowerIsLowBattery();
     if (res < 0) {
         return error.Unexpected;
     }
@@ -103,7 +106,7 @@ pub fn powerIsLowBattery() !bool {
 // @return Battery charge percentage (0-100), < 0 on error.
 pub extern fn scePowerGetBatteryLifePercent() c_int;
 pub fn powerGetBatteryLifePercent() !i32 {
-    var res = scePowerGetBatteryLifePercent();
+    const res = scePowerGetBatteryLifePercent();
     if (res < 0) {
         return error.Unexpected;
     }
@@ -115,7 +118,7 @@ pub fn powerGetBatteryLifePercent() !i32 {
 // @return Battery life in minutes, < 0 on error.
 pub extern fn scePowerGetBatteryLifeTime() c_int;
 pub fn powerGetBatteryLifeTime() !i32 {
-    var res = scePowerGetBatteryLifeTime();
+    const res = scePowerGetBatteryLifeTime();
     if (res < 0) {
         return error.Unexpected;
     }
@@ -183,7 +186,7 @@ pub extern fn scePowerSetClockFrequency(pllfreq: c_int, cpufreq: c_int, busfreq:
 // @return 0 on success, < 0 on error.
 pub extern fn scePowerLock(unknown: c_int) c_int;
 pub fn powerLock(unknown: c_int) !void {
-    var res = scePowerLock(unknown);
+    const res = scePowerLock(unknown);
     if (res < 0) {
         return error.Unexpected;
     }
@@ -196,7 +199,7 @@ pub fn powerLock(unknown: c_int) !void {
 // @return 0 on success, < 0 on error.
 pub extern fn scePowerUnlock(unknown: c_int) c_int;
 pub fn powerUnlock(unknown: c_int) !void {
-    var res = scePowerUnlock(unknown);
+    const res = scePowerUnlock(unknown);
     if (res < 0) {
         return error.Unexpected;
     }
@@ -210,7 +213,7 @@ pub fn powerUnlock(unknown: c_int) !void {
 // @return 0 on success, < 0 on error.
 pub extern fn scePowerTick(typec: c_int) c_int;
 pub fn powerTick(typec: PSPPowerTick) !void {
-    var res = scePowerTick(@enumToInt(typec));
+    const res = scePowerTick(@intFromEnum(typec));
     if (res < 0) {
         return error.Unexpected;
     }

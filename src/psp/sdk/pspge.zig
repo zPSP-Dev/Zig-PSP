@@ -6,12 +6,12 @@ pub const SceGeStack = extern struct {
     stack: [8]c_uint,
 };
 
-pub const PspGeCallback = ?fn (c_int, ?*c_void) callconv(.C) void;
+pub const PspGeCallback = ?*const fn (c_int, ?*anyopaque) callconv(.C) void;
 pub const PspGeCallbackData = extern struct {
     signal_func: PspGeCallback,
-    signal_arg: ?*c_void,
+    signal_arg: ?*anyopaque,
     finish_func: PspGeCallback,
-    finish_arg: ?*c_void,
+    finish_arg: ?*anyopaque,
 };
 
 pub const PspGeListArgs = extern struct {
@@ -25,7 +25,7 @@ pub const PspGeBreakParam = extern struct {
     buf: [4]c_uint,
 };
 
-pub const PspGeMatrixTypes = extern enum(c_int) {
+pub const PspGeMatrixTypes = enum(c_int) {
     Bone0 = 0,
     Bone1 = 1,
     Bone2 = 2,
@@ -44,7 +44,7 @@ pub const PspGeStack = extern struct {
     stack: [8]c_uint,
 };
 
-pub const PspGeListState = extern enum(c_int) {
+pub const PspGeListState = enum(c_int) {
     Done = 0,
     Queued = 1,
     DrawingDone = 2,
@@ -60,7 +60,7 @@ pub extern fn sceGeEdramGetSize() c_uint;
 // Get the eDRAM address.
 //
 // @return A pointer to the base of the eDRAM.
-pub extern fn sceGeEdramGetAddr() ?*c_void;
+pub extern fn sceGeEdramGetAddr() ?*anyopaque;
 
 // Retrieve the current value of a GE command.
 //
@@ -75,7 +75,7 @@ pub extern fn sceGeGetCmd(cmd: c_int) c_uint;
 // @param matrix - Pointer to a variable to store the matrix.
 //
 // @return < 0 on error.
-pub extern fn sceGeGetMtx(typec: c_int, matrix: ?*c_void) c_int;
+pub extern fn sceGeGetMtx(typec: c_int, matrix: ?*anyopaque) c_int;
 
 // Save the GE's current state.
 //
@@ -100,7 +100,7 @@ pub extern fn sceGeRestoreContext(context: [*c]const PspGeContext) c_int;
 // @param arg - Structure containing GE context buffer address
 //
 // @return The ID of the queue, < 0 on error.
-pub extern fn sceGeListEnQueue(list: ?*const c_void, stall: ?*c_void, cbid: c_int, arg: [*c]PspGeListArgs) c_int;
+pub extern fn sceGeListEnQueue(list: ?*const anyopaque, stall: ?*anyopaque, cbid: c_int, arg: [*c]PspGeListArgs) c_int;
 
 // Enqueue a display list at the head of the GE display list queue.
 //
@@ -111,7 +111,7 @@ pub extern fn sceGeListEnQueue(list: ?*const c_void, stall: ?*c_void, cbid: c_in
 // @param arg - Structure containing GE context buffer address
 //
 // @return The ID of the queue, < 0 on error.
-pub extern fn sceGeListEnQueueHead(list: ?*const c_void, stall: ?*c_void, cbid: c_int, arg: [*c]PspGeListArgs) c_int;
+pub extern fn sceGeListEnQueueHead(list: ?*const anyopaque, stall: ?*anyopaque, cbid: c_int, arg: [*c]PspGeListArgs) c_int;
 
 // Cancel a queued or running list.
 //
@@ -126,7 +126,7 @@ pub extern fn sceGeListDeQueue(qid: c_int) c_int;
 // @param stall - The new stall address.
 //
 // @return < 0 on error
-pub extern fn sceGeListUpdateStallAddr(qid: c_int, stall: ?*c_void) c_int;
+pub extern fn sceGeListUpdateStallAddr(qid: c_int, stall: ?*anyopaque) c_int;
 
 // Wait for syncronisation of a list.
 //

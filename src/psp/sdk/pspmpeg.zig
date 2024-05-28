@@ -1,4 +1,9 @@
-usingnamespace @import("psptypes.zig");
+const psptypes = @import("psptypes.zig");
+const SceUID = psptypes.SceUID;
+const SceVoid = psptypes.SceVoid;
+const ScePVoid = psptypes.ScePVoid;
+const SceInt32 = psptypes.SceInt32;
+const SceUInt32 = psptypes.SceUInt32;
 
 pub const SceMpegLLI = extern struct {
     pSrc: ScePVoid,
@@ -26,7 +31,7 @@ pub const SceMpegYCrCbBuffer = extern struct {
 
 pub const SceMpeg = ScePVoid;
 pub const SceMpegStream = SceVoid;
-pub const sceMpegRingbufferCB = ?fn (ScePVoid, SceInt32, ScePVoid) callconv(.C) SceInt32;
+pub const sceMpegRingbufferCB = ?*const fn (ScePVoid, SceInt32, ScePVoid) callconv(.C) SceInt32;
 
 pub const SceMpegRingbuffer = extern struct {
     iPackets: SceInt32,

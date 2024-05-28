@@ -62,10 +62,10 @@ fn sin_(comptime T: type, x_: T) T {
     }
 
     var sign = x < 0;
-    x = math.fabs(x);
+    x = @abs(x);
 
     var y = math.floor(x * m4pi);
-    var j = @floatToInt(I, y);
+    var j = @as(I, @intFromFloat(y));
 
     if (j & 1 == 1) {
         j += 1;

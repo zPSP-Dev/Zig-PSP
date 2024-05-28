@@ -1,4 +1,5 @@
-usingnamespace @import("psptypes.zig");
+const psptypes = @import("psptypes.zig");
+const SceUID = psptypes.SceUID;
 
 // Function to get the current standard in file no
 //
