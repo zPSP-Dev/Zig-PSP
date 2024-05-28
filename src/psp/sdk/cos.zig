@@ -58,7 +58,7 @@ fn cos_(comptime T: type, x_: T) T {
     }
 
     var sign = false;
-    x = math.fabs(x);
+    x = @abs(x);
 
     var y = math.floor(x * m4pi);
     var j = @as(I, @intFromFloat(y));

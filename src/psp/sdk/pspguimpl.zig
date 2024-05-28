@@ -1062,7 +1062,7 @@ pub fn sceGuSetCallback(signal: c_int, callback: ?*const fn (c_int) callconv(.C)
     return old_callback;
 }
 
-pub fn sceGuSetDither(matrix: *const pspgutypes.ScePspIMatrix4) void {
+pub fn sceGuSetDither(matrix: *const psptypes.ScePspIMatrix4) void {
     @setRuntimeSafety(false);
     sendCommandi(226, (matrix.x.x & 0x0f) | ((matrix.x.y & 0x0f) << 4) | ((matrix.x.z & 0x0f) << 8) | ((matrix.x.w & 0x0f) << 12));
     sendCommandi(227, (matrix.y.x & 0x0f) | ((matrix.y.y & 0x0f) << 4) | ((matrix.y.z & 0x0f) << 8) | ((matrix.y.w & 0x0f) << 12));
@@ -1070,7 +1070,7 @@ pub fn sceGuSetDither(matrix: *const pspgutypes.ScePspIMatrix4) void {
     sendCommandi(229, (matrix.w.x & 0x0f) | ((matrix.w.y & 0x0f) << 4) | ((matrix.w.z & 0x0f) << 8) | ((matrix.w.w & 0x0f) << 12));
 }
 
-pub fn sceGuSetMatrix(typec: c_int, matrix: [*c]pspgutypes.ScePspFMatrix4) void {
+pub fn sceGuSetMatrix(typec: c_int, matrix: [*c]psptypes.ScePspFMatrix4) void {
     @setRuntimeSafety(false);
 
     const fmatrix: [*]f32 = @as([*]f32, @ptrCast(matrix));
@@ -1184,7 +1184,7 @@ pub fn sceGuSwapBuffers() ?*anyopaque {
     }
 
     if (gu_display_on != 0) {
-        _ = pspge.sceDisplaySetFrameBuf(@as(*anyopaque, @ptrFromInt(@intFromPtr(ge_edram_address) + @intFromPtr(gu_draw_buffer.disp_buffer))), gu_draw_buffer.frame_width, gu_draw_buffer.pixel_size, gu_settings.swapBuffersBehaviour);
+        _ = display.sceDisplaySetFrameBuf(@as(*anyopaque, @ptrFromInt(@intFromPtr(ge_edram_address) + @intFromPtr(gu_draw_buffer.disp_buffer))), gu_draw_buffer.frame_width, gu_draw_buffer.pixel_size, gu_settings.swapBuffersBehaviour);
     }
 
     gu_current_frame ^= 1;
@@ -1383,7 +1383,7 @@ const ge_init_list = [_]c_uint{
 
 pub fn sceGuInit() void {
     @setRuntimeSafety(false);
-    var callback: pspgutypes.PspGeCallbackData = undefined;
+    var callback: pspge.PspGeCallbackData = undefined;
     callback.signal_func = callbackSig;
     callback.signal_arg = &gu_settings;
     callback.finish_func = callbackFin;
@@ -1398,7 +1398,7 @@ pub fn sceGuInit() void {
     ge_list_executed[0] = pspge.sceGeListEnQueue((@as(*anyopaque, @ptrFromInt(@intFromPtr(&ge_init_list) & 0x1fffffff))), null, gu_settings.ge_callback_id, 0);
 
     resetValues();
-    gu_settings.kernel_event_flag = pspge.sceKernelCreateEventFlag("SceGuSignal", 512, 3, 0);
+    gu_settings.kernel_event_flag = pspthreadman.sceKernelCreateEventFlag("SceGuSignal", 512, 3, 0);
 
     _ = pspge.sceGeListSync(ge_list_executed[0], 0);
 }
@@ -1429,12 +1429,12 @@ pub fn sceGuStart(cont: pspgutypes.GuContextType, list: ?*anyopaque) void {
             3,  -1, 2,  -2,
         };
 
-        display.sceGuSetDither(@as(*pspgutypes.ScePspIMatrix4, @ptrCast(&dither_matrix)));
-        display.sceGuPatchDivide(16, 16);
-        display.sceGuColorMaterial(@intFromEnum(pspgutypes.GuLightBitFlags.Ambient) | @intFromEnum(pspgutypes.GuLightBitFlags.Diffuse) | @intFromEnum(pspgutypes.GuLightBitFlags.Specular));
+        sceGuSetDither(@as(*psptypes.ScePspIMatrix4, @ptrCast(&dither_matrix)));
+        sceGuPatchDivide(16, 16);
+        sceGuColorMaterial(@intFromEnum(pspgutypes.GuLightBitFlags.Ambient) | @intFromEnum(pspgutypes.GuLightBitFlags.Diffuse) | @intFromEnum(pspgutypes.GuLightBitFlags.Specular));
 
-        display.sceGuSpecular(1.0);
-        display.sceGuTexScale(1.0, 1.0);
+        sceGuSpecular(1.0);
+        sceGuTexScale(1.0, 1.0);
         gu_init = 1;
     }
 
@@ -1472,7 +1472,7 @@ pub fn sceGuClear(flags: c_int) void {
     }
 
     const count: i32 = @divTrunc(gu_draw_buffer.width + 63, 64) * 2;
-    const vertices: [*]Vertex = @as([*]Vertex, @ptrCast(sceGuGetMemory(@as(c_uint, @intCast(count)) * @sizeOf(Vertex))));
+    const vertices: [*]Vertex = @as([*]Vertex, @alignCast(@ptrCast(sceGuGetMemory(@as(c_uint, @intCast(count)) * @sizeOf(Vertex)))));
 
     var i: usize = 0;
     var curr: [*]Vertex = vertices;
@@ -1494,9 +1494,9 @@ pub fn sceGuClear(flags: c_int) void {
     const VertexTypeFlags = pspgutypes.VertexTypeFlags;
     const GuPrimitive = pspgutypes.GuPrimitive;
 
-    display.sendCommandi(211, ((flags & (@intFromEnum(ClearBitFlags.ColorBuffer) | @intFromEnum(ClearBitFlags.StencilBuffer) | @intFromEnum(ClearBitFlags.DepthBuffer))) << 8) | 0x01);
-    display.sceGuDrawArray(GuPrimitive.Sprites, @intFromEnum(VertexTypeFlags.Color8888) | @intFromEnum(VertexTypeFlags.Vertex16Bit) | @intFromEnum(VertexTypeFlags.Transform2D), @as(c_int, @intCast(count)), null, vertices);
-    display.sendCommandi(211, 0);
+    sendCommandi(211, ((flags & (@intFromEnum(ClearBitFlags.ColorBuffer) | @intFromEnum(ClearBitFlags.StencilBuffer) | @intFromEnum(ClearBitFlags.DepthBuffer))) << 8) | 0x01);
+    sceGuDrawArray(GuPrimitive.Sprites, @intFromEnum(VertexTypeFlags.Color8888) | @intFromEnum(VertexTypeFlags.Vertex16Bit) | @intFromEnum(VertexTypeFlags.Transform2D), @as(c_int, @intCast(count)), null, vertices);
+    sendCommandi(211, 0);
 }
 
 pub fn sceGuGetMemory(size: c_uint) *anyopaque {
@@ -1519,7 +1519,7 @@ pub fn sceGuGetMemory(size: c_uint) *anyopaque {
     gu_list.?.current = new_ptr;
 
     if (gu_curr_context == 0) {
-        _ = display.sceGeListUpdateStallAddr(ge_list_executed[0], new_ptr);
+        _ = pspge.sceGeListUpdateStallAddr(ge_list_executed[0], new_ptr);
     }
     return @as(*anyopaque, @ptrFromInt(@intFromPtr(orig_ptr + 2)));
 }

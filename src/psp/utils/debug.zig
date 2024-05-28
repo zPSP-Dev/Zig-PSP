@@ -30,7 +30,7 @@ pub fn screenSetXY(sX: u8, sY: u8) void {
 //Clears the screen to the clear color (default is black)
 pub fn screenClear() void {
     var i: usize = 0;
-    while (i < constants.constants.SCR_BUF_WIDTH * constants.constants.SCREEN_HEIGHT) : (i += 1) {
+    while (i < constants.SCR_BUF_WIDTH * constants.SCREEN_HEIGHT) : (i += 1) {
         vram_base.?[i] = cl_col;
     }
 }
@@ -115,7 +115,7 @@ export fn pspDebugScreenClear(color: u32) void {
 }
 
 export fn pspDebugScreenPrint(text: [*c]const u8) void {
-    print(std.mem.spanZ(text));
+    print(std.mem.span(text));
 }
 
 const std = @import("std");
@@ -164,7 +164,8 @@ pub var pancakeMode: bool = false;
 
 //Panic handler
 //Import this in main to use!
-pub fn panic(message: []const u8, stack_trace: ?*std.builtin.StackTrace) noreturn {
+pub fn panic(message: []const u8, stack_trace: ?*std.builtin.StackTrace, size: ?usize) noreturn {
+    _ = size; // autofix
     _ = stack_trace;
     screenInit();
 

@@ -46,7 +46,7 @@ pub fn build_psp(b: *std.Build, comptime build_info: PSPBuildInfo) !void {
         .root_source_file = b.path(build_info.src_file),
         .target = target,
         .optimize = optimize,
-        // .strip = true,
+        .strip = false, // disable as cannot be used with "link_emit_relocs = true"
         // .single_threaded = true,
     });
 

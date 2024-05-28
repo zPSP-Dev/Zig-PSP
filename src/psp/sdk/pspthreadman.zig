@@ -75,6 +75,7 @@ pub const enum_PspThreadStatus = enum(c_int) {
     PSP_THREAD_KILLED = 32,
     _,
 };
+
 pub extern fn sceKernelDeleteThread(thid: SceUID) c_int;
 pub extern fn sceKernelStartThread(thid: SceUID, arglen: SceSize, argp: ?*anyopaque) c_int;
 pub extern fn sceKernelExitThread(status: c_int) c_int;
