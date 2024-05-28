@@ -255,7 +255,7 @@ pub fn lseek(fd: fd_t, off: i64, whence: c_int) c_int {
 
     switch (fdman.__psp_descriptormap[fd].?.ftype) {
         .File => {
-            std.debug.warn("{}", .{whence});
+            std.log.warn("{}", .{whence});
             //If you need to seek past 4GB, you have a real problem.
             return pspErrToErrno(@as(u32, @bitCast(pspiofilemgr.sceIoLseek32(fdman.__psp_descriptormap[fd].?.sce_descriptor, @as(c_int, @truncate(off)), whence))));
         },

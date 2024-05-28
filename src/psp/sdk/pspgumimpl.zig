@@ -12,22 +12,22 @@ var gum_stack_depth: [4][*]psptypes.ScePspFMatrix4 = [_][*]psptypes.ScePspFMatri
 var gum_matrix_stack: [4][32]psptypes.ScePspFMatrix4 = undefined;
 
 pub fn sceGumDrawArray(prim: pspgu.GuPrimitive, vtype: c_int, count: c_int, indices: ?*const anyopaque, vertices: ?*const anyopaque) void {
-    pspgu.sceGumUpdateMatrix();
+    sceGumUpdateMatrix();
     pspgu.sceGuDrawArray(prim, vtype, count, indices, vertices);
 }
 
 pub fn sceGumDrawArrayN(prim: c_int, vtype: c_int, count: c_int, a3: c_int, indices: ?*const anyopaque, vertices: ?*const anyopaque) void {
-    pspgu.sceGumUpdateMatrix();
+    sceGumUpdateMatrix();
     pspgu.sceGuDrawArrayN(prim, vtype, count, a3, indices, vertices);
 }
 
 pub fn sceGumDrawBezier(vtype: c_int, ucount: c_int, vcount: c_int, indices: ?*const anyopaque, vertices: ?*const anyopaque) void {
-    pspgu.sceGumUpdateMatrix();
+    sceGumUpdateMatrix();
     pspgu.sceGuDrawBezier(vtype, ucount, vcount, indices, vertices);
 }
 
 pub fn sceGumDrawSpline(vtype: c_int, ucount: c_int, vcount: c_int, uedge: c_int, vedge: c_int, indices: ?*const anyopaque, vertices: ?*const anyopaque) void {
-    pspgu.sceGumUpdateMatrix();
+    sceGumUpdateMatrix();
     pspgu.sceGuDrawSpline(vtype, ucount, vcount, uedge, vedge, indices, vertices);
 }
 
@@ -335,7 +335,7 @@ pub fn sceGumFullInverse() void {
     d3 = gum_current_matrix.y.x * gum_current_matrix.z.y * gum_current_matrix.w.z + gum_current_matrix.y.y * gum_current_matrix.z.z * gum_current_matrix.w.x + gum_current_matrix.y.z * gum_current_matrix.z.x * gum_current_matrix.w.y - gum_current_matrix.w.x * gum_current_matrix.z.y * gum_current_matrix.y.z - gum_current_matrix.w.y * gum_current_matrix.z.z * gum_current_matrix.y.x - gum_current_matrix.w.z * gum_current_matrix.z.x * gum_current_matrix.y.y;
     d = gum_current_matrix.x.x * d0 - gum_current_matrix.x.y * d1 + gum_current_matrix.x.z * d2 - gum_current_matrix.x.w * d3;
 
-    if (std.math.fabs(d) < 0.000001) {
+    if (@abs(d) < 0.000001) {
         _ = memset(@as([*]u8, @ptrCast(gum_current_matrix)), 0, @sizeOf(psptypes.ScePspFMatrix4));
 
         var i: usize = 0;

@@ -9,11 +9,11 @@ pub const PSPBuildInfo = struct {
     //Title
     title: []const u8,
     //Optional customizations
-    icon0: []const u8 = "NULL",
-    icon1: []const u8 = "NULL",
-    pic0: []const u8 = "NULL",
-    pic1: []const u8 = "NULL",
-    snd0: []const u8 = "NULL",
+    icon0: []const u8 = &[0]u8{},
+    icon1: []const u8 = &[0]u8{},
+    pic0: []const u8 = &[0]u8{},
+    pic1: []const u8 = &[0]u8{},
+    snd0: []const u8 = &[0]u8{},
 };
 
 const append: []const u8 = switch (builtin.os.tag) {
@@ -43,17 +43,17 @@ pub fn build_psp(b: *std.Build, comptime build_info: PSPBuildInfo) !void {
     //Build from your main file!
     const exe = b.addExecutable(.{
         .name = "main",
-        .root_source_file = .{ .path = build_info.src_file },
+        .root_source_file = b.path(build_info.src_file),
         .target = target,
         .optimize = optimize,
+        .strip = false, // disable as cannot be used with "link_emit_relocs = true"
+        // .single_threaded = true,
     });
 
-    exe.setLinkerScriptPath(.{ .path = build_info.path_to_sdk ++ "tools/linkfile.ld" });
+    exe.setLinkerScriptPath(b.path(build_info.path_to_sdk ++ "tools/linkfile.ld"));
 
     exe.link_eh_frame_hdr = true;
     exe.link_emit_relocs = true;
-    // exe.strip = true;
-    // exe.single_threaded = true;
     // exe.install();
     // b.installArtifact(exe);
 
@@ -61,15 +61,16 @@ pub fn build_psp(b: *std.Build, comptime build_info: PSPBuildInfo) !void {
 
     //Post-build actions
     const hostTarget = b.standardTargetOptions(.{});
+    const hostOptimize = b.standardOptimizeOption(.{});
     const prx = b.addExecutable(.{
         .name = "prxgen",
-        .root_source_file = .{ .path = build_info.path_to_sdk ++ "tools/prxgen/stub.zig" },
+        .root_source_file = b.path(build_info.path_to_sdk ++ "tools/prxgen/stub.zig"),
         .link_libc = true,
         .target = hostTarget,
         .optimize = .ReleaseFast,
     });
     prx.addCSourceFile(.{
-        .file = .{ .path = build_info.path_to_sdk ++ "tools/prxgen/psp-prxgen.c" },
+        .file = b.path(build_info.path_to_sdk ++ "tools/prxgen/psp-prxgen.c"),
         .flags = &[_][]const u8{
             "-std=c99",
             "-Wno-address-of-packed-member",
@@ -91,9 +92,9 @@ pub fn build_psp(b: *std.Build, comptime build_info: PSPBuildInfo) !void {
     //Build SFO
     const sfo = b.addExecutable(.{
         .name = "sfotool",
-        .root_source_file = .{ .path = build_info.path_to_sdk ++ "tools/sfo/src/main.zig" },
+        .root_source_file = b.path(build_info.path_to_sdk ++ "tools/sfo/src/main.zig"),
         .target = hostTarget,
-        .optimize = optimize,
+        .optimize = hostOptimize,
     });
     // sfo.setOutputDir(build_info.path_to_sdk ++ "tools/bin");
     b.installArtifact(sfo);
@@ -109,24 +110,23 @@ pub fn build_psp(b: *std.Build, comptime build_info: PSPBuildInfo) !void {
     //Build PBP
     const PBP = b.addExecutable(.{
         .name = "pbptool",
-        .root_source_file = .{ .path = build_info.path_to_sdk ++ "tools/pbp/src/main.zig" },
+        .root_source_file = b.path(build_info.path_to_sdk ++ "tools/pbp/src/main.zig"),
         .target = hostTarget,
-        .optimize = .ReleaseFast,
+        .optimize = hostOptimize,
     });
     // PBP.setOutputDir(build_info.path_to_sdk ++ "tools/bin");
-
     //Pack the PBP executable
     const pack_pbp = b.addRunArtifact(PBP);
     pack_pbp.addArg("pack");
     const eboot_file = pack_pbp.addOutputFileArg("EBOOT.PBP");
     pack_pbp.addFileArg(sfo_file);
-    pack_pbp.addFileArg(.{ .path = build_info.icon0 });
-    pack_pbp.addFileArg(.{ .path = build_info.icon1 });
-    pack_pbp.addFileArg(.{ .path = build_info.pic0 });
-    pack_pbp.addFileArg(.{ .path = build_info.pic1 });
-    pack_pbp.addFileArg(.{ .path = build_info.snd0 });
+    if (build_info.icon0.len > 0) pack_pbp.addFileArg(b.path(build_info.icon0)) else pack_pbp.addArg("NULL");
+    if (build_info.icon1.len > 0) pack_pbp.addFileArg(b.path(build_info.icon1)) else pack_pbp.addArg("NULL");
+    if (build_info.pic0.len > 0) pack_pbp.addFileArg(b.path(build_info.pic0)) else pack_pbp.addArg("NULL");
+    if (build_info.pic1.len > 0) pack_pbp.addFileArg(b.path(build_info.pic1)) else pack_pbp.addArg("NULL");
+    if (build_info.snd0.len > 0) pack_pbp.addFileArg(b.path(build_info.snd0)) else pack_pbp.addArg("NULL");
     pack_pbp.addFileArg(prx_file);
-    pack_pbp.addArg("NULL");
+    pack_pbp.addArg("NULL"); //DATA.PSAR not necessary.
 
     const install_file = b.addInstallBinFile(eboot_file, "EBOOT.PBP");
     b.getInstallStep().dependOn(&install_file.step);
