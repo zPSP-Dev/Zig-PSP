@@ -134,7 +134,7 @@ pub fn packPBP() !void {
         defer f.close();
 
         //Read fragment to buffer
-        var buf: [std.mem.page_size]u8 = undefined;
+        var buf: [std.heap.page_size_min]u8 = undefined;
         var bytes_read = try f.read(buf[0..]);
 
         //Read / Write loop
