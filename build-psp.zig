@@ -50,7 +50,7 @@ pub fn build_psp(b: *std.Build, comptime build_info: PSPBuildInfo) !void {
         // .single_threaded = true,
     });
 
-    exe.setLinkerScriptPath(b.path(build_info.path_to_sdk ++ "tools/linkfile.ld"));
+    exe.setLinkerScript(b.path(build_info.path_to_sdk ++ "tools/linkfile.ld"));
 
     exe.link_eh_frame_hdr = true;
     exe.link_emit_relocs = true;

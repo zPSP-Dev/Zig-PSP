@@ -40,7 +40,7 @@ pub fn jpegDeleteMJpeg() bool {
 // @param jpegbuf - the buffer with the mjpeg frame
 // @param size - size of the buffer pointed by jpegbuf
 // @param rgba - buffer where the decoded data in RGBA format will be stored.
-//				       It should have a size of (width * height * 4).
+//               It should have a size of (width * height * 4).
 // @param unk - Unknown, pass 0
 //
 // @return (width * 65536) + height on success, < 0 on error
