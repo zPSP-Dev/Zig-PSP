@@ -433,7 +433,7 @@ pub fn sceGuDepthRange(near: c_int, far: c_int) void {
     @setRuntimeSafety(false);
     const max = near + far;
     const val = ((max >> 31) + max);
-    const z: f32 = @as(f32, @bitCast((val >> 1)));
+    const z: f32 = @floatFromInt(val >> 1);
 
     gu_contexts[@as(usize, @intCast(gu_curr_context))].near_plane = near;
     gu_contexts[@as(usize, @intCast(gu_curr_context))].far_plane = far;
