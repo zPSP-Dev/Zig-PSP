@@ -30,21 +30,21 @@ pub fn _module_main_thread(argc: psptypes.SceSize, argv: ?*anyopaque) callconv(.
         pspos.system.__pspOsInit(argv);
     }
 
-    switch (@typeInfo(@typeInfo(@TypeOf(root.main)).Fn.return_type.?)) {
-        .NoReturn => {
+    switch (@typeInfo(@typeInfo(@TypeOf(root.main)).@"fn".return_type.?)) {
+        .noreturn => {
             root.main();
         },
-        .Void => {
+        .void => {
             root.main();
             return 0;
         },
-        .Int => |info| {
+        .int => |info| {
             if (info.bits != 8 or info.is_signed) {
                 @compileError(bad_main_ret);
             }
             return root.main();
         },
-        .ErrorUnion => {
+        .error_union => {
             const result = root.main() catch |err| {
                 debug.print("ERROR CAUGHT: ");
                 debug.print(@errorName(err));
@@ -54,8 +54,8 @@ pub fn _module_main_thread(argc: psptypes.SceSize, argv: ?*anyopaque) callconv(.
                 return 1;
             };
             switch (@typeInfo(@TypeOf(result))) {
-                .Void => return 0,
-                .Int => |info| {
+                .void => return 0,
+                .int => |info| {
                     if (info.bits != 8) {
                         @compileError(bad_main_ret);
                     }
