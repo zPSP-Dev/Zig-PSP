@@ -60,12 +60,12 @@ pub fn main() !void {
     psp.utils.enableHBCB();
     psp.debug.screenInit();
 
-    var fbp0 = psp.vram.allocVramRelative(psp.SCR_BUF_WIDTH, psp.SCREEN_HEIGHT, psp.GuPixelMode.Psm8888);
-    var fbp1 = psp.vram.allocVramRelative(psp.SCR_BUF_WIDTH, psp.SCREEN_HEIGHT, psp.GuPixelMode.Psm8888);
-    var zbp = psp.vram.allocVramRelative(psp.SCR_BUF_WIDTH, psp.SCREEN_HEIGHT, psp.GuPixelMode.Psm4444);
+    const fbp0 = psp.vram.allocVramRelative(psp.SCR_BUF_WIDTH, psp.SCREEN_HEIGHT, psp.GuPixelMode.Psm8888);
+    const fbp1 = psp.vram.allocVramRelative(psp.SCR_BUF_WIDTH, psp.SCREEN_HEIGHT, psp.GuPixelMode.Psm8888);
+    const zbp = psp.vram.allocVramRelative(psp.SCR_BUF_WIDTH, psp.SCREEN_HEIGHT, psp.GuPixelMode.Psm4444);
 
     psp.sceGuInit();
-    psp.sceGuStart(psp.GuContextType.Direct, @as(*c_void, @ptrCast(&display_list)));
+    psp.sceGuStart(psp.GuContextType.Direct, @as(*anyopaque, @ptrCast(&display_list)));
     psp.sceGuDrawBuffer(psp.GuPixelMode.Psm8888, fbp0, psp.SCR_BUF_WIDTH);
     psp.sceGuDispBuffer(psp.SCREEN_WIDTH, psp.SCREEN_HEIGHT, fbp1, psp.SCR_BUF_WIDTH);
     psp.sceGuDepthBuffer(zbp, psp.SCR_BUF_WIDTH);
@@ -89,7 +89,7 @@ pub fn main() !void {
 
     var i: u32 = 0;
     while (true) : (i += 1) {
-        psp.sceGuStart(psp.GuContextType.Direct, @as(*c_void, @ptrCast(&display_list)));
+        psp.sceGuStart(psp.GuContextType.Direct, @as(*anyopaque, @ptrCast(&display_list)));
 
         psp.sceGuClearColor(psp.rgba(32, 32, 32, 0xFF));
         psp.sceGuClearDepth(0);
@@ -122,7 +122,7 @@ pub fn main() !void {
 
         // draw cube
 
-        psp.sceGumDrawArray(psp.GuPrimitive.Triangles, @intFromEnum(psp.VertexTypeFlags.Texture32Bitf) | @intFromEnum(psp.VertexTypeFlags.Color8888) | @intFromEnum(psp.VertexTypeFlags.Vertex32Bitf) | @intFromEnum(psp.VertexTypeFlags.Transform3D), 12 * 3, null, @as(*c_void, @ptrCast(&vertices)));
+        psp.sceGumDrawArray(psp.GuPrimitive.Triangles, @intFromEnum(psp.VertexTypeFlags.Texture32Bitf) | @intFromEnum(psp.VertexTypeFlags.Color8888) | @intFromEnum(psp.VertexTypeFlags.Vertex32Bitf) | @intFromEnum(psp.VertexTypeFlags.Transform3D), 12 * 3, null, @as(*anyopaque, @ptrCast(&vertices)));
 
         psp.guFinish();
         psp.guSync(psp.GuSyncMode.Finish, psp.GuSyncBehavior.Wait);
