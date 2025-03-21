@@ -75,7 +75,7 @@ pub fn writeSFO() !void {
 
     //Tracker pointers
     var h: *align(1) SFOHeader = undefined;
-    var el: [*]SFOEntry = undefined;
+    var el: [*]align(1) SFOEntry = undefined;
     var k: [*]u8 = undefined;
     var d: [*]u8 = undefined;
 
