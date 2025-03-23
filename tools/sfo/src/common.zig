@@ -1,7 +1,7 @@
 pub const PSF_MAGIC_NUM = 0x46535000;
 pub const PSF_VERSION = 0x00000101;
 
-pub const SFOHeader = packed struct {
+pub const SFOHeader = extern struct {
     magic: u32,
     version: u32,
     keyofs: u32,
@@ -9,7 +9,7 @@ pub const SFOHeader = packed struct {
     count: u32,
 };
 
-pub const SFOEntry = packed struct {
+pub const SFOEntry = extern struct {
     nameofs: u16,
     alignment: u8,
     typec: u8,
