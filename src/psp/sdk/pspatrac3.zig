@@ -1,7 +1,4 @@
-const psptypes = @import("psptypes.zig");
-test {
-    @import("std").meta.refAllDecls(@This());
-}
+const psptypes = @import("psp");
 
 pub const AtracError = enum(u32) {
     ParamFail = (0x80630001),
@@ -34,70 +31,70 @@ fn intToError(res: c_int) !void {
         const translated = @as(u32, @bitCast(res));
         _ = translated;
         switch (@as(AtracError, @enumFromInt(res))) {
-            psptypes.ParamFail => {
+            .ParamFail => {
                 return error.ParamFail;
             },
-            psptypes.ApiFail => {
+            .ApiFail => {
                 return error.ApiFail;
             },
-            psptypes.NoAtracid => {
+            .NoAtracid => {
                 return error.NoAtracid;
             },
-            psptypes.BadCodectype => {
+            .BadCodectype => {
                 return error.BadCodectype;
             },
-            psptypes.BadAtracid => {
+            .BadAtracid => {
                 return error.BadAtracid;
             },
-            psptypes.UnknownFormat => {
+            .UnknownFormat => {
                 return error.UnknownFormat;
             },
-            psptypes.UnmatchFormat => {
+            .UnmatchFormat => {
                 return error.UnmatchFormat;
             },
-            psptypes.BadData => {
+            .BadData => {
                 return error.BadData;
             },
-            psptypes.AlldataIsOnmemory => {
+            .AlldataIsOnmemory => {
                 return error.AlldataIsOnmemory;
             },
-            psptypes.UnsetData => {
+            .UnsetData => {
                 return error.UnsetData;
             },
-            psptypes.ReadSizeIsTooSmall => {
+            .ReadSizeIsTooSmall => {
                 return error.ReadSizeIsTooSmall;
             },
-            psptypes.NeedSecondBuffer => {
+            .NeedSecondBuffer => {
                 return error.NeedSecondBuffer;
             },
-            psptypes.ReadSizeOverBuffer => {
+            .ReadSizeOverBuffer => {
                 return error.ReadSizeOverBuffer;
             },
-            psptypes.Not4byteAlignment => {
+            .Not4byteAlignment => {
                 return error.Not4byteAlignment;
             },
-            psptypes.BadSample => {
+            .BadSample => {
                 return error.BadSample;
             },
-            psptypes.WriteByteFirstBuffer => {
+            .WriteByteFirstBuffer => {
                 return error.WriteByteFirstBuffer;
             },
-            psptypes.WriteByteSecondBuffer => {
+            .WriteByteSecondBuffer => {
                 return error.WriteByteSecondBuffer;
             },
-            psptypes.AddDataIsTooBig => {
+            .AddDataIsTooBig => {
                 return error.AddDataIsTooBig;
             },
-            psptypes.UnsetParam => {
+            .UnsetParam => {
                 return error.UnsetParam;
             },
-            psptypes.NoNeedSecondBuffer => {
+            .NoNeedSecondBuffer => {
                 return error.NoNeedSecondBuffer;
             },
-            psptypes.NoDataInBuffer => {
+            .NoDataInBuffer => {
                 return error.NoDataInBuffer;
             },
-            psptypes.AllDataWasDecoded => {
+            .AllDataWasDecoded => {
                 return error.AllDataWasDecoded;
             },
         }

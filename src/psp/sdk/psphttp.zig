@@ -1,4 +1,4 @@
-const psptypes = @import("psptypes.zig");
+const psptypes = @import("psp");
 const SceSize = psptypes.SceSize;
 const SceBool = psptypes.SceBool;
 const SceULong64 = psptypes.SceULong64;

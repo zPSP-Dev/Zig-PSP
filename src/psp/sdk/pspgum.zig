@@ -1,2 +1,2 @@
-usingnamespace @import("psptypes.zig");
-usingnamespace @import("pspgumimpl.zig");
+usingnamespace @import("psp");
+pub usingnamespace @import("pspgumimpl.zig");

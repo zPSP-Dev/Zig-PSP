@@ -3,12 +3,11 @@ const mem = std.mem;
 const debug = std.debug;
 const assert = debug.assert;
 
-const psptypes = @import("../include/psptypes.zig");
-const pspsysmem = @import("../include/pspsysmem.zig");
-const psploadexec = @import("../include/psploadexec.zig");
+const psploadexec = @import("../sdk/psploadexec.zig");
+const psp = @import("psp");
 
-const SceSize = psptypes.SceSize;
-const SceUID = psptypes.SceUID;
+const SceSize = psp.SceSize;
+const SceUID = psp.SceUID;
 
 const Allocator = mem.Allocator;
 
@@ -41,7 +40,7 @@ pub const PSPAllocator = struct {
         if (len > 0) {
 
             //Gets a block of memory
-            const id: SceUID = psploadexec.sceKernelAllocPartitionMemory(2, "block", @intFromEnum(psploadexec.PspSysMemBlockTypes.MemLow), len + @sizeOf(SceUID), null);
+            const id: SceUID = psp.sceKernelAllocPartitionMemory(2, "block", @intFromEnum(psploadexec.PspSysMemBlockTypes.MemLow), len + @sizeOf(SceUID), null);
 
             if (id < 0) {
                 //TODO: Handle error cases that aren't out of memory...
@@ -49,7 +48,7 @@ pub const PSPAllocator = struct {
             }
 
             //Get the head address
-            const ptr = @as([*]u32, @ptrCast(@alignCast(psploadexec.sceKernelGetBlockHeadAddr(id))));
+            const ptr = @as([*]u32, @ptrCast(@alignCast(psp.sceKernelGetBlockHeadAddr(id))));
 
             //Store our ID to free
             @as(*c_int, @ptrCast(ptr)).* = id;
@@ -80,7 +79,7 @@ pub const PSPAllocator = struct {
         const id = @as(*c_int, @ptrCast(@alignCast(ptr))).*;
 
         //Free the ID
-        const s = psploadexec.sceKernelFreePartitionMemory(id);
+        const s = psp.sceKernelFreePartitionMemory(id);
         _ = s;
 
         //Return 0

@@ -1,4 +1,4 @@
-const psptypes = @import("psptypes.zig");
+const psptypes = @import("psp");
 const SceSize = psptypes.SceSize;
 
 // Copy data in memory using DMAC

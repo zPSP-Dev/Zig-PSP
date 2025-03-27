@@ -1,4 +1,4 @@
-const psptypes = @import("psptypes.zig");
+const psptypes = @import("psp");
 const pspgu = @import("pspgu.zig");
 
 //Internal

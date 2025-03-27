@@ -1,5 +1,5 @@
-const psptypes = @import("psptypes.zig");
-const psprtc = @import("psptypes.zig");
+const psptypes = @import("psp");
+const psprtc = @import("psp");
 const SceUShort16 = psptypes.SceUShort16;
 const SceULong64 = psptypes.SceULong64;
 const time_t = psprtc.time_t;

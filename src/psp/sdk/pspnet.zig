@@ -287,7 +287,7 @@ pub const struct_in_addr = packed struct {
     s_addr: in_addr_t,
 };
 
-const SceSize = @import("psptypes.zig").SceSize;
+const SceSize = @import("psp").SceSize;
 
 pub extern fn sceNetResolverInit() c_int;
 pub extern fn sceNetResolverCreate(rid: [*c]c_int, buf: ?*anyopaque, buflen: SceSize) c_int;
