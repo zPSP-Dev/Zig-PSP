@@ -1,24 +1,19 @@
 const std = @import("std");
 
 pub fn build(b: *std.Build) void {
-    var feature_set: std.Target.Cpu.Feature.Set = std.Target.Cpu.Feature.Set.empty;
-    feature_set.addFeature(@intFromEnum(std.Target.mips.Feature.single_float));
-
-    const target = .{
-        .cpu_arch = .mipsel,
-        .os_tag = .freestanding,
-        .cpu_model = .{ .explicit = &std.Target.mips.cpu.mips2 },
-        .cpu_features_add = feature_set,
-    };
-
+    const target = b.standardTargetOptions(.{});
     const optimize = b.standardOptimizeOption(.{});
 
-    const lib = b.addStaticLibrary(.{
-        .name = "zpsp",
-        .root_source_file = .{ .path = "libzpsp.zig" },
+    const lib_mod = b.createModule(.{
+        .root_source_file = b.path("src/root.zig"),
         .target = target,
         .optimize = optimize,
     });
 
+    const lib = b.addLibrary(.{
+        .linkage = .static,
+        .name = "libzpsp",
+        .root_module = lib_mod,
+    });
     b.installArtifact(lib);
 }
