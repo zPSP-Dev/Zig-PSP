@@ -3187,7 +3187,7 @@ const IoFileMgrForUser = struct {
     /// Returns < 0 on error.
     pub extern fn sceIoRename(oldname: [*c]const c_char, newname: [*c]const c_char) callconv(.C) c_int;
 
-    pub extern fn sceIoDevctl("fatms0:": c_int, 0x02415821: c_int, &cbid: c_int, sizeof(cbid: c_int) callconv(.C) c_int;
+    pub extern fn sceIoDevctl(": c_int, 0x02415821: c_int, &cbid: c_int, sizeof(cbid: c_int) callconv(.C) c_int;
 
     /// Get the device type of the currently opened file descriptor.
     /// `fd` - The opened file descriptor.
