@@ -157,7 +157,7 @@ pub fn main() !void {
     const commands = try get_arg_list(allocator, &arg_it);
 
     if (commands.len == 0) {
-        std.debug.print("Usage: pbptool pack <output.pbp> <param.sfo> <icon0.png> <icon1.pmf> <pic0.png> <pic1.png> <snd0.at3> <data.psp> <data.psar>\n", .{});
+        std.debug.print("Usage: pbptool <pack | unpack | analyze | help>\n", .{});
         std.posix.exit(1);
     }
 
