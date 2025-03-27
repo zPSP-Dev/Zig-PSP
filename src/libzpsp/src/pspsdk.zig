@@ -114,30 +114,6 @@ const sceUmdUser = struct {
     /// Wait for the UMD drive to reach a certain state
     /// `stat` - One or more of ::pspUmdState
     /// Returns < 0 on error
-    /// Activates the UMD drive
-    /// `unit` - The unit to initialise (probably). Should be set to 1.
-    /// `drive` - A prefix string for the fs device to mount the UMD on (e.g. "disc0:")
-    /// Returns < 0 on error
-    /// @par Example:
-    /// `
-    /// // Wait for disc and mount to filesystem
-    /// int i;
-    /// i = sceUmdCheckMedium();
-    /// if(i == 0)
-    /// {
-    /// sceUmdWaitDriveStat(PSP_UMD_PRESENT);
-    /// }
-    /// sceUmdActivate(1, "disc0:"); // Mount UMD to disc0: file system
-    /// Activates the UMD drive
-    /// `unit` - The unit to initialise (probably). Should be set to 1.
-    /// `drive` - A prefix string for the fs device to mount the UMD on (e.g. "disc0:")
-    /// Returns < 0 on error
-    /// @par Example:
-    /// `
-    /// // Wait for disc and mount to filesystem
-    /// int i;
-    /// i = sceUmdCheckMedium();
-    /// if(i == 0)
     pub extern fn sceUmdWaitDriveStat(stat: c_int) callconv(.C) c_int;
 
     /// Register a callback for the UMD drive
@@ -153,16 +129,6 @@ const sceUmdUser = struct {
     /// int cbid = sceKernelCreateCallback("UMD Callback", umd_callback, NULL);
     /// sceUmdRegisterUMDCallBack(cbid);
     /// `
-    /// Register a callback for the UMD drive
-    /// @note Callback is of type UmdCallback
-    /// `cbid` - A callback ID created from sceKernelCreateCallback
-    /// Returns < 0 on error
-    /// @par Example:
-    /// `
-    /// int umd_callback(int unknown, int event)
-    /// {
-    /// //do something
-    /// }
     pub extern fn sceUmdRegisterUMDCallBack(cbid: c_int) callconv(.C) c_int;
 
     /// Un-register a callback for the UMD drive
@@ -187,18 +153,6 @@ const sceUmdUser = struct {
     /// sceUmdWaitDriveStat(PSP_UMD_READY);
     /// // Now you can access the UMD using standard sceIo functions
     /// `
-    /// Activates the UMD drive
-    /// `unit` - The unit to initialise (probably). Should be set to 1.
-    /// `drive` - A prefix string for the fs device to mount the UMD on (e.g. "disc0:")
-    /// Returns < 0 on error
-    /// @par Example:
-    /// `
-    /// // Wait for disc and mount to filesystem
-    /// int i;
-    /// i = sceUmdCheckMedium();
-    /// if(i == 0)
-    /// {
-    /// sceUmdWaitDriveStat(PSP_UMD_PRESENT);
     pub extern fn sceUmdActivate(unit: c_int, drive: c_char) callconv(.C) c_int;
 
     /// Permit UMD disc being replaced
@@ -888,13 +842,13 @@ const sceNetInet = struct {
 
     pub extern fn sceNetInetGetUdpcbstat() callconv(.C) void;
 
-    pub extern fn sceNetInetInetAddr(ip: c_char) callconv(.C) c_int;
+    pub extern fn sceNetInetInetAddr() callconv(.C) void;
 
-    pub extern fn sceNetInetInetAton(ip: c_char, in: c_int) callconv(.C) c_int;
+    pub extern fn sceNetInetInetAton() callconv(.C) void;
 
     pub extern fn sceNetInetInetNtop() callconv(.C) void;
 
-    pub extern fn sceNetInetInetPton(af: c_int, src: c_char, dst: void) callconv(.C) c_int;
+    pub extern fn sceNetInetInetPton() callconv(.C) void;
 
 };
 
@@ -1521,7 +1475,7 @@ const sceAtrac3plus = struct {
 
     pub extern fn sceAtracEndEntry() callconv(.C) void;
 
-    pub extern fn sceAtracGetAtracID(uiCodecType: c_int) callconv(.C) c_int;
+    pub extern fn sceAtracGetAtracID() callconv(.C) void;
 
     /// It releases an atrac ID
     /// `atracID` - the atrac ID to release
@@ -1734,15 +1688,11 @@ const sceCtrl = struct {
     /// `mode` - One of ::PspCtrlMode. If this is ::PSP_CTRL_MODE_DIGITAL, no data about the analog stick
     /// will be present in the SceCtrlData struct read by SceCtrlReadBuffer.
     /// Returns The previous mode.
-    /// @brief Controller mode.
-    /// Specifies if analog data should be included in ::SceCtrlData.
     pub extern fn sceCtrlSetSamplingMode(mode: c_int) callconv(.C) c_int;
 
     /// Get the current controller mode.
     /// `pmode` - Return value.
     /// Returns 0.
-    /// @brief Controller mode.
-    /// Specifies if analog data should be included in ::SceCtrlData.
     pub extern fn sceCtrlGetSamplingMode(pmode: c_int) callconv(.C) c_int;
 
     /// @brief Read latest controller data from the controller service.
@@ -1753,20 +1703,8 @@ const sceCtrl = struct {
     /// @see ::SceCtrlData
     /// @see ::sceCtrlPeekBufferNegative()
     /// @see ::sceCtrlReadBufferPositive()
-    /// @brief Controller data.
-    /// Contains current button and axis state.
-    /// @note Axis state is present only in ::PSP_CTRL_MODE_ANALOG controller mode.
     pub extern fn sceCtrlPeekBufferPositive(pad_data: c_int, count: c_int) callconv(.C) c_int;
 
-    /// @brief Read latest controller data from the controller service.
-    /// Controller data contains current button and axis state.
-    /// @note Axis state is present only in ::PSP_CTRL_MODE_ANALOG controller mode.
-    /// `pad_data` - A pointer to ::SceCtrlData structure that receives controller data.
-    /// `count` - Number of ::SceCtrlData structures to read.
-    /// @see ::SceCtrlData
-    /// @brief Controller data.
-    /// Contains current button and axis state.
-    /// @note Axis state is present only in ::PSP_CTRL_MODE_ANALOG controller mode.
     pub extern fn sceCtrlPeekBufferNegative(pad_data: c_int, count: c_int) callconv(.C) c_int;
 
     /// @brief Read new controller data from the controller service.
@@ -1788,48 +1726,8 @@ const sceCtrl = struct {
     /// @see ::SceCtrlData
     /// @see ::sceCtrlReadBufferNegative()
     /// @see ::sceCtrlPeekBufferPositive()
-    /// @brief Read new controller data from the controller service.
-    /// Controller data contains current button and axis state.
-    /// **Example:**
-    /// `
-    /// SceCtrlData pad;
-    /// sceCtrlSetSamplingCycle(0);
-    /// sceCtrlSetSamplingMode(1);
-    /// @brief Read latest controller data from the controller service.
-    /// Controller data contains current button and axis state.
-    /// @note Axis state is present only in ::PSP_CTRL_MODE_ANALOG controller mode.
-    /// `pad_data` - A pointer to ::SceCtrlData structure that receives controller data.
-    /// `count` - Number of ::SceCtrlData structures to read.
-    /// @see ::SceCtrlData
-    /// @see ::sceCtrlPeekBufferNegative()
-    /// @brief Controller data.
-    /// Contains current button and axis state.
-    /// @note Axis state is present only in ::PSP_CTRL_MODE_ANALOG controller mode.
-    /// @see ::sceCtrlPeekBufferPositive()
     pub extern fn sceCtrlReadBufferPositive(pad_data: c_int, count: c_int) callconv(.C) c_int;
 
-    /// @brief Read new controller data from the controller service.
-    /// Controller data contains current button and axis state.
-    /// **Example:**
-    /// `
-    /// SceCtrlData pad;
-    /// sceCtrlSetSamplingCycle(0);
-    /// sceCtrlSetSamplingMode(1);
-    /// sceCtrlReadBufferPositive(&pad, 1);
-    /// // Do something with the read controller data
-    /// `
-    /// @note Axis state is present only in ::PSP_CTRL_MODE_ANALOG controller mode.
-    /// @warning Controller data is collected once every controller sampling cycle.
-    /// If controller data was already read during a cycle, trying to read it again
-    /// will block the execution until the next one.
-    /// `pad_data` - A pointer to ::SceCtrlData structure that receives controller data.
-    /// `count` - Number of ::SceCtrlData structures to read.
-    /// @see ::SceCtrlData
-    /// @brief Controller data.
-    /// Contains current button and axis state.
-    /// @note Axis state is present only in ::PSP_CTRL_MODE_ANALOG controller mode.
-    /// @see ::sceCtrlPeekBufferPositive()
-    /// @see ::sceCtrlPeekBufferNegative()
     pub extern fn sceCtrlReadBufferNegative(pad_data: c_int, count: c_int) callconv(.C) c_int;
 
     /// @brief Read latest latch data from the controller service.
@@ -1840,45 +1738,6 @@ const sceCtrl = struct {
     /// Returns < 0 on error.
     /// @see ::SceCtrlLatch
     /// @see ::sceCtrlReadLatch()
-    /// @brief Controller latch data.
-    /// Contains information about button state changes between two controller service sampling cycles.
-    /// With each sampling cycle, the controller service compares the new pressed & releasedbutton states
-    /// with the previously collected pressed button states. This comparison will result in the following possible
-    /// states for each button:
-    /// - **Make** - The button has just been pressed with its prior state being the released state.
-    /// Transition from 'released' state to 'pressed' state.
-    /// - **Press** - The button is currently in the 'pressed' state.
-    /// - **Break** - The button has just been released with its prior state being the 'pressed' state.
-    /// Transition from 'pressed' state to 'release' state.
-    /// - **Release** - The button is currently in the 'released' state.
-    /// It is possible for a button to (briefly) be in two states at the same time. Valid combinations are as follows:
-    /// - **Make** & **Press**
-    /// - **Break** & **Release**
-    /// In other words, if a button is in the **Make** state, then it is also in the **Press** state. However, this is not the case
-    /// for the inverse. A button in the **Press** state does not need to be in the **Make** state.
-    /// Mask the values with one or more ::PspCtrlButtons flags to access specific buttons.
-    /// These comparison results are stored internally as latch data and can be retrieved using the APIs ::sceCtrlPeekLatch() and
-    /// ::sceCtrlReadLatch().
-    /// @remark The same can be accomplished by using the different sceCtrl[Read/Peek]Buffer[Positive/Negative]() APIs
-    /// and comparing the currently collected button sampling data with the previously collected one.
-    /// @see ::PspCtrlButtons
-    /// @brief Controller latch data.
-    /// Contains information about button state changes between two controller service sampling cycles.
-    /// With each sampling cycle, the controller service compares the new pressed & releasedbutton states
-    /// with the previously collected pressed button states. This comparison will result in the following possible
-    /// states for each button:
-    /// - **Make** - The button has just been pressed with its prior state being the released state.
-    /// Transition from 'released' state to 'pressed' state.
-    /// - **Press** - The button is currently in the 'pressed' state.
-    /// - **Break** - The button has just been released with its prior state being the 'pressed' state.
-    /// Transition from 'pressed' state to 'release' state.
-    /// - **Release** - The button is currently in the 'released' state.
-    /// It is possible for a button to (briefly) be in two states at the same time. Valid combinations are as follows:
-    /// - **Make** & **Press**
-    /// - **Break** & **Release**
-    /// In other words, if a button is in the **Make** state, then it is also in the **Press** state. However, this is not the case
-    /// for the inverse. A button in the **Press** state does not need to be in the **Make** state.
-    /// Mask the values with one or more ::PspCtrlButtons flags to access specific buttons.
     pub extern fn sceCtrlPeekLatch(latch_data: c_int) callconv(.C) c_int;
 
     /// @brief Read new latch data from the controller service.
@@ -1921,126 +1780,6 @@ const sceCtrl = struct {
     /// Returns < 0 on error.
     /// @see ::SceCtrlLatch
     /// @see ::sceCtrlPeekLatch()
-    /// @brief Read new latch data from the controller service.
-    /// Latch data contains information about button state changes between two controller service sampling cycles.
-    /// **Example:**
-    /// `
-    /// SceCtrlLatch latchData;
-    /// while (1) {
-    /// // Obtain latch data
-    /// sceCtrlReadLatch(&latchData);
-    /// if (latchData.uiMake & PSP_CTRL_CROSS)
-    /// {
-    /// // The Cross button has just been pressed (transition from 'released' state to 'pressed' state)
-    /// }
-    /// if (latchData.uiPress & PSP_CTRL_SQUARE)
-    /// {
-    /// // The Square button is currently in the 'pressed' state
-    /// }
-    /// if (latchData.uiBreak & PSP_CTRL_TRIANGLE)
-    /// {
-    /// // The Triangle button has just been released (transition from 'pressed' state to 'released' state)
-    /// }
-    /// if (latchData.uiRelease & PSP_CTRL_CIRCLE)
-    /// {
-    /// // The Circle button is currently in the 'released' state
-    /// }
-    /// // As we clear the internal latch data with the ReadLatch() call, we can explicitly wait for the VBLANK interval
-    /// // to give the controller service the time it needs to collect new latch data again. This guarantees the next call
-    /// // to sceCtrlReadLatch() will return collected data again.
-    /// //
-    /// // Note: The sceCtrlReadBuffer*() APIs are implicitly waiting for a VBLANK interval if necessary.
-    /// sceDisplayWaitVBlank();
-    /// }
-    /// `
-    /// @warning Latch data is produced once every controller sampling cycle. If latch data was already read
-    /// during a cycle, trying to read it again will block the execution until the next one.
-    /// `latch_data A pointer to ::SceCtrlLatch structure that receives latch data.`
-    /// Returns On success, the number of times the controller service performed sampling since the last time
-    /// @brief Read new latch data from the controller service.
-    /// Latch data contains information about button state changes between two controller service sampling cycles.
-    /// **Example:**
-    /// `
-    /// SceCtrlLatch latchData;
-    /// while (1) {
-    /// // Obtain latch data
-    /// sceCtrlReadLatch(&latchData);
-    /// if (latchData.uiMake & PSP_CTRL_CROSS)
-    /// {
-    /// // The Cross button has just been pressed (transition from 'released' state to 'pressed' state)
-    /// }
-    /// if (latchData.uiPress & PSP_CTRL_SQUARE)
-    /// {
-    /// // The Square button is currently in the 'pressed' state
-    /// }
-    /// if (latchData.uiBreak & PSP_CTRL_TRIANGLE)
-    /// {
-    /// // The Triangle button has just been released (transition from 'pressed' state to 'released' state)
-    /// }
-    /// if (latchData.uiRelease & PSP_CTRL_CIRCLE)
-    /// {
-    /// // The Circle button is currently in the 'released' state
-    /// }
-    /// // As we clear the internal latch data with the ReadLatch() call, we can explicitly wait for the VBLANK interval
-    /// // to give the controller service the time it needs to collect new latch data again. This guarantees the next call
-    /// @brief Read new latch data from the controller service.
-    /// Latch data contains information about button state changes between two controller service sampling cycles.
-    /// **Example:**
-    /// `
-    /// SceCtrlLatch latchData;
-    /// while (1) {
-    /// // Obtain latch data
-    /// @brief Read latest latch data from the controller service.
-    /// Latch data contains information about button state changes between two controller service sampling cycles.
-    /// `latch_data A pointer to ::SceCtrlLatch structure that receives latch data.`
-    /// Returns On success, the number of times the controller service performed sampling since the last time
-    /// ::sceCtrlReadLatch() was called.
-    /// Returns < 0 on error.
-    /// @see ::SceCtrlLatch
-    /// @brief Read latest latch data from the controller service.
-    /// Latch data contains information about button state changes between two controller service sampling cycles.
-    /// `latch_data A pointer to ::SceCtrlLatch structure that receives latch data.`
-    /// Returns On success, the number of times the controller service performed sampling since the last time
-    /// @brief Controller latch data.
-    /// Contains information about button state changes between two controller service sampling cycles.
-    /// With each sampling cycle, the controller service compares the new pressed & releasedbutton states
-    /// with the previously collected pressed button states. This comparison will result in the following possible
-    /// states for each button:
-    /// - **Make** - The button has just been pressed with its prior state being the released state.
-    /// Transition from 'released' state to 'pressed' state.
-    /// - **Press** - The button is currently in the 'pressed' state.
-    /// - **Break** - The button has just been released with its prior state being the 'pressed' state.
-    /// Transition from 'pressed' state to 'release' state.
-    /// - **Release** - The button is currently in the 'released' state.
-    /// It is possible for a button to (briefly) be in two states at the same time. Valid combinations are as follows:
-    /// - **Make** & **Press**
-    /// - **Break** & **Release**
-    /// In other words, if a button is in the **Make** state, then it is also in the **Press** state. However, this is not the case
-    /// for the inverse. A button in the **Press** state does not need to be in the **Make** state.
-    /// Mask the values with one or more ::PspCtrlButtons flags to access specific buttons.
-    /// These comparison results are stored internally as latch data and can be retrieved using the APIs ::sceCtrlPeekLatch() and
-    /// ::sceCtrlReadLatch().
-    /// @remark The same can be accomplished by using the different sceCtrl[Read/Peek]Buffer[Positive/Negative]() APIs
-    /// and comparing the currently collected button sampling data with the previously collected one.
-    /// @see ::PspCtrlButtons
-    /// @see ::sceCtrlPeekLatch()
-    /// @brief Controller latch data.
-    /// Contains information about button state changes between two controller service sampling cycles.
-    /// With each sampling cycle, the controller service compares the new pressed & releasedbutton states
-    /// with the previously collected pressed button states. This comparison will result in the following possible
-    /// states for each button:
-    /// - **Make** - The button has just been pressed with its prior state being the released state.
-    /// Transition from 'released' state to 'pressed' state.
-    /// - **Press** - The button is currently in the 'pressed' state.
-    /// - **Break** - The button has just been released with its prior state being the 'pressed' state.
-    /// Transition from 'pressed' state to 'release' state.
-    /// - **Release** - The button is currently in the 'released' state.
-    /// It is possible for a button to (briefly) be in two states at the same time. Valid combinations are as follows:
-    /// - **Make** & **Press**
-    /// - **Break** & **Release**
-    /// In other words, if a button is in the **Make** state, then it is also in the **Press** state. However, this is not the case
-    /// for the inverse. A button in the **Press** state does not need to be in the **Make** state.
-    /// Mask the values with one or more ::PspCtrlButtons flags to access specific buttons.
     pub extern fn sceCtrlReadLatch(latch_data: c_int) callconv(.C) c_int;
 
     pub extern fn sceCtrl_348D99D4() callconv(.C) void;
@@ -3244,7 +2983,6 @@ const IoFileMgrForUser = struct {
     /// `
     /// `fd` - File descriptor to close
     /// Returns < 0 on error
-    /// Delete a descriptor
     pub extern fn sceIoClose(fd: SceUID) callconv(.C) c_int;
 
     /// Delete a descriptor (asynchronous)
@@ -3269,17 +3007,6 @@ const IoFileMgrForUser = struct {
     /// `flags` - Libc styled flags that are or'ed together
     /// `mode` - File access mode.
     /// Returns A non-negative integer is a valid fd, anything else an error
-    /// Open or create a file for reading or writing
-    /// @par Example1: Open a file for reading
-    /// `
-    /// if(!(fd = sceIoOpen("device:/path/to/file", O_RDONLY, 0777)) {
-    /// // error
-    /// }
-    /// `
-    /// @par Example2: Open a file for writing, creating it if it doesnt exist
-    /// `
-    /// Open or create a file for reading or writing
-    /// @par Example1: Open a file for reading
     pub extern fn sceIoOpen(file: c_char, flags: c_int, mode: SceMode) callconv(.C) SceUID;
 
     /// Open or create a file for reading or writing (asynchronous)
@@ -3298,8 +3025,6 @@ const IoFileMgrForUser = struct {
     /// `data` - Pointer to the buffer where the read data will be placed
     /// `size` - Size of the read in bytes
     /// Returns The number of bytes read
-    /// Read input
-    /// @par Example:
     pub extern fn sceIoRead(fd: SceUID, data: void, size: SceSize) callconv(.C) c_int;
 
     /// Read input (asynchronous)
@@ -3322,8 +3047,6 @@ const IoFileMgrForUser = struct {
     /// `data` - Pointer to the data to write
     /// `size` - Size of data to write
     /// Returns The number of bytes written
-    /// Write output
-    /// @par Example:
     pub extern fn sceIoWrite(fd: SceUID, data: void, size: SceSize) callconv(.C) c_int;
 
     /// Write output (asynchronous)
@@ -3343,8 +3066,6 @@ const IoFileMgrForUser = struct {
     /// `whence` - Set to SEEK_SET to seek from the start of the file, SEEK_CUR
     /// seek from the current position and SEEK_END to seek from the end.
     /// Returns The position in the file after the seek.
-    /// Reposition read/write file descriptor offset
-    /// @par Example:
     pub extern fn sceIoLseek(fd: SceUID, offset: SceOff, whence: c_int) callconv(.C) SceOff;
 
     /// Reposition read/write file descriptor offset (asynchronous)
@@ -3365,8 +3086,6 @@ const IoFileMgrForUser = struct {
     /// `whence` - Set to SEEK_SET to seek from the start of the file, SEEK_CUR
     /// seek from the current position and SEEK_END to seek from the end.
     /// Returns The position in the file after the seek.
-    /// Reposition read/write file descriptor offset (32bit mode)
-    /// @par Example:
     pub extern fn sceIoLseek32(fd: SceUID, offset: c_int, whence: c_int) callconv(.C) c_int;
 
     /// Reposition read/write file descriptor offset (32bit mode, asynchronous)
@@ -3407,9 +3126,6 @@ const IoFileMgrForUser = struct {
     /// `
     /// `dirname` - The directory to open for reading.
     /// Returns If >= 0 then a valid file descriptor, otherwise a Sony error code.
-    /// Open a directory
-    /// @par Example:
-    /// `
     pub extern fn sceIoDopen(dirname: c_char) callconv(.C) SceUID;
 
     /// Reads an entry from an opened file descriptor.
@@ -3491,31 +3207,12 @@ const IoFileMgrForUser = struct {
     /// sceIoUnassign("flash0");
     /// sceIoAssign("flash0", "lflash0:0,0", "flashfat0:", IOASSIGN_RDWR, NULL, 0);
     /// `
-    /// Assigns one IO device to another (I guess)
-    /// `dev1` - The device name to assign.
-    /// `dev2` - The block device to assign from.
-    /// `dev3` - The filesystem device to mape the block device to dev1
-    /// `mode` - Read/Write mode. One of IoAssignPerms.
-    /// `unk1` - Unknown, set to NULL.
-    /// `unk2` - Unknown, set to 0.
-    /// Returns < 0 on error.
-    /// @par Example: Reassign flash0 in read/write mode.
-    /// `
     pub extern fn sceIoAssign(dev1: c_char, dev2: c_char, dev3: c_char, mode: c_int, unk1: [*c]void, unk2: c_long) callconv(.C) c_int;
 
     /// Unassign an IO device.
     /// `dev` - The device to unassign.
     /// Returns < 0 on error
     /// @par Example: See ::sceIoAssign
-    /// Assigns one IO device to another (I guess)
-    /// `dev1` - The device name to assign.
-    /// `dev2` - The block device to assign from.
-    /// `dev3` - The filesystem device to mape the block device to dev1
-    /// `mode` - Read/Write mode. One of IoAssignPerms.
-    /// `unk1` - Unknown, set to NULL.
-    /// `unk2` - Unknown, set to 0.
-    /// Returns < 0 on error.
-    /// @par Example: Reassign flash0 in read/write mode.
     pub extern fn sceIoUnassign(dev: c_char) callconv(.C) c_int;
 
     /// Cancel an asynchronous operation on a file descriptor.
@@ -3562,9 +3259,6 @@ const ThreadManForUser = struct {
     /// `func` - A pointer to a function that will be called as the callback
     /// `arg` - Argument for the callback ?
     /// Returns >= 0 A callback id which can be used in subsequent functions, < 0 an error.
-    /// Create callback
-    /// @par Example:
-    /// `
     pub extern fn sceKernelCreateCallback(name: c_char, func: c_int, arg: void) callconv(.C) c_int;
 
     /// Delete a callback
@@ -3609,9 +3303,6 @@ const ThreadManForUser = struct {
     /// // Once all callbacks have been setup call this function
     /// sceKernelSleepThreadCB();
     /// `
-    /// Sleep thread but service any callbacks as necessary
-    /// @par Example:
-    /// `
     pub extern fn sceKernelSleepThreadCB() callconv(.C) c_int;
 
     /// Wake a thread previously put into the sleep state.
@@ -3652,9 +3343,6 @@ const ThreadManForUser = struct {
     /// `
     /// sceKernelDelayThread(1000000); // Delay for a second
     /// `
-    /// Delay the current thread by a specified number of microseconds
-    /// `delay` - Delay in microseconds.
-    /// @par Example:
     pub extern fn sceKernelDelayThread(delay: SceUInt) callconv(.C) c_int;
 
     /// Delay the current thread by a specified number of microseconds and handle any callbacks.
@@ -3687,9 +3375,6 @@ const ThreadManForUser = struct {
     /// `maxVal` - Sema maximum value
     /// `option` - Sema options (normally set to 0)
     /// Returns A semaphore id
-    /// Creates a new semaphore
-    /// @par Example:
-    /// `
     pub extern fn sceKernelCreateSema(name: c_char, attr: SceUInt, initVal: c_int, maxVal: c_int, option: c_int) callconv(.C) SceUID;
 
     /// Destroy a semaphore
@@ -3706,9 +3391,6 @@ const ThreadManForUser = struct {
     /// `semaid` - The sema id returned from sceKernelCreateSema
     /// `signal` - The amount to signal the sema (i.e. if 2 then increment the sema by 2)
     /// Returns < 0 On error.
-    /// Send a signal to a semaphore
-    /// @par Example:
-    /// `
     pub extern fn sceKernelSignalSema(semaid: SceUID, signal: c_int) callconv(.C) c_int;
 
     /// Lock a semaphore
@@ -3720,8 +3402,6 @@ const ThreadManForUser = struct {
     /// `signal` - The value to wait for (i.e. if 1 then wait till reaches a signal state of 1)
     /// `timeout` - Timeout in microseconds (assumed).
     /// Returns < 0 on error.
-    /// Lock a semaphore
-    /// @par Example:
     pub extern fn sceKernelWaitSema(semaid: SceUID, signal: c_int, timeout: SceUInt) callconv(.C) c_int;
 
     /// Lock a semaphore a handle callbacks if necessary.
@@ -3733,8 +3413,6 @@ const ThreadManForUser = struct {
     /// `signal` - The value to wait for (i.e. if 1 then wait till reaches a signal state of 1)
     /// `timeout` - Timeout in microseconds (assumed).
     /// Returns < 0 on error.
-    /// Lock a semaphore a handle callbacks if necessary.
-    /// @par Example:
     pub extern fn sceKernelWaitSemaCB(semaid: SceUID, signal: c_int, timeout: SceUInt) callconv(.C) c_int;
 
     /// Poll a sempahore.
@@ -3761,14 +3439,6 @@ const ThreadManForUser = struct {
     /// `
     /// int evid;
     /// evid = sceKernelCreateEventFlag("wait_event", 0, 0, 0);
-    /// `
-    /// Create an event flag.
-    /// `name` - The name of the event flag.
-    /// `attr` - Attributes from ::PspEventFlagAttributes
-    /// `bits` - Initial bit pattern.
-    /// `opt` - Options, set to NULL
-    /// Returns < 0 on error. >= 0 event flag id.
-    /// @par Example:
     /// `
     pub extern fn sceKernelCreateEventFlag(name: c_char, attr: c_int, bits: c_int, opt: c_int) callconv(.C) SceUID;
 
@@ -3833,9 +3503,6 @@ const ThreadManForUser = struct {
     /// `attr` - Mbx attribute flags (normally set to 0)
     /// `option` - Mbx options (normally set to NULL)
     /// Returns A messagebox id
-    /// Creates a new messagebox
-    /// @par Example:
-    /// `
     pub extern fn sceKernelCreateMbx(name: c_char, attr: SceUInt, option: c_int) callconv(.C) SceUID;
 
     /// Destroy a messagebox
@@ -3859,14 +3526,6 @@ const ThreadManForUser = struct {
     /// The start of the message should be the
     /// ::SceKernelMsgPacket structure, the rest
     /// Returns < 0 On error.
-    /// Send a message to a messagebox
-    /// @par Example:
-    /// `
-    /// struct MyMessage {
-    /// SceKernelMsgPacket header;
-    /// char text[8];
-    /// };
-    /// struct MyMessage msg = { {0}, "Hello" };
     pub extern fn sceKernelSendMbx(mbxid: SceUID, message: void) callconv(.C) c_int;
 
     /// Wait for a message to arrive in a messagebox
@@ -3880,9 +3539,6 @@ const ThreadManForUser = struct {
     /// received message should be stored
     /// `timeout` - Timeout in microseconds
     /// Returns < 0 on error.
-    /// Wait for a message to arrive in a messagebox
-    /// @par Example:
-    /// `
     pub extern fn sceKernelReceiveMbx(mbxid: SceUID, pmessage: void, timeout: SceUInt) callconv(.C) c_int;
 
     /// Wait for a message to arrive in a messagebox and handle callbacks if necessary.
@@ -3896,9 +3552,6 @@ const ThreadManForUser = struct {
     /// received message should be stored
     /// `timeout` - Timeout in microseconds
     /// Returns < 0 on error.
-    /// Wait for a message to arrive in a messagebox and handle callbacks if necessary.
-    /// @par Example:
-    /// `
     pub extern fn sceKernelReceiveMbxCB(mbxid: SceUID, pmessage: void, timeout: SceUInt) callconv(.C) c_int;
 
     /// Check if a message has arrived in a messagebox
@@ -3911,9 +3564,6 @@ const ThreadManForUser = struct {
     /// `pmessage` - A pointer to where a pointer to the
     /// received message should be stored
     /// Returns < 0 on error (SCE_KERNEL_ERROR_MBOX_NOMSG if the mbx is empty).
-    /// Check if a message has arrived in a messagebox
-    /// @par Example:
-    /// `
     pub extern fn sceKernelPollMbx(mbxid: SceUID, pmessage: void) callconv(.C) c_int;
 
     /// Abort all wait operations on a messagebox
@@ -3926,8 +3576,6 @@ const ThreadManForUser = struct {
     /// were waiting on the mbx should be stored (NULL
     /// if you don't care)
     /// Returns < 0 on error
-    /// Abort all wait operations on a messagebox
-    /// @par Example:
     pub extern fn sceKernelCancelReceiveMbx(mbxid: SceUID, pnum: c_int) callconv(.C) c_int;
 
     /// Retrieve information about a messagebox.
@@ -4277,7 +3925,7 @@ const ThreadManForUser = struct {
     /// Returns 0 on success, < 0 on error
     pub extern fn sceKernelReferVTimerStatus(uid: SceUID, info: c_int) callconv(.C) c_int;
 
-    pub extern fn sceKernelCreateThread() callconv(.C) void;
+    pub extern fn sceKernelCreateThread(name: c_char, entry: c_int, initPriority: c_int, stackSize: c_int, attr: SceUInt, option: c_int) callconv(.C) SceUID;
 
     /// Delate a thread
     /// `thid` - UID of the thread to be deleted.
@@ -4338,12 +3986,6 @@ const ThreadManForUser = struct {
     /// sceKernelChangeThreadPriority(thid, 16);
     /// `
     /// Returns 0 if successful, otherwise the error code.
-    /// Change the threads current priority.
-    /// `thid` - The ID of the thread (from sceKernelCreateThread or sceKernelGetThreadId)
-    /// `priority` - The new priority (the lower the number the higher the priority)
-    /// @par Example:
-    /// `
-    /// int thid = sceKernelGetThreadId();
     pub extern fn sceKernelChangeThreadPriority(thid: SceUID, priority: c_int) callconv(.C) c_int;
 
     /// Rotate thread ready queue at a set priority
@@ -4358,12 +4000,6 @@ const ThreadManForUser = struct {
 
     /// Get the current thread Id
     /// Returns The thread id of the calling thread.
-    /// Change the threads current priority.
-    /// `thid` - The ID of the thread (from sceKernelCreateThread or sceKernelGetThreadId)
-    /// `priority` - The new priority (the lower the number the higher the priority)
-    /// @par Example:
-    /// `
-    /// Change the threads current priority.
     pub extern fn sceKernelGetThreadId() callconv(.C) c_int;
 
     /// Get the current priority of the thread you are in.
@@ -4398,14 +4034,6 @@ const ThreadManForUser = struct {
     /// { Do something... }
     /// `
     /// Returns 0 if successful, otherwise the error code.
-    /// Get the status information for the specified thread.
-    /// `thid` - Id of the thread to get status
-    /// `info` - Pointer to the info structure to receive the data.
-    /// Note: The structures size field should be set to
-    /// sizeof(SceKernelThreadInfo) before calling this function.
-    /// @par Example:
-    /// `
-    /// SceKernelThreadInfo status;
     pub extern fn sceKernelReferThreadStatus(thid: SceUID, info: c_int) callconv(.C) c_int;
 
     /// Retrive the runtime status of a thread.
@@ -4493,7 +4121,6 @@ const Kernel_Library = struct {
 
     /// Resume all interrupts.
     /// `flags` - The value returned from ::sceKernelCpuSuspendIntr().
-    /// Suspend all interrupts.
     pub extern fn sceKernelCpuResumeIntr(flags: c_uint) callconv(.C) void;
 
     /// Resume all interrupts (using sync instructions).
@@ -4555,12 +4182,6 @@ const UtilsForUser = struct {
     /// sceKernelUtilsMd5BlockUpdate(&ctx, (u8*) "Hello", 5);
     /// sceKernelUtilsMd5BlockResult(&ctx, digest);
     /// `
-    /// Function to initialise a MD5 digest context
-    /// `ctx` - A context block to initialise
-    /// Returns < 0 on error.
-    /// @par Example:
-    /// `
-    /// SceKernelUtilsMd5Context ctx;
     pub extern fn sceKernelUtilsMd5BlockInit(ctx: c_int) callconv(.C) c_int;
 
     /// Function to update the MD5 digest with a block of data.
@@ -4568,27 +4189,12 @@ const UtilsForUser = struct {
     /// `data` - The data block to hash.
     /// `size` - The size of the data to hash
     /// Returns < 0 on error.
-    /// Function to initialise a MD5 digest context
-    /// `ctx` - A context block to initialise
-    /// Returns < 0 on error.
-    /// @par Example:
-    /// `
-    /// SceKernelUtilsMd5Context ctx;
-    /// u8 digest[16];
     pub extern fn sceKernelUtilsMd5BlockUpdate(ctx: c_int, data: c_int, size: c_int) callconv(.C) c_int;
 
     /// Function to get the digest result of the MD5 hash.
     /// `ctx` - A filled in context block.
     /// `digest` - A 16 byte array to hold the digest.
     /// Returns < 0 on error.
-    /// Function to initialise a MD5 digest context
-    /// `ctx` - A context block to initialise
-    /// Returns < 0 on error.
-    /// @par Example:
-    /// `
-    /// SceKernelUtilsMd5Context ctx;
-    /// u8 digest[16];
-    /// sceKernelUtilsMd5BlockInit(&ctx);
     pub extern fn sceKernelUtilsMd5BlockResult(ctx: c_int, digest: c_int) callconv(.C) c_int;
 
     /// Function to SHA1 hash a data block.
@@ -4609,12 +4215,6 @@ const UtilsForUser = struct {
     /// sceKernelUtilsSha1BlockUpdate(&ctx, (u8*) "Hello", 5);
     /// sceKernelUtilsSha1BlockResult(&ctx, digest);
     /// `
-    /// Function to initialise a context for SHA1 hashing.
-    /// `ctx` - Pointer to a context.
-    /// Returns < 0 on error.
-    /// @par Example:
-    /// `
-    /// SceKernelUtilsSha1Context ctx;
     pub extern fn sceKernelUtilsSha1BlockInit(ctx: c_int) callconv(.C) c_int;
 
     /// Function to update the current hash.
@@ -4622,27 +4222,12 @@ const UtilsForUser = struct {
     /// `data` - The data block to hash.
     /// `size` - The size of the data block
     /// Returns < 0 on error.
-    /// Function to initialise a context for SHA1 hashing.
-    /// `ctx` - Pointer to a context.
-    /// Returns < 0 on error.
-    /// @par Example:
-    /// `
-    /// SceKernelUtilsSha1Context ctx;
-    /// u8 digest[20];
     pub extern fn sceKernelUtilsSha1BlockUpdate(ctx: c_int, data: c_int, size: c_int) callconv(.C) c_int;
 
     /// Function to get the result of the SHA1 hash.
     /// `ctx` - Pointer to a prefilled context.
     /// `digest` - A pointer to a 20 byte array to contain the digest.
     /// Returns < 0 on error.
-    /// Function to initialise a context for SHA1 hashing.
-    /// `ctx` - Pointer to a context.
-    /// Returns < 0 on error.
-    /// @par Example:
-    /// `
-    /// SceKernelUtilsSha1Context ctx;
-    /// u8 digest[20];
-    /// sceKernelUtilsSha1BlockInit(&ctx);
     pub extern fn sceKernelUtilsSha1BlockResult(ctx: c_int, digest: c_int) callconv(.C) c_int;
 
     /// Function to initialise a mersenne twister context.
@@ -4655,22 +4240,11 @@ const UtilsForUser = struct {
     /// u23 rand_val = sceKernelUtilsMt19937UInt(&ctx);
     /// `
     /// Returns < 0 on error.
-    /// Function to initialise a mersenne twister context.
-    /// `ctx` - Pointer to a context
-    /// `seed` - A seed for the random function.
-    /// @par Example:
-    /// `
     pub extern fn sceKernelUtilsMt19937Init(ctx: c_int, seed: c_int) callconv(.C) c_int;
 
     /// Function to return a new psuedo random number.
     /// `ctx` - Pointer to a pre-initialised context.
     /// Returns A pseudo random number (between 0 and MAX_INT).
-    /// Function to initialise a mersenne twister context.
-    /// `ctx` - Pointer to a context
-    /// `seed` - A seed for the random function.
-    /// @par Example:
-    /// `
-    /// SceKernelUtilsMt19937Context ctx;
     pub extern fn sceKernelUtilsMt19937UInt(ctx: c_int) callconv(.C) c_int;
 
     pub extern fn sceKernelGetGPI() callconv(.C) void;
@@ -4768,10 +4342,6 @@ const LoadExecForUser = struct {
 
     /// Exit game and go back to the PSP browser.
     /// @note You need to be in a thread in order for this function to work
-    /// Register callback
-    /// @note By installing the exit callback the home button becomes active. However if sceKernelExitGame
-    /// is not called in the callback it is likely that the psp will just crash.
-    /// @par Example:
     pub extern fn sceKernelExitGame() callconv(.C) void;
 
     /// Register callback
@@ -4785,12 +4355,6 @@ const LoadExecForUser = struct {
     /// `
     /// `cbid Callback id`
     /// Returns < 0 on error
-    /// Register callback
-    /// @note By installing the exit callback the home button becomes active. However if sceKernelExitGame
-    /// is not called in the callback it is likely that the psp will just crash.
-    /// @par Example:
-    /// `
-    /// int exit_callback(void) { sceKernelExitGame(); }
     pub extern fn sceKernelRegisterExitCallback(cbid: c_int) callconv(.C) c_int;
 
 };
@@ -5020,7 +4584,6 @@ const sceUtility = struct {
     /// Returns 2 if the GUI is visible (you need to call sceUtilityGameSharingGetStatus).
     /// 3 if the user cancelled the dialog, and you need to call sceUtilityGameSharingShutdownStart.
     /// 4 if the dialog has been successfully shut down.
-    /// Get the current status of game sharing.
     pub extern fn sceUtilityGameSharingGetStatus() callconv(.C) c_int;
 
     pub extern fn sceNetplayDialogInitStart() callconv(.C) void;
@@ -5099,7 +4662,6 @@ const sceUtility = struct {
     /// Returns 2 if the GUI is visible (you need to call sceUtilityMsgDialogGetStatus).
     /// 3 if the user cancelled the dialog, and you need to call sceUtilityMsgDialogShutdownStart.
     /// 4 if the dialog has been successfully shut down.
-    /// Get the current status of a message dialog currently active.
     pub extern fn sceUtilityMsgDialogGetStatus() callconv(.C) c_int;
 
     /// Create an on-screen keyboard
@@ -5119,7 +4681,6 @@ const sceUtility = struct {
 
     /// Get the status of a on-screen keyboard currently active.
     /// Returns the current status of the keyboard. See ::pspUtilityDialogState for details.
-    /// Remove a currently active keyboard. After calling this function you must
     pub extern fn sceUtilityOskGetStatus() callconv(.C) c_int;
 
     /// Set Integer System Parameter
@@ -5209,7 +4770,6 @@ const sceUtility = struct {
     /// Returns 2 if the GUI is visible (you need to call sceUtilityHtmlViewerGetStatus).
     /// 3 if the user cancelled the dialog, and you need to call sceUtilityHtmlViewerShutdownStart.
     /// 4 if the dialog has been successfully shut down.
-    /// Get the current status of the html viewer.
     pub extern fn sceUtilityHtmlViewerGetStatus() callconv(.C) c_int;
 
     /// Init the html viewer
