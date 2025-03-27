@@ -86,7 +86,8 @@ comptime {
         asm(macro.import_function("sceNetInet", "0xCDA85C99", "sceNetInetRecv"));
         asm(macro.import_function("sceNetInet", "0xC91142E4", "sceNetInetRecvfrom"));
         asm(macro.import_function("sceNetInet", "0xEECE61D2", "sceNetInetRecvmsg"));
-        asm(macro.import_function("sceNetInet", "0x5BE8D595", "sceNetInetSelect"));
+        asm(macro.import_function("sceNetInet", "0x5BE8D595", "sceNetInetSelect_stub"));
+        asm(macro.generic_abi_wrapper("sceNetInetSelect", 5));
         asm(macro.import_function("sceNetInet", "0x7AA671BC", "sceNetInetSend"));
         asm(macro.import_function("sceNetInet", "0x05038FC7", "sceNetInetSendto"));
         asm(macro.import_function("sceNetInet", "0x774E36F4", "sceNetInetSendmsg"));
@@ -154,7 +155,8 @@ comptime {
         asm(macro.import_function("sceHttp", "0x87797BDD", "sceHttpsLoadDefaultCert"));
         asm(macro.import_function("sceHttp", "0x87F1E666", "sceHttp_87F1E666"));
         asm(macro.import_function("sceHttp", "0x8ACD1F73", "sceHttpSetConnectTimeOut"));
-        asm(macro.import_function("sceHttp", "0x8EEFD953", "sceHttpCreateConnection"));
+        asm(macro.import_function("sceHttp", "0x8EEFD953", "sceHttpCreateConnection_stub"));
+        asm(macro.generic_abi_wrapper("sceHttpCreateConnection", 5));
         asm(macro.import_function("sceHttp", "0x951D310E", "sceHttp_951D310E"));
         asm(macro.import_function("sceHttp", "0x9668864C", "sceHttpSetRecvBlockSize"));
         asm(macro.import_function("sceHttp", "0x96F16D3E", "sceHttpGetCookie"));
@@ -189,13 +191,15 @@ comptime {
         asm(macro.import_function("sceHttp", "0xD11DAB01", "sceHttpsGetCaList"));
         asm(macro.import_function("sceHttp", "0xD1C8945E", "sceHttpEnd"));
         asm(macro.import_function("sceHttp", "0xD29163DA", "sceHttp_D29163DA"));
-        asm(macro.import_function("sceHttp", "0xD70D4847", "sceHttpGetProxy"));
+        asm(macro.import_function("sceHttp", "0xD70D4847", "sceHttpGetProxy_stub"));
+        asm(macro.generic_abi_wrapper("sceHttpGetProxy", 6));
         asm(macro.import_function("sceHttp", "0xD80BE761", "sceHttp_D80BE761"));
         asm(macro.import_function("sceHttp", "0xDB266CCF", "sceHttpGetAllHeader"));
         asm(macro.import_function("sceHttp", "0xDD6E7857", "sceHttp_DD6E7857"));
         asm(macro.import_function("sceHttp", "0xE4D21302", "sceHttpsInit"));
         asm(macro.import_function("sceHttp", "0xEDEEB999", "sceHttpReadData"));
-        asm(macro.import_function("sceHttp", "0xF0F46C62", "sceHttpSetProxy"));
+        asm(macro.import_function("sceHttp", "0xF0F46C62", "sceHttpSetProxy_stub"));
+        asm(macro.generic_abi_wrapper("sceHttpSetProxy", 5));
         asm(macro.import_function("sceHttp", "0xF1657B22", "sceHttpLoadSystemCookie"));
         asm(macro.import_function("sceHttp", "0xF49934F6", "sceHttpSetMallocFunction"));
         asm(macro.import_function("sceHttp", "0xF9D8EB63", "sceHttpsEnd"));
@@ -204,7 +208,8 @@ comptime {
 
     if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "include_sceNet") and options.include_sceNet)) {
         asm(macro.import_module_start("sceNet", "0x00090000", "8"));
-        asm(macro.import_function("sceNet", "0x39AF39A6", "sceNetInit"));
+        asm(macro.import_function("sceNet", "0x39AF39A6", "sceNetInit_stub"));
+        asm(macro.generic_abi_wrapper("sceNetInit", 5));
         asm(macro.import_function("sceNet", "0x281928A9", "sceNetTerm"));
         asm(macro.import_function("sceNet", "0x50647530", "sceNetFreeThreadinfo"));
         asm(macro.import_function("sceNet", "0xAD6844C6", "sceNetThreadAbort"));
@@ -220,8 +225,10 @@ comptime {
         asm(macro.import_function("sceNetResolver", "0x6138194A", "sceNetResolverTerm"));
         asm(macro.import_function("sceNetResolver", "0x244172AF", "sceNetResolverCreate"));
         asm(macro.import_function("sceNetResolver", "0x94523E09", "sceNetResolverDelete"));
-        asm(macro.import_function("sceNetResolver", "0x224C5F44", "sceNetResolverStartNtoA"));
-        asm(macro.import_function("sceNetResolver", "0x629E2FB7", "sceNetResolverStartAtoN"));
+        asm(macro.import_function("sceNetResolver", "0x224C5F44", "sceNetResolverStartNtoA_stub"));
+        asm(macro.generic_abi_wrapper("sceNetResolverStartNtoA", 5));
+        asm(macro.import_function("sceNetResolver", "0x629E2FB7", "sceNetResolverStartAtoN_stub"));
+        asm(macro.generic_abi_wrapper("sceNetResolverStartAtoN", 6));
         asm(macro.import_function("sceNetResolver", "0x808F6063", "sceNetResolverStop"));
     }
 
@@ -343,7 +350,8 @@ comptime {
         asm(macro.import_function("sceNetAdhocctl", "0x8916C003", "sceNetAdhocctlGetNameByAddr"));
         asm(macro.import_function("sceNetAdhocctl", "0xDED9D28E", "sceNetAdhocctlGetParameter"));
         asm(macro.import_function("sceNetAdhocctl", "0x81AEE1BE", "sceNetAdhocctlGetScanInfo"));
-        asm(macro.import_function("sceNetAdhocctl", "0xA5C055CE", "sceNetAdhocctlCreateEnterGameMode"));
+        asm(macro.import_function("sceNetAdhocctl", "0xA5C055CE", "sceNetAdhocctlCreateEnterGameMode_stub"));
+        asm(macro.generic_abi_wrapper("sceNetAdhocctlCreateEnterGameMode", 6));
         asm(macro.import_function("sceNetAdhocctl", "0x1FF89745", "sceNetAdhocctlJoinEnterGameMode"));
         asm(macro.import_function("sceNetAdhocctl", "0xCF8E084D", "sceNetAdhocctlExitGameMode"));
         asm(macro.import_function("sceNetAdhocctl", "0x5A014CE0", "sceNetAdhocctlGetGameModeInfo"));
@@ -354,8 +362,10 @@ comptime {
         asm(macro.import_module_start("sceNetAdhocMatching", "0x00090000", "16"));
         asm(macro.import_function("sceNetAdhocMatching", "0x2A2A1E07", "sceNetAdhocMatchingInit"));
         asm(macro.import_function("sceNetAdhocMatching", "0x7945ECDA", "sceNetAdhocMatchingTerm"));
-        asm(macro.import_function("sceNetAdhocMatching", "0xCA5EDA6F", "sceNetAdhocMatchingCreate"));
-        asm(macro.import_function("sceNetAdhocMatching", "0x93EF3843", "sceNetAdhocMatchingStart"));
+        asm(macro.import_function("sceNetAdhocMatching", "0xCA5EDA6F", "sceNetAdhocMatchingCreate_stub"));
+        asm(macro.generic_abi_wrapper("sceNetAdhocMatchingCreate", 9));
+        asm(macro.import_function("sceNetAdhocMatching", "0x93EF3843", "sceNetAdhocMatchingStart_stub"));
+        asm(macro.generic_abi_wrapper("sceNetAdhocMatchingStart", 7));
         asm(macro.import_function("sceNetAdhocMatching", "0x32B156B3", "sceNetAdhocMatchingStop"));
         asm(macro.import_function("sceNetAdhocMatching", "0xF16EAF4F", "sceNetAdhocMatchingDelete"));
         asm(macro.import_function("sceNetAdhocMatching", "0x5E3D4B79", "sceNetAdhocMatchingSelectTarget"));
@@ -378,16 +388,23 @@ comptime {
         asm(macro.import_function("sceNetAdhoc", "0x73BFD52D", "sceNetAdhocSetSocketAlert"));
         asm(macro.import_function("sceNetAdhoc", "0x4D2CE199", "sceNetAdhocGetSocketAlert"));
         asm(macro.import_function("sceNetAdhoc", "0x6F92741B", "sceNetAdhocPdpCreate"));
-        asm(macro.import_function("sceNetAdhoc", "0xABED3790", "sceNetAdhocPdpSend"));
-        asm(macro.import_function("sceNetAdhoc", "0xDFE53E03", "sceNetAdhocPdpRecv"));
+        asm(macro.import_function("sceNetAdhoc", "0xABED3790", "sceNetAdhocPdpSend_stub"));
+        asm(macro.generic_abi_wrapper("sceNetAdhocPdpSend", 7));
+        asm(macro.import_function("sceNetAdhoc", "0xDFE53E03", "sceNetAdhocPdpRecv_stub"));
+        asm(macro.generic_abi_wrapper("sceNetAdhocPdpRecv", 7));
         asm(macro.import_function("sceNetAdhoc", "0x7F27BB5E", "sceNetAdhocPdpDelete"));
         asm(macro.import_function("sceNetAdhoc", "0xC7C1FC57", "sceNetAdhocGetPdpStat"));
-        asm(macro.import_function("sceNetAdhoc", "0x877F6D66", "sceNetAdhocPtpOpen"));
+        asm(macro.import_function("sceNetAdhoc", "0x877F6D66", "sceNetAdhocPtpOpen_stub"));
+        asm(macro.generic_abi_wrapper("sceNetAdhocPtpOpen", 8));
         asm(macro.import_function("sceNetAdhoc", "0xFC6FC07B", "sceNetAdhocPtpConnect"));
-        asm(macro.import_function("sceNetAdhoc", "0xE08BDAC1", "sceNetAdhocPtpListen"));
-        asm(macro.import_function("sceNetAdhoc", "0x9DF81198", "sceNetAdhocPtpAccept"));
-        asm(macro.import_function("sceNetAdhoc", "0x4DA4C788", "sceNetAdhocPtpSend"));
-        asm(macro.import_function("sceNetAdhoc", "0x8BEA2B3E", "sceNetAdhocPtpRecv"));
+        asm(macro.import_function("sceNetAdhoc", "0xE08BDAC1", "sceNetAdhocPtpListen_stub"));
+        asm(macro.generic_abi_wrapper("sceNetAdhocPtpListen", 7));
+        asm(macro.import_function("sceNetAdhoc", "0x9DF81198", "sceNetAdhocPtpAccept_stub"));
+        asm(macro.generic_abi_wrapper("sceNetAdhocPtpAccept", 5));
+        asm(macro.import_function("sceNetAdhoc", "0x4DA4C788", "sceNetAdhocPtpSend_stub"));
+        asm(macro.generic_abi_wrapper("sceNetAdhocPtpSend", 5));
+        asm(macro.import_function("sceNetAdhoc", "0x8BEA2B3E", "sceNetAdhocPtpRecv_stub"));
+        asm(macro.generic_abi_wrapper("sceNetAdhocPtpRecv", 5));
         asm(macro.import_function("sceNetAdhoc", "0x9AC2EEAC", "sceNetAdhocPtpFlush"));
         asm(macro.import_function("sceNetAdhoc", "0x157E6225", "sceNetAdhocPtpClose"));
         asm(macro.import_function("sceNetAdhoc", "0xB9685118", "sceNetAdhocGetPtpStat"));
@@ -451,7 +468,8 @@ comptime {
         asm(macro.import_function("sceMpeg", "0x682A619B", "sceMpegInit"));
         asm(macro.import_function("sceMpeg", "0x874624D6", "sceMpegFinish"));
         asm(macro.import_function("sceMpeg", "0xC132E22F", "sceMpegQueryMemSize"));
-        asm(macro.import_function("sceMpeg", "0xD8C5F121", "sceMpegCreate"));
+        asm(macro.import_function("sceMpeg", "0xD8C5F121", "sceMpegCreate_stub"));
+        asm(macro.generic_abi_wrapper("sceMpegCreate", 7));
         asm(macro.import_function("sceMpeg", "0x606A4649", "sceMpegDelete"));
         asm(macro.import_function("sceMpeg", "0x42560F23", "sceMpegRegistStream"));
         asm(macro.import_function("sceMpeg", "0x591A4AA2", "sceMpegUnRegistStream"));
@@ -467,13 +485,15 @@ comptime {
         asm(macro.import_function("sceMpeg", "0xE1CE83A7", "sceMpegGetAtracAu"));
         asm(macro.import_function("sceMpeg", "0x500F0429", "sceMpegFlushStream"));
         asm(macro.import_function("sceMpeg", "0x707B7629", "sceMpegFlushAllStream"));
-        asm(macro.import_function("sceMpeg", "0x0E3C2E9D", "sceMpegAvcDecode"));
+        asm(macro.import_function("sceMpeg", "0x0E3C2E9D", "sceMpegAvcDecode_stub"));
+        asm(macro.generic_abi_wrapper("sceMpegAvcDecode", 5));
         asm(macro.import_function("sceMpeg", "0x0F6C18D7", "sceMpegAvcDecodeDetail"));
         asm(macro.import_function("sceMpeg", "0xA11C7026", "sceMpegAvcDecodeMode"));
         asm(macro.import_function("sceMpeg", "0x740FCCD1", "sceMpegAvcDecodeStop"));
         asm(macro.import_function("sceMpeg", "0x800C44DF", "sceMpegAtracDecode"));
         asm(macro.import_function("sceMpeg", "0xD7A29F46", "sceMpegRingbufferQueryMemSize"));
-        asm(macro.import_function("sceMpeg", "0x37295ED8", "sceMpegRingbufferConstruct"));
+        asm(macro.import_function("sceMpeg", "0x37295ED8", "sceMpegRingbufferConstruct_stub"));
+        asm(macro.generic_abi_wrapper("sceMpegRingbufferConstruct", 6));
         asm(macro.import_function("sceMpeg", "0x13407F13", "sceMpegRingbufferDestruct"));
         asm(macro.import_function("sceMpeg", "0xB240A59E", "sceMpegRingbufferPut"));
         asm(macro.import_function("sceMpeg", "0xB5F6DC87", "sceMpegRingbufferAvailableSize"));
@@ -579,7 +599,8 @@ comptime {
         asm(macro.import_module_start("SysMemUserForUser", "0x40000000", "9"));
         asm(macro.import_function("SysMemUserForUser", "0xA291F107", "sceKernelMaxFreeMemSize"));
         asm(macro.import_function("SysMemUserForUser", "0xF919F628", "sceKernelTotalFreeMemSize"));
-        asm(macro.import_function("SysMemUserForUser", "0x237DBD4F", "sceKernelAllocPartitionMemory"));
+        asm(macro.import_function("SysMemUserForUser", "0x237DBD4F", "sceKernelAllocPartitionMemory_stub"));
+        asm(macro.generic_abi_wrapper("sceKernelAllocPartitionMemory", 5));
         asm(macro.import_function("SysMemUserForUser", "0xB6D61D02", "sceKernelFreePartitionMemory"));
         asm(macro.import_function("SysMemUserForUser", "0x9D9A5BA1", "sceKernelGetBlockHeadAddr"));
         asm(macro.import_function("SysMemUserForUser", "0x3FC9AE6A", "sceKernelDevkitVersion"));
@@ -604,8 +625,10 @@ comptime {
         asm(macro.import_function("ModuleMgrForUser", "0x977DE386", "sceKernelLoadModule"));
         asm(macro.import_function("ModuleMgrForUser", "0x710F61B5", "sceKernelLoadModuleMs"));
         asm(macro.import_function("ModuleMgrForUser", "0xF9275D98", "sceKernelLoadModuleBufferUsbWlan"));
-        asm(macro.import_function("ModuleMgrForUser", "0x50F0C1EC", "sceKernelStartModule"));
-        asm(macro.import_function("ModuleMgrForUser", "0xD1FF982A", "sceKernelStopModule"));
+        asm(macro.import_function("ModuleMgrForUser", "0x50F0C1EC", "sceKernelStartModule_stub"));
+        asm(macro.generic_abi_wrapper("sceKernelStartModule", 5));
+        asm(macro.import_function("ModuleMgrForUser", "0xD1FF982A", "sceKernelStopModule_stub"));
+        asm(macro.generic_abi_wrapper("sceKernelStopModule", 5));
         asm(macro.import_function("ModuleMgrForUser", "0x2E0911AA", "sceKernelUnloadModule"));
         asm(macro.import_function("ModuleMgrForUser", "0xD675EBB8", "sceKernelSelfStopUnloadModule"));
         asm(macro.import_function("ModuleMgrForUser", "0xCC1D3699", "sceKernelStopUnloadSelfModule"));
@@ -634,8 +657,10 @@ comptime {
         asm(macro.import_function("IoFileMgrForUser", "0x71B19E77", "sceIoLseekAsync"));
         asm(macro.import_function("IoFileMgrForUser", "0x68963324", "sceIoLseek32"));
         asm(macro.import_function("IoFileMgrForUser", "0x1B385D8F", "sceIoLseek32Async"));
-        asm(macro.import_function("IoFileMgrForUser", "0x63632449", "sceIoIoctl"));
-        asm(macro.import_function("IoFileMgrForUser", "0xE95A012B", "sceIoIoctlAsync"));
+        asm(macro.import_function("IoFileMgrForUser", "0x63632449", "sceIoIoctl_stub"));
+        asm(macro.generic_abi_wrapper("sceIoIoctl", 6));
+        asm(macro.import_function("IoFileMgrForUser", "0xE95A012B", "sceIoIoctlAsync_stub"));
+        asm(macro.generic_abi_wrapper("sceIoIoctlAsync", 6));
         asm(macro.import_function("IoFileMgrForUser", "0xB29DDF9C", "sceIoDopen"));
         asm(macro.import_function("IoFileMgrForUser", "0xE3EB004C", "sceIoDread"));
         asm(macro.import_function("IoFileMgrForUser", "0xEB092469", "sceIoDclose"));
@@ -647,9 +672,11 @@ comptime {
         asm(macro.import_function("IoFileMgrForUser", "0xACE946E8", "sceIoGetstat"));
         asm(macro.import_function("IoFileMgrForUser", "0xB8A740F4", "sceIoChstat"));
         asm(macro.import_function("IoFileMgrForUser", "0x779103A0", "sceIoRename"));
-        asm(macro.import_function("IoFileMgrForUser", "0x54F5FB11", "sceIoDevctl"));
+        asm(macro.import_function("IoFileMgrForUser", "0x54F5FB11", "sceIoDevctl_stub"));
+        asm(macro.generic_abi_wrapper("sceIoDevctl", 6));
         asm(macro.import_function("IoFileMgrForUser", "0x08BD7374", "sceIoGetDevType"));
-        asm(macro.import_function("IoFileMgrForUser", "0xB2A628C1", "sceIoAssign"));
+        asm(macro.import_function("IoFileMgrForUser", "0xB2A628C1", "sceIoAssign_stub"));
+        asm(macro.generic_abi_wrapper("sceIoAssign", 6));
         asm(macro.import_function("IoFileMgrForUser", "0x6D08A871", "sceIoUnassign"));
         asm(macro.import_function("IoFileMgrForUser", "0xE8BC6571", "sceIoCancel"));
     }
@@ -700,7 +727,8 @@ comptime {
     if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "include_ThreadManForUser") and options.include_ThreadManForUser)) {
         asm(macro.import_module_start("ThreadManForUser", "0x40010000", "128"));
         asm(macro.import_function("ThreadManForUser", "0x6E9EA350", "_sceKernelReturnFromCallback"));
-        asm(macro.import_function("ThreadManForUser", "0x0C106E53", "sceKernelRegisterThreadEventHandler"));
+        asm(macro.import_function("ThreadManForUser", "0x0C106E53", "sceKernelRegisterThreadEventHandler_stub"));
+        asm(macro.generic_abi_wrapper("sceKernelRegisterThreadEventHandler", 5));
         asm(macro.import_function("ThreadManForUser", "0x72F3C145", "sceKernelReleaseThreadEventHandler"));
         asm(macro.import_function("ThreadManForUser", "0x369EEB6B", "sceKernelReferThreadEventHandlerStatus"));
         asm(macro.import_function("ThreadManForUser", "0xE81CAF8F", "sceKernelCreateCallback"));
@@ -722,7 +750,8 @@ comptime {
         asm(macro.import_function("ThreadManForUser", "0x68DA9E36", "sceKernelDelayThreadCB"));
         asm(macro.import_function("ThreadManForUser", "0xBD123D9E", "sceKernelDelaySysClockThread"));
         asm(macro.import_function("ThreadManForUser", "0x1181E963", "sceKernelDelaySysClockThreadCB"));
-        asm(macro.import_function("ThreadManForUser", "0xD6DA4BA1", "sceKernelCreateSema"));
+        asm(macro.import_function("ThreadManForUser", "0xD6DA4BA1", "sceKernelCreateSema_stub"));
+        asm(macro.generic_abi_wrapper("sceKernelCreateSema", 5));
         asm(macro.import_function("ThreadManForUser", "0x28B6489C", "sceKernelDeleteSema"));
         asm(macro.import_function("ThreadManForUser", "0x3F53E640", "sceKernelSignalSema"));
         asm(macro.import_function("ThreadManForUser", "0x4E3A1105", "sceKernelWaitSema"));
@@ -734,8 +763,10 @@ comptime {
         asm(macro.import_function("ThreadManForUser", "0xEF9E4C70", "sceKernelDeleteEventFlag"));
         asm(macro.import_function("ThreadManForUser", "0x1FB15A32", "sceKernelSetEventFlag"));
         asm(macro.import_function("ThreadManForUser", "0x812346E4", "sceKernelClearEventFlag"));
-        asm(macro.import_function("ThreadManForUser", "0x402FCF22", "sceKernelWaitEventFlag"));
-        asm(macro.import_function("ThreadManForUser", "0x328C546A", "sceKernelWaitEventFlagCB"));
+        asm(macro.import_function("ThreadManForUser", "0x402FCF22", "sceKernelWaitEventFlag_stub"));
+        asm(macro.generic_abi_wrapper("sceKernelWaitEventFlag", 5));
+        asm(macro.import_function("ThreadManForUser", "0x328C546A", "sceKernelWaitEventFlagCB_stub"));
+        asm(macro.generic_abi_wrapper("sceKernelWaitEventFlagCB", 5));
         asm(macro.import_function("ThreadManForUser", "0x30FD48F0", "sceKernelPollEventFlag"));
         asm(macro.import_function("ThreadManForUser", "0xCD203292", "sceKernelCancelEventFlag"));
         asm(macro.import_function("ThreadManForUser", "0xA66B0120", "sceKernelReferEventFlagStatus"));
@@ -747,17 +778,25 @@ comptime {
         asm(macro.import_function("ThreadManForUser", "0x0D81716A", "sceKernelPollMbx"));
         asm(macro.import_function("ThreadManForUser", "0x87D4DD36", "sceKernelCancelReceiveMbx"));
         asm(macro.import_function("ThreadManForUser", "0xA8E8C846", "sceKernelReferMbxStatus"));
-        asm(macro.import_function("ThreadManForUser", "0x7C0DC2A0", "sceKernelCreateMsgPipe"));
+        asm(macro.import_function("ThreadManForUser", "0x7C0DC2A0", "sceKernelCreateMsgPipe_stub"));
+        asm(macro.generic_abi_wrapper("sceKernelCreateMsgPipe", 5));
         asm(macro.import_function("ThreadManForUser", "0xF0B7DA1C", "sceKernelDeleteMsgPipe"));
-        asm(macro.import_function("ThreadManForUser", "0x876DBFAD", "sceKernelSendMsgPipe"));
-        asm(macro.import_function("ThreadManForUser", "0x7C41F2C2", "sceKernelSendMsgPipeCB"));
-        asm(macro.import_function("ThreadManForUser", "0x884C9F90", "sceKernelTrySendMsgPipe"));
-        asm(macro.import_function("ThreadManForUser", "0x74829B76", "sceKernelReceiveMsgPipe"));
-        asm(macro.import_function("ThreadManForUser", "0xFBFA697D", "sceKernelReceiveMsgPipeCB"));
-        asm(macro.import_function("ThreadManForUser", "0xDF52098F", "sceKernelTryReceiveMsgPipe"));
+        asm(macro.import_function("ThreadManForUser", "0x876DBFAD", "sceKernelSendMsgPipe_stub"));
+        asm(macro.generic_abi_wrapper("sceKernelSendMsgPipe", 6));
+        asm(macro.import_function("ThreadManForUser", "0x7C41F2C2", "sceKernelSendMsgPipeCB_stub"));
+        asm(macro.generic_abi_wrapper("sceKernelSendMsgPipeCB", 6));
+        asm(macro.import_function("ThreadManForUser", "0x884C9F90", "sceKernelTrySendMsgPipe_stub"));
+        asm(macro.generic_abi_wrapper("sceKernelTrySendMsgPipe", 5));
+        asm(macro.import_function("ThreadManForUser", "0x74829B76", "sceKernelReceiveMsgPipe_stub"));
+        asm(macro.generic_abi_wrapper("sceKernelReceiveMsgPipe", 6));
+        asm(macro.import_function("ThreadManForUser", "0xFBFA697D", "sceKernelReceiveMsgPipeCB_stub"));
+        asm(macro.generic_abi_wrapper("sceKernelReceiveMsgPipeCB", 6));
+        asm(macro.import_function("ThreadManForUser", "0xDF52098F", "sceKernelTryReceiveMsgPipe_stub"));
+        asm(macro.generic_abi_wrapper("sceKernelTryReceiveMsgPipe", 5));
         asm(macro.import_function("ThreadManForUser", "0x349B864D", "sceKernelCancelMsgPipe"));
         asm(macro.import_function("ThreadManForUser", "0x33BE4024", "sceKernelReferMsgPipeStatus"));
-        asm(macro.import_function("ThreadManForUser", "0x56C039B5", "sceKernelCreateVpl"));
+        asm(macro.import_function("ThreadManForUser", "0x56C039B5", "sceKernelCreateVpl_stub"));
+        asm(macro.generic_abi_wrapper("sceKernelCreateVpl", 5));
         asm(macro.import_function("ThreadManForUser", "0x89B3D48C", "sceKernelDeleteVpl"));
         asm(macro.import_function("ThreadManForUser", "0xBED27435", "sceKernelAllocateVpl"));
         asm(macro.import_function("ThreadManForUser", "0xEC0A693F", "sceKernelAllocateVplCB"));
@@ -765,7 +804,8 @@ comptime {
         asm(macro.import_function("ThreadManForUser", "0xB736E9FF", "sceKernelFreeVpl"));
         asm(macro.import_function("ThreadManForUser", "0x1D371B8A", "sceKernelCancelVpl"));
         asm(macro.import_function("ThreadManForUser", "0x39810265", "sceKernelReferVplStatus"));
-        asm(macro.import_function("ThreadManForUser", "0xC07BB470", "sceKernelCreateFpl"));
+        asm(macro.import_function("ThreadManForUser", "0xC07BB470", "sceKernelCreateFpl_stub"));
+        asm(macro.generic_abi_wrapper("sceKernelCreateFpl", 6));
         asm(macro.import_function("ThreadManForUser", "0xED1410E0", "sceKernelDeleteFpl"));
         asm(macro.import_function("ThreadManForUser", "0xD979E9BF", "sceKernelAllocateFpl"));
         asm(macro.import_function("ThreadManForUser", "0xE7282CB6", "sceKernelAllocateFplCB"));
@@ -799,7 +839,8 @@ comptime {
         asm(macro.import_function("ThreadManForUser", "0x53B00E9A", "sceKernelSetVTimerHandlerWide"));
         asm(macro.import_function("ThreadManForUser", "0xD2D615EF", "sceKernelCancelVTimerHandler"));
         asm(macro.import_function("ThreadManForUser", "0x5F32BEAA", "sceKernelReferVTimerStatus"));
-        asm(macro.import_function("ThreadManForUser", "0x446D8DE6", "sceKernelCreateThread"));
+        asm(macro.import_function("ThreadManForUser", "0x446D8DE6", "sceKernelCreateThread_stub"));
+        asm(macro.generic_abi_wrapper("sceKernelCreateThread", 6));
         asm(macro.import_function("ThreadManForUser", "0x9FA03CD3", "sceKernelDeleteThread"));
         asm(macro.import_function("ThreadManForUser", "0xF475845D", "sceKernelStartThread"));
         asm(macro.import_function("ThreadManForUser", "0x532A522E", "_sceKernelExitThread"));
@@ -826,7 +867,8 @@ comptime {
         asm(macro.import_function("ThreadManForUser", "0x64D4540E", "sceKernelReferThreadProfiler"));
         asm(macro.import_function("ThreadManForUser", "0x8218B4DD", "sceKernelReferGlobalProfiler"));
         asm(macro.import_function("ThreadManForUser", "0x60107536", "sceKernelDeleteLwMutex"));
-        asm(macro.import_function("ThreadManForUser", "0x19CFF145", "sceKernelCreateLwMutex"));
+        asm(macro.import_function("ThreadManForUser", "0x19CFF145", "sceKernelCreateLwMutex_stub"));
+        asm(macro.generic_abi_wrapper("sceKernelCreateLwMutex", 5));
     }
 
     if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "include_StdioForUser") and options.include_StdioForUser)) {
@@ -1015,7 +1057,8 @@ comptime {
         asm(macro.import_function("sceMp3", "0x3548AEC8", "sceMp3GetFrameNum"));
         asm(macro.import_function("sceMp3", "0x0840E808", "sceMp3ResetPlayPositionByFrame"));
         asm(macro.import_function("sceMp3", "0x1B839B83", "sceMp3LowLevelInit"));
-        asm(macro.import_function("sceMp3", "0xE3EE2C81", "sceMp3LowLevelDecode"));
+        asm(macro.import_function("sceMp3", "0xE3EE2C81", "sceMp3LowLevelDecode_stub"));
+        asm(macro.generic_abi_wrapper("sceMp3LowLevelDecode", 5));
     }
 
     if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "include_sceRtc") and options.include_sceRtc)) {
@@ -1086,7 +1129,8 @@ comptime {
         asm(macro.import_function("sceReg", "0x0D69BF40", "sceRegFlushCategory"));
         asm(macro.import_function("sceReg", "0x57641A81", "sceRegCreateKey"));
         asm(macro.import_function("sceReg", "0x17768E14", "sceRegSetKeyValue"));
-        asm(macro.import_function("sceReg", "0xD4475AA8", "sceRegGetKeyInfo"));
+        asm(macro.import_function("sceReg", "0xD4475AA8", "sceRegGetKeyInfo_stub"));
+        asm(macro.generic_abi_wrapper("sceRegGetKeyInfo", 5));
         asm(macro.import_function("sceReg", "0x28A8E98A", "sceRegGetKeyValue"));
         asm(macro.import_function("sceReg", "0x2C0DB9DD", "sceRegGetKeysNum"));
         asm(macro.import_function("sceReg", "0x2D211135", "sceRegGetKeys"));
@@ -1161,7 +1205,8 @@ comptime {
         asm(macro.import_function("sceAtrac3plus", "0x3F6E26B5", "sceAtracSetHalfwayBuffer"));
         asm(macro.import_function("sceAtrac3plus", "0x7A20E7AF", "sceAtracSetDataAndGetID"));
         asm(macro.import_function("sceAtrac3plus", "0x0FAE370E", "sceAtracSetHalfwayBufferAndGetID"));
-        asm(macro.import_function("sceAtrac3plus", "0x6A8C3CD5", "sceAtracDecodeData"));
+        asm(macro.import_function("sceAtrac3plus", "0x6A8C3CD5", "sceAtracDecodeData_stub"));
+        asm(macro.generic_abi_wrapper("sceAtracDecodeData", 5));
         asm(macro.import_function("sceAtrac3plus", "0x9AE849A7", "sceAtracGetRemainFrame"));
         asm(macro.import_function("sceAtrac3plus", "0x5D268707", "sceAtracGetStreamDataInfo"));
         asm(macro.import_function("sceAtrac3plus", "0x7DB31251", "sceAtracAddStreamData"));
