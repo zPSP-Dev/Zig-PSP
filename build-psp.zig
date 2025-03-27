@@ -37,6 +37,18 @@ pub fn build_psp(b: *std.Build, comptime build_info: PSPBuildInfo) !void {
     //Debug Mode can cause issues with trap instructions - use ReleaseSafe for "Debug" builds
     const optimize = builtin.Mode.ReleaseSmall;
 
+    const libzpsp = b.dependency("libzpsp", .{
+        .target = target,
+        .optimize = optimize,
+    });
+
+    const options_step = b.addOptions();
+    options_step.addOption(bool, "everything", true);
+    const options_module = options_step.createModule();
+
+    const libzpsp_module = libzpsp.artifact("libzpsp").root_module;
+    libzpsp_module.addImport("libzpsp_option", options_module);
+
     //Build from your main file!
     const exe = b.addExecutable(.{
         .name = "main",
@@ -45,6 +57,7 @@ pub fn build_psp(b: *std.Build, comptime build_info: PSPBuildInfo) !void {
         .optimize = optimize,
         .strip = false, // disable as cannot be used with "link_emit_relocs = true"
     });
+    exe.root_module.addImport("psp", libzpsp_module);
 
     exe.setLinkerScript(b.path(build_info.path_to_sdk ++ "tools/linkfile.ld"));
 

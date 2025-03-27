@@ -1,4 +1,4 @@
-const psptypes = @import("psptypes.zig");
+const psptypes = @import("psp");
 const SceSize = psptypes.SceSize;
 
 pub const RegKeyTypes = enum(c_int) {

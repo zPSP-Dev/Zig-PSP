@@ -1,4 +1,4 @@
-usingnamespace @import("psptypes.zig");
+usingnamespace @import("psp");
 usingnamespace @import("pspge.zig");
 pub usingnamespace @import("pspgutypes.zig");
 pub usingnamespace @import("pspguimpl.zig");

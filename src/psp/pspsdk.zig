@@ -1,10 +1,9 @@
 //Use this as an "include everything"
 
+pub usingnamespace @import("psp");
+
 //Smaller utilities
 pub usingnamespace @import("utils/psp.zig");
-
-//Implementations
-pub usingnamespace @import("libzpsp.zig");
 
 //Basic outlines
 pub usingnamespace @import("sdk/pspatrac3.zig");
@@ -34,7 +33,6 @@ pub usingnamespace @import("sdk/pspstdio.zig");
 pub usingnamespace @import("sdk/pspsysmem.zig");
 pub usingnamespace @import("sdk/pspthreadman.zig");
 pub usingnamespace @import("sdk/pspumd.zig");
-pub usingnamespace @import("sdk/psptypes.zig");
 pub usingnamespace @import("sdk/pspusb.zig");
 pub usingnamespace @import("sdk/psputility.zig");
 pub usingnamespace @import("sdk/psputils.zig");

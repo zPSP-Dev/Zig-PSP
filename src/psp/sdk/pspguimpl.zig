@@ -1,7 +1,8 @@
-const pspge = @import("pspge.zig");
 const pspgutypes = @import("pspgutypes.zig");
-const psptypes = @import("psptypes.zig");
-const display = @import("pspdisplay.zig");
+const psptypes = @import("psp");
+const psp = @import("psp");
+const pspge = @import("pspge.zig");
+const pspdisplay = @import("pspdisplay.zig");
 
 test {
     @import("std").meta.refAllDecls(@This());
@@ -22,14 +23,14 @@ const GuSettings = struct {
     swapBuffersBehaviour: i32,
 };
 
-const GuDisplayList = struct {
+const GupspList = struct {
     start: [*]u32,
     current: [*]u32,
     parent_context: i32,
 };
 
 const GuContext = struct {
-    list: GuDisplayList,
+    list: GupspList,
     scissor_enable: i32,
     scissor_start: [2]i32,
     scissor_end: [2]i32,
@@ -82,10 +83,10 @@ var gu_contexts: [3]GuContext = undefined;
 var ge_list_executed: [2]i32 = undefined;
 var ge_edram_address: ?*anyopaque = null;
 var gu_settings: GuSettings = undefined;
-var gu_list: ?*GuDisplayList = null;
+var gu_list: ?*GupspList = null;
 var gu_curr_context: i32 = 0;
 var gu_init: i32 = 0;
-var gu_display_on: i32 = 0;
+var gu_psp_on: i32 = 0;
 var gu_call_mode: i32 = 0;
 var gu_states: i32 = 0;
 var gu_draw_buffer: GuDrawBuffer = undefined;
@@ -202,7 +203,7 @@ pub fn resetValues() void {
     gu_current_frame = 0;
     gu_object_stack_depth = 0;
 
-    gu_display_on = 0;
+    gu_psp_on = 0;
     gu_call_mode = 0;
 
     gu_draw_buffer.pixel_size = 1;
@@ -251,7 +252,7 @@ pub fn sendCommandiStall(cmd: c_int, argument: c_int) void {
     @setRuntimeSafety(false);
     sendCommandi(cmd, argument);
     if (gu_object_stack_depth == 0 and gu_curr_context == 0) {
-        _ = pspge.sceGeListUpdateStallAddr(ge_list_executed[0], @as(*anyopaque, @ptrCast(gu_list.?.current)));
+        _ = psp.sceGeListUpdateStallAddr(ge_list_executed[0], @as(*anyopaque, @ptrCast(gu_list.?.current)));
     }
 }
 
@@ -545,20 +546,20 @@ pub fn sceGuDispBuffer(width: c_int, height: c_int, dispbp: ?*anyopaque, dispbw:
         gu_draw_buffer.frame_width = dispbw;
 
     drawRegion(0, 0, gu_draw_buffer.width, gu_draw_buffer.height);
-    _ = display.sceDisplaySetMode(0, gu_draw_buffer.width, gu_draw_buffer.height);
+    _ = psp.sceDisplaySetMode(0, gu_draw_buffer.width, gu_draw_buffer.height);
 
-    if (gu_display_on != 0)
-        _ = display.sceDisplaySetFrameBuf(@as(*anyopaque, @ptrFromInt(@intFromPtr(ge_edram_address) + @intFromPtr(gu_draw_buffer.disp_buffer))), dispbw, gu_draw_buffer.pixel_size, @intFromEnum(display.PspDisplaySetBufSync.Nextframe));
+    if (gu_psp_on != 0)
+        _ = psp.sceDisplaySetFrameBuf(@as(*anyopaque, @ptrFromInt(@intFromPtr(ge_edram_address) + @intFromPtr(gu_draw_buffer.disp_buffer))), dispbw, gu_draw_buffer.pixel_size, @intFromEnum(pspdisplay.PspDisplaySetBufSync.Nextframe));
 }
 
 pub fn sceGuDisplay(state: bool) void {
     if (state) {
-        _ = display.sceDisplaySetFrameBuf(@as(*anyopaque, @ptrFromInt(@intFromPtr(ge_edram_address) + @intFromPtr(gu_draw_buffer.disp_buffer))), gu_draw_buffer.frame_width, gu_draw_buffer.pixel_size, @intFromEnum(display.PspDisplaySetBufSync.Nextframe));
+        _ = psp.sceDisplaySetFrameBuf(@as(*anyopaque, @ptrFromInt(@intFromPtr(ge_edram_address) + @intFromPtr(gu_draw_buffer.disp_buffer))), gu_draw_buffer.frame_width, gu_draw_buffer.pixel_size, @intFromEnum(pspdisplay.PspDisplaySetBufSync.Nextframe));
     } else {
-        _ = display.sceDisplaySetFrameBuf(null, 0, 0, @intFromEnum(display.PspDisplaySetBufSync.Nextframe));
+        _ = psp.sceDisplaySetFrameBuf(null, 0, 0, @intFromEnum(pspdisplay.PspDisplaySetBufSync.Nextframe));
     }
 
-    gu_display_on = @intFromBool(state);
+    gu_psp_on = @intFromBool(state);
 }
 
 pub fn sceGuDrawArray(prim: pspgutypes.GuPrimitive, vtype: c_int, count: c_int, indices: ?*const anyopaque, vertices: ?*const anyopaque) void {
@@ -1010,10 +1011,10 @@ pub fn sceGuSendCommandi(cmd: c_int, argument: c_int) void {
     sendCommandi(cmd, argument);
 }
 
-pub fn sceGuSendList(mode: c_int, list: ?*const anyopaque, context: [*c]pspgutypes.PspGeContext) void {
+pub fn sceGuSendList(mode: c_int, list: ?*const anyopaque, context: [*c]pspgutypes.pspContext) void {
     @setRuntimeSafety(false);
     gu_settings.signal_offset = 0;
-    var args: pspgutypes.PspGeListArgs = undefined;
+    var args: pspgutypes.pspListArgs = undefined;
     args.size = 8;
     args.context = context;
 
@@ -1022,10 +1023,10 @@ pub fn sceGuSendList(mode: c_int, list: ?*const anyopaque, context: [*c]pspgutyp
 
     switch (@as(pspgutypes.GuQueueMode, @enumFromInt(mode))) {
         .Head => {
-            list_id = pspge.sceGeListEnQueueHead(list, null, callback, &args);
+            list_id = psp.sceGeListEnQueueHead(list, null, callback, &args);
         },
         .Tail => {
-            list_id = pspge.sceGeListEnQueue(list, null, callback, &args);
+            list_id = psp.sceGeListEnQueue(list, null, callback, &args);
         },
     }
 
@@ -1183,8 +1184,8 @@ pub fn sceGuSwapBuffers() ?*anyopaque {
         gu_draw_buffer.frame_buffer = temp;
     }
 
-    if (gu_display_on != 0) {
-        _ = display.sceDisplaySetFrameBuf(@as(*anyopaque, @ptrFromInt(@intFromPtr(ge_edram_address) + @intFromPtr(gu_draw_buffer.disp_buffer))), gu_draw_buffer.frame_width, gu_draw_buffer.pixel_size, gu_settings.swapBuffersBehaviour);
+    if (gu_psp_on != 0) {
+        _ = psp.sceDisplaySetFrameBuf(@as(*anyopaque, @ptrFromInt(@intFromPtr(ge_edram_address) + @intFromPtr(gu_draw_buffer.disp_buffer))), gu_draw_buffer.frame_width, gu_draw_buffer.pixel_size, gu_settings.swapBuffersBehaviour);
     }
 
     gu_current_frame ^= 1;
@@ -1208,13 +1209,13 @@ pub fn guSwapBuffersCallback(callback: pspgutypes.GuSwapBuffersCallback) void {
 pub fn sceGuSync(mode: pspgutypes.GuSyncMode, what: pspgutypes.GuSyncBehavior) c_int {
     switch (mode) {
         .Finish => {
-            return pspge.sceGeDrawSync(@intFromEnum(what));
+            return psp.sceGeDrawSync(@intFromEnum(what));
         },
         .List => {
-            return pspge.sceGeListSync(ge_list_executed[0], @intFromEnum(what));
+            return psp.sceGeListSync(ge_list_executed[0], @intFromEnum(what));
         },
         .Send => {
-            return pspge.sceGeListSync(ge_list_executed[1], @intFromEnum(what));
+            return psp.sceGeListSync(ge_list_executed[1], @intFromEnum(what));
         },
         else => {
             return 0;
@@ -1227,8 +1228,8 @@ pub fn guSync(mode: pspgutypes.GuSyncMode, what: pspgutypes.GuSyncBehavior) void
 
 pub fn sceGuTerm() void {
     @setRuntimeSafety(false);
-    _ = pspge.sceKernelDeleteEventFlag(gu_settings.kernel_event_flag);
-    _ = pspge.sceGeUnsetCallback(gu_settings.ge_callback_id);
+    _ = psp.sceKernelDeleteEventFlag(gu_settings.kernel_event_flag);
+    _ = psp.sceGeUnsetCallback(gu_settings.ge_callback_id);
 }
 
 pub fn sceGuTexEnvColor(color: c_int) void {
@@ -1389,18 +1390,18 @@ pub fn sceGuInit() void {
     callback.finish_func = callbackFin;
     callback.finish_arg = &gu_settings;
 
-    gu_settings.ge_callback_id = pspge.sceGeSetCallback(&callback);
+    gu_settings.ge_callback_id = psp.sceGeSetCallback(@ptrCast(&callback));
     gu_settings.swapBuffersCallback = null;
     gu_settings.swapBuffersBehaviour = 1;
 
-    ge_edram_address = pspge.sceGeEdramGetAddr();
+    ge_edram_address = psp.sceGeEdramGetAddr();
 
-    ge_list_executed[0] = pspge.sceGeListEnQueue((@as(*anyopaque, @ptrFromInt(@intFromPtr(&ge_init_list) & 0x1fffffff))), null, gu_settings.ge_callback_id, 0);
+    ge_list_executed[0] = psp.sceGeListEnQueue((@as(*anyopaque, @ptrFromInt(@intFromPtr(&ge_init_list) & 0x1fffffff))), null, gu_settings.ge_callback_id, 0);
 
     resetValues();
     gu_settings.kernel_event_flag = pspthreadman.sceKernelCreateEventFlag("SceGuSignal", 512, 3, 0);
 
-    _ = pspge.sceGeListSync(ge_list_executed[0], 0);
+    _ = psp.sceGeListSync(ge_list_executed[0], 0);
 }
 
 pub fn sceGuStart(cont: pspgutypes.GuContextType, list: ?*anyopaque) void {
@@ -1417,7 +1418,7 @@ pub fn sceGuStart(cont: pspgutypes.GuContextType, list: ?*anyopaque) void {
     gu_curr_context = cid;
 
     if (cid == 0) {
-        ge_list_executed[0] = pspge.sceGeListEnQueue(local_list, local_list, gu_settings.ge_callback_id, 0);
+        ge_list_executed[0] = psp.sceGeListEnQueue(local_list, local_list, gu_settings.ge_callback_id, 0);
         gu_settings.signal_offset = 0;
     }
 
@@ -1519,7 +1520,7 @@ pub fn sceGuGetMemory(size: c_uint) *anyopaque {
     gu_list.?.current = new_ptr;
 
     if (gu_curr_context == 0) {
-        _ = pspge.sceGeListUpdateStallAddr(ge_list_executed[0], new_ptr);
+        _ = psp.sceGeListUpdateStallAddr(ge_list_executed[0], new_ptr);
     }
     return @as(*anyopaque, @ptrFromInt(@intFromPtr(orig_ptr + 2)));
 }

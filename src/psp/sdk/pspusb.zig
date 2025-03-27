@@ -1,4 +1,4 @@
-usingnamespace @import("psptypes.zig");
+usingnamespace @import("psp");
 
 // Start a USB driver.
 //
