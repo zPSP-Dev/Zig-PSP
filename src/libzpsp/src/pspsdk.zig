@@ -153,7 +153,7 @@ const sceUmdUser = struct {
     /// sceUmdWaitDriveStat(PSP_UMD_READY);
     /// // Now you can access the UMD using standard sceIo functions
     /// `
-    pub extern fn sceUmdActivate(unit: c_int, drive: [*c]c_char) callconv(.C) c_int;
+    pub extern fn sceUmdActivate(unit: c_int, drive: [*c]const c_char) callconv(.C) c_int;
 
     /// Permit UMD disc being replaced
     /// Returns < 0 on error
@@ -163,7 +163,7 @@ const sceUmdUser = struct {
     /// `unit` - The unit to initialise (probably). Should be set to 1.
     /// `drive` - A prefix string for the fs device to mount the UMD on (e.g. "disc0:")
     /// Returns < 0 on error
-    pub extern fn sceUmdDeactivate(unit: c_int, drive: [*c]c_char) callconv(.C) c_int;
+    pub extern fn sceUmdDeactivate(unit: c_int, drive: [*c]const c_char) callconv(.C) c_int;
 
 };
 
@@ -206,7 +206,7 @@ const sceGe_user = struct {
     /// Restore a previously saved GE context.
     /// `context` - Pointer to a ::PspGeContext.
     /// Returns < 0 on error.
-    pub extern fn sceGeRestoreContext(context: [*c]c_int) callconv(.C) c_int;
+    pub extern fn sceGeRestoreContext(context: [*c]const c_int) callconv(.C) c_int;
 
     /// Enqueue a display list at the tail of the GE display list queue.
     /// `list` - The head of the list to queue.
@@ -215,7 +215,7 @@ const sceGe_user = struct {
     /// `cbid` - ID of the callback set by calling sceGeSetCallback
     /// `arg` - Structure containing GE context buffer address
     /// Returns The ID of the queue, < 0 on error.
-    pub extern fn sceGeListEnQueue(list: [*c]void, stall: [*c]void, cbid: c_int, arg: [*c]c_int) callconv(.C) c_int;
+    pub extern fn sceGeListEnQueue(list: [*c]const void, stall: [*c]void, cbid: c_int, arg: [*c]c_int) callconv(.C) c_int;
 
     /// Enqueue a display list at the head of the GE display list queue.
     /// `list` - The head of the list to queue.
@@ -224,7 +224,7 @@ const sceGe_user = struct {
     /// `cbid` - ID of the callback set by calling sceGeSetCallback
     /// `arg` - Structure containing GE context buffer address
     /// Returns The ID of the queue, < 0 on error.
-    pub extern fn sceGeListEnQueueHead(list: [*c]void, stall: [*c]void, cbid: c_int, arg: [*c]c_int) callconv(.C) c_int;
+    pub extern fn sceGeListEnQueueHead(list: [*c]const void, stall: [*c]void, cbid: c_int, arg: [*c]c_int) callconv(.C) c_int;
 
     /// Cancel a queued or running list.
     /// `qid` - The ID of the queue.
@@ -524,7 +524,7 @@ const sceHttp = struct {
     /// `id` - ID of the template, connection or request
     /// `name` - Name of the content
     /// Returns 0 on success, < 0 on error.
-    pub extern fn sceHttpDeleteHeader(id: c_int, name: [*c]c_char) callconv(.C) c_int;
+    pub extern fn sceHttpDeleteHeader(id: c_int, name: [*c]const c_char) callconv(.C) c_int;
 
     /// Disable redirect
     /// `id` - ID of the template or connection
@@ -733,7 +733,7 @@ const sceHttp = struct {
     /// `url` - url to connect to
     /// `unknown1` - Pass 0
     /// Returns A connection ID on success, < 0 on error.
-    pub extern fn sceHttpCreateConnectionWithURL(templateid: c_int, url: [*c]c_char, unknown1: c_int) callconv(.C) c_int;
+    pub extern fn sceHttpCreateConnectionWithURL(templateid: c_int, url: [*c]const c_char, unknown1: c_int) callconv(.C) c_int;
 
     pub extern fn sceHttpGetNetworkErrno(request: c_int, err_num: [*c]c_int) callconv(.C) c_int;
 
@@ -768,7 +768,7 @@ const sceHttp = struct {
     /// Returns The size read into the data buffer, 0 if there is no more data, < 0 on error.
     pub extern fn sceHttpReadData(requestid: c_int, data: [*c]void, datasize: c_uint) callconv(.C) c_int;
 
-    pub extern fn sceHttpSetProxy(id: c_int, activate_flag: c_int, mode: c_int, new_proxy_host: [*c]u8, new_proxy_port: c_ushort) callconv(.C) c_int;
+    pub extern fn sceHttpSetProxy(id: c_int, activate_flag: c_int, mode: c_int, new_proxy_host: [*c]const u8, new_proxy_port: c_ushort) callconv(.C) c_int;
 
     /// Load cookie
     /// Returns 0 on success, < 0 on error.
@@ -796,13 +796,13 @@ const sceNetInet = struct {
 
     pub extern fn sceNetInetAccept(s: c_int, addr: [*c]c_int, addrlen: [*c]c_int) callconv(.C) c_int;
 
-    pub extern fn sceNetInetBind(s: c_int, my_addr: [*c]c_int, addrlen: c_int) callconv(.C) c_int;
+    pub extern fn sceNetInetBind(s: c_int, my_addr: [*c]const c_int, addrlen: c_int) callconv(.C) c_int;
 
     pub extern fn sceNetInetClose(s: c_int) callconv(.C) c_int;
 
     pub extern fn sceNetInetCloseWithRST() callconv(.C) void;
 
-    pub extern fn sceNetInetConnect(s: c_int, serv_addr: [*c]c_int, addrlen: c_int) callconv(.C) c_int;
+    pub extern fn sceNetInetConnect(s: c_int, serv_addr: [*c]const c_int, addrlen: c_int) callconv(.C) c_int;
 
     pub extern fn sceNetInetGetpeername(s: c_int, name: [*c]c_int, namelen: [*c]c_int) callconv(.C) c_int;
 
@@ -822,13 +822,13 @@ const sceNetInet = struct {
 
     pub extern fn sceNetInetSelect(n: c_int, readfds: [*c]c_int, writefds: [*c]c_int, exceptfds: [*c]c_int, timeout: [*c]c_int) callconv(.C) c_int;
 
-    pub extern fn sceNetInetSend(s: c_int, buf: [*c]void, len: usize, flags: c_int) callconv(.C) usize;
+    pub extern fn sceNetInetSend(s: c_int, buf: [*c]const void, len: usize, flags: c_int) callconv(.C) usize;
 
-    pub extern fn sceNetInetSendto(s: c_int, buf: [*c]void, len: usize, flags: c_int, to: [*c]c_int, tolen: c_int) callconv(.C) usize;
+    pub extern fn sceNetInetSendto(s: c_int, buf: [*c]const void, len: usize, flags: c_int, to: [*c]const c_int, tolen: c_int) callconv(.C) usize;
 
-    pub extern fn sceNetInetSendmsg(s: c_int, msg: [*c]c_int, flags: c_int) callconv(.C) isize;
+    pub extern fn sceNetInetSendmsg(s: c_int, msg: [*c]const c_int, flags: c_int) callconv(.C) isize;
 
-    pub extern fn sceNetInetSetsockopt(s: c_int, level: c_int, optname: c_int, optval: [*c]void, optlen: c_int) callconv(.C) c_int;
+    pub extern fn sceNetInetSetsockopt(s: c_int, level: c_int, optname: c_int, optval: [*c]const void, optlen: c_int) callconv(.C) c_int;
 
     pub extern fn sceNetInetShutdown(s: c_int, how: c_int) callconv(.C) c_int;
 
@@ -907,12 +907,12 @@ const sceNetAdhocctl = struct {
     /// Connect to the Adhoc control
     /// `name` - The name of the connection (maximum 8 alphanumeric characters).
     /// Returns 0 on success, < 0 on error.
-    pub extern fn sceNetAdhocctlConnect(name: [*c]c_char) callconv(.C) c_int;
+    pub extern fn sceNetAdhocctlConnect(name: [*c]const c_char) callconv(.C) c_int;
 
     /// Connect to the Adhoc control (as a host)
     /// `name` - The name of the connection (maximum 8 alphanumeric characters).
     /// Returns 0 on success, < 0 on error.
-    pub extern fn sceNetAdhocctlCreate(name: [*c]c_char) callconv(.C) c_int;
+    pub extern fn sceNetAdhocctlCreate(name: [*c]const c_char) callconv(.C) c_int;
 
     /// Connect to the Adhoc control (as a client)
     /// `scaninfo` - A valid ::SceNetAdhocctlScanInfo struct that has been filled by sceNetAchocctlGetScanInfo
@@ -986,7 +986,7 @@ const sceNetAdhocctl = struct {
     /// `timeout` - Timeout in microseconds.
     /// `unknown2` - pass 0.
     /// Returns 0 on success, < 0 on error.
-    pub extern fn sceNetAdhocctlCreateEnterGameMode(name: [*c]c_char, unknown: c_int, num: c_int, macs: [*c]u8, timeout: c_uint, unknown2: c_int) callconv(.C) c_int;
+    pub extern fn sceNetAdhocctlCreateEnterGameMode(name: [*c]const c_char, unknown: c_int, num: c_int, macs: [*c]u8, timeout: c_uint, unknown2: c_int) callconv(.C) c_int;
 
     /// Connect to the Adhoc control game mode (as a client)
     /// `name` - The name of the connection (maximum 8 alphanumeric characters).
@@ -994,7 +994,7 @@ const sceNetAdhocctl = struct {
     /// `timeout` - Timeout in microseconds.
     /// `unknown` - pass 0.
     /// Returns 0 on success, < 0 on error.
-    pub extern fn sceNetAdhocctlJoinEnterGameMode(name: [*c]c_char, hostmac: [*c]u8, timeout: c_uint, unknown: c_int) callconv(.C) c_int;
+    pub extern fn sceNetAdhocctlJoinEnterGameMode(name: [*c]const c_char, hostmac: [*c]u8, timeout: c_uint, unknown: c_int) callconv(.C) c_int;
 
     /// Exit game mode.
     /// Returns 0 on success, < 0 on error.
@@ -1449,7 +1449,7 @@ const sceNetResolver = struct {
     /// `timeout` - Number of seconds before timeout
     /// `retry` - Number of retires
     /// Returns 0 on success, < 0 on error
-    pub extern fn sceNetResolverStartNtoA(rid: c_int, hostname: [*c]c_char, addr: [*c]c_int, timeout: c_uint, retry: c_int) callconv(.C) c_int;
+    pub extern fn sceNetResolverStartNtoA(rid: c_int, hostname: [*c]const c_char, addr: [*c]c_int, timeout: c_uint, retry: c_int) callconv(.C) c_int;
 
     /// Begin a address to name lookup
     /// `rid -Resolver id`
@@ -1459,7 +1459,7 @@ const sceNetResolver = struct {
     /// `timeout` - Number of seconds before timeout
     /// `retry` - Number of retries
     /// Returns 0 on success, < 0 on error
-    pub extern fn sceNetResolverStartAtoN(rid: c_int, addr: [*c]c_int, hostname: [*c]c_char, hostname_len: SceSize, timeout: c_uint, retry: c_int) callconv(.C) c_int;
+    pub extern fn sceNetResolverStartAtoN(rid: c_int, addr: [*c]const c_int, hostname: [*c]c_char, hostname_len: SceSize, timeout: c_uint, retry: c_int) callconv(.C) c_int;
 
     /// Stop a resolver operation
     /// `rid` - Resolver id
@@ -1946,9 +1946,9 @@ const sceDmac = struct {
     /// `src` - The pointer to the source
     /// `n` - The size of data
     /// Returns 0 on success; otherwise an error code
-    pub extern fn sceDmacMemcpy(dst: [*c]void, src: [*c]void, n: SceSize) callconv(.C) c_int;
+    pub extern fn sceDmacMemcpy(dst: [*c]void, src: [*c]const void, n: SceSize) callconv(.C) c_int;
 
-    pub extern fn sceDmacTryMemcpy(dst: [*c]void, src: [*c]void, n: SceSize) callconv(.C) c_int;
+    pub extern fn sceDmacTryMemcpy(dst: [*c]void, src: [*c]const void, n: SceSize) callconv(.C) c_int;
 
 };
 
@@ -1960,14 +1960,14 @@ const sceUsb = struct {
     /// `size` - Size of arguments to pass to USB driver start
     /// `args` - Arguments to pass to USB driver start
     /// Returns 0 on success
-    pub extern fn sceUsbStart(driverName: [*c]c_char, size: c_int, args: [*c]void) callconv(.C) c_int;
+    pub extern fn sceUsbStart(driverName: [*c]const c_char, size: c_int, args: [*c]void) callconv(.C) c_int;
 
     /// Stop a USB driver.
     /// `driverName` - name of the USB driver to stop
     /// `size` - Size of arguments to pass to USB driver stop
     /// `args` - Arguments to pass to USB driver stop
     /// Returns 0 on success
-    pub extern fn sceUsbStop(driverName: [*c]c_char, size: c_int, args: [*c]void) callconv(.C) c_int;
+    pub extern fn sceUsbStop(driverName: [*c]const c_char, size: c_int, args: [*c]void) callconv(.C) c_int;
 
     /// Get USB state
     /// Returns OR'd PSP_USB_* constants
@@ -1978,7 +1978,7 @@ const sceUsb = struct {
     /// Get state of a specific USB driver
     /// `driverName` - name of USB driver to get status from
     /// Returns 1 if the driver has been started, 2 if it is stopped
-    pub extern fn sceUsbGetDrvState(driverName: [*c]c_char) callconv(.C) c_int;
+    pub extern fn sceUsbGetDrvState(driverName: [*c]const c_char) callconv(.C) c_int;
 
     /// Activate a USB driver.
     /// `pid` - Product ID for the default USB Driver
@@ -2561,13 +2561,13 @@ const sceRtc = struct {
     /// `tickUTC` - pointer to u64 tick in UTC time
     /// `tickLocal` - pointer to u64 to receive tick in local time
     /// Returns 0 on success, < 0 on error
-    pub extern fn sceRtcConvertUtcToLocalTime(tickUTC: [*c]c_int, tickLocal: [*c]c_int) callconv(.C) c_int;
+    pub extern fn sceRtcConvertUtcToLocalTime(tickUTC: [*c]const c_int, tickLocal: [*c]c_int) callconv(.C) c_int;
 
     /// Convert a local time based tickcount into a UTC-based tick count
     /// `tickLocal` - pointer to u64 tick in local time
     /// `tickUTC` - pointer to u64 to receive tick in UTC based time
     /// Returns 0 on success, < 0 on error
-    pub extern fn sceRtcConvertLocalTimeToUTC(tickLocal: [*c]c_int, tickUTC: [*c]c_int) callconv(.C) c_int;
+    pub extern fn sceRtcConvertLocalTimeToUTC(tickLocal: [*c]const c_int, tickUTC: [*c]c_int) callconv(.C) c_int;
 
     /// Check if a year is a leap year
     /// `year` - year to check if is a leap year
@@ -2590,11 +2590,11 @@ const sceRtc = struct {
     /// Validate pspDate component ranges
     /// `date` - pointer to pspDate struct to be checked
     /// Returns 0 on success, one of ::pspRtcCheckValidErrors on error
-    pub extern fn sceRtcCheckValid(date: [*c]c_int) callconv(.C) c_int;
+    pub extern fn sceRtcCheckValid(date: [*c]const c_int) callconv(.C) c_int;
 
     pub extern fn sceRtcSetTime_t(date: [*c]c_int, time: c_int) callconv(.C) c_int;
 
-    pub extern fn sceRtcGetTime_t(date: [*c]c_int, time: [*c]c_int) callconv(.C) c_int;
+    pub extern fn sceRtcGetTime_t(date: [*c]const c_int, time: [*c]c_int) callconv(.C) c_int;
 
     pub extern fn sceRtcSetDosTime(date: [*c]c_int, dosTime: c_int) callconv(.C) c_int;
 
@@ -2608,7 +2608,7 @@ const sceRtc = struct {
     /// `date` - pointer to ScePspDateTime struct to set
     /// `tick` - pointer to ticks to convert
     /// Returns 0 on success, < 0 on error
-    pub extern fn sceRtcSetTick(date: [*c]c_int, tick: [*c]c_int) callconv(.C) c_int;
+    pub extern fn sceRtcSetTick(date: [*c]c_int, tick: [*c]const c_int) callconv(.C) c_int;
 
     /// Set ticks based on a ScePspDateTime struct
     /// `date` - pointer to ScePspDateTime to convert
@@ -2616,93 +2616,93 @@ const sceRtc = struct {
     /// Returns 0 on success, < 0 on error
     /// Get the resolution of the tick counter
     /// Returns # of ticks per second
-    pub extern fn sceRtcGetTick(date: [*c]c_int, tick: [*c]c_int) callconv(.C) c_int;
+    pub extern fn sceRtcGetTick(date: [*c]const c_int, tick: [*c]c_int) callconv(.C) c_int;
 
     /// Compare two ticks
     /// `tick1` - pointer to first tick
     /// `tick2` - poiinter to second tick
     /// Returns 0 on equal, <0 when tick1 < tick2, >0 when tick1 > tick2
-    pub extern fn sceRtcCompareTick(tick1: [*c]c_int, tick2: [*c]c_int) callconv(.C) c_int;
+    pub extern fn sceRtcCompareTick(tick1: [*c]const c_int, tick2: [*c]const c_int) callconv(.C) c_int;
 
     /// Add two ticks
     /// `destTick` - pointer to tick to hold result
     /// `srcTick` - pointer to source tick
     /// `numTicks` - number of ticks to add
     /// Returns 0 on success, <0 on error
-    pub extern fn sceRtcTickAddTicks(destTick: [*c]c_int, srcTick: [*c]c_int, numTicks: c_int) callconv(.C) c_int;
+    pub extern fn sceRtcTickAddTicks(destTick: [*c]c_int, srcTick: [*c]const c_int, numTicks: c_int) callconv(.C) c_int;
 
     /// Add an amount of ms to a tick
     /// `destTick` - pointer to tick to hold result
     /// `srcTick` - pointer to source tick
     /// `numMS` - number of ms to add
     /// Returns 0 on success, <0 on error
-    pub extern fn sceRtcTickAddMicroseconds(destTick: [*c]c_int, srcTick: [*c]c_int, numMS: c_int) callconv(.C) c_int;
+    pub extern fn sceRtcTickAddMicroseconds(destTick: [*c]c_int, srcTick: [*c]const c_int, numMS: c_int) callconv(.C) c_int;
 
     /// Add an amount of seconds to a tick
     /// `destTick` - pointer to tick to hold result
     /// `srcTick` - pointer to source tick
     /// `numSecs` - number of seconds to add
     /// Returns 0 on success, <0 on error
-    pub extern fn sceRtcTickAddSeconds(destTick: [*c]c_int, srcTick: [*c]c_int, numSecs: c_int) callconv(.C) c_int;
+    pub extern fn sceRtcTickAddSeconds(destTick: [*c]c_int, srcTick: [*c]const c_int, numSecs: c_int) callconv(.C) c_int;
 
     /// Add an amount of minutes to a tick
     /// `destTick` - pointer to tick to hold result
     /// `srcTick` - pointer to source tick
     /// `numMins` - number of minutes to add
     /// Returns 0 on success, <0 on error
-    pub extern fn sceRtcTickAddMinutes(destTick: [*c]c_int, srcTick: [*c]c_int, numMins: c_int) callconv(.C) c_int;
+    pub extern fn sceRtcTickAddMinutes(destTick: [*c]c_int, srcTick: [*c]const c_int, numMins: c_int) callconv(.C) c_int;
 
     /// Add an amount of hours to a tick
     /// `destTick` - pointer to tick to hold result
     /// `srcTick` - pointer to source tick
     /// `numHours` - number of hours to add
     /// Returns 0 on success, <0 on error
-    pub extern fn sceRtcTickAddHours(destTick: [*c]c_int, srcTick: [*c]c_int, numHours: c_int) callconv(.C) c_int;
+    pub extern fn sceRtcTickAddHours(destTick: [*c]c_int, srcTick: [*c]const c_int, numHours: c_int) callconv(.C) c_int;
 
     /// Add an amount of days to a tick
     /// `destTick` - pointer to tick to hold result
     /// `srcTick` - pointer to source tick
     /// `numDays` - number of days to add
     /// Returns 0 on success, <0 on error
-    pub extern fn sceRtcTickAddDays(destTick: [*c]c_int, srcTick: [*c]c_int, numDays: c_int) callconv(.C) c_int;
+    pub extern fn sceRtcTickAddDays(destTick: [*c]c_int, srcTick: [*c]const c_int, numDays: c_int) callconv(.C) c_int;
 
     /// Add an amount of weeks to a tick
     /// `destTick` - pointer to tick to hold result
     /// `srcTick` - pointer to source tick
     /// `numWeeks` - number of weeks to add
     /// Returns 0 on success, <0 on error
-    pub extern fn sceRtcTickAddWeeks(destTick: [*c]c_int, srcTick: [*c]c_int, numWeeks: c_int) callconv(.C) c_int;
+    pub extern fn sceRtcTickAddWeeks(destTick: [*c]c_int, srcTick: [*c]const c_int, numWeeks: c_int) callconv(.C) c_int;
 
     /// Add an amount of months to a tick
     /// `destTick` - pointer to tick to hold result
     /// `srcTick` - pointer to source tick
     /// `numMonths` - number of months to add
     /// Returns 0 on success, <0 on error
-    pub extern fn sceRtcTickAddMonths(destTick: [*c]c_int, srcTick: [*c]c_int, numMonths: c_int) callconv(.C) c_int;
+    pub extern fn sceRtcTickAddMonths(destTick: [*c]c_int, srcTick: [*c]const c_int, numMonths: c_int) callconv(.C) c_int;
 
     /// Add an amount of years to a tick
     /// `destTick` - pointer to tick to hold result
     /// `srcTick` - pointer to source tick
     /// `numYears` - number of years to add
     /// Returns 0 on success, <0 on error
-    pub extern fn sceRtcTickAddYears(destTick: [*c]c_int, srcTick: [*c]c_int, numYears: c_int) callconv(.C) c_int;
+    pub extern fn sceRtcTickAddYears(destTick: [*c]c_int, srcTick: [*c]const c_int, numYears: c_int) callconv(.C) c_int;
 
     /// Format Tick-representation UTC time in RFC2822 format
-    pub extern fn sceRtcFormatRFC2822(pszDateTime: [*c]c_char, pUtc: [*c]c_int, iTimeZoneMinutes: c_int) callconv(.C) c_int;
+    pub extern fn sceRtcFormatRFC2822(pszDateTime: [*c]c_char, pUtc: [*c]const c_int, iTimeZoneMinutes: c_int) callconv(.C) c_int;
 
     /// Format Tick-representation UTC time in RFC2822 format
-    pub extern fn sceRtcFormatRFC2822LocalTime(pszDateTime: [*c]c_char, pUtc: [*c]c_int) callconv(.C) c_int;
+    pub extern fn sceRtcFormatRFC2822LocalTime(pszDateTime: [*c]c_char, pUtc: [*c]const c_int) callconv(.C) c_int;
 
     /// Format Tick-representation UTC time in RFC3339(ISO8601) format
-    pub extern fn sceRtcFormatRFC3339(pszDateTime: [*c]c_char, pUtc: [*c]c_int, iTimeZoneMinutes: c_int) callconv(.C) c_int;
+    pub extern fn sceRtcFormatRFC3339(pszDateTime: [*c]c_char, pUtc: [*c]const c_int, iTimeZoneMinutes: c_int) callconv(.C) c_int;
 
     /// Format Tick-representation UTC time in RFC3339(ISO8601) format
-    pub extern fn sceRtcFormatRFC3339LocalTime(pszDateTime: [*c]c_char, pUtc: [*c]c_int) callconv(.C) c_int;
+    pub extern fn sceRtcFormatRFC3339LocalTime(pszDateTime: [*c]c_char, pUtc: [*c]const c_int) callconv(.C) c_int;
 
-    pub extern fn sceRtcParseDateTime(destTick: [*c]c_int, dateString: [*c]c_char) callconv(.C) c_int;
+    pub extern fn sceRtcParseDateTime(destTick: [*c]c_int, dateString: [*c]const c_char) callconv(.C) c_int;
 
     /// Parse time information represented in RFC3339 format
-    pub extern fn sceRtcParseRFC3339(pUtc: [*c]c_int, pszDateTime: [*c]c_char) callconv(.C) c_int;
+    pub extern fn sceRtcParseRFC3339(pUtc: [*c]c_int, pszDateTime: [*c]const c_char) callconv(.C) c_int;
 
     pub extern fn sceRtcGetAccumulativeTime() callconv(.C) void;
 
@@ -2768,7 +2768,7 @@ const ModuleMgrForUser = struct {
     /// `flags` - Unused, always 0 .
     /// `option` - Pointer to a mod_param_t structure. Can be NULL.
     /// Returns The UID of the loaded module on success, otherwise one of ::PspKernelErrorCodes.
-    pub extern fn sceKernelLoadModule(path: [*c]c_char, flags: c_int, option: [*c]c_int) callconv(.C) SceUID;
+    pub extern fn sceKernelLoadModule(path: [*c]const c_char, flags: c_int, option: [*c]c_int) callconv(.C) SceUID;
 
     /// Load a module from MS.
     /// @note This function restricts what it can load, e.g. it wont load plain executables.
@@ -2776,7 +2776,7 @@ const ModuleMgrForUser = struct {
     /// `flags` - Unused, set to 0.
     /// `option` - Pointer to a mod_param_t structure. Can be NULL.
     /// Returns The UID of the loaded module on success, otherwise one of ::PspKernelErrorCodes.
-    pub extern fn sceKernelLoadModuleMs(path: [*c]c_char, flags: c_int, option: [*c]c_int) callconv(.C) SceUID;
+    pub extern fn sceKernelLoadModuleMs(path: [*c]const c_char, flags: c_int, option: [*c]c_int) callconv(.C) SceUID;
 
     /// Load a module from a buffer using the USB/WLAN API.
     /// Can only be called from kernel mode, or from a thread that has attributes of 0xa0000000.
@@ -2847,7 +2847,7 @@ const ModuleMgrForUser = struct {
     /// Get the ID of the module occupying the address
     /// `moduleAddr` - A pointer to the module
     /// Returns >= 0 on success, otherwise one of ::PspKernelErrorCodes
-    pub extern fn sceKernelGetModuleIdByAddress(moduleAddr: [*c]void) callconv(.C) c_int;
+    pub extern fn sceKernelGetModuleIdByAddress(moduleAddr: [*c]const void) callconv(.C) c_int;
 
 };
 
@@ -2869,7 +2869,7 @@ const SysMemUserForUser = struct {
     /// `size` - Size of the memory block, in bytes.
     /// `addr` - If type is PSP_SMEM_Addr, then addr specifies the lowest address allocate the block from.
     /// Returns The UID of the new block, or if less than 0 an error.
-    pub extern fn sceKernelAllocPartitionMemory(partitionid: SceUID, name: [*c]c_char, type: c_int, size: SceSize, addr: [*c]void) callconv(.C) SceUID;
+    pub extern fn sceKernelAllocPartitionMemory(partitionid: SceUID, name: [*c]const c_char, type: c_int, size: SceSize, addr: [*c]void) callconv(.C) SceUID;
 
     /// Free a memory block allocated with ::sceKernelAllocPartitionMemory.
     /// `blockid` - UID of the block to free.
@@ -2894,7 +2894,7 @@ const SysMemUserForUser = struct {
     /// Kernel printf function.
     /// `format` - The format string.
     /// `...` - Arguments for the format string.
-    pub extern fn sceKernelPrintf(format: [*c]c_char, ...) callconv(.C) void;
+    pub extern fn sceKernelPrintf(format: [*c]const c_char, ...) callconv(.C) void;
 
     /// Set the version of the SDK with which the caller was compiled.
     /// Version numbers are as for sceKernelDevkitVersion().
@@ -3007,14 +3007,14 @@ const IoFileMgrForUser = struct {
     /// `flags` - Libc styled flags that are or'ed together
     /// `mode` - File access mode.
     /// Returns A non-negative integer is a valid fd, anything else an error
-    pub extern fn sceIoOpen(file: [*c]c_char, flags: c_int, mode: SceMode) callconv(.C) SceUID;
+    pub extern fn sceIoOpen(file: [*c]const c_char, flags: c_int, mode: SceMode) callconv(.C) SceUID;
 
     /// Open or create a file for reading or writing (asynchronous)
     /// `file` - Pointer to a string holding the name of the file to open
     /// `flags` - Libc styled flags that are or'ed together
     /// `mode` - File access mode.
     /// Returns A non-negative integer is a valid fd, anything else an error
-    pub extern fn sceIoOpenAsync(file: [*c]c_char, flags: c_int, mode: SceMode) callconv(.C) SceUID;
+    pub extern fn sceIoOpenAsync(file: [*c]const c_char, flags: c_int, mode: SceMode) callconv(.C) SceUID;
 
     /// Read input
     /// @par Example:
@@ -3047,14 +3047,14 @@ const IoFileMgrForUser = struct {
     /// `data` - Pointer to the data to write
     /// `size` - Size of data to write
     /// Returns The number of bytes written
-    pub extern fn sceIoWrite(fd: SceUID, data: [*c]void, size: SceSize) callconv(.C) c_int;
+    pub extern fn sceIoWrite(fd: SceUID, data: [*c]const void, size: SceSize) callconv(.C) c_int;
 
     /// Write output (asynchronous)
     /// `fd` - Opened file descriptor to write to
     /// `data` - Pointer to the data to write
     /// `size` - Size of data to write
     /// Returns < 0 on error.
-    pub extern fn sceIoWriteAsync(fd: SceUID, data: [*c]void, size: SceSize) callconv(.C) c_int;
+    pub extern fn sceIoWriteAsync(fd: SceUID, data: [*c]const void, size: SceSize) callconv(.C) c_int;
 
     /// Reposition read/write file descriptor offset
     /// @par Example:
@@ -3126,7 +3126,7 @@ const IoFileMgrForUser = struct {
     /// `
     /// `dirname` - The directory to open for reading.
     /// Returns If >= 0 then a valid file descriptor, otherwise a Sony error code.
-    pub extern fn sceIoDopen(dirname: [*c]c_char) callconv(.C) SceUID;
+    pub extern fn sceIoDopen(dirname: [*c]const c_char) callconv(.C) SceUID;
 
     /// Reads an entry from an opened file descriptor.
     /// `fd` - Already opened file descriptor (using sceIoDopen)
@@ -3145,47 +3145,47 @@ const IoFileMgrForUser = struct {
     /// Remove directory entry
     /// `file` - Path to the file to remove
     /// Returns < 0 on error
-    pub extern fn sceIoRemove(file: [*c]c_char) callconv(.C) c_int;
+    pub extern fn sceIoRemove(file: [*c]const c_char) callconv(.C) c_int;
 
     /// Make a directory file
     /// `dir`
     /// `mode` - Access mode.
     /// Returns Returns the value 0 if its succesful otherwise -1
-    pub extern fn sceIoMkdir(dir: [*c]c_char, mode: SceMode) callconv(.C) c_int;
+    pub extern fn sceIoMkdir(dir: [*c]const c_char, mode: SceMode) callconv(.C) c_int;
 
     /// Remove a directory file
     /// `path` - Removes a directory file pointed by the string path
     /// Returns Returns the value 0 if its succesful otherwise -1
-    pub extern fn sceIoRmdir(path: [*c]c_char) callconv(.C) c_int;
+    pub extern fn sceIoRmdir(path: [*c]const c_char) callconv(.C) c_int;
 
     /// Change the current directory.
     /// `path` - The path to change to.
     /// Returns < 0 on error.
-    pub extern fn sceIoChdir(path: [*c]c_char) callconv(.C) c_int;
+    pub extern fn sceIoChdir(path: [*c]const c_char) callconv(.C) c_int;
 
     /// Synchronise the file data on the device.
     /// `device` - The device to synchronise (e.g. msfat0:)
     /// `unk` - Unknown
-    pub extern fn sceIoSync(device: [*c]c_char, unk: c_uint) callconv(.C) c_int;
+    pub extern fn sceIoSync(device: [*c]const c_char, unk: c_uint) callconv(.C) c_int;
 
     /// Get the status of a file.
     /// `file` - The path to the file.
     /// `stat` - A pointer to an io_stat_t structure.
     /// Returns < 0 on error.
-    pub extern fn sceIoGetstat(file: [*c]c_char, stat: [*c]c_int) callconv(.C) c_int;
+    pub extern fn sceIoGetstat(file: [*c]const c_char, stat: [*c]c_int) callconv(.C) c_int;
 
     /// Change the status of a file.
     /// `file` - The path to the file.
     /// `stat` - A pointer to an io_stat_t structure.
     /// `bits` - Bitmask defining which bits to change.
     /// Returns < 0 on error.
-    pub extern fn sceIoChstat(file: [*c]c_char, stat: [*c]c_int, bits: c_int) callconv(.C) c_int;
+    pub extern fn sceIoChstat(file: [*c]const c_char, stat: [*c]c_int, bits: c_int) callconv(.C) c_int;
 
     /// Change the name of a file
     /// `oldname` - The old filename
     /// `newname` - The new filename
     /// Returns < 0 on error.
-    pub extern fn sceIoRename(oldname: [*c]c_char, newname: [*c]c_char) callconv(.C) c_int;
+    pub extern fn sceIoRename(oldname: [*c]const c_char, newname: [*c]const c_char) callconv(.C) c_int;
 
     pub extern fn sceIoDevctl("fatms0:": c_int, 0x02415821: c_int, &cbid: c_int, sizeof(cbid: c_int) callconv(.C) c_int;
 
@@ -3207,13 +3207,13 @@ const IoFileMgrForUser = struct {
     /// sceIoUnassign("flash0");
     /// sceIoAssign("flash0", "lflash0:0,0", "flashfat0:", IOASSIGN_RDWR, NULL, 0);
     /// `
-    pub extern fn sceIoAssign(dev1: [*c]c_char, dev2: [*c]c_char, dev3: [*c]c_char, mode: c_int, unk1: [*c]void, unk2: c_long) callconv(.C) c_int;
+    pub extern fn sceIoAssign(dev1: [*c]const c_char, dev2: [*c]const c_char, dev3: [*c]const c_char, mode: c_int, unk1: [*c]void, unk2: c_long) callconv(.C) c_int;
 
     /// Unassign an IO device.
     /// `dev` - The device to unassign.
     /// Returns < 0 on error
     /// @par Example: See ::sceIoAssign
-    pub extern fn sceIoUnassign(dev: [*c]c_char) callconv(.C) c_int;
+    pub extern fn sceIoUnassign(dev: [*c]const c_char) callconv(.C) c_int;
 
     /// Cancel an asynchronous operation on a file descriptor.
     /// `fd` - The file descriptor to perform cancel on.
@@ -3236,7 +3236,7 @@ const ThreadManForUser = struct {
     /// `handler` - Pointer to a ::SceKernelThreadEventHandler function
     /// `common` - Common pointer
     /// Returns The UID of the create event handler, < 0 on error
-    pub extern fn sceKernelRegisterThreadEventHandler(name: [*c]c_char, threadID: SceUID, mask: c_int, handler: c_int, common: [*c]void) callconv(.C) SceUID;
+    pub extern fn sceKernelRegisterThreadEventHandler(name: [*c]const c_char, threadID: SceUID, mask: c_int, handler: c_int, common: [*c]void) callconv(.C) SceUID;
 
     /// Release a thread event handler.
     /// `uid` - The UID of the event handler
@@ -3259,7 +3259,7 @@ const ThreadManForUser = struct {
     /// `func` - A pointer to a function that will be called as the callback
     /// `arg` - Argument for the callback ?
     /// Returns >= 0 A callback id which can be used in subsequent functions, < 0 an error.
-    pub extern fn sceKernelCreateCallback(name: [*c]c_char, func: c_int, arg: [*c]void) callconv(.C) c_int;
+    pub extern fn sceKernelCreateCallback(name: [*c]const c_char, func: c_int, arg: [*c]void) callconv(.C) c_int;
 
     /// Delete a callback
     /// `cb` - The UID of the specified callback
@@ -3375,7 +3375,7 @@ const ThreadManForUser = struct {
     /// `maxVal` - Sema maximum value
     /// `option` - Sema options (normally set to 0)
     /// Returns A semaphore id
-    pub extern fn sceKernelCreateSema(name: [*c]c_char, attr: SceUInt, initVal: c_int, maxVal: c_int, option: [*c]c_int) callconv(.C) SceUID;
+    pub extern fn sceKernelCreateSema(name: [*c]const c_char, attr: SceUInt, initVal: c_int, maxVal: c_int, option: [*c]c_int) callconv(.C) SceUID;
 
     /// Destroy a semaphore
     /// `semaid` - The semaid returned from a previous create call.
@@ -3440,7 +3440,7 @@ const ThreadManForUser = struct {
     /// int evid;
     /// evid = sceKernelCreateEventFlag("wait_event", 0, 0, 0);
     /// `
-    pub extern fn sceKernelCreateEventFlag(name: [*c]c_char, attr: c_int, bits: c_int, opt: [*c]c_int) callconv(.C) SceUID;
+    pub extern fn sceKernelCreateEventFlag(name: [*c]const c_char, attr: c_int, bits: c_int, opt: [*c]c_int) callconv(.C) SceUID;
 
     /// Delete an event flag
     /// `evid` - The event id returned by sceKernelCreateEventFlag.
@@ -3503,7 +3503,7 @@ const ThreadManForUser = struct {
     /// `attr` - Mbx attribute flags (normally set to 0)
     /// `option` - Mbx options (normally set to NULL)
     /// Returns A messagebox id
-    pub extern fn sceKernelCreateMbx(name: [*c]c_char, attr: SceUInt, option: [*c]c_int) callconv(.C) SceUID;
+    pub extern fn sceKernelCreateMbx(name: [*c]const c_char, attr: SceUInt, option: [*c]c_int) callconv(.C) SceUID;
 
     /// Destroy a messagebox
     /// `mbxid` - The mbxid returned from a previous create call.
@@ -3591,7 +3591,7 @@ const ThreadManForUser = struct {
     /// `unk1` - Unknown
     /// `opt` - Message pipe options (set to NULL)
     /// Returns The UID of the created pipe, < 0 on error
-    pub extern fn sceKernelCreateMsgPipe(name: [*c]c_char, part: c_int, attr: c_int, unk1: [*c]void, opt: [*c]void) callconv(.C) SceUID;
+    pub extern fn sceKernelCreateMsgPipe(name: [*c]const c_char, part: c_int, attr: c_int, unk1: [*c]void, opt: [*c]void) callconv(.C) SceUID;
 
     /// Delete a message pipe
     /// `uid` - The UID of the pipe
@@ -3676,7 +3676,7 @@ const ThreadManForUser = struct {
     /// `size` - Size of pool
     /// `opt` - Options (set to NULL)
     /// Returns The UID of the created pool, < 0 on error.
-    pub extern fn sceKernelCreateVpl(name: [*c]c_char, part: c_int, attr: c_int, size: c_uint, opt: [*c]c_int) callconv(.C) SceUID;
+    pub extern fn sceKernelCreateVpl(name: [*c]const c_char, part: c_int, attr: c_int, size: c_uint, opt: [*c]c_int) callconv(.C) SceUID;
 
     /// Delete a variable pool
     /// `uid` - The UID of the pool
@@ -3732,7 +3732,7 @@ const ThreadManForUser = struct {
     /// `blocks` - Number of blocks to allocate
     /// `opt` - Options (set to NULL)
     /// Returns The UID of the created pool, < 0 on error.
-    pub extern fn sceKernelCreateFpl(name: [*c]c_char, part: c_int, attr: c_int, size: c_uint, blocks: c_uint, opt: [*c]c_int) callconv(.C) c_int;
+    pub extern fn sceKernelCreateFpl(name: [*c]const c_char, part: c_int, attr: c_int, size: c_uint, blocks: c_uint, opt: [*c]c_int) callconv(.C) c_int;
 
     /// Delete a fixed pool
     /// `uid` - The UID of the pool
@@ -3847,7 +3847,7 @@ const ThreadManForUser = struct {
     /// `name` - Name for the timer.
     /// `opt` - Pointer to an ::SceKernelVTimerOptParam (pass NULL)
     /// Returns The VTimer's UID or < 0 on error.
-    pub extern fn sceKernelCreateVTimer(name: [*c]c_char, opt: [*c]c_int) callconv(.C) SceUID;
+    pub extern fn sceKernelCreateVTimer(name: [*c]const c_char, opt: [*c]c_int) callconv(.C) SceUID;
 
     /// Delete a virtual timer
     /// `uid` - The UID of the timer
@@ -3925,7 +3925,7 @@ const ThreadManForUser = struct {
     /// Returns 0 on success, < 0 on error
     pub extern fn sceKernelReferVTimerStatus(uid: SceUID, info: [*c]c_int) callconv(.C) c_int;
 
-    pub extern fn sceKernelCreateThread(name: [*c]c_char, entry: c_int, initPriority: c_int, stackSize: c_int, attr: SceUInt, option: [*c]c_int) callconv(.C) SceUID;
+    pub extern fn sceKernelCreateThread(name: [*c]const c_char, entry: c_int, initPriority: c_int, stackSize: c_int, attr: SceUInt, option: [*c]c_int) callconv(.C) SceUID;
 
     /// Delate a thread
     /// `thid` - UID of the thread to be deleted.
@@ -4077,7 +4077,7 @@ const ThreadManForUser = struct {
     /// `initialCount` - THe inital value of the mutex
     /// `optionsPTr` - Other optioons for mutex
     /// Returns 0 on success, otherwise one of ::PspKernelErrorCodes
-    pub extern fn sceKernelCreateLwMutex(workarea: [*c]c_int, name: [*c]c_char, attr: SceUInt32, initialCount: c_int, optionsPtr: [*c]c_int) callconv(.C) c_int;
+    pub extern fn sceKernelCreateLwMutex(workarea: [*c]c_int, name: [*c]const c_char, attr: SceUInt32, initialCount: c_int, optionsPtr: [*c]c_int) callconv(.C) c_int;
 
 };
 
@@ -4162,7 +4162,7 @@ pub usingnamespace if ((@hasDecl(options, "everything") and options.everything) 
 
 const UtilsForUser = struct {
     /// Invalidate a range of addresses in data cache
-    pub extern fn sceKernelDcacheInvalidateRange(p: [*c]void, size: c_uint) callconv(.C) void;
+    pub extern fn sceKernelDcacheInvalidateRange(p: [*c]const void, size: c_uint) callconv(.C) void;
 
     /// Function to perform an MD5 digest of a data block.
     /// `data` - Pointer to a data block to make a digest of.
@@ -4267,10 +4267,10 @@ const UtilsForUser = struct {
     pub extern fn sceKernelDcacheWritebackInvalidateAll() callconv(.C) void;
 
     /// Write back a range of addresses from the data cache to memory
-    pub extern fn sceKernelDcacheWritebackRange(p: [*c]void, size: c_uint) callconv(.C) void;
+    pub extern fn sceKernelDcacheWritebackRange(p: [*c]const void, size: c_uint) callconv(.C) void;
 
     /// Write back and invalidate a range of addresses in the data cache
-    pub extern fn sceKernelDcacheWritebackInvalidateRange(p: [*c]void, size: c_uint) callconv(.C) void;
+    pub extern fn sceKernelDcacheWritebackInvalidateRange(p: [*c]const void, size: c_uint) callconv(.C) void;
 
     pub extern fn sceKernelDcacheProbe() callconv(.C) void;
 
@@ -4284,7 +4284,7 @@ const UtilsForUser = struct {
     pub extern fn sceKernelIcacheInvalidateAll() callconv(.C) void;
 
     /// Invalidate a range of addresses in the instruction cache
-    pub extern fn sceKernelIcacheInvalidateRange(p: [*c]void, size: c_uint) callconv(.C) void;
+    pub extern fn sceKernelIcacheInvalidateRange(p: [*c]const void, size: c_uint) callconv(.C) void;
 
 };
 
@@ -4336,7 +4336,7 @@ const LoadExecForUser = struct {
     /// `file` - The file to execute.
     /// `param` - Pointer to a ::SceKernelLoadExecParam structure, or NULL.
     /// Returns < 0 on error, probably.
-    pub extern fn sceKernelLoadExec(file: [*c]c_char, param: [*c]c_int) callconv(.C) c_int;
+    pub extern fn sceKernelLoadExec(file: [*c]const c_char, param: [*c]c_int) callconv(.C) c_int;
 
     pub extern fn sceKernelExitGameWithStatus() callconv(.C) void;
 
@@ -4561,7 +4561,7 @@ const sceUtility_netparam_internal = struct {
     /// `param` - Which parameter to set
     /// `val` - Pointer to the the data to set
     /// Returns 0 on success
-    pub extern fn sceUtilitySetNetParam(param: c_int, val: [*c]void) callconv(.C) c_int;
+    pub extern fn sceUtilitySetNetParam(param: c_int, val: [*c]const void) callconv(.C) c_int;
 
 };
 
@@ -4693,7 +4693,7 @@ const sceUtility = struct {
     /// `id` - which parameter to set
     /// `str` - char * value to set
     /// Returns 0 on success, PSP_SYSTEMPARAM_RETVAL_FAIL on failure
-    pub extern fn sceUtilitySetSystemParamString(id: c_int, str: [*c]c_char) callconv(.C) c_int;
+    pub extern fn sceUtilitySetSystemParamString(id: c_int, str: [*c]const c_char) callconv(.C) c_int;
 
     /// Get Integer System Parameter
     /// `id` - which parameter to get
@@ -5101,7 +5101,7 @@ const sceReg = struct {
     /// `mode` - Open mode (can be 1 or 2, probably read or read/write
     /// `hd` - Pointer to a REGHANDLE to receive the registry dir handle
     /// Returns 0 on success, < 0 on error
-    pub extern fn sceRegOpenCategory(h: c_int, name: [*c]c_char, mode: c_int, hd: [*c]c_int) callconv(.C) c_int;
+    pub extern fn sceRegOpenCategory(h: c_int, name: [*c]const c_char, mode: c_int, hd: [*c]c_int) callconv(.C) c_int;
 
     /// Close the registry directory
     /// `hd` - The open registry dir handle
@@ -5124,7 +5124,7 @@ const sceReg = struct {
     /// `type` - Type of key (note cannot be a directory type)
     /// `size` - Size of the allocated value space
     /// Returns 0 on success, < 0 on error
-    pub extern fn sceRegCreateKey(hd: c_int, name: [*c]c_char, type: c_int, size: SceSize) callconv(.C) c_int;
+    pub extern fn sceRegCreateKey(hd: c_int, name: [*c]const c_char, type: c_int, size: SceSize) callconv(.C) c_int;
 
     /// Set a key's value
     /// `hd` - The open registry dir handle
@@ -5132,7 +5132,7 @@ const sceReg = struct {
     /// `buf` - Buffer to hold the value
     /// `size` - The size of the buffer
     /// Returns 0 on success, < 0 on error
-    pub extern fn sceRegSetKeyValue(hd: c_int, name: [*c]c_char, buf: [*c]void, size: SceSize) callconv(.C) c_int;
+    pub extern fn sceRegSetKeyValue(hd: c_int, name: [*c]const c_char, buf: [*c]const void, size: SceSize) callconv(.C) c_int;
 
     /// Get a key's information
     /// `hd` - The open registry dir handle
@@ -5141,7 +5141,7 @@ const sceReg = struct {
     /// `type` - Type of the key, on of ::RegKeyTypes
     /// `size` - The size of the key's value in bytes
     /// Returns 0 on success, < 0 on error
-    pub extern fn sceRegGetKeyInfo(hd: c_int, name: [*c]c_char, hk: [*c]c_int, type: [*c]c_uint, size: [*c]SceSize) callconv(.C) c_int;
+    pub extern fn sceRegGetKeyInfo(hd: c_int, name: [*c]const c_char, hk: [*c]c_int, type: [*c]c_uint, size: [*c]SceSize) callconv(.C) c_int;
 
     /// Get a key's value
     /// `hd` - The open registry dir handle
@@ -5172,7 +5172,7 @@ const sceReg = struct {
     /// `h` - The open registry dir handle
     /// `name` - The name of the key
     /// Returns 0 on success, < 0 on error
-    pub extern fn sceRegRemoveCategory(h: c_int, name: [*c]c_char) callconv(.C) c_int;
+    pub extern fn sceRegRemoveCategory(h: c_int, name: [*c]const c_char) callconv(.C) c_int;
 
     pub extern fn sceRegRemoveKey() callconv(.C) void;
 
@@ -5182,7 +5182,7 @@ const sceReg = struct {
     /// `type` - Type of the key, on of ::RegKeyTypes
     /// `size` - The size of the key's value in bytes
     /// Returns 0 on success, < 0 on error
-    pub extern fn sceRegGetKeyInfoByName(hd: c_int, name: [*c]c_char, type: [*c]c_uint, size: [*c]SceSize) callconv(.C) c_int;
+    pub extern fn sceRegGetKeyInfoByName(hd: c_int, name: [*c]const c_char, type: [*c]c_uint, size: [*c]SceSize) callconv(.C) c_int;
 
     /// Get a key's value by name
     /// `hd` - The open registry dir handle
@@ -5190,7 +5190,7 @@ const sceReg = struct {
     /// `buf` - Buffer to hold the value
     /// `size` - The size of the buffer
     /// Returns 0 on success, < 0 on error
-    pub extern fn sceRegGetKeyValueByName(hd: c_int, name: [*c]c_char, buf: [*c]void, size: SceSize) callconv(.C) c_int;
+    pub extern fn sceRegGetKeyValueByName(hd: c_int, name: [*c]const c_char, buf: [*c]void, size: SceSize) callconv(.C) c_int;
 
 };
 
