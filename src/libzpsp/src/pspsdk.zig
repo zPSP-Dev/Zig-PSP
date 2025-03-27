@@ -275,45 +275,45 @@ const sceNetInet = struct {
 
     pub extern fn sceNetInetTerm() callconv(.C) c_int;
 
-    pub extern fn sceNetInetAccept(s: c_int, addr: [*c]c_int, addrlen: [*c]c_int) callconv(.C) c_int;
+    pub extern fn sceNetInetAccept() callconv(.C) void;
 
-    pub extern fn sceNetInetBind(s: c_int, my_addr: [*c]const c_int, addrlen: c_int) callconv(.C) c_int;
+    pub extern fn sceNetInetBind() callconv(.C) void;
 
     pub extern fn sceNetInetClose(s: c_int) callconv(.C) c_int;
 
     pub extern fn sceNetInetCloseWithRST() callconv(.C) void;
 
-    pub extern fn sceNetInetConnect(s: c_int, serv_addr: [*c]const c_int, addrlen: c_int) callconv(.C) c_int;
+    pub extern fn sceNetInetConnect() callconv(.C) void;
 
-    pub extern fn sceNetInetGetpeername(s: c_int, name: [*c]c_int, namelen: [*c]c_int) callconv(.C) c_int;
+    pub extern fn sceNetInetGetpeername() callconv(.C) void;
 
-    pub extern fn sceNetInetGetsockname(s: c_int, name: [*c]c_int, namelen: [*c]c_int) callconv(.C) c_int;
+    pub extern fn sceNetInetGetsockname() callconv(.C) void;
 
-    pub extern fn sceNetInetGetsockopt(s: c_int, level: c_int, optname: c_int, optval: ?*anyopaque, optlen: [*c]c_int) callconv(.C) c_int;
+    pub extern fn sceNetInetGetsockopt() callconv(.C) void;
 
-    pub extern fn sceNetInetListen(s: c_int, backlog: c_int) callconv(.C) c_int;
+    pub extern fn sceNetInetListen() callconv(.C) void;
 
     pub extern fn sceNetInetPoll() callconv(.C) void;
 
-    pub extern fn sceNetInetRecv(s: c_int, buf: ?*anyopaque, len: usize, flags: c_int) callconv(.C) usize;
+    pub extern fn sceNetInetRecv() callconv(.C) void;
 
-    pub extern fn sceNetInetRecvfrom(s: c_int, buf: ?*anyopaque, flags: usize, int: c_int, from: [*c]c_int, fromlen: [*c]c_int) callconv(.C) usize;
+    pub extern fn sceNetInetRecvfrom() callconv(.C) void;
 
     pub extern fn sceNetInetRecvmsg(s: c_int, msg: [*c]c_int, flags: c_int) callconv(.C) isize;
 
     pub extern fn sceNetInetSelect(n: c_int, readfds: [*c]c_int, writefds: [*c]c_int, exceptfds: [*c]c_int, timeout: [*c]c_int) callconv(.C) c_int;
 
-    pub extern fn sceNetInetSend(s: c_int, buf: ?*const anyopaque, len: usize, flags: c_int) callconv(.C) usize;
+    pub extern fn sceNetInetSend() callconv(.C) void;
 
-    pub extern fn sceNetInetSendto(s: c_int, buf: ?*const anyopaque, len: usize, flags: c_int, to: [*c]const c_int, tolen: c_int) callconv(.C) usize;
+    pub extern fn sceNetInetSendto() callconv(.C) void;
 
     pub extern fn sceNetInetSendmsg(s: c_int, msg: [*c]const c_int, flags: c_int) callconv(.C) isize;
 
-    pub extern fn sceNetInetSetsockopt(s: c_int, level: c_int, optname: c_int, optval: ?*const anyopaque, optlen: c_int) callconv(.C) c_int;
+    pub extern fn sceNetInetSetsockopt() callconv(.C) void;
 
-    pub extern fn sceNetInetShutdown(s: c_int, how: c_int) callconv(.C) c_int;
+    pub extern fn sceNetInetShutdown() callconv(.C) void;
 
-    pub extern fn sceNetInetSocket(domain: c_int, type: c_int, protocol: c_int) callconv(.C) c_int;
+    pub extern fn sceNetInetSocket() callconv(.C) void;
 
     pub extern fn sceNetInetSocketAbort() callconv(.C) void;
 
@@ -1531,7 +1531,12 @@ const sceMpeg = struct {
     /// `Mpeg` - SceMpeg handle
     pub extern fn sceMpegDelete(Mpeg: [*c]c_int) callconv(.C) SceVoid;
 
-    pub extern fn sceMpegRegistStream() callconv(.C) void;
+    /// sceMpegRegistStream
+    /// `Mpeg` - SceMpeg handle
+    /// `iStreamID` - stream id, 0 for video, 1 for audio
+    /// `iUnk` - unknown, set to 0
+    /// Returns 0 if error.
+    pub extern fn sceMpegRegistStream(Mpeg: [*c]c_int, iStreamID: SceInt32, iUnk: SceInt32) callconv(.C) [*c]c_int;
 
     /// sceMpegUnRegistStream
     /// `Mpeg` - SceMpeg handle
@@ -2078,7 +2083,10 @@ const SysMemUserForUser = struct {
     /// Returns ? on success, less than 0 on error.
     pub extern fn sceKernelFreePartitionMemory(blockid: SceUID) callconv(.C) c_int;
 
-    pub extern fn sceKernelGetBlockHeadAddr() callconv(.C) void;
+    /// Get the address of a memory block.
+    /// `blockid` - UID of the memory block.
+    /// Returns The lowest address belonging to the memory block.
+    pub extern fn sceKernelGetBlockHeadAddr(blockid: SceUID) callconv(.C) ?*anyopaque;
 
     /// Get the firmware version.
     /// Returns The firmware version.
@@ -3548,9 +3556,13 @@ const ThreadManForUser = struct {
     /// Returns The type, < 0 on error
     pub extern fn sceKernelGetThreadmanIdType(uid: SceUID) callconv(.C) c_int;
 
-    pub extern fn sceKernelReferThreadProfiler() callconv(.C) void;
+    /// Get the thread profiler registers.
+    /// Returns Pointer to the registers, NULL on error
+    pub extern fn sceKernelReferThreadProfiler() callconv(.C) [*c]c_int;
 
-    pub extern fn sceKernelReferGlobalProfiler() callconv(.C) void;
+    /// Get the globile profiler registers.
+    /// Returns Pointer to the registers, NULL on error
+    pub extern fn sceKernelReferGlobalProfiler() callconv(.C) [*c]c_int;
 
     /// Delete a lightweight mutex
     /// `workarea` - The pointer to the workarea
@@ -4102,7 +4114,9 @@ const sceGe_user = struct {
     /// Returns The size of VRAM (in bytes).
     pub extern fn sceGeEdramGetSize() callconv(.C) c_uint;
 
-    pub extern fn sceGeEdramGetAddr() callconv(.C) void;
+    /// Get the eDRAM address.
+    /// Returns A pointer to the base of the eDRAM.
+    pub extern fn sceGeEdramGetAddr() callconv(.C) ?*anyopaque;
 
     /// Set the eDRAM address translation mode.
     /// `width` - 0 to not set the translation width, otherwise 512, 1024, 2048 or 4096.
