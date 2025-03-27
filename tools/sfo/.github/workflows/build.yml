@@ -1,5 +1,13 @@
 name: Build
-on: [push, pull_request]
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+
 env:
   zig_version: 0.14.0
 
