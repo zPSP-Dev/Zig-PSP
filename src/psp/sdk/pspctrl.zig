@@ -1,26 +1,41 @@
-pub const PspCtrlButtons = enum(c_uint) {
-    Select = 1,
-    Start = 8,
-    Up = 16,
-    Right = 32,
-    Down = 64,
-    Left = 128,
-    LTrigger = 256,
-    RTrigger = 512,
-    Triangle = 4096,
-    Circle = 8192,
-    Cross = 16384,
-    Square = 32768,
-    Home = 65536,
-    Hold = 131072,
-    Note = 8388608,
-    Screen = 4194304,
-    VolUp = 1048576,
-    VolDown = 2097152,
-    WlanUp = 262144,
-    Remote = 524288,
-    Disc = 16777216,
-    Ms = 33554432,
+// See also: https://github.com/hrydgard/ppsspp/issues/17464
+pub const PspCtrlButtons = packed struct(u32) {
+    select: u1,
+    l3: u1, // Available on devkits when connecting a dualshock controller
+    r3: u1,
+    start: u1,
+
+    up: u1,
+    right: u1,
+    down: u1,
+    left: u1,
+
+    l_trigger: u1,
+    r_trigger: u1,
+    l2: u1, // Available on devkits when connecting a dualshock controller
+    r2: u1,
+
+    triangle: u1,
+    circle: u1,
+    cross: u1,
+    square: u1,
+
+    home: u1,
+    hold: u1,
+    wlan_up: u1,
+    remote: u1,
+
+    vol_up: u1,
+    vol_down: u1,
+    screen: u1,
+    note: u1,
+
+    disc: u1,
+    memory_stick: u1,
+    unknown_b26: u1,
+    unknown_b27: u1,
+
+    unknown_b28_31: u4,
 };
 
 pub const PspCtrlMode = enum(c_int) {
@@ -30,17 +45,17 @@ pub const PspCtrlMode = enum(c_int) {
 
 pub const SceCtrlData = extern struct {
     timeStamp: c_uint,
-    buttons: c_uint,
+    buttons: PspCtrlButtons,
     Lx: u8,
     Ly: u8,
     Rsrv: [6]u8,
 };
 
 pub const SceCtrlLatch = extern struct {
-    uiMake: c_uint,
-    uiBreak: c_uint,
-    uiPress: c_uint,
-    uiRelease: c_uint,
+    uiMake: PspCtrlButtons,
+    uiBreak: PspCtrlButtons,
+    uiPress: PspCtrlButtons,
+    uiRelease: PspCtrlButtons,
 };
 
 // Set the controller cycle setting.
