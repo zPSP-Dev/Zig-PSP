@@ -243,33 +243,6 @@ const scePower = struct {
 
 pub usingnamespace if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "scePower") and options.scePower)) scePower else EMPTY;
 
-const sceVideocodec = struct {
-    pub extern fn sceVideocodecInit(Buffer: [*c]c_ulong, Type: c_int) callconv(.C) c_int;
-
-    pub extern fn sceVideocodecGetVersion() callconv(.C) void;
-
-    pub extern fn sceVideocodecGetEDRAM(Buffer: [*c]c_ulong, Type: c_int) callconv(.C) c_int;
-
-    pub extern fn sceVideocodecScanHeader() callconv(.C) void;
-
-    pub extern fn sceVideocodecDelete() callconv(.C) void;
-
-    pub extern fn sceVideocodecReleaseEDRAM(Buffer: [*c]c_ulong) callconv(.C) c_int;
-
-    pub extern fn sceVideocodec_627B7D42() callconv(.C) void;
-
-    pub extern fn sceVideocodecSetMemory() callconv(.C) void;
-
-    pub extern fn sceVideocodecStop() callconv(.C) void;
-
-    pub extern fn sceVideocodecOpen(Buffer: [*c]c_ulong, Type: c_int) callconv(.C) c_int;
-
-    pub extern fn sceVideocodecDecode(Buffer: [*c]c_ulong, Type: c_int) callconv(.C) c_int;
-
-};
-
-pub usingnamespace if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "sceVideocodec") and options.sceVideocodec)) sceVideocodec else EMPTY;
-
 const sceNetInet = struct {
     pub extern fn sceNetInetInit() callconv(.C) c_int;
 
@@ -3906,13 +3879,6 @@ const sceDmac = struct {
 };
 
 pub usingnamespace if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "sceDmac") and options.sceDmac)) sceDmac else EMPTY;
-
-const sceSircs = struct {
-    pub extern fn sceSircsSend(sd: [*c]c_int, count: c_int) callconv(.C) c_int;
-
-};
-
-pub usingnamespace if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "sceSircs") and options.sceSircs)) sceSircs else EMPTY;
 
 const sceAudio = struct {
     /// Output audio of the specified channel

@@ -54,21 +54,6 @@ comptime {
         asm(macro.import_function("scePower", "0x737486F2", "scePowerSetClockFrequency"));
     }
 
-    if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "sceVideocodec") and options.sceVideocodec)) {
-        asm(macro.import_module_start("sceVideocodec", "0x40010011", "11"));
-        asm(macro.import_function("sceVideocodec", "0x17099F0A", "sceVideocodecInit"));
-        asm(macro.import_function("sceVideocodec", "0x26927D19", "sceVideocodecGetVersion"));
-        asm(macro.import_function("sceVideocodec", "0x2D31F5B1", "sceVideocodecGetEDRAM"));
-        asm(macro.import_function("sceVideocodec", "0x2F385E7F", "sceVideocodecScanHeader"));
-        asm(macro.import_function("sceVideocodec", "0x307E6E1C", "sceVideocodecDelete"));
-        asm(macro.import_function("sceVideocodec", "0x4F160BF4", "sceVideocodecReleaseEDRAM"));
-        asm(macro.import_function("sceVideocodec", "0x627B7D42", "sceVideocodec_627B7D42"));
-        asm(macro.import_function("sceVideocodec", "0x745A7B7A", "sceVideocodecSetMemory"));
-        asm(macro.import_function("sceVideocodec", "0xA2F0564E", "sceVideocodecStop"));
-        asm(macro.import_function("sceVideocodec", "0xC01EC829", "sceVideocodecOpen"));
-        asm(macro.import_function("sceVideocodec", "0xDBA273FA", "sceVideocodecDecode"));
-    }
-
     if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "sceNetInet") and options.sceNetInet)) {
         asm(macro.import_module_start("sceNetInet", "0x00090000", "30"));
         asm(macro.import_function("sceNetInet", "0x17943399", "sceNetInetInit"));
@@ -959,11 +944,6 @@ comptime {
         asm(macro.import_module_start("sceDmac", "0x40010011", "2"));
         asm(macro.import_function("sceDmac", "0x617F3FE6", "sceDmacMemcpy"));
         asm(macro.import_function("sceDmac", "0xD97F94D8", "sceDmacTryMemcpy"));
-    }
-
-    if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "sceSircs") and options.sceSircs)) {
-        asm(macro.import_module_start("sceSircs", "0x40010000", "1"));
-        asm(macro.import_function("sceSircs", "0x71EEF62D", "sceSircsSend"));
     }
 
     if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "sceAudio") and options.sceAudio)) {

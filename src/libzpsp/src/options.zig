@@ -3,7 +3,6 @@ const std = @import("std");
 pub const Options = struct {
     everything: bool = false,
     scePower: bool = false,
-    sceVideocodec: bool = false,
     sceNetInet: bool = false,
     sceNetApctl: bool = false,
     sceHttp: bool = false,
@@ -34,7 +33,6 @@ pub const Options = struct {
     sceUsbCam: bool = false,
     sceUsb: bool = false,
     sceDmac: bool = false,
-    sceSircs: bool = false,
     sceAudio: bool = false,
     sceAudiocodec: bool = false,
     sceGe_user: bool = false,
@@ -58,7 +56,6 @@ pub fn addOptions(b: *std.Build, options: Options) *std.Build.Step.Options {
     step_options.addOption(bool, "everything", options.everything);
 
     step_options.addOption(bool, "scePower", options.scePower);
-    step_options.addOption(bool, "sceVideocodec", options.sceVideocodec);
     step_options.addOption(bool, "sceNetInet", options.sceNetInet);
     step_options.addOption(bool, "sceNetApctl", options.sceNetApctl);
     step_options.addOption(bool, "sceHttp", options.sceHttp);
@@ -89,7 +86,6 @@ pub fn addOptions(b: *std.Build, options: Options) *std.Build.Step.Options {
     step_options.addOption(bool, "sceUsbCam", options.sceUsbCam);
     step_options.addOption(bool, "sceUsb", options.sceUsb);
     step_options.addOption(bool, "sceDmac", options.sceDmac);
-    step_options.addOption(bool, "sceSircs", options.sceSircs);
     step_options.addOption(bool, "sceAudio", options.sceAudio);
     step_options.addOption(bool, "sceAudiocodec", options.sceAudiocodec);
     step_options.addOption(bool, "sceGe_user", options.sceGe_user);
