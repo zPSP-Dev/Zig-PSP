@@ -241,7 +241,7 @@ const scePower = struct {
 
 };
 
-pub usingnamespace if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "include_scePower") and options.include_scePower)) scePower else EMPTY;
+pub usingnamespace if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "scePower") and options.scePower)) scePower else EMPTY;
 
 const sceVideocodec = struct {
     pub extern fn sceVideocodecInit(Buffer: [*c]c_ulong, Type: c_int) callconv(.C) c_int;
@@ -268,7 +268,7 @@ const sceVideocodec = struct {
 
 };
 
-pub usingnamespace if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "include_sceVideocodec") and options.include_sceVideocodec)) sceVideocodec else EMPTY;
+pub usingnamespace if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "sceVideocodec") and options.sceVideocodec)) sceVideocodec else EMPTY;
 
 const sceNetInet = struct {
     pub extern fn sceNetInetInit() callconv(.C) c_int;
@@ -333,7 +333,7 @@ const sceNetInet = struct {
 
 };
 
-pub usingnamespace if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "include_sceNetInet") and options.include_sceNetInet)) sceNetInet else EMPTY;
+pub usingnamespace if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "sceNetInet") and options.sceNetInet)) sceNetInet else EMPTY;
 
 const sceNetApctl = struct {
     /// Init the apctl.
@@ -379,7 +379,7 @@ const sceNetApctl = struct {
 
 };
 
-pub usingnamespace if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "include_sceNetApctl") and options.include_sceNetApctl)) sceNetApctl else EMPTY;
+pub usingnamespace if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "sceNetApctl") and options.sceNetApctl)) sceNetApctl else EMPTY;
 
 const sceHttp = struct {
     /// Get http request response length.
@@ -678,7 +678,7 @@ const sceHttp = struct {
 
 };
 
-pub usingnamespace if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "include_sceHttp") and options.include_sceHttp)) sceHttp else EMPTY;
+pub usingnamespace if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "sceHttp") and options.sceHttp)) sceHttp else EMPTY;
 
 const sceNet = struct {
     /// Initialise the networking library
@@ -726,7 +726,7 @@ const sceNet = struct {
 
 };
 
-pub usingnamespace if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "include_sceNet") and options.include_sceNet)) sceNet else EMPTY;
+pub usingnamespace if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "sceNet") and options.sceNet)) sceNet else EMPTY;
 
 const sceNetResolver = struct {
     /// Inititalise the resolver library
@@ -775,7 +775,7 @@ const sceNetResolver = struct {
 
 };
 
-pub usingnamespace if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "include_sceNetResolver") and options.include_sceNetResolver)) sceNetResolver else EMPTY;
+pub usingnamespace if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "sceNetResolver") and options.sceNetResolver)) sceNetResolver else EMPTY;
 
 const sceNet_lib = struct {
     pub extern fn sceNet_lib_3B617AA0() callconv(.C) void;
@@ -972,7 +972,7 @@ const sceNet_lib = struct {
 
 };
 
-pub usingnamespace if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "include_sceNet_lib") and options.include_sceNet_lib)) sceNet_lib else EMPTY;
+pub usingnamespace if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "sceNet_lib") and options.sceNet_lib)) sceNet_lib else EMPTY;
 
 const sceNetAdhocctl = struct {
     /// Initialise the Adhoc control library
@@ -1096,7 +1096,7 @@ const sceNetAdhocctl = struct {
 
 };
 
-pub usingnamespace if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "include_sceNetAdhocctl") and options.include_sceNetAdhocctl)) sceNetAdhocctl else EMPTY;
+pub usingnamespace if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "sceNetAdhocctl") and options.sceNetAdhocctl)) sceNetAdhocctl else EMPTY;
 
 const sceNetAdhocMatching = struct {
     /// Initialise the Adhoc matching library
@@ -1210,7 +1210,7 @@ const sceNetAdhocMatching = struct {
 
 };
 
-pub usingnamespace if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "include_sceNetAdhocMatching") and options.include_sceNetAdhocMatching)) sceNetAdhocMatching else EMPTY;
+pub usingnamespace if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "sceNetAdhocMatching") and options.sceNetAdhocMatching)) sceNetAdhocMatching else EMPTY;
 
 const sceNetAdhoc = struct {
     /// Initialise the adhoc library.
@@ -1379,7 +1379,7 @@ const sceNetAdhoc = struct {
 
 };
 
-pub usingnamespace if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "include_sceNetAdhoc") and options.include_sceNetAdhoc)) sceNetAdhoc else EMPTY;
+pub usingnamespace if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "sceNetAdhoc") and options.sceNetAdhoc)) sceNetAdhoc else EMPTY;
 
 const sceSsl = struct {
     pub extern fn sceSslGetNameEntryCount() callconv(.C) void;
@@ -1417,7 +1417,7 @@ const sceSsl = struct {
 
 };
 
-pub usingnamespace if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "include_sceSsl") and options.include_sceSsl)) sceSsl else EMPTY;
+pub usingnamespace if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "sceSsl") and options.sceSsl)) sceSsl else EMPTY;
 
 const sceJpeg = struct {
     pub extern fn sceJpeg_0425B986() callconv(.C) void;
@@ -1465,7 +1465,7 @@ const sceJpeg = struct {
 
 };
 
-pub usingnamespace if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "include_sceJpeg") and options.include_sceJpeg)) sceJpeg else EMPTY;
+pub usingnamespace if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "sceJpeg") and options.sceJpeg)) sceJpeg else EMPTY;
 
 const sceMpegbase = struct {
     pub extern fn sceMpegBaseYCrCbCopyVme(YUVBuffer: ScePVoid, Buffer: [*c]SceInt32, Type: SceInt32) callconv(.C) SceInt32;
@@ -1488,7 +1488,7 @@ const sceMpegbase = struct {
 
 };
 
-pub usingnamespace if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "include_sceMpegbase") and options.include_sceMpegbase)) sceMpegbase else EMPTY;
+pub usingnamespace if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "sceMpegbase") and options.sceMpegbase)) sceMpegbase else EMPTY;
 
 const sceMpeg = struct {
     /// sceMpegQueryStreamOffset
@@ -1678,7 +1678,7 @@ const sceMpeg = struct {
 
 };
 
-pub usingnamespace if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "include_sceMpeg") and options.include_sceMpeg)) sceMpeg else EMPTY;
+pub usingnamespace if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "sceMpeg") and options.sceMpeg)) sceMpeg else EMPTY;
 
 const sceHprm = struct {
     pub extern fn sceHprmRegisterCallback() callconv(.C) void;
@@ -1715,7 +1715,7 @@ const sceHprm = struct {
 
 };
 
-pub usingnamespace if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "include_sceHprm") and options.include_sceHprm)) sceHprm else EMPTY;
+pub usingnamespace if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "sceHprm") and options.sceHprm)) sceHprm else EMPTY;
 
 const sceUmdUser = struct {
     /// Get the error code associated with a failed event
@@ -1811,7 +1811,7 @@ const sceUmdUser = struct {
 
 };
 
-pub usingnamespace if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "include_sceUmdUser") and options.include_sceUmdUser)) sceUmdUser else EMPTY;
+pub usingnamespace if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "sceUmdUser") and options.sceUmdUser)) sceUmdUser else EMPTY;
 
 const sceCtrl = struct {
     /// Set the controller cycle setting.
@@ -1947,7 +1947,7 @@ const sceCtrl = struct {
 
 };
 
-pub usingnamespace if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "include_sceCtrl") and options.include_sceCtrl)) sceCtrl else EMPTY;
+pub usingnamespace if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "sceCtrl") and options.sceCtrl)) sceCtrl else EMPTY;
 
 const LoadExecForUser = struct {
     /// Execute a new game executable, limited when not running in kernel mode.
@@ -1977,7 +1977,7 @@ const LoadExecForUser = struct {
 
 };
 
-pub usingnamespace if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "include_LoadExecForUser") and options.include_LoadExecForUser)) LoadExecForUser else EMPTY;
+pub usingnamespace if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "LoadExecForUser") and options.LoadExecForUser)) LoadExecForUser else EMPTY;
 
 const Kernel_Library = struct {
     /// Suspend all interrupts.
@@ -2023,7 +2023,7 @@ const Kernel_Library = struct {
 
 };
 
-pub usingnamespace if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "include_Kernel_Library") and options.include_Kernel_Library)) Kernel_Library else EMPTY;
+pub usingnamespace if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "Kernel_Library") and options.Kernel_Library)) Kernel_Library else EMPTY;
 
 const sceImpose = struct {
     pub extern fn sceImposeGetHomePopup() callconv(.C) void;
@@ -2058,7 +2058,7 @@ const sceImpose = struct {
 
 };
 
-pub usingnamespace if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "include_sceImpose") and options.include_sceImpose)) sceImpose else EMPTY;
+pub usingnamespace if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "sceImpose") and options.sceImpose)) sceImpose else EMPTY;
 
 const SysMemUserForUser = struct {
     /// Get the size of the largest free memory block.
@@ -2117,7 +2117,7 @@ const SysMemUserForUser = struct {
 
 };
 
-pub usingnamespace if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "include_SysMemUserForUser") and options.include_SysMemUserForUser)) SysMemUserForUser else EMPTY;
+pub usingnamespace if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "SysMemUserForUser") and options.SysMemUserForUser)) SysMemUserForUser else EMPTY;
 
 const sceSuspendForUser = struct {
     pub extern fn sceKernelPowerLock() callconv(.C) void;
@@ -2148,7 +2148,7 @@ const sceSuspendForUser = struct {
 
 };
 
-pub usingnamespace if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "include_sceSuspendForUser") and options.include_sceSuspendForUser)) sceSuspendForUser else EMPTY;
+pub usingnamespace if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "sceSuspendForUser") and options.sceSuspendForUser)) sceSuspendForUser else EMPTY;
 
 const ModuleMgrForUser = struct {
     /// Load a module from the given file UID.
@@ -2248,7 +2248,7 @@ const ModuleMgrForUser = struct {
 
 };
 
-pub usingnamespace if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "include_ModuleMgrForUser") and options.include_ModuleMgrForUser)) ModuleMgrForUser else EMPTY;
+pub usingnamespace if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "ModuleMgrForUser") and options.ModuleMgrForUser)) ModuleMgrForUser else EMPTY;
 
 const IoFileMgrForUser = struct {
     /// Poll for asyncronous completion.
@@ -2546,7 +2546,7 @@ const IoFileMgrForUser = struct {
 
 };
 
-pub usingnamespace if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "include_IoFileMgrForUser") and options.include_IoFileMgrForUser)) IoFileMgrForUser else EMPTY;
+pub usingnamespace if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "IoFileMgrForUser") and options.IoFileMgrForUser)) IoFileMgrForUser else EMPTY;
 
 const UtilsForUser = struct {
     /// Invalidate a range of addresses in data cache
@@ -2676,7 +2676,7 @@ const UtilsForUser = struct {
 
 };
 
-pub usingnamespace if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "include_UtilsForUser") and options.include_UtilsForUser)) UtilsForUser else EMPTY;
+pub usingnamespace if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "UtilsForUser") and options.UtilsForUser)) UtilsForUser else EMPTY;
 
 const InterruptManager = struct {
     /// Register a sub interrupt handler.
@@ -2717,7 +2717,7 @@ const InterruptManager = struct {
 
 };
 
-pub usingnamespace if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "include_InterruptManager") and options.include_InterruptManager)) InterruptManager else EMPTY;
+pub usingnamespace if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "InterruptManager") and options.InterruptManager)) InterruptManager else EMPTY;
 
 const ThreadManForUser = struct {
     /// Return from a callback (used as a syscall for the return
@@ -3580,7 +3580,7 @@ const ThreadManForUser = struct {
 
 };
 
-pub usingnamespace if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "include_ThreadManForUser") and options.include_ThreadManForUser)) ThreadManForUser else EMPTY;
+pub usingnamespace if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "ThreadManForUser") and options.ThreadManForUser)) ThreadManForUser else EMPTY;
 
 const StdioForUser = struct {
     pub extern fn sceKernelStdioRead() callconv(.C) void;
@@ -3609,7 +3609,7 @@ const StdioForUser = struct {
 
 };
 
-pub usingnamespace if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "include_StdioForUser") and options.include_StdioForUser)) StdioForUser else EMPTY;
+pub usingnamespace if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "StdioForUser") and options.StdioForUser)) StdioForUser else EMPTY;
 
 const sceUsbCam = struct {
     pub extern fn sceUsbCamSetupMic() callconv(.C) void;
@@ -3847,7 +3847,7 @@ const sceUsbCam = struct {
 
 };
 
-pub usingnamespace if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "include_sceUsbCam") and options.include_sceUsbCam)) sceUsbCam else EMPTY;
+pub usingnamespace if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "sceUsbCam") and options.sceUsbCam)) sceUsbCam else EMPTY;
 
 const sceUsb = struct {
     /// Start a USB driver.
@@ -3891,7 +3891,7 @@ const sceUsb = struct {
 
 };
 
-pub usingnamespace if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "include_sceUsb") and options.include_sceUsb)) sceUsb else EMPTY;
+pub usingnamespace if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "sceUsb") and options.sceUsb)) sceUsb else EMPTY;
 
 const sceDmac = struct {
     /// Copy data in memory using DMAC
@@ -3905,14 +3905,14 @@ const sceDmac = struct {
 
 };
 
-pub usingnamespace if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "include_sceDmac") and options.include_sceDmac)) sceDmac else EMPTY;
+pub usingnamespace if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "sceDmac") and options.sceDmac)) sceDmac else EMPTY;
 
 const sceSircs = struct {
     pub extern fn sceSircsSend(sd: [*c]c_int, count: c_int) callconv(.C) c_int;
 
 };
 
-pub usingnamespace if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "include_sceSircs") and options.include_sceSircs)) sceSircs else EMPTY;
+pub usingnamespace if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "sceSircs") and options.sceSircs)) sceSircs else EMPTY;
 
 const sceAudio = struct {
     /// Output audio of the specified channel
@@ -4086,7 +4086,7 @@ const sceAudio = struct {
 
 };
 
-pub usingnamespace if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "include_sceAudio") and options.include_sceAudio)) sceAudio else EMPTY;
+pub usingnamespace if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "sceAudio") and options.sceAudio)) sceAudio else EMPTY;
 
 const sceAudiocodec = struct {
     pub extern fn sceAudiocodecCheckNeedMem(Buffer: [*c]c_ulong, Type: c_int) callconv(.C) c_int;
@@ -4107,7 +4107,7 @@ const sceAudiocodec = struct {
 
 };
 
-pub usingnamespace if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "include_sceAudiocodec") and options.include_sceAudiocodec)) sceAudiocodec else EMPTY;
+pub usingnamespace if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "sceAudiocodec") and options.sceAudiocodec)) sceAudiocodec else EMPTY;
 
 const sceGe_user = struct {
     /// Get the size of VRAM.
@@ -4217,7 +4217,7 @@ const sceGe_user = struct {
 
 };
 
-pub usingnamespace if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "include_sceGe_user") and options.include_sceGe_user)) sceGe_user else EMPTY;
+pub usingnamespace if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "sceGe_user") and options.sceGe_user)) sceGe_user else EMPTY;
 
 const sceMp3 = struct {
     /// sceMp3ReserveMp3Handle
@@ -4348,7 +4348,7 @@ const sceMp3 = struct {
 
 };
 
-pub usingnamespace if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "include_sceMp3") and options.include_sceMp3)) sceMp3 else EMPTY;
+pub usingnamespace if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "sceMp3") and options.sceMp3)) sceMp3 else EMPTY;
 
 const sceRtc = struct {
     /// Get the resolution of the tick counter
@@ -4532,7 +4532,7 @@ const sceRtc = struct {
 
 };
 
-pub usingnamespace if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "include_sceRtc") and options.include_sceRtc)) sceRtc else EMPTY;
+pub usingnamespace if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "sceRtc") and options.sceRtc)) sceRtc else EMPTY;
 
 const sceVaudio = struct {
     /// Output audio (blocking)
@@ -4573,7 +4573,7 @@ const sceVaudio = struct {
 
 };
 
-pub usingnamespace if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "include_sceVaudio") and options.include_sceVaudio)) sceVaudio else EMPTY;
+pub usingnamespace if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "sceVaudio") and options.sceVaudio)) sceVaudio else EMPTY;
 
 const sceReg = struct {
     pub extern fn sceRegExit() callconv(.C) void;
@@ -4694,7 +4694,7 @@ const sceReg = struct {
 
 };
 
-pub usingnamespace if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "include_sceReg") and options.include_sceReg)) sceReg else EMPTY;
+pub usingnamespace if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "sceReg") and options.sceReg)) sceReg else EMPTY;
 
 const sceWlanDrv_lib = struct {
     /// Attach to the wlan device
@@ -4739,7 +4739,7 @@ const sceWlanDrv_lib = struct {
 
 };
 
-pub usingnamespace if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "include_sceWlanDrv_lib") and options.include_sceWlanDrv_lib)) sceWlanDrv_lib else EMPTY;
+pub usingnamespace if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "sceWlanDrv_lib") and options.sceWlanDrv_lib)) sceWlanDrv_lib else EMPTY;
 
 const sceWlanDrv = struct {
     /// Determine if the wlan device is currently powered on
@@ -4758,14 +4758,14 @@ const sceWlanDrv = struct {
 
 };
 
-pub usingnamespace if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "include_sceWlanDrv") and options.include_sceWlanDrv)) sceWlanDrv else EMPTY;
+pub usingnamespace if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "sceWlanDrv") and options.sceWlanDrv)) sceWlanDrv else EMPTY;
 
 const sceOpenPSID = struct {
     pub extern fn sceOpenPSIDGetOpenPSID(openpsid: [*c]c_int) callconv(.C) c_int;
 
 };
 
-pub usingnamespace if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "include_sceOpenPSID") and options.include_sceOpenPSID)) sceOpenPSID else EMPTY;
+pub usingnamespace if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "sceOpenPSID") and options.sceOpenPSID)) sceOpenPSID else EMPTY;
 
 const sceDisplay = struct {
     /// Set display mode
@@ -4841,7 +4841,7 @@ const sceDisplay = struct {
 
 };
 
-pub usingnamespace if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "include_sceDisplay") and options.include_sceDisplay)) sceDisplay else EMPTY;
+pub usingnamespace if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "sceDisplay") and options.sceDisplay)) sceDisplay else EMPTY;
 
 const sceAtrac3plus = struct {
     pub extern fn sceAtracStartEntry() callconv(.C) void;
@@ -4939,14 +4939,14 @@ const sceAtrac3plus = struct {
 
 };
 
-pub usingnamespace if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "include_sceAtrac3plus") and options.include_sceAtrac3plus)) sceAtrac3plus else EMPTY;
+pub usingnamespace if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "sceAtrac3plus") and options.sceAtrac3plus)) sceAtrac3plus else EMPTY;
 
 const sceUsbstor = struct {
     pub extern fn sceUsbstorGetStatus() callconv(.C) void;
 
 };
 
-pub usingnamespace if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "include_sceUsbstor") and options.include_sceUsbstor)) sceUsbstor else EMPTY;
+pub usingnamespace if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "sceUsbstor") and options.sceUsbstor)) sceUsbstor else EMPTY;
 
 const sceUtility = struct {
     /// Init the game sharing
@@ -5191,7 +5191,7 @@ const sceUtility = struct {
 
 };
 
-pub usingnamespace if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "include_sceUtility") and options.include_sceUtility)) sceUtility else EMPTY;
+pub usingnamespace if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "sceUtility") and options.sceUtility)) sceUtility else EMPTY;
 
 const sceUtility_netparam_internal = struct {
     /// Create a new Network Configuration
@@ -5220,5 +5220,5 @@ const sceUtility_netparam_internal = struct {
 
 };
 
-pub usingnamespace if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "include_sceUtility_netparam_internal") and options.include_sceUtility_netparam_internal)) sceUtility_netparam_internal else EMPTY;
+pub usingnamespace if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "sceUtility_netparam_internal") and options.sceUtility_netparam_internal)) sceUtility_netparam_internal else EMPTY;
 

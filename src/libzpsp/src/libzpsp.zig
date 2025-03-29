@@ -4,7 +4,7 @@ const options = @import("libzpsp_option");
 comptime {
     @setEvalBranchQuota(1000000);
 
-    if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "include_scePower") and options.include_scePower)) {
+    if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "scePower") and options.scePower)) {
         asm(macro.import_module_start("scePower", "0x40010000", "46"));
         asm(macro.import_function("scePower", "0x2B51FE2F", "scePowerGetWlanActivity"));
         asm(macro.import_function("scePower", "0x442BFBAC", "scePowerGetBacklightMaximum"));
@@ -54,7 +54,7 @@ comptime {
         asm(macro.import_function("scePower", "0x737486F2", "scePowerSetClockFrequency"));
     }
 
-    if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "include_sceVideocodec") and options.include_sceVideocodec)) {
+    if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "sceVideocodec") and options.sceVideocodec)) {
         asm(macro.import_module_start("sceVideocodec", "0x40010011", "11"));
         asm(macro.import_function("sceVideocodec", "0x17099F0A", "sceVideocodecInit"));
         asm(macro.import_function("sceVideocodec", "0x26927D19", "sceVideocodecGetVersion"));
@@ -69,7 +69,7 @@ comptime {
         asm(macro.import_function("sceVideocodec", "0xDBA273FA", "sceVideocodecDecode"));
     }
 
-    if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "include_sceNetInet") and options.include_sceNetInet)) {
+    if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "sceNetInet") and options.sceNetInet)) {
         asm(macro.import_module_start("sceNetInet", "0x00090000", "30"));
         asm(macro.import_function("sceNetInet", "0x17943399", "sceNetInetInit"));
         asm(macro.import_function("sceNetInet", "0xA9ED66B9", "sceNetInetTerm"));
@@ -104,7 +104,7 @@ comptime {
         asm(macro.import_function("sceNetInet", "0xE30B8C19", "sceNetInetInetPton"));
     }
 
-    if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "include_sceNetApctl") and options.include_sceNetApctl)) {
+    if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "sceNetApctl") and options.sceNetApctl)) {
         asm(macro.import_module_start("sceNetApctl", "0x00090000", "8"));
         asm(macro.import_function("sceNetApctl", "0xE2F91F9B", "sceNetApctlInit"));
         asm(macro.import_function("sceNetApctl", "0xB3EDD0EC", "sceNetApctlTerm"));
@@ -116,7 +116,7 @@ comptime {
         asm(macro.import_function("sceNetApctl", "0x5DEAC81B", "sceNetApctlGetState"));
     }
 
-    if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "include_sceHttp") and options.include_sceHttp)) {
+    if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "sceHttp") and options.sceHttp)) {
         asm(macro.import_module_start("sceHttp", "0x00090011", "83"));
         asm(macro.import_function("sceHttp", "0x0282A3BD", "sceHttpGetContentLength"));
         asm(macro.import_function("sceHttp", "0x03D9526F", "sceHttpSetResolveRetry"));
@@ -206,7 +206,7 @@ comptime {
         asm(macro.import_function("sceHttp", "0xFCF8C055", "sceHttpDeleteTemplate"));
     }
 
-    if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "include_sceNet") and options.include_sceNet)) {
+    if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "sceNet") and options.sceNet)) {
         asm(macro.import_module_start("sceNet", "0x00090000", "8"));
         asm(macro.import_function("sceNet", "0x39AF39A6", "sceNetInit_stub"));
         asm(macro.generic_abi_wrapper("sceNetInit", 5));
@@ -219,7 +219,7 @@ comptime {
         asm(macro.import_function("sceNet", "0xCC393E48", "sceNetGetMallocStat"));
     }
 
-    if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "include_sceNetResolver") and options.include_sceNetResolver)) {
+    if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "sceNetResolver") and options.sceNetResolver)) {
         asm(macro.import_module_start("sceNetResolver", "0x00090000", "7"));
         asm(macro.import_function("sceNetResolver", "0xF3370E61", "sceNetResolverInit"));
         asm(macro.import_function("sceNetResolver", "0x6138194A", "sceNetResolverTerm"));
@@ -232,7 +232,7 @@ comptime {
         asm(macro.import_function("sceNetResolver", "0x808F6063", "sceNetResolverStop"));
     }
 
-    if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "include_sceNet_lib") and options.include_sceNet_lib)) {
+    if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "sceNet_lib") and options.sceNet_lib)) {
         asm(macro.import_module_start("sceNet_lib", "0x00090000", "96"));
         asm(macro.import_function("sceNet_lib", "0x3B617AA0", "sceNet_lib_3B617AA0"));
         asm(macro.import_function("sceNet_lib", "0xDB88F458", "sceNet_lib_DB88F458"));
@@ -332,7 +332,7 @@ comptime {
         asm(macro.import_function("sceNet_lib", "0x5505D820", "sceNet_lib_5505D820"));
     }
 
-    if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "include_sceNetAdhocctl") and options.include_sceNetAdhocctl)) {
+    if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "sceNetAdhocctl") and options.sceNetAdhocctl)) {
         asm(macro.import_module_start("sceNetAdhocctl", "0x00090000", "21"));
         asm(macro.import_function("sceNetAdhocctl", "0xE26F226E", "sceNetAdhocctlInit"));
         asm(macro.import_function("sceNetAdhocctl", "0x9D689E13", "sceNetAdhocctlTerm"));
@@ -358,7 +358,7 @@ comptime {
         asm(macro.import_function("sceNetAdhocctl", "0x8DB83FDC", "sceNetAdhocctlGetPeerInfo"));
     }
 
-    if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "include_sceNetAdhocMatching") and options.include_sceNetAdhocMatching)) {
+    if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "sceNetAdhocMatching") and options.sceNetAdhocMatching)) {
         asm(macro.import_module_start("sceNetAdhocMatching", "0x00090000", "16"));
         asm(macro.import_function("sceNetAdhocMatching", "0x2A2A1E07", "sceNetAdhocMatchingInit"));
         asm(macro.import_function("sceNetAdhocMatching", "0x7945ECDA", "sceNetAdhocMatchingTerm"));
@@ -380,7 +380,7 @@ comptime {
         asm(macro.import_function("sceNetAdhocMatching", "0xEC19337D", "sceNetAdhocMatchingAbortSendData"));
     }
 
-    if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "include_sceNetAdhoc") and options.include_sceNetAdhoc)) {
+    if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "sceNetAdhoc") and options.sceNetAdhoc)) {
         asm(macro.import_module_start("sceNetAdhoc", "0x00090000", "25"));
         asm(macro.import_function("sceNetAdhoc", "0xE1D621D7", "sceNetAdhocInit"));
         asm(macro.import_function("sceNetAdhoc", "0xA62C6F57", "sceNetAdhocTerm"));
@@ -416,7 +416,7 @@ comptime {
         asm(macro.import_function("sceNetAdhoc", "0x0B2228E9", "sceNetAdhocGameModeDeleteReplica"));
     }
 
-    if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "include_sceSsl") and options.include_sceSsl)) {
+    if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "sceSsl") and options.sceSsl)) {
         asm(macro.import_module_start("sceSsl", "0x00090011", "11"));
         asm(macro.import_function("sceSsl", "0x058D21C0", "sceSslGetNameEntryCount"));
         asm(macro.import_function("sceSsl", "0x0EB43B06", "sceSslGetUsedMemoryCurrent"));
@@ -431,7 +431,7 @@ comptime {
         asm(macro.import_function("sceSsl", "0xD6D097B4", "sceSslGetNameEntryInfo"));
     }
 
-    if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "include_sceJpeg") and options.include_sceJpeg)) {
+    if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "sceJpeg") and options.sceJpeg)) {
         asm(macro.import_module_start("sceJpeg", "0x00090000", "13"));
         asm(macro.import_function("sceJpeg", "0x0425B986", "sceJpeg_0425B986"));
         asm(macro.import_function("sceJpeg", "0x04B5AE02", "sceJpegMJpegCsc"));
@@ -448,7 +448,7 @@ comptime {
         asm(macro.import_function("sceJpeg", "0xAC9E70E6", "sceJpegInitMJpeg"));
     }
 
-    if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "include_sceMpegbase") and options.include_sceMpegbase)) {
+    if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "sceMpegbase") and options.sceMpegbase)) {
         asm(macro.import_module_start("sceMpegbase", "0x00090000", "9"));
         asm(macro.import_function("sceMpegbase", "0xBE45C284", "sceMpegBaseYCrCbCopyVme"));
         asm(macro.import_function("sceMpegbase", "0x492B5E4B", "sceMpegBaseCscInit"));
@@ -461,7 +461,7 @@ comptime {
         asm(macro.import_function("sceMpegbase", "0xBEA18F91", "sceMpegbase_BEA18F91"));
     }
 
-    if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "include_sceMpeg") and options.include_sceMpeg)) {
+    if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "sceMpeg") and options.sceMpeg)) {
         asm(macro.import_module_start("sceMpeg", "0x00090000", "38"));
         asm(macro.import_function("sceMpeg", "0x21FF80E4", "sceMpegQueryStreamOffset"));
         asm(macro.import_function("sceMpeg", "0x611E9E11", "sceMpegQueryStreamSize"));
@@ -506,7 +506,7 @@ comptime {
         asm(macro.import_function("sceMpeg", "0x988E9E12", "sceMpeg_988E9E12"));
     }
 
-    if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "include_sceHprm") and options.include_sceHprm)) {
+    if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "sceHprm") and options.sceHprm)) {
         asm(macro.import_module_start("sceHprm", "0x40010000", "8"));
         asm(macro.import_function("sceHprm", "0xC7154136", "sceHprmRegisterCallback"));
         asm(macro.import_function("sceHprm", "0x444ED0B7", "sceHprmUnregisterCallback"));
@@ -518,7 +518,7 @@ comptime {
         asm(macro.import_function("sceHprm", "0x40D2F9F0", "sceHprmReadLatch"));
     }
 
-    if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "include_sceUmdUser") and options.include_sceUmdUser)) {
+    if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "sceUmdUser") and options.sceUmdUser)) {
         asm(macro.import_module_start("sceUmdUser", "0x40010011", "14"));
         asm(macro.import_function("sceUmdUser", "0x20628E6F", "sceUmdGetErrorStat"));
         asm(macro.import_function("sceUmdUser", "0x340B7686", "sceUmdGetDiscInfo"));
@@ -536,7 +536,7 @@ comptime {
         asm(macro.import_function("sceUmdUser", "0xE83742BA", "sceUmdDeactivate"));
     }
 
-    if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "include_sceCtrl") and options.include_sceCtrl)) {
+    if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "sceCtrl") and options.sceCtrl)) {
         asm(macro.import_module_start("sceCtrl", "0x40010000", "16"));
         asm(macro.import_function("sceCtrl", "0x6A2774F3", "sceCtrlSetSamplingCycle"));
         asm(macro.import_function("sceCtrl", "0x02BAAD91", "sceCtrlGetSamplingCycle"));
@@ -556,7 +556,7 @@ comptime {
         asm(macro.import_function("sceCtrl", "0x687660FA", "sceCtrlGetIdleCancelThreshold"));
     }
 
-    if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "include_LoadExecForUser") and options.include_LoadExecForUser)) {
+    if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "LoadExecForUser") and options.LoadExecForUser)) {
         asm(macro.import_module_start("LoadExecForUser", "0x40010000", "4"));
         asm(macro.import_function("LoadExecForUser", "0xBD2F1094", "sceKernelLoadExec"));
         asm(macro.import_function("LoadExecForUser", "0x2AC9954B", "sceKernelExitGameWithStatus"));
@@ -564,7 +564,7 @@ comptime {
         asm(macro.import_function("LoadExecForUser", "0x4AC57943", "sceKernelRegisterExitCallback"));
     }
 
-    if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "include_Kernel_Library") and options.include_Kernel_Library)) {
+    if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "Kernel_Library") and options.Kernel_Library)) {
         asm(macro.import_module_start("Kernel_Library", "0x00010000", "8"));
         asm(macro.import_function("Kernel_Library", "0x092968F4", "sceKernelCpuSuspendIntr"));
         asm(macro.import_function("Kernel_Library", "0x5F10D406", "sceKernelCpuResumeIntr"));
@@ -576,7 +576,7 @@ comptime {
         asm(macro.import_function("Kernel_Library", "0xDC692EE3", "sceKernelTryLockLwMutex"));
     }
 
-    if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "include_sceImpose") and options.include_sceImpose)) {
+    if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "sceImpose") and options.sceImpose)) {
         asm(macro.import_module_start("sceImpose", "0x40010011", "15"));
         asm(macro.import_function("sceImpose", "0x0F341BE4", "sceImposeGetHomePopup"));
         asm(macro.import_function("sceImpose", "0x24FD7BCF", "sceImposeGetLanguageMode"));
@@ -595,7 +595,7 @@ comptime {
         asm(macro.import_function("sceImpose", "0xFF1A2F07", "sceImpose_FF1A2F07"));
     }
 
-    if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "include_SysMemUserForUser") and options.include_SysMemUserForUser)) {
+    if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "SysMemUserForUser") and options.SysMemUserForUser)) {
         asm(macro.import_module_start("SysMemUserForUser", "0x40000000", "9"));
         asm(macro.import_function("SysMemUserForUser", "0xA291F107", "sceKernelMaxFreeMemSize"));
         asm(macro.import_function("SysMemUserForUser", "0xF919F628", "sceKernelTotalFreeMemSize"));
@@ -609,7 +609,7 @@ comptime {
         asm(macro.import_function("SysMemUserForUser", "0xFC114573", "sceKernelGetCompiledSdkVersion"));
     }
 
-    if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "include_sceSuspendForUser") and options.include_sceSuspendForUser)) {
+    if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "sceSuspendForUser") and options.sceSuspendForUser)) {
         asm(macro.import_module_start("sceSuspendForUser", "0x40000000", "6"));
         asm(macro.import_function("sceSuspendForUser", "0xEADB1BD7", "sceKernelPowerLock"));
         asm(macro.import_function("sceSuspendForUser", "0x3AEE7261", "sceKernelPowerUnlock"));
@@ -619,7 +619,7 @@ comptime {
         asm(macro.import_function("sceSuspendForUser", "0xA569E425", "sceKernelVolatileMemUnlock"));
     }
 
-    if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "include_ModuleMgrForUser") and options.include_ModuleMgrForUser)) {
+    if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "ModuleMgrForUser") and options.ModuleMgrForUser)) {
         asm(macro.import_module_start("ModuleMgrForUser", "0x40010000", "12"));
         asm(macro.import_function("ModuleMgrForUser", "0xB7F46618", "sceKernelLoadModuleByID"));
         asm(macro.import_function("ModuleMgrForUser", "0x977DE386", "sceKernelLoadModule"));
@@ -637,7 +637,7 @@ comptime {
         asm(macro.import_function("ModuleMgrForUser", "0xD8B73127", "sceKernelGetModuleIdByAddress"));
     }
 
-    if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "include_IoFileMgrForUser") and options.include_IoFileMgrForUser)) {
+    if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "IoFileMgrForUser") and options.IoFileMgrForUser)) {
         asm(macro.import_module_start("IoFileMgrForUser", "0x40010000", "36"));
         asm(macro.import_function("IoFileMgrForUser", "0x3251EA56", "sceIoPollAsync"));
         asm(macro.import_function("IoFileMgrForUser", "0xE23EEC33", "sceIoWaitAsync"));
@@ -681,7 +681,7 @@ comptime {
         asm(macro.import_function("IoFileMgrForUser", "0xE8BC6571", "sceIoCancel"));
     }
 
-    if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "include_UtilsForUser") and options.include_UtilsForUser)) {
+    if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "UtilsForUser") and options.UtilsForUser)) {
         asm(macro.import_module_start("UtilsForUser", "0x40010000", "26"));
         asm(macro.import_function("UtilsForUser", "0xBFA98062", "sceKernelDcacheInvalidateRange"));
         asm(macro.import_function("UtilsForUser", "0xC8186A58", "sceKernelUtilsMd5Digest"));
@@ -711,7 +711,7 @@ comptime {
         asm(macro.import_function("UtilsForUser", "0xC2DF770E", "sceKernelIcacheInvalidateRange"));
     }
 
-    if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "include_InterruptManager") and options.include_InterruptManager)) {
+    if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "InterruptManager") and options.InterruptManager)) {
         asm(macro.import_module_start("InterruptManager", "0x40000000", "9"));
         asm(macro.import_function("InterruptManager", "0xCA04A2B9", "sceKernelRegisterSubIntrHandler"));
         asm(macro.import_function("InterruptManager", "0xD61E6961", "sceKernelReleaseSubIntrHandler"));
@@ -724,7 +724,7 @@ comptime {
         asm(macro.import_function("InterruptManager", "0xEEE43F47", "sceKernelRegisterUserSpaceIntrStack"));
     }
 
-    if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "include_ThreadManForUser") and options.include_ThreadManForUser)) {
+    if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "ThreadManForUser") and options.ThreadManForUser)) {
         asm(macro.import_module_start("ThreadManForUser", "0x40010000", "128"));
         asm(macro.import_function("ThreadManForUser", "0x6E9EA350", "_sceKernelReturnFromCallback"));
         asm(macro.import_function("ThreadManForUser", "0x0C106E53", "sceKernelRegisterThreadEventHandler_stub"));
@@ -871,7 +871,7 @@ comptime {
         asm(macro.generic_abi_wrapper("sceKernelCreateLwMutex", 5));
     }
 
-    if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "include_StdioForUser") and options.include_StdioForUser)) {
+    if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "StdioForUser") and options.StdioForUser)) {
         asm(macro.import_module_start("StdioForUser", "0x40010000", "9"));
         asm(macro.import_function("StdioForUser", "0x3054D478", "sceKernelStdioRead"));
         asm(macro.import_function("StdioForUser", "0x0CBB0571", "sceKernelStdioLseek"));
@@ -884,7 +884,7 @@ comptime {
         asm(macro.import_function("StdioForUser", "0xF78BA90A", "sceKernelStderr"));
     }
 
-    if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "include_sceUsbCam") and options.include_sceUsbCam)) {
+    if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "sceUsbCam") and options.sceUsbCam)) {
         asm(macro.import_module_start("sceUsbCam", "0x40090000", "54"));
         asm(macro.import_function("sceUsbCam", "0x03ED7A82", "sceUsbCamSetupMic"));
         asm(macro.import_function("sceUsbCam", "0x08AEE98A", "sceUsbCamSetMicGain"));
@@ -942,7 +942,7 @@ comptime {
         asm(macro.import_function("sceUsbCam", "0xFDB68C23", "sceUsbCamGetSharpness"));
     }
 
-    if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "include_sceUsb") and options.include_sceUsb)) {
+    if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "sceUsb") and options.sceUsb)) {
         asm(macro.import_module_start("sceUsb", "0x40010000", "9"));
         asm(macro.import_function("sceUsb", "0xAE5DE6AF", "sceUsbStart"));
         asm(macro.import_function("sceUsb", "0xC2464FA0", "sceUsbStop"));
@@ -955,18 +955,18 @@ comptime {
         asm(macro.import_function("sceUsb", "0x1C360735", "sceUsbWaitCancel"));
     }
 
-    if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "include_sceDmac") and options.include_sceDmac)) {
+    if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "sceDmac") and options.sceDmac)) {
         asm(macro.import_module_start("sceDmac", "0x40010011", "2"));
         asm(macro.import_function("sceDmac", "0x617F3FE6", "sceDmacMemcpy"));
         asm(macro.import_function("sceDmac", "0xD97F94D8", "sceDmacTryMemcpy"));
     }
 
-    if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "include_sceSircs") and options.include_sceSircs)) {
+    if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "sceSircs") and options.sceSircs)) {
         asm(macro.import_module_start("sceSircs", "0x40010000", "1"));
         asm(macro.import_function("sceSircs", "0x71EEF62D", "sceSircsSend"));
     }
 
-    if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "include_sceAudio") and options.include_sceAudio)) {
+    if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "sceAudio") and options.sceAudio)) {
         asm(macro.import_module_start("sceAudio", "0x40010000", "27"));
         asm(macro.import_function("sceAudio", "0x8C1009B2", "sceAudioOutput"));
         asm(macro.import_function("sceAudio", "0x136CAF51", "sceAudioOutputBlocking"));
@@ -997,7 +997,7 @@ comptime {
         asm(macro.import_function("sceAudio", "0x647CEF33", "sceAudioOutput2GetRestSample"));
     }
 
-    if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "include_sceAudiocodec") and options.include_sceAudiocodec)) {
+    if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "sceAudiocodec") and options.sceAudiocodec)) {
         asm(macro.import_module_start("sceAudiocodec", "0x40090000", "8"));
         asm(macro.import_function("sceAudiocodec", "0x9D3F790C", "sceAudiocodecCheckNeedMem"));
         asm(macro.import_function("sceAudiocodec", "0x5B37EB1D", "sceAudiocodecInit"));
@@ -1009,7 +1009,7 @@ comptime {
         asm(macro.import_function("sceAudiocodec", "0x29681260", "sceAudiocodecReleaseEDRAM"));
     }
 
-    if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "include_sceGe_user") and options.include_sceGe_user)) {
+    if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "sceGe_user") and options.sceGe_user)) {
         asm(macro.import_module_start("sceGe_user", "0x40010000", "19"));
         asm(macro.import_function("sceGe_user", "0x1F6752AD", "sceGeEdramGetSize"));
         asm(macro.import_function("sceGe_user", "0xE47E40E4", "sceGeEdramGetAddr"));
@@ -1032,7 +1032,7 @@ comptime {
         asm(macro.import_function("sceGe_user", "0x5BAA5439", "sceGeEdramSetSize"));
     }
 
-    if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "include_sceMp3") and options.include_sceMp3)) {
+    if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "sceMp3") and options.sceMp3)) {
         asm(macro.import_module_start("sceMp3", "0x00090011", "24"));
         asm(macro.import_function("sceMp3", "0x07EC321A", "sceMp3ReserveMp3Handle"));
         asm(macro.import_function("sceMp3", "0x0DB149F4", "sceMp3NotifyAddStreamData"));
@@ -1061,7 +1061,7 @@ comptime {
         asm(macro.generic_abi_wrapper("sceMp3LowLevelDecode", 5));
     }
 
-    if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "include_sceRtc") and options.include_sceRtc)) {
+    if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "sceRtc") and options.sceRtc)) {
         asm(macro.import_module_start("sceRtc", "0x40010000", "40"));
         asm(macro.import_function("sceRtc", "0xC41C2853", "sceRtcGetTickResolution"));
         asm(macro.import_function("sceRtc", "0x3F7AD767", "sceRtcGetCurrentTick"));
@@ -1105,7 +1105,7 @@ comptime {
         asm(macro.import_function("sceRtc", "0xE1C93E47", "sceRtcGetTime64_t"));
     }
 
-    if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "include_sceVaudio") and options.include_sceVaudio)) {
+    if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "sceVaudio") and options.sceVaudio)) {
         asm(macro.import_module_start("sceVaudio", "0x40090000", "8"));
         asm(macro.import_function("sceVaudio", "0x8986295E", "sceVaudioOutputBlocking"));
         asm(macro.import_function("sceVaudio", "0x03B6807D", "sceVaudioChReserve"));
@@ -1117,7 +1117,7 @@ comptime {
         asm(macro.import_function("sceVaudio", "0xE8E78DC8", "sceVaudio_E8E78DC8"));
     }
 
-    if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "include_sceReg") and options.include_sceReg)) {
+    if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "sceReg") and options.sceReg)) {
         asm(macro.import_module_start("sceReg", "0x40010000", "18"));
         asm(macro.import_function("sceReg", "0x9B25EDF1", "sceRegExit"));
         asm(macro.import_function("sceReg", "0x92E41280", "sceRegOpenRegistry"));
@@ -1140,7 +1140,7 @@ comptime {
         asm(macro.import_function("sceReg", "0x30BE0259", "sceRegGetKeyValueByName"));
     }
 
-    if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "include_sceWlanDrv_lib") and options.include_sceWlanDrv_lib)) {
+    if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "sceWlanDrv_lib") and options.sceWlanDrv_lib)) {
         asm(macro.import_module_start("sceWlanDrv_lib", "0x40010000", "18"));
         asm(macro.import_function("sceWlanDrv_lib", "0x482CAE9A", "sceWlanDevAttach"));
         asm(macro.import_function("sceWlanDrv_lib", "0xC9A8CAB7", "sceWlanDevDetach"));
@@ -1162,19 +1162,19 @@ comptime {
         asm(macro.import_function("sceWlanDrv_lib", "0x05FE320C", "sceWlanDevGetStateGPIO"));
     }
 
-    if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "include_sceWlanDrv") and options.include_sceWlanDrv)) {
+    if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "sceWlanDrv") and options.sceWlanDrv)) {
         asm(macro.import_module_start("sceWlanDrv", "0x40010000", "3"));
         asm(macro.import_function("sceWlanDrv", "0x93440B11", "sceWlanDevIsPowerOn"));
         asm(macro.import_function("sceWlanDrv", "0xD7763699", "sceWlanGetSwitchState"));
         asm(macro.import_function("sceWlanDrv", "0x0C622081", "sceWlanGetEtherAddr"));
     }
 
-    if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "include_sceOpenPSID") and options.include_sceOpenPSID)) {
+    if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "sceOpenPSID") and options.sceOpenPSID)) {
         asm(macro.import_module_start("sceOpenPSID", "0x40010011", "1"));
         asm(macro.import_function("sceOpenPSID", "0xC69BEBCE", "sceOpenPSIDGetOpenPSID"));
     }
 
-    if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "include_sceDisplay") and options.include_sceDisplay)) {
+    if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "sceDisplay") and options.sceDisplay)) {
         asm(macro.import_module_start("sceDisplay", "0x40010000", "17"));
         asm(macro.import_function("sceDisplay", "0x0E20F177", "sceDisplaySetMode"));
         asm(macro.import_function("sceDisplay", "0xDEA197D4", "sceDisplayGetMode"));
@@ -1195,7 +1195,7 @@ comptime {
         asm(macro.import_function("sceDisplay", "0x210EAB3A", "sceDisplayGetAccumulatedHcount"));
     }
 
-    if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "include_sceAtrac3plus") and options.include_sceAtrac3plus)) {
+    if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "sceAtrac3plus") and options.sceAtrac3plus)) {
         asm(macro.import_module_start("sceAtrac3plus", "0x00090000", "25"));
         asm(macro.import_function("sceAtrac3plus", "0xD1F59FDB", "sceAtracStartEntry"));
         asm(macro.import_function("sceAtrac3plus", "0xD5C28CC0", "sceAtracEndEntry"));
@@ -1225,12 +1225,12 @@ comptime {
         asm(macro.import_function("sceAtrac3plus", "0xE88F759B", "sceAtracGetInternalErrorInfo"));
     }
 
-    if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "include_sceUsbstor") and options.include_sceUsbstor)) {
+    if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "sceUsbstor") and options.sceUsbstor)) {
         asm(macro.import_module_start("sceUsbstor", "0x40090000", "1"));
         asm(macro.import_function("sceUsbstor", "0x60066CFE", "sceUsbstorGetStatus"));
     }
 
-    if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "include_sceUtility") and options.include_sceUtility)) {
+    if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "sceUtility") and options.sceUtility)) {
         asm(macro.import_module_start("sceUtility", "0x40010000", "56"));
         asm(macro.import_function("sceUtility", "0xC492F751", "sceUtilityGameSharingInitStart"));
         asm(macro.import_function("sceUtility", "0xEFC6F80F", "sceUtilityGameSharingShutdownStart"));
@@ -1290,7 +1290,7 @@ comptime {
         asm(macro.import_function("sceUtility", "0x86ABDB1B", "sceUtilityNpSigninGetStatus"));
     }
 
-    if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "include_sceUtility_netparam_internal") and options.include_sceUtility_netparam_internal)) {
+    if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "sceUtility_netparam_internal") and options.sceUtility_netparam_internal)) {
         asm(macro.import_module_start("sceUtility_netparam_internal", "0x40010000", "4"));
         asm(macro.import_function("sceUtility_netparam_internal", "0x072DEBF2", "sceUtilityCreateNetParam"));
         asm(macro.import_function("sceUtility_netparam_internal", "0x9CE50172", "sceUtilityDeleteNetParam"));
