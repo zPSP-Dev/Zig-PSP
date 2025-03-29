@@ -15,5 +15,9 @@ pub fn build(b: *std.Build) void {
         .name = "libzpsp",
         .root_module = lib_mod,
     });
+
+    _ = b.addModule("libzpsp_options", .{
+        .root_source_file = b.path("src/options.zig"),
+    });
     b.installArtifact(lib);
 }
