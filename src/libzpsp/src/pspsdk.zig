@@ -1404,7 +1404,7 @@ const sceJpeg = struct {
     /// It should have a size of (width * height * 4).
     /// `unk` - Unknown, pass 0
     /// Returns (width * 65536) + height on success, < 0 on error
-    pub extern fn sceJpegDecodeMJpeg(jpegbuf: [*c]c_int, size: SceSize, rgba: ?*anyopaque, unk: c_int) callconv(.C) c_int;
+    pub extern fn sceJpegDecodeMJpeg(jpegbuf: [*c]u8, size: SceSize, rgba: ?*anyopaque, unk: u32) callconv(.C) c_int;
 
     pub extern fn sceJpeg_227662D7() callconv(.C) void;
 
@@ -1674,17 +1674,17 @@ const sceHprm = struct {
     /// `key` - Pointer to the u32 to receive the key bitmap, should be one or
     /// more of ::PspHprmKeys
     /// Returns < 0 on error
-    pub extern fn sceHprmPeekCurrentKey(key: [*c]c_int) callconv(.C) c_int;
+    pub extern fn sceHprmPeekCurrentKey(key: [*c]u32) callconv(.C) c_int;
 
     /// Peek at the current latch data.
     /// `latch` - Pointer a to a 4 dword array to contain the latch data.
     /// Returns < 0 on error.
-    pub extern fn sceHprmPeekLatch(latch: [*c]c_int) callconv(.C) c_int;
+    pub extern fn sceHprmPeekLatch(latch: [*c]u32) callconv(.C) c_int;
 
     /// Read the current latch data.
     /// `latch` - Pointer a to a 4 dword array to contain the latch data.
     /// Returns < 0 on error.
-    pub extern fn sceHprmReadLatch(latch: [*c]c_int) callconv(.C) c_int;
+    pub extern fn sceHprmReadLatch(latch: [*c]u32) callconv(.C) c_int;
 
 };
 
@@ -1983,7 +1983,6 @@ const Kernel_Library = struct {
 
     /// Lock a lightweight mutex
     /// `workarea` - The pointer to the workarea
-    /// `name` - The name of the lightweight mutex
     /// `lockCount` - value of decrease the lock counter
     /// Returns 0 on success, otherwise one of ::PspKernelErrorCodes
     pub extern fn sceKernelUnlockLwMutex(workarea: [*c]c_int, lockCount: c_int) callconv(.C) c_int;
@@ -2530,7 +2529,7 @@ const UtilsForUser = struct {
     /// `size` - Size of the data block.
     /// `digest` - Pointer to a 16byte buffer to store the resulting digest
     /// Returns < 0 on error.
-    pub extern fn sceKernelUtilsMd5Digest(data: [*c]c_int, size: c_int, digest: [*c]c_int) callconv(.C) c_int;
+    pub extern fn sceKernelUtilsMd5Digest(data: [*c]u8, size: u32, digest: [*c]u8) callconv(.C) c_int;
 
     /// Function to initialise a MD5 digest context
     /// `ctx` - A context block to initialise
@@ -2550,20 +2549,20 @@ const UtilsForUser = struct {
     /// `data` - The data block to hash.
     /// `size` - The size of the data to hash
     /// Returns < 0 on error.
-    pub extern fn sceKernelUtilsMd5BlockUpdate(ctx: [*c]c_int, data: [*c]c_int, size: c_int) callconv(.C) c_int;
+    pub extern fn sceKernelUtilsMd5BlockUpdate(ctx: [*c]c_int, data: [*c]u8, size: u32) callconv(.C) c_int;
 
     /// Function to get the digest result of the MD5 hash.
     /// `ctx` - A filled in context block.
     /// `digest` - A 16 byte array to hold the digest.
     /// Returns < 0 on error.
-    pub extern fn sceKernelUtilsMd5BlockResult(ctx: [*c]c_int, digest: [*c]c_int) callconv(.C) c_int;
+    pub extern fn sceKernelUtilsMd5BlockResult(ctx: [*c]c_int, digest: [*c]u8) callconv(.C) c_int;
 
     /// Function to SHA1 hash a data block.
     /// `data` - The data to hash.
     /// `size` - The size of the data.
     /// `digest` - Pointer to a 20 byte array for storing the digest
     /// Returns < 0 on error.
-    pub extern fn sceKernelUtilsSha1Digest(data: [*c]c_int, size: c_int, digest: [*c]c_int) callconv(.C) c_int;
+    pub extern fn sceKernelUtilsSha1Digest(data: [*c]u8, size: u32, digest: [*c]u8) callconv(.C) c_int;
 
     /// Function to initialise a context for SHA1 hashing.
     /// `ctx` - Pointer to a context.
@@ -2583,13 +2582,13 @@ const UtilsForUser = struct {
     /// `data` - The data block to hash.
     /// `size` - The size of the data block
     /// Returns < 0 on error.
-    pub extern fn sceKernelUtilsSha1BlockUpdate(ctx: [*c]c_int, data: [*c]c_int, size: c_int) callconv(.C) c_int;
+    pub extern fn sceKernelUtilsSha1BlockUpdate(ctx: [*c]c_int, data: [*c]u8, size: u32) callconv(.C) c_int;
 
     /// Function to get the result of the SHA1 hash.
     /// `ctx` - Pointer to a prefilled context.
     /// `digest` - A pointer to a 20 byte array to contain the digest.
     /// Returns < 0 on error.
-    pub extern fn sceKernelUtilsSha1BlockResult(ctx: [*c]c_int, digest: [*c]c_int) callconv(.C) c_int;
+    pub extern fn sceKernelUtilsSha1BlockResult(ctx: [*c]c_int, digest: [*c]u8) callconv(.C) c_int;
 
     /// Function to initialise a mersenne twister context.
     /// `ctx` - Pointer to a context
@@ -2601,12 +2600,12 @@ const UtilsForUser = struct {
     /// u23 rand_val = sceKernelUtilsMt19937UInt(&ctx);
     /// `
     /// Returns < 0 on error.
-    pub extern fn sceKernelUtilsMt19937Init(ctx: [*c]c_int, seed: c_int) callconv(.C) c_int;
+    pub extern fn sceKernelUtilsMt19937Init(ctx: [*c]c_int, seed: u32) callconv(.C) c_int;
 
     /// Function to return a new psuedo random number.
     /// `ctx` - Pointer to a pre-initialised context.
     /// Returns A pseudo random number (between 0 and MAX_INT).
-    pub extern fn sceKernelUtilsMt19937UInt(ctx: [*c]c_int) callconv(.C) c_int;
+    pub extern fn sceKernelUtilsMt19937UInt(ctx: [*c]c_int) callconv(.C) u32;
 
     pub extern fn sceKernelGetGPI() callconv(.C) void;
 
@@ -2919,13 +2918,13 @@ const ThreadManForUser = struct {
     /// `evid` - The event id returned by sceKernelCreateEventFlag.
     /// `bits` - The bit pattern to set.
     /// Returns < 0 On error
-    pub extern fn sceKernelSetEventFlag(evid: SceUID, bits: c_int) callconv(.C) c_int;
+    pub extern fn sceKernelSetEventFlag(evid: SceUID, bits: u32) callconv(.C) c_int;
 
     /// Clear a event flag bit pattern
     /// `evid` - The event id returned by ::sceKernelCreateEventFlag
     /// `bits` - The bits to clean
     /// Returns < 0 on Error
-    pub extern fn sceKernelClearEventFlag(evid: SceUID, bits: c_int) callconv(.C) c_int;
+    pub extern fn sceKernelClearEventFlag(evid: SceUID, bits: u32) callconv(.C) c_int;
 
     /// Wait for an event flag for a given bit pattern.
     /// `evid` - The event id returned by sceKernelCreateEventFlag.
@@ -2934,7 +2933,7 @@ const ThreadManForUser = struct {
     /// `outBits` - The bit pattern that was matched.
     /// `timeout` - Timeout in microseconds
     /// Returns < 0 On error
-    pub extern fn sceKernelWaitEventFlag(evid: c_int, bits: c_int, wait: c_int, outBits: [*c]c_int, timeout: [*c]SceUInt) callconv(.C) c_int;
+    pub extern fn sceKernelWaitEventFlag(evid: c_int, bits: u32, wait: u32, outBits: [*c]u32, timeout: [*c]SceUInt) callconv(.C) c_int;
 
     /// Wait for an event flag for a given bit pattern with callback.
     /// `evid` - The event id returned by sceKernelCreateEventFlag.
@@ -2943,7 +2942,7 @@ const ThreadManForUser = struct {
     /// `outBits` - The bit pattern that was matched.
     /// `timeout` - Timeout in microseconds
     /// Returns < 0 On error
-    pub extern fn sceKernelWaitEventFlagCB(evid: c_int, bits: c_int, wait: c_int, outBits: [*c]c_int, timeout: [*c]SceUInt) callconv(.C) c_int;
+    pub extern fn sceKernelWaitEventFlagCB(evid: c_int, bits: u32, wait: u32, outBits: [*c]u32, timeout: [*c]SceUInt) callconv(.C) c_int;
 
     /// Poll an event flag for a given bit pattern.
     /// `evid` - The event id returned by sceKernelCreateEventFlag.
@@ -2951,7 +2950,7 @@ const ThreadManForUser = struct {
     /// `wait` - Wait type, one or more of ::PspEventFlagWaitTypes or'ed together
     /// `outBits` - The bit pattern that was matched.
     /// Returns < 0 On error
-    pub extern fn sceKernelPollEventFlag(evid: c_int, bits: c_int, wait: c_int, outBits: [*c]c_int) callconv(.C) c_int;
+    pub extern fn sceKernelPollEventFlag(evid: c_int, bits: u32, wait: u32, outBits: [*c]u32) callconv(.C) c_int;
 
     pub extern fn sceKernelCancelEventFlag() callconv(.C) void;
 
@@ -3547,9 +3546,9 @@ const ThreadManForUser = struct {
     /// `name` - The name of the lightweight mutex
     /// `attr` - The LwMutex attributes, zero or more of ::PspLwMutexAttributes.
     /// `initialCount` - THe inital value of the mutex
-    /// `optionsPTr` - Other optioons for mutex
+    /// `optionsPtr` - Other options for mutex
     /// Returns 0 on success, otherwise one of ::PspKernelErrorCodes
-    pub extern fn sceKernelCreateLwMutex(workarea: [*c]c_int, name: [*c]const c_char, attr: SceUInt32, initialCount: c_int, optionsPtr: [*c]c_int) callconv(.C) c_int;
+    pub extern fn sceKernelCreateLwMutex(workarea: [*c]c_int, name: [*c]const c_char, attr: SceUInt32, initialCount: c_int, optionsPtr: [*c]u32) callconv(.C) c_int;
 
 };
 
@@ -3673,7 +3672,7 @@ const sceUsbCam = struct {
     /// `buf` - The buffer that receives the image jpeg data
     /// `size` - The size of the buffer.
     /// Returns size of acquired image on success, < 0 on error
-    pub extern fn sceUsbCamStillInputBlocking(buf: [*c]c_int, size: SceSize) callconv(.C) c_int;
+    pub extern fn sceUsbCamStillInputBlocking(buf: [*c]u8, size: SceSize) callconv(.C) c_int;
 
     /// Sets the sharpness
     /// `sharpness` - The sharpness (0-255)
@@ -3705,7 +3704,7 @@ const sceUsbCam = struct {
     /// `buf` - The buffer that receives the frame jpeg data
     /// `size` - The size of the buffer.
     /// Returns size of acquired frame on success, < 0 on error
-    pub extern fn sceUsbCamReadVideoFrameBlocking(buf: [*c]c_int, size: SceSize) callconv(.C) c_int;
+    pub extern fn sceUsbCamReadVideoFrameBlocking(buf: [*c]u8, size: SceSize) callconv(.C) c_int;
 
     pub extern fn sceUsbCamStartMic() callconv(.C) void;
 
@@ -3732,7 +3731,7 @@ const sceUsbCam = struct {
     /// `buf` - The buffer that receives the frame jpeg data
     /// `size` - The size of the buffer.
     /// Returns size of acquired frame on success, < 0 on error
-    pub extern fn sceUsbCamReadVideoFrame(buf: [*c]c_int, size: SceSize) callconv(.C) c_int;
+    pub extern fn sceUsbCamReadVideoFrame(buf: [*c]u8, size: SceSize) callconv(.C) c_int;
 
     /// Gets the current zoom.
     /// `zoom` - pointer to a variable that receives the current zoom
@@ -3811,7 +3810,7 @@ const sceUsbCam = struct {
     /// `buf` - The buffer that receives the image jpeg data
     /// `size` - The size of the buffer.
     /// Returns size of acquired image on success, < 0 on error
-    pub extern fn sceUsbCamStillInput(buf: [*c]c_int, size: SceSize) callconv(.C) c_int;
+    pub extern fn sceUsbCamStillInput(buf: [*c]u8, size: SceSize) callconv(.C) c_int;
 
     /// Gets the current sharpness
     /// `sharpness` - pointer to a variable that receives the current sharpness
@@ -3841,7 +3840,7 @@ const sceUsb = struct {
     /// Returns OR'd PSP_USB_* constants
     pub extern fn sceUsbGetState() callconv(.C) c_int;
 
-    pub extern fn sceUsbGetDrvList(r4one: c_int, r5ret: [*c]c_int, r6one: c_int) callconv(.C) c_int;
+    pub extern fn sceUsbGetDrvList(r4one: u32, r5ret: [*c]u32, r6one: u32) callconv(.C) c_int;
 
     /// Get state of a specific USB driver
     /// `driverName` - name of USB driver to get status from
@@ -3851,14 +3850,14 @@ const sceUsb = struct {
     /// Activate a USB driver.
     /// `pid` - Product ID for the default USB Driver
     /// Returns 0 on success
-    pub extern fn sceUsbActivate(pid: c_int) callconv(.C) c_int;
+    pub extern fn sceUsbActivate(pid: u32) callconv(.C) c_int;
 
     /// Deactivate USB driver.
     /// `pid` - Product ID for the default USB driver
     /// Returns 0 on success
-    pub extern fn sceUsbDeactivate(pid: c_int) callconv(.C) c_int;
+    pub extern fn sceUsbDeactivate(pid: u32) callconv(.C) c_int;
 
-    pub extern fn sceUsbWaitState(state: c_int, waitmode: c_int, timeout: [*c]c_int) callconv(.C) c_int;
+    pub extern fn sceUsbWaitState(state: u32, waitmode: c_int, timeout: [*c]u32) callconv(.C) c_int;
 
     pub extern fn sceUsbWaitCancel() callconv(.C) c_int;
 
@@ -4319,12 +4318,12 @@ pub usingnamespace if ((@hasDecl(options, "everything") and options.everything) 
 const sceRtc = struct {
     /// Get the resolution of the tick counter
     /// Returns # of ticks per second
-    pub extern fn sceRtcGetTickResolution() callconv(.C) c_int;
+    pub extern fn sceRtcGetTickResolution() callconv(.C) u32;
 
     /// Get current tick count
     /// `tick` - pointer to u64 to receive tick count
     /// Returns 0 on success, < 0 on error
-    pub extern fn sceRtcGetCurrentTick(tick: [*c]c_int) callconv(.C) c_int;
+    pub extern fn sceRtcGetCurrentTick(tick: [*c]u64) callconv(.C) c_int;
 
     pub extern fn sceRtc_029CA3B3() callconv(.C) void;
 
@@ -4343,13 +4342,13 @@ const sceRtc = struct {
     /// `tickUTC` - pointer to u64 tick in UTC time
     /// `tickLocal` - pointer to u64 to receive tick in local time
     /// Returns 0 on success, < 0 on error
-    pub extern fn sceRtcConvertUtcToLocalTime(tickUTC: [*c]const c_int, tickLocal: [*c]c_int) callconv(.C) c_int;
+    pub extern fn sceRtcConvertUtcToLocalTime(tickUTC: [*c]const u64, tickLocal: [*c]u64) callconv(.C) c_int;
 
     /// Convert a local time based tickcount into a UTC-based tick count
     /// `tickLocal` - pointer to u64 tick in local time
     /// `tickUTC` - pointer to u64 to receive tick in UTC based time
     /// Returns 0 on success, < 0 on error
-    pub extern fn sceRtcConvertLocalTimeToUTC(tickLocal: [*c]const c_int, tickUTC: [*c]c_int) callconv(.C) c_int;
+    pub extern fn sceRtcConvertLocalTimeToUTC(tickLocal: [*c]const u64, tickUTC: [*c]u64) callconv(.C) c_int;
 
     /// Check if a year is a leap year
     /// `year` - year to check if is a leap year
@@ -4378,19 +4377,19 @@ const sceRtc = struct {
 
     pub extern fn sceRtcGetTime_t(date: [*c]const c_int, time: [*c]c_int) callconv(.C) c_int;
 
-    pub extern fn sceRtcSetDosTime(date: [*c]c_int, dosTime: c_int) callconv(.C) c_int;
+    pub extern fn sceRtcSetDosTime(date: [*c]c_int, dosTime: u32) callconv(.C) c_int;
 
-    pub extern fn sceRtcGetDosTime(date: [*c]c_int, dosTime: c_int) callconv(.C) c_int;
+    pub extern fn sceRtcGetDosTime(date: [*c]c_int, dosTime: u32) callconv(.C) c_int;
 
-    pub extern fn sceRtcSetWin32FileTime(date: [*c]c_int, win32Time: [*c]c_int) callconv(.C) c_int;
+    pub extern fn sceRtcSetWin32FileTime(date: [*c]c_int, win32Time: [*c]u64) callconv(.C) c_int;
 
-    pub extern fn sceRtcGetWin32FileTime(date: [*c]c_int, win32Time: [*c]c_int) callconv(.C) c_int;
+    pub extern fn sceRtcGetWin32FileTime(date: [*c]c_int, win32Time: [*c]u64) callconv(.C) c_int;
 
     /// Set a ScePspDateTime struct based on ticks
     /// `date` - pointer to ScePspDateTime struct to set
     /// `tick` - pointer to ticks to convert
     /// Returns 0 on success, < 0 on error
-    pub extern fn sceRtcSetTick(date: [*c]c_int, tick: [*c]const c_int) callconv(.C) c_int;
+    pub extern fn sceRtcSetTick(date: [*c]c_int, tick: [*c]const u64) callconv(.C) c_int;
 
     /// Set ticks based on a ScePspDateTime struct
     /// `date` - pointer to ScePspDateTime to convert
@@ -4398,93 +4397,93 @@ const sceRtc = struct {
     /// Returns 0 on success, < 0 on error
     /// Get the resolution of the tick counter
     /// Returns # of ticks per second
-    pub extern fn sceRtcGetTick(date: [*c]const c_int, tick: [*c]c_int) callconv(.C) c_int;
+    pub extern fn sceRtcGetTick(date: [*c]const c_int, tick: [*c]u64) callconv(.C) c_int;
 
     /// Compare two ticks
     /// `tick1` - pointer to first tick
     /// `tick2` - poiinter to second tick
     /// Returns 0 on equal, <0 when tick1 < tick2, >0 when tick1 > tick2
-    pub extern fn sceRtcCompareTick(tick1: [*c]const c_int, tick2: [*c]const c_int) callconv(.C) c_int;
+    pub extern fn sceRtcCompareTick(tick1: [*c]const u64, tick2: [*c]const u64) callconv(.C) c_int;
 
     /// Add two ticks
     /// `destTick` - pointer to tick to hold result
     /// `srcTick` - pointer to source tick
     /// `numTicks` - number of ticks to add
     /// Returns 0 on success, <0 on error
-    pub extern fn sceRtcTickAddTicks(destTick: [*c]c_int, srcTick: [*c]const c_int, numTicks: c_int) callconv(.C) c_int;
+    pub extern fn sceRtcTickAddTicks(destTick: [*c]u64, srcTick: [*c]const u64, numTicks: u64) callconv(.C) c_int;
 
     /// Add an amount of ms to a tick
     /// `destTick` - pointer to tick to hold result
     /// `srcTick` - pointer to source tick
     /// `numMS` - number of ms to add
     /// Returns 0 on success, <0 on error
-    pub extern fn sceRtcTickAddMicroseconds(destTick: [*c]c_int, srcTick: [*c]const c_int, numMS: c_int) callconv(.C) c_int;
+    pub extern fn sceRtcTickAddMicroseconds(destTick: [*c]u64, srcTick: [*c]const u64, numMS: u64) callconv(.C) c_int;
 
     /// Add an amount of seconds to a tick
     /// `destTick` - pointer to tick to hold result
     /// `srcTick` - pointer to source tick
     /// `numSecs` - number of seconds to add
     /// Returns 0 on success, <0 on error
-    pub extern fn sceRtcTickAddSeconds(destTick: [*c]c_int, srcTick: [*c]const c_int, numSecs: c_int) callconv(.C) c_int;
+    pub extern fn sceRtcTickAddSeconds(destTick: [*c]u64, srcTick: [*c]const u64, numSecs: u64) callconv(.C) c_int;
 
     /// Add an amount of minutes to a tick
     /// `destTick` - pointer to tick to hold result
     /// `srcTick` - pointer to source tick
     /// `numMins` - number of minutes to add
     /// Returns 0 on success, <0 on error
-    pub extern fn sceRtcTickAddMinutes(destTick: [*c]c_int, srcTick: [*c]const c_int, numMins: c_int) callconv(.C) c_int;
+    pub extern fn sceRtcTickAddMinutes(destTick: [*c]u64, srcTick: [*c]const u64, numMins: u64) callconv(.C) c_int;
 
     /// Add an amount of hours to a tick
     /// `destTick` - pointer to tick to hold result
     /// `srcTick` - pointer to source tick
     /// `numHours` - number of hours to add
     /// Returns 0 on success, <0 on error
-    pub extern fn sceRtcTickAddHours(destTick: [*c]c_int, srcTick: [*c]const c_int, numHours: c_int) callconv(.C) c_int;
+    pub extern fn sceRtcTickAddHours(destTick: [*c]u64, srcTick: [*c]const u64, numHours: c_int) callconv(.C) c_int;
 
     /// Add an amount of days to a tick
     /// `destTick` - pointer to tick to hold result
     /// `srcTick` - pointer to source tick
     /// `numDays` - number of days to add
     /// Returns 0 on success, <0 on error
-    pub extern fn sceRtcTickAddDays(destTick: [*c]c_int, srcTick: [*c]const c_int, numDays: c_int) callconv(.C) c_int;
+    pub extern fn sceRtcTickAddDays(destTick: [*c]u64, srcTick: [*c]const u64, numDays: c_int) callconv(.C) c_int;
 
     /// Add an amount of weeks to a tick
     /// `destTick` - pointer to tick to hold result
     /// `srcTick` - pointer to source tick
     /// `numWeeks` - number of weeks to add
     /// Returns 0 on success, <0 on error
-    pub extern fn sceRtcTickAddWeeks(destTick: [*c]c_int, srcTick: [*c]const c_int, numWeeks: c_int) callconv(.C) c_int;
+    pub extern fn sceRtcTickAddWeeks(destTick: [*c]u64, srcTick: [*c]const u64, numWeeks: c_int) callconv(.C) c_int;
 
     /// Add an amount of months to a tick
     /// `destTick` - pointer to tick to hold result
     /// `srcTick` - pointer to source tick
     /// `numMonths` - number of months to add
     /// Returns 0 on success, <0 on error
-    pub extern fn sceRtcTickAddMonths(destTick: [*c]c_int, srcTick: [*c]const c_int, numMonths: c_int) callconv(.C) c_int;
+    pub extern fn sceRtcTickAddMonths(destTick: [*c]u64, srcTick: [*c]const u64, numMonths: c_int) callconv(.C) c_int;
 
     /// Add an amount of years to a tick
     /// `destTick` - pointer to tick to hold result
     /// `srcTick` - pointer to source tick
     /// `numYears` - number of years to add
     /// Returns 0 on success, <0 on error
-    pub extern fn sceRtcTickAddYears(destTick: [*c]c_int, srcTick: [*c]const c_int, numYears: c_int) callconv(.C) c_int;
+    pub extern fn sceRtcTickAddYears(destTick: [*c]u64, srcTick: [*c]const u64, numYears: c_int) callconv(.C) c_int;
 
     /// Format Tick-representation UTC time in RFC2822 format
-    pub extern fn sceRtcFormatRFC2822(pszDateTime: [*c]c_char, pUtc: [*c]const c_int, iTimeZoneMinutes: c_int) callconv(.C) c_int;
+    pub extern fn sceRtcFormatRFC2822(pszDateTime: [*c]c_char, pUtc: [*c]const u64, iTimeZoneMinutes: c_int) callconv(.C) c_int;
 
     /// Format Tick-representation UTC time in RFC2822 format
-    pub extern fn sceRtcFormatRFC2822LocalTime(pszDateTime: [*c]c_char, pUtc: [*c]const c_int) callconv(.C) c_int;
+    pub extern fn sceRtcFormatRFC2822LocalTime(pszDateTime: [*c]c_char, pUtc: [*c]const u64) callconv(.C) c_int;
 
     /// Format Tick-representation UTC time in RFC3339(ISO8601) format
-    pub extern fn sceRtcFormatRFC3339(pszDateTime: [*c]c_char, pUtc: [*c]const c_int, iTimeZoneMinutes: c_int) callconv(.C) c_int;
+    pub extern fn sceRtcFormatRFC3339(pszDateTime: [*c]c_char, pUtc: [*c]const u64, iTimeZoneMinutes: c_int) callconv(.C) c_int;
 
     /// Format Tick-representation UTC time in RFC3339(ISO8601) format
-    pub extern fn sceRtcFormatRFC3339LocalTime(pszDateTime: [*c]c_char, pUtc: [*c]const c_int) callconv(.C) c_int;
+    pub extern fn sceRtcFormatRFC3339LocalTime(pszDateTime: [*c]c_char, pUtc: [*c]const u64) callconv(.C) c_int;
 
-    pub extern fn sceRtcParseDateTime(destTick: [*c]c_int, dateString: [*c]const c_char) callconv(.C) c_int;
+    pub extern fn sceRtcParseDateTime(destTick: [*c]u64, dateString: [*c]const c_char) callconv(.C) c_int;
 
     /// Parse time information represented in RFC3339 format
-    pub extern fn sceRtcParseRFC3339(pUtc: [*c]c_int, pszDateTime: [*c]const c_char) callconv(.C) c_int;
+    pub extern fn sceRtcParseRFC3339(pUtc: [*c]u64, pszDateTime: [*c]const c_char) callconv(.C) c_int;
 
     pub extern fn sceRtcGetAccumulativeTime() callconv(.C) void;
 
@@ -4825,9 +4824,9 @@ const sceAtrac3plus = struct {
     /// `buf` - the buffer holding the atrac3 data, including the RIFF/WAVE header.
     /// `bufsize` - the size of the buffer pointed by buf
     /// Returns the new atrac ID, or < 0 on error
-    pub extern fn sceAtracSetData(atracID: c_int, pucBufferAddr: [*c]c_int, uiBufferByte: c_int) callconv(.C) c_int;
+    pub extern fn sceAtracSetData(atracID: c_int, pucBufferAddr: [*c]u8, uiBufferByte: u32) callconv(.C) c_int;
 
-    pub extern fn sceAtracSetHalfwayBuffer(atracID: c_int, pucBufferAddr: [*c]c_int, uiReadByte: c_int, uiBufferByte: c_int) callconv(.C) c_int;
+    pub extern fn sceAtracSetHalfwayBuffer(atracID: c_int, pucBufferAddr: [*c]u8, uiReadByte: u32, uiBufferByte: u32) callconv(.C) c_int;
 
     /// Creates a new Atrac ID from the specified data
     /// `buf` - the buffer holding the atrac3 data, including the RIFF/WAVE header.
@@ -4835,7 +4834,7 @@ const sceAtrac3plus = struct {
     /// Returns the new atrac ID, or < 0 on error
     pub extern fn sceAtracSetDataAndGetID(buf: ?*anyopaque, bufsize: SceSize) callconv(.C) c_int;
 
-    pub extern fn sceAtracSetHalfwayBufferAndGetID(pucBufferAddr: [*c]c_int, uiReadByte: c_int, uiBufferByte: c_int) callconv(.C) c_int;
+    pub extern fn sceAtracSetHalfwayBufferAndGetID(pucBufferAddr: [*c]u8, uiReadByte: u32, uiBufferByte: u32) callconv(.C) c_int;
 
     /// Decode a frame of data.
     /// `atracID` - the atrac ID
@@ -4845,7 +4844,7 @@ const sceAtrac3plus = struct {
     /// `outRemainFrame` - pointer to a integer that receives either -1 if all at3 data is already on memory,
     /// or the remaining (not decoded yet) frames at memory if not all at3 data is on memory
     /// Returns < 0 on error, otherwise 0
-    pub extern fn sceAtracDecodeData(atracID: c_int, outSamples: [*c]c_int, outN: [*c]c_int, outEnd: [*c]c_int, outRemainFrame: [*c]c_int) callconv(.C) c_int;
+    pub extern fn sceAtracDecodeData(atracID: c_int, outSamples: [*c]u16, outN: [*c]c_int, outEnd: [*c]c_int, outRemainFrame: [*c]c_int) callconv(.C) c_int;
 
     /// Gets the remaining (not decoded) number of frames
     /// `atracID` - the atrac ID
@@ -4854,22 +4853,22 @@ const sceAtrac3plus = struct {
     /// Returns < 0 on error, otherwise 0
     pub extern fn sceAtracGetRemainFrame(atracID: c_int, outRemainFrame: [*c]c_int) callconv(.C) c_int;
 
-    pub extern fn sceAtracGetStreamDataInfo(atracID: c_int, writePointer: [*c]c_int, availableBytes: [*c]c_int, readOffset: [*c]c_int) callconv(.C) c_int;
+    pub extern fn sceAtracGetStreamDataInfo(atracID: c_int, writePointer: [*c]u8, availableBytes: [*c]u32, readOffset: [*c]u32) callconv(.C) c_int;
 
     /// `atracID` - the atrac ID
     /// `bytesToAdd` - Number of bytes read into location given by sceAtracGetStreamDataInfo().
     /// Returns < 0 on error, otherwise 0
     pub extern fn sceAtracAddStreamData(atracID: c_int, bytesToAdd: c_uint) callconv(.C) c_int;
 
-    pub extern fn sceAtracGetSecondBufferInfo(atracID: c_int, puiPosition: [*c]c_int, puiDataByte: [*c]c_int) callconv(.C) c_int;
+    pub extern fn sceAtracGetSecondBufferInfo(atracID: c_int, puiPosition: [*c]u32, puiDataByte: [*c]u32) callconv(.C) c_int;
 
-    pub extern fn sceAtracSetSecondBuffer(atracID: c_int, pucSecondBufferAddr: [*c]c_int, uiSecondBufferByte: c_int) callconv(.C) c_int;
+    pub extern fn sceAtracSetSecondBuffer(atracID: c_int, pucSecondBufferAddr: [*c]u8, uiSecondBufferByte: u32) callconv(.C) c_int;
 
-    pub extern fn sceAtracGetNextDecodePosition(atracID: c_int, puiSamplePosition: [*c]c_int) callconv(.C) c_int;
+    pub extern fn sceAtracGetNextDecodePosition(atracID: c_int, puiSamplePosition: [*c]u32) callconv(.C) c_int;
 
     pub extern fn sceAtracGetSoundSample(atracID: c_int, piEndSample: [*c]c_int, piLoopStartSample: [*c]c_int, piLoopEndSample: [*c]c_int) callconv(.C) c_int;
 
-    pub extern fn sceAtracGetChannel(atracID: c_int, puiChannel: [*c]c_int) callconv(.C) c_int;
+    pub extern fn sceAtracGetChannel(atracID: c_int, puiChannel: [*c]u32) callconv(.C) c_int;
 
     /// Gets the maximum number of samples of the atrac3 stream.
     /// `atracID` - the atrac ID
@@ -4889,7 +4888,7 @@ const sceAtrac3plus = struct {
     /// Returns < 0 on error, otherwise 0
     pub extern fn sceAtracGetBitrate(atracID: c_int, outBitrate: [*c]c_int) callconv(.C) c_int;
 
-    pub extern fn sceAtracGetLoopStatus(atracID: c_int, piLoopNum: [*c]c_int, puiLoopStatus: [*c]c_int) callconv(.C) c_int;
+    pub extern fn sceAtracGetLoopStatus(atracID: c_int, piLoopNum: [*c]c_int, puiLoopStatus: [*c]u32) callconv(.C) c_int;
 
     /// Sets the number of loops for this atrac ID
     /// `atracID` - the atracID
@@ -4897,9 +4896,9 @@ const sceAtrac3plus = struct {
     /// Returns < 0 on error, otherwise 0
     pub extern fn sceAtracSetLoopNum(atracID: c_int, nloops: c_int) callconv(.C) c_int;
 
-    pub extern fn sceAtracGetBufferInfoForReseting(atracID: c_int, uiSample: c_int, pBufferInfo: [*c]c_int) callconv(.C) c_int;
+    pub extern fn sceAtracGetBufferInfoForReseting(atracID: c_int, uiSample: u32, pBufferInfo: [*c]c_int) callconv(.C) c_int;
 
-    pub extern fn sceAtracResetPlayPosition(atracID: c_int, uiSample: c_int, uiWriteByteFirstBuf: c_int, uiWriteByteSecondBuf: c_int) callconv(.C) c_int;
+    pub extern fn sceAtracResetPlayPosition(atracID: c_int, uiSample: u32, uiWriteByteFirstBuf: u32, uiWriteByteSecondBuf: u32) callconv(.C) c_int;
 
     pub extern fn sceAtracGetInternalErrorInfo(atracID: c_int, piResult: [*c]c_int) callconv(.C) c_int;
 
