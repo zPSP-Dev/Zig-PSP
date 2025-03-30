@@ -14,8 +14,8 @@
             .hash = "zSFOTool-0.0.0-liqp5RA3AAAxZ09q9C5h5kgBhNq-gC2BpxO6vSlbGI9m",
         },
         .libzpsp = .{
-            .url = "git+https://github.com/zPSP-Dev/libzpsp#37b49614977d31c6ce8f298e814b535b81f91d31",
-            .hash = "libzpsp-0.0.0-NAgUb7t9BQAleywz2RvlEn5SzxnFX2pRVHcv-KtiUJ3K",
+            .url = "git+https://github.com/zPSP-Dev/libzpsp#836d9cd94809071996cc788b429961f128de843e",
+            .hash = "libzpsp-0.0.0-NAgUb598BQBMsjLg55ZXDzHlzeZ2fg3TbgZUfgaoeerR",
         },
     },
     .paths = .{
