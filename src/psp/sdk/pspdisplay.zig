@@ -50,9 +50,8 @@ pub fn displayGetMode(pmode: *c_int, pwidth: *c_int, pheight: *c_int) bool {
 //
 // @return 0 on success
 pub extern fn sceDisplaySetFrameBuf(topaddr: ?*anyopaque, bufferwidth: c_int, pixelformat: c_int, sync: c_int) c_int;
-pub fn displaySetFrameBuf(topaddr: ?*anyopaque, bufferwidth: c_int, pixelformat: c_int, sync: c_int) bool {
-    const res = sceDisplaySetFrameBuf(topaddr, bufferwidth, pixelformat, sync);
-    return res;
+pub fn displaySetFrameBuf(topaddr: ?*anyopaque, bufferwidth: c_int, pixelformat: PspDisplayPixelFormats, sync: PspDisplaySetBufSync) c_int {
+    return sceDisplaySetFrameBuf(topaddr, bufferwidth, @intFromEnum(pixelformat), @intFromEnum(sync));
 }
 
 // Get Display Framebuffer information

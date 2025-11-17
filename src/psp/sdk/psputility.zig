@@ -69,7 +69,7 @@ pub extern fn sceUtilityNetconfInitStart(data: *PspUtilityNetconfData) c_int;
 pub extern fn sceUtilityNetconfShutdownStart() c_int;
 pub extern fn sceUtilityNetconfUpdate(unknown: c_int) c_int;
 pub extern fn sceUtilityNetconfGetStatus() c_int;
-const NetData = extern union {
+pub const NetData = extern union {
     asUint: u32,
     asString: [128]u8,
 };
