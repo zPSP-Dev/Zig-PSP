@@ -273,7 +273,7 @@ pub extern fn sceNetInetConnect(s: c_int, serv_addr: [*c]const struct_sockaddr, 
 pub extern fn sceNetInetGetsockopt(s: c_int, level: c_int, optname: c_int, optval: ?*anyopaque, optlen: [*c]socklen_t) c_int;
 pub extern fn sceNetInetListen(s: c_int, backlog: c_int) c_int;
 pub extern fn sceNetInetRecv(s: c_int, buf: ?*anyopaque, len: u32, flags: c_int) u32;
-pub extern fn sceNetInetRecvfrom(s: c_int, buf: ?*anyopaque, flags: u32, c_int, from: [*c]struct_sockaddr, fromlen: [*c]socklen_t) u32;
+pub extern fn sceNetInetRecvfrom(s: c_int, buf: ?*anyopaque, len: u32, flags: c_int, from: [*c]struct_sockaddr, fromlen: [*c]socklen_t) u32;
 pub extern fn sceNetInetSend(s: c_int, buf: ?*const anyopaque, len: u32, flags: c_int) u32;
 pub extern fn sceNetInetSendto(s: c_int, buf: ?*const anyopaque, len: u32, flags: c_int, to: [*c]const struct_sockaddr, tolen: socklen_t) u32;
 pub extern fn sceNetInetSetsockopt(s: c_int, level: c_int, optname: c_int, optval: ?*const anyopaque, optlen: socklen_t) c_int;
