@@ -24,7 +24,7 @@ pub fn wlanGetSwitchState() bool {
 pub extern fn sceWlanGetEtherAddr(etherAddr: [*c]u8) c_int;
 
 pub fn wlanGetEtherAddr(etherAddr: []u8) !void {
-    const res = sceWlanGetEtherAddr(etherAddr);
+    const res = sceWlanGetEtherAddr(@ptrCast(etherAddr));
     if (res < 0) {
         return error.Unexpected;
     }
