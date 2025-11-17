@@ -40,6 +40,7 @@ pub const utils = struct {
     pub const allocator = @import("utils/allocator.zig");
     pub const constants = @import("utils/constants.zig");
     pub const debug = @import("utils/debug.zig");
+    pub const math = @import("utils/math.zig");
     pub const mem_fix = @import("utils/mem-fix.zig");
     pub const module = @import("utils/module.zig");
     pub const psp = @import("utils/psp.zig");
