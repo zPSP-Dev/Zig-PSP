@@ -125,26 +125,18 @@ pub fn addOptions(b: *std.Build, options: Options) *std.Build.Step.Options {
 
     return step_options;
 }
+//All of the release modes work
+//Debug Mode can cause issues with trap instructions - use ReleaseSafe for "Debug" builds
+const psp_optimize = builtin.Mode.ReleaseSmall;
 
-pub fn build_psp(b: *std.Build, comptime build_info: PSPBuildInfo, comptime build_options: Options) !void {
-    var feature_set: std.Target.Cpu.Feature.Set = std.Target.Cpu.Feature.Set.empty;
-    feature_set.addFeature(@intFromEnum(std.Target.mips.Feature.single_float));
-
+// Detached SDK build, this allows you to link the sdk to other libraries
+pub fn build_sdk(b: *std.Build, comptime sdk_path: []const u8, comptime build_options: Options) *std.Build.Module {
     //PSP-Specific Build Options
-    const target = b.resolveTargetQuery(.{
-        .cpu_arch = .mipsel,
-        .os_tag = .freestanding,
-        .cpu_model = .{ .explicit = &std.Target.mips.cpu.mips2 },
-        .cpu_features_add = feature_set,
-    });
-
-    //All of the release modes work
-    //Debug Mode can cause issues with trap instructions - use ReleaseSafe for "Debug" builds
-    const optimize = builtin.Mode.ReleaseSmall;
+    const target = get_target(b);
 
     const libzpsp = b.dependency("libzpsp", .{
         .target = target,
-        .optimize = optimize,
+        .optimize = psp_optimize,
     });
 
     const options_step = addOptions(b, build_options);
@@ -153,20 +145,32 @@ pub fn build_psp(b: *std.Build, comptime build_info: PSPBuildInfo, comptime buil
     const libzpsp_module = libzpsp.artifact("libzpsp").root_module;
     libzpsp_module.addImport("libzpsp_option", options_module);
 
+    const psp_sdk = b.addModule("psp-sdk", .{ .root_source_file = b.path(sdk_path ++ "src/psp/pspsdk.zig") });
+    psp_sdk.addImport("psp", libzpsp_module);
+    return psp_sdk;
+}
+
+// By using prebuilt SDK, we only have to attach it to the main binary, also return the binary to attach other libraries
+pub fn build_psp(b: *std.Build, comptime build_info: PSPBuildInfo, sdk: *std.Build.Module) *std.Build.Module {
+    //PSP-Specific Build Options
+    const target = get_target(b);
+
     //Build from your main file!
     const exe = b.addExecutable(.{
         .name = "main",
         .root_source_file = b.path(build_info.src_file),
         .target = target,
-        .optimize = optimize,
+        .optimize = psp_optimize,
         .strip = false, // disable as cannot be used with "link_emit_relocs = true"
     });
-    exe.root_module.addImport("psp", libzpsp_module);
+    exe.root_module.addImport("psp-sdk", sdk);
+    exe.addAssemblyFile(b.path(build_info.path_to_sdk ++ "src/psp/utils/divmod_u32.s"));
 
     exe.setLinkerScript(b.path(build_info.path_to_sdk ++ "tools/linkfile.ld"));
 
     exe.link_eh_frame_hdr = true;
     exe.link_emit_relocs = true;
+
 
     //Post-build actions
     const hostTarget = b.standardTargetOptions(.{});
@@ -225,4 +229,18 @@ pub fn build_psp(b: *std.Build, comptime build_info: PSPBuildInfo, comptime buil
 
     const install_prx = b.addInstallBinFile(prx_file, "app.prx");
     b.getInstallStep().dependOn(&install_prx.step);
+
+    return exe.root_module;
+}
+
+inline fn get_target(b: *std.Build) std.Build.ResolvedTarget {
+    var feature_set: std.Target.Cpu.Feature.Set = std.Target.Cpu.Feature.Set.empty;
+    feature_set.addFeature(@intFromEnum(std.Target.mips.Feature.single_float));
+
+    return b.resolveTargetQuery(.{
+        .cpu_arch = .mipsel,
+        .os_tag = .freestanding,
+        .cpu_model = .{ .explicit = &std.Target.mips.cpu.mips2 },
+        .cpu_features_add = feature_set,
+    });
 }
