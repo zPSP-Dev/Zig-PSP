@@ -1,39 +1,47 @@
-//Use this as an "include everything"
+pub const psp = @import("psp");
 
-pub usingnamespace @import("psp");
+pub const sdk = struct {
+    // Basic outlines
+    pub const atrac3 = @import("sdk/pspatrac3.zig");
+    pub const audio = @import("sdk/pspaudio.zig");
+    pub const audiocodec = @import("sdk/pspaudiocodec.zig");
+    pub const ctrl = @import("sdk/pspctrl.zig");
+    pub const display = @import("sdk/pspdisplay.zig");
+    pub const dmac = @import("sdk/pspdmac.zig");
+    pub const ge = @import("sdk/pspge.zig");
+    pub const gu = @import("sdk/pspgu.zig");
+    pub const gum = @import("sdk/pspgum.zig");
+    pub const hprm = @import("sdk/psphprm.zig");
+    pub const http = @import("sdk/psphttp.zig");
+    pub const iofilemgr = @import("sdk/pspiofilemgr.zig");
+    pub const jpeg = @import("sdk/pspjpeg.zig");
+    pub const loadexec = @import("sdk/psploadexec.zig");
+    pub const modulemgr = @import("sdk/pspmodulemgr.zig");
+    pub const mp3 = @import("sdk/pspmp3.zig");
+    pub const mpeg = @import("sdk/pspmpeg.zig");
+    pub const net = @import("sdk/pspnet.zig");
+    pub const openpsid = @import("sdk/pspopenpsid.zig");
+    pub const power = @import("sdk/psppower.zig");
+    pub const reg = @import("sdk/pspreg.zig");
+    pub const rtc = @import("sdk/psprtc.zig");
+    pub const ssl = @import("sdk/pspssl.zig");
+    pub const stdio = @import("sdk/pspstdio.zig");
+    pub const sysmem = @import("sdk/pspsysmem.zig");
+    pub const threadman = @import("sdk/pspthreadman.zig");
+    pub const umd = @import("sdk/pspumd.zig");
+    pub const usb = @import("sdk/pspusb.zig");
+    pub const utility = @import("sdk/psputility.zig");
+    pub const utils = @import("sdk/psputils.zig");
+    pub const wlan = @import("sdk/pspwlan.zig");
+};
 
-//Smaller utilities
-pub usingnamespace @import("utils/psp.zig");
-
-//Basic outlines
-pub usingnamespace @import("sdk/pspatrac3.zig");
-pub usingnamespace @import("sdk/pspaudio.zig");
-pub usingnamespace @import("sdk/pspaudiocodec.zig");
-pub usingnamespace @import("sdk/pspctrl.zig");
-pub usingnamespace @import("sdk/pspdisplay.zig");
-pub usingnamespace @import("sdk/pspdmac.zig");
-pub usingnamespace @import("sdk/pspge.zig");
-pub usingnamespace @import("sdk/pspgu.zig");
-pub usingnamespace @import("sdk/pspgum.zig");
-pub usingnamespace @import("sdk/psphprm.zig");
-pub usingnamespace @import("sdk/psphttp.zig");
-pub usingnamespace @import("sdk/pspiofilemgr.zig");
-pub usingnamespace @import("sdk/pspjpeg.zig");
-pub usingnamespace @import("sdk/psploadexec.zig");
-pub usingnamespace @import("sdk/pspmodulemgr.zig");
-pub usingnamespace @import("sdk/pspmp3.zig");
-pub usingnamespace @import("sdk/pspmpeg.zig");
-pub usingnamespace @import("sdk/pspnet.zig");
-pub usingnamespace @import("sdk/pspopenpsid.zig");
-pub usingnamespace @import("sdk/psppower.zig");
-pub usingnamespace @import("sdk/pspreg.zig");
-pub usingnamespace @import("sdk/psprtc.zig");
-pub usingnamespace @import("sdk/pspssl.zig");
-pub usingnamespace @import("sdk/pspstdio.zig");
-pub usingnamespace @import("sdk/pspsysmem.zig");
-pub usingnamespace @import("sdk/pspthreadman.zig");
-pub usingnamespace @import("sdk/pspumd.zig");
-pub usingnamespace @import("sdk/pspusb.zig");
-pub usingnamespace @import("sdk/psputility.zig");
-pub usingnamespace @import("sdk/psputils.zig");
-pub usingnamespace @import("sdk/pspwlan.zig");
+pub const utils = struct {
+    // Smaller utilities
+    pub const allocator = @import("utils/allocator.zig");
+    pub const constants = @import("utils/constants.zig");
+    pub const debug = @import("utils/debug.zig");
+    pub const mem_fix = @import("utils/mem-fix.zig");
+    pub const module = @import("utils/module.zig");
+    pub const psp = @import("utils/psp.zig");
+    pub const utils = @import("utils/utils.zig");
+};
