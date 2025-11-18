@@ -306,4 +306,4 @@ pub const VertexTypeFlags = enum(c_int) {
     Transform3D = 0,
 };
 
-pub const GuSwapBuffersCallback = ?*const fn ([*c]?*anyopaque, [*c]?*anyopaque) callconv(.C) void;
+pub const GuSwapBuffersCallback = ?*const fn ([*c]?*anyopaque, [*c]?*anyopaque) callconv(.c) void;

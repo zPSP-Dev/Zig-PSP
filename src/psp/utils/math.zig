@@ -6,7 +6,7 @@ pub fn format_u8(buf: []u8, value: u8) usize {
     return format_u32(buf, @intCast(value));
 }
 
-pub fn write_u8(writer: anytype, value: u8) !void {
+pub fn write_u8(writer: *std.Io.Writer, value: u8) !void {
     var tmp: [3]u8 = undefined; // max "255"
     const len = format_u8(tmp[0..], value);
     if (len == 0) return;
@@ -17,7 +17,7 @@ pub fn format_u16(buf: []u8, value: u16) usize {
     return format_u32(buf, @intCast(value));
 }
 
-pub fn write_u16(writer: anytype, value: u16) !void {
+pub fn write_u16(writer: *std.Io.Writer, value: u16) !void {
     var tmp: [5]u8 = undefined; // max "65535"
     const len = format_u16(tmp[0..], value);
     if (len == 0) return;
@@ -56,7 +56,7 @@ pub fn format_u32(buf: []u8, value: u32) usize {
     return idx;
 }
 
-pub fn write_u32(writer: anytype, value: u32) !void {
+pub fn write_u32(writer: *std.Io.Writer, value: u32) !void {
     var tmp: [11]u8 = undefined; // max 10 digits + '\0' safety
     const len = format_u32(tmp[0..], value);
     if (len == 0) return; // or return error if you prefer

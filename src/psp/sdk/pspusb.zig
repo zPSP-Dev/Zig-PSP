@@ -1,5 +1,3 @@
-usingnamespace @import("psp");
-
 // Start a USB driver.
 //
 // @param driverName - name of the USB driver to start

@@ -102,7 +102,7 @@ pub extern fn sceNetAdhocctlGetPeerList(length: [*c]c_int, buf: ?*anyopaque) c_i
 pub extern fn sceNetAdhocctlGetPeerInfo(mac: [*c]u8, size: c_int, peerinfo: [*c]struct_SceNetAdhocctlPeerInfo) c_int;
 pub extern fn sceNetAdhocctlScan() c_int;
 pub extern fn sceNetAdhocctlGetScanInfo(length: [*c]c_int, buf: ?*anyopaque) c_int;
-pub const sceNetAdhocctlHandler = ?*const fn (c_int, c_int, ?*anyopaque) callconv(.C) void;
+pub const sceNetAdhocctlHandler = ?*const fn (c_int, c_int, ?*anyopaque) callconv(.c) void;
 pub extern fn sceNetAdhocctlAddHandler(handler: sceNetAdhocctlHandler, unknown: ?*anyopaque) c_int;
 pub extern fn sceNetAdhocctlDelHandler(id: c_int) c_int;
 pub extern fn sceNetAdhocctlGetNameByAddr(mac: [*c]u8, nickname: [*c]u8) c_int;
@@ -144,7 +144,7 @@ pub const struct_pspAdhocPoolStat = extern struct {
 };
 pub extern fn sceNetAdhocMatchingInit(memsize: c_int) c_int;
 pub extern fn sceNetAdhocMatchingTerm() c_int;
-pub const pspAdhocMatchingCallback = ?*const fn (c_int, c_int, [*c]u8, c_int, ?*anyopaque) callconv(.C) void;
+pub const pspAdhocMatchingCallback = ?*const fn (c_int, c_int, [*c]u8, c_int, ?*anyopaque) callconv(.c) void;
 pub extern fn sceNetAdhocMatchingCreate(mode: c_int, maxpeers: c_int, port: c_ushort, bufsize: c_int, hellodelay: c_uint, pingdelay: c_uint, initcount: c_int, msgdelay: c_uint, callback: pspAdhocMatchingCallback) c_int;
 pub extern fn sceNetAdhocMatchingDelete(matchingid: c_int) c_int;
 pub extern fn sceNetAdhocMatchingStart(matchingid: c_int, evthpri: c_int, evthstack: c_int, inthpri: c_int, inthstack: c_int, optlen: c_int, optdata: ?*anyopaque) c_int;
@@ -181,7 +181,7 @@ pub const union_SceNetApctlInfo = extern union {
     startBrowser: c_uint,
     wifisp: c_uint,
 };
-pub const sceNetApctlHandler = ?*const fn (c_int, c_int, c_int, c_int, ?*anyopaque) callconv(.C) void;
+pub const sceNetApctlHandler = ?*const fn (c_int, c_int, c_int, c_int, ?*anyopaque) callconv(.c) void;
 pub extern fn sceNetApctlInit(stackSize: c_int, initPriority: c_int) c_int;
 pub extern fn sceNetApctlTerm() c_int;
 pub extern fn sceNetApctlGetInfo(code: c_int, pInfo: [*c]union_SceNetApctlInfo) c_int;
@@ -328,6 +328,7 @@ pub const SceNetInetTimeval = inet_timeinterval;
 pub extern fn sceNetInetAccept(s: c_int, addr: [*c]struct_sockaddr, addrlen: [*c]socklen_t) c_int;
 pub extern fn sceNetInetBind(s: c_int, my_addr: [*c]const struct_sockaddr, addrlen: socklen_t) c_int;
 pub extern fn sceNetInetClose(s: c_int) c_int;
+// pub extern fn sceNetInetCloseWithRST(params) return;
 pub extern fn sceNetInetConnect(s: c_int, serv_addr: [*c]const struct_sockaddr, addrlen: socklen_t) c_int;
 pub extern fn sceNetInetGetpeername(s: c_int, name: [*c]struct_sockaddr, namelen: [*c]socklen_t) c_int;
 pub extern fn sceNetInetGetsockname(s: c_int, name: [*c]struct_sockaddr, namelen: [*c]socklen_t) c_int;
@@ -344,7 +345,10 @@ pub extern fn sceNetInetSendmsg(s: c_int, msg: [*c]const struct_msg_hdr, flags: 
 pub extern fn sceNetInetSetsockopt(s: c_int, level: c_int, optname: c_int, optval: ?*const anyopaque, optlen: socklen_t) c_int;
 pub extern fn sceNetInetShutdown(s: c_int, how: c_int) c_int;
 pub extern fn sceNetInetSocket(domain: c_int, type: c_int, protocol: c_int) c_int;
+// pub extern fn sceNetInetSocketAbort(params) return;
 pub extern fn sceNetInetGetErrno() c_int;
+// pub extern fn sceNetInetGetTcpcbstat(params) return;
+// pub extern fn sceNetInetGetUdpcbstat(params) return;
 pub extern fn sceNetInetInetAddr(ip: [*:0]const u8) in_addr_t;
 pub extern fn sceNetInetInetAton(ip: [*:0]const u8, in: [*c]struct_sockaddr) c_int;
 pub extern fn sceNetInetInetNtop(af: c_int, src: ?*const anyopaque, dst: [*c]u8, cnt: socklen_t) ?[*:0]const u8;
