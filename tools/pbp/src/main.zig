@@ -21,10 +21,6 @@ const default_file_names: [8][]const u8 = [8][]const u8{
     "DATA.PSAR",
 };
 
-fn read_header(reader: std.io.AnyReader) !PBPHeader {
-    return try reader.readStruct(PBPHeader);
-}
-
 fn validate_header(header: PBPHeader) !void {
     if (!std.mem.eql(u8, header.signature[1..], "PBP")) {
         return error.InvalidSignature;
@@ -39,7 +35,10 @@ pub fn analyze_file(file_path: []const u8) !void {
     var file = try std.fs.cwd().openFile(file_path, .{});
     defer file.close();
 
-    const header = try read_header(file.reader().any());
+    var buf: [4096]u8 = undefined;
+    var reader = file.reader(&buf).interface;
+    var header: PBPHeader = undefined;
+    try reader.readSliceAll(std.mem.asBytes(&header));
     try validate_header(header);
 
     std.debug.print("PBP Header:\n", .{});
@@ -60,13 +59,16 @@ pub fn unpack_pbp(allocator: std.mem.Allocator, file_path: []const u8, dir_path:
     var file = try std.fs.cwd().openFile(file_path, .{});
     defer file.close();
 
-    const header = try read_header(file.reader().any());
+    var buf: [4096]u8 = undefined;
+    var reader = file.reader(&buf).interface;
+    var header: PBPHeader = undefined;
+    try reader.readSliceAll(std.mem.asBytes(&header));
     try validate_header(header);
 
     try std.fs.cwd().makePath(dir_path);
 
     // I don't think any PBPs are bigger than 16MB
-    const content = try file.reader().readAllAlloc(allocator, std.math.maxInt(u24));
+    const content = try file.readToEndAlloc(allocator, std.math.maxInt(u24));
 
     for (header.offset, 0..) |offset, i| {
         const file_size = if (i + 1 < header.offset.len) header.offset[i + 1] -| offset else content.len -| offset;
@@ -80,7 +82,9 @@ pub fn unpack_pbp(allocator: std.mem.Allocator, file_path: []const u8, dir_path:
         defer out_file.close();
 
         const corrected_offset = offset - @sizeOf(PBPHeader);
-        try out_file.writer().writeAll(content[corrected_offset .. corrected_offset + file_size]);
+        var wbuf: [4096]u8 = undefined;
+        var writer = out_file.writer(&wbuf).interface;
+        try writer.writeAll(content[corrected_offset .. corrected_offset + file_size]);
     }
 }
 
@@ -95,7 +99,7 @@ pub fn pack_pbp(allocator: std.mem.Allocator, paths: []const []const u8) !void {
         file_size: u32,
     };
 
-    var files = std.ArrayList(Files).init(allocator);
+    var files = std.array_list.Managed(Files).init(allocator);
     defer files.deinit();
 
     // Gather all files and initialize offsets
@@ -136,7 +140,8 @@ pub fn pack_pbp(allocator: std.mem.Allocator, paths: []const []const u8) !void {
 }
 
 fn get_arg_list(allocator: std.mem.Allocator, iterator: *std.process.ArgIterator) ![]const []const u8 {
-    var list = std.ArrayList([]const u8).init(allocator);
+    var list = std.array_list.Managed([]const u8).init(allocator);
+    defer list.deinit();
     while (iterator.next()) |arg| {
         try list.append(arg);
     }
