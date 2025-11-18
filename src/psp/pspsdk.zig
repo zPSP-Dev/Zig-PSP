@@ -43,6 +43,5 @@ pub const utils = struct {
     pub const math = @import("utils/math.zig");
     pub const mem_fix = @import("utils/mem-fix.zig");
     pub const module = @import("utils/module.zig");
-    pub const psp = @import("utils/psp.zig");
     pub const utils = @import("utils/utils.zig");
 };

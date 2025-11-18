@@ -1,5 +1,5 @@
-const psp = @import("psp");
 const pspdisplay = @import("../sdk/pspdisplay.zig");
+const pspge = @import("../sdk/pspge.zig");
 const constants = @import("constants.zig");
 
 const builtin = @import("builtin");
@@ -70,10 +70,10 @@ pub fn screenInit() void {
     x = 0;
     y = 0;
 
-    vram_base = @as(?[*]u32, @ptrFromInt(0x40000000 | @intFromPtr(psp.sceGeEdramGetAddr())));
+    vram_base = @as(?[*]u32, @ptrFromInt(0x40000000 | @intFromPtr(pspge.sceGeEdramGetAddr())));
 
-    _ = psp.sceDisplaySetMode(0, constants.SCREEN_WIDTH, constants.SCREEN_HEIGHT);
-    _ = psp.sceDisplaySetFrameBuf(vram_base, constants.SCR_BUF_WIDTH, @intFromEnum(pspdisplay.PspDisplayPixelFormats.Format8888), @intFromEnum(pspdisplay.PspDisplaySetBufSync.Nextframe));
+    _ = pspdisplay.sceDisplaySetMode(0, constants.SCREEN_WIDTH, constants.SCREEN_HEIGHT);
+    _ = pspdisplay.sceDisplaySetFrameBuf(vram_base, constants.SCR_BUF_WIDTH, @intFromEnum(pspdisplay.PspDisplayPixelFormats.Format8888), @intFromEnum(pspdisplay.PspDisplaySetBufSync.Nextframe));
 
     screenClear();
 }
