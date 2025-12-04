@@ -3,7 +3,7 @@ const psp = @import("psp/pspsdk.zig");
 pub const panic = psp.debug.panic;
 
 comptime {
-    asm (psp.module_info("Zig PSP App", 0, 1, 0));
+    asm (psp.utils.module.module_info("Zig PSP App", 0, 1, 0));
 }
 
 var display_list: [0x40000]u32 align(16) = [_]u32{0} ** 0x40000;
