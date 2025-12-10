@@ -1,5 +1,5 @@
 //A quick graphics example
-const psp = @import("psp/pspsdk.zig");
+const psp = @import("psp");
 pub const panic = psp.debug.panic;
 
 comptime {

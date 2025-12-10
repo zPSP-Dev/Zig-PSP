@@ -6,11 +6,11 @@
 
     .dependencies = .{
         .zPBPTool = .{
-            .url = "git+https://github.com/zPSP-Dev/zPBPTool#ff72cfd84f2b388f24f9c1573a4b5e92be2910d9",
+            .url = "git+https://github.com/zPSP-Dev/zPBPTool#3744fb5d7b2c3a53e0467bf8889f258b9c969279",
             .hash = "zPBPTool-0.0.0-p6Zf3yMuAABqPy3oC7kNPni3TMGHJa0E1tzyS7pEto2Z",
         },
         .zSFOTool = .{
-            .url = "git+https://github.com/zPSP-Dev/zSFOTool#2fc24b32bb5fea099701164280944fafe8b04239",
+            .url = "git+https://github.com/zPSP-Dev/zSFOTool#4efcda254ddbb014d770ad99a9e69b297405dc86",
             .hash = "zSFOTool-0.0.0-liqp5dU4AACpKPRRzZXOtYOFXfTrlHdTc7EHnE9fCOFB",
         },
         .libzpsp = .{

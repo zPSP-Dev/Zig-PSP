@@ -6,9 +6,10 @@ pub fn build(b: *std.Build) void {
         .everything = true,
     });
 
-    _ = psp.build_psp(b, psp.PSPBuildInfo{
+    const eboot = psp.build_psp(b, psp.PSPBuildInfo{
         .path_to_sdk = "",
         .src_file = "src/main.zig",
         .title = "Zig PSP Test",
     }, sdk);
+    eboot.addImport("psp", sdk);
 }
