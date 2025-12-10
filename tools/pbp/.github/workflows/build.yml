@@ -8,7 +8,7 @@ on:
       - master
 
 env:
-  zig_version: 0.14.0
+  zig_version: 0.15.1
 
 jobs:
   build:
@@ -18,7 +18,7 @@ jobs:
     runs-on: ${{matrix.os}}
     steps:
       - uses: actions/checkout@v4
-      - uses: mlugg/setup-zig@v1
+      - uses: mlugg/setup-zig@v2
         with:
           version: ${{ env.zig_version }}
       - run: zig build
@@ -27,7 +27,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: mlugg/setup-zig@v1
+      - uses: mlugg/setup-zig@v2
         with:
           version: ${{ env.zig_version }}
       - run: zig fmt --check *.zig
