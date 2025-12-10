@@ -424,10 +424,12 @@ comptime {
         asm(macro.import_function("sceJpeg", "0x227662D7", "sceJpeg_227662D7"));
         asm(macro.import_function("sceJpeg", "0x48B602B7", "sceJpegDeleteMJpeg"));
         asm(macro.import_function("sceJpeg", "0x64B6F978", "sceJpeg_64B6F978"));
-        asm(macro.import_function("sceJpeg", "0x67F0ED84", "sceJpeg_67F0ED84"));
+        asm(macro.import_function("sceJpeg", "0x67F0ED84", "sceJpegCsc_stub"));
+        asm(macro.generic_abi_wrapper("sceJpegCsc", 5));
         asm(macro.import_function("sceJpeg", "0x7D2F3D7F", "sceJpegFinishMJpeg"));
         asm(macro.import_function("sceJpeg", "0x8F2BB012", "sceJpegGetOutputInfo"));
-        asm(macro.import_function("sceJpeg", "0x91EED83C", "sceJpegDecodeMJpegYCbCr"));
+        asm(macro.import_function("sceJpeg", "0x91EED83C", "sceJpegDecodeMJpegYCbCr_stub"));
+        asm(macro.generic_abi_wrapper("sceJpegDecodeMJpegYCbCr", 5));
         asm(macro.import_function("sceJpeg", "0x9B36444C", "sceJpeg_9B36444C"));
         asm(macro.import_function("sceJpeg", "0x9D47469C", "sceJpegCreateMJpeg"));
         asm(macro.import_function("sceJpeg", "0xAC9E70E6", "sceJpegInitMJpeg"));
@@ -987,6 +989,13 @@ comptime {
         asm(macro.import_function("sceAudiocodec", "0x59176A0F", "sceAudiocodec_59176A0F"));
         asm(macro.import_function("sceAudiocodec", "0x3A20A200", "sceAudiocodecGetEDRAM"));
         asm(macro.import_function("sceAudiocodec", "0x29681260", "sceAudiocodecReleaseEDRAM"));
+    }
+
+    if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "sceKermitPeripheral") and options.sceKermitPeripheral)) {
+        asm(macro.import_module_start("sceKermitPeripheral", "0x40090000", "3"));
+        asm(macro.import_function("sceKermitPeripheral", "0x4A26B7C8", "sceKermitPeripheral_4A26B7C8"));
+        asm(macro.import_function("sceKermitPeripheral", "0xC0EBC631", "sceKermitPeripheral_C0EBC631"));
+        asm(macro.import_function("sceKermitPeripheral", "0xD27C5E03", "sceKermitPeripheral_D27C5E03"));
     }
 
     if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "sceGe_user") and options.sceGe_user)) {

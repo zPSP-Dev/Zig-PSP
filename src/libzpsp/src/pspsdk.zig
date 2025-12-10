@@ -1397,14 +1397,16 @@ const sceJpeg = struct {
 
     pub extern fn sceJpegMJpegCsc() callconv(.C) void;
 
-    /// Decodes a mjpeg frame.
+    /// Decodes a mjpeg frame to RGBA encoding.
+    /// @note Input frame should be encoded as either yuv420p or yuvj420p,
+    /// returns SCE_JPEG_ERROR_UNSUPPORT_SAMPLING otherwise
     /// `jpegbuf` - the buffer with the mjpeg frame
     /// `size` - size of the buffer pointed by jpegbuf
     /// `rgba` - buffer where the decoded data in RGBA format will be stored.
     /// It should have a size of (width * height * 4).
     /// `unk` - Unknown, pass 0
     /// Returns (width * 65536) + height on success, < 0 on error
-    pub extern fn sceJpegDecodeMJpeg(jpegbuf: [*c]u8, size: SceSize, rgba: ?*anyopaque, unk: u32) callconv(.C) c_int;
+    pub extern fn sceJpegDecodeMJpeg(jpegbuf: [*c]u8, size: SceSize, rgba: [*c]u8, unk: u32) callconv(.C) c_int;
 
     pub extern fn sceJpeg_227662D7() callconv(.C) void;
 
@@ -1414,15 +1416,38 @@ const sceJpeg = struct {
 
     pub extern fn sceJpeg_64B6F978() callconv(.C) void;
 
-    pub extern fn sceJpeg_67F0ED84() callconv(.C) void;
+    /// Converts a frame from YCbCr to RGBA
+    /// `imageAddr` - buffer where the converted data in RGBA format will be stored.
+    /// `yCbCrAddr` - the buffer with the YCbCr data
+    /// `widthHeight` - width and height of the frame (width * 65536) + height,
+    /// as returned by sceJpegDecodeMJpegYCbCr() or sceJpegDecodeMJpeg()
+    /// `bufferWidth` - number of pixels per row of the buffer
+    /// `colourInfo` - chroma subsampling mode, as provided by sceJpegGetOutputInfo()
+    /// Returns 0 on success, < 0 on error
+    pub extern fn sceJpegCsc(imageAddr: [*c]u8, yCbCrAddr: [*c]u8, widthHeight: c_int, bufferWidth: c_int, colourInfo: c_int) callconv(.C) c_int;
 
     /// Finishes the MJpeg library
     /// Returns 0 on success, < 0 on error
     pub extern fn sceJpegFinishMJpeg() callconv(.C) c_int;
 
-    pub extern fn sceJpegGetOutputInfo() callconv(.C) void;
+    /// Reads information from mjpeg frame
+    /// `jpegbuf` - the buffer with the mjpeg frame
+    /// `size` - size of the mjpeg frame
+    /// `colourInfo` - address where the mjpeg chroma information will be stored
+    /// `unk` - Unknown, pass 0
+    /// Returns number of bytes needed in the buffer that will be used for YCbCr decoding, <= 0 on error
+    pub extern fn sceJpegGetOutputInfo(jpegbuf: [*c]u8, size: SceSize, colourInfo: [*c]c_int, unk: c_int) callconv(.C) c_int;
 
-    pub extern fn sceJpegDecodeMJpegYCbCr() callconv(.C) void;
+    /// Decodes a mjpeg frame to YCbCr encoding
+    /// @note Input frame should be encoded as either yuv420p or yuvj420p,
+    /// returns SCE_JPEG_ERROR_UNSUPPORT_SAMPLING otherwise
+    /// `jpegbuf` - the buffer with the mjpeg frame
+    /// `size` - size of the buffer pointed by jpegbuf
+    /// `yCbCr` - buffer where the decoded data in YCbCr format will be stored
+    /// `yCbCrSize` - size of the buffer pointed by yCbCr (see sceJpegGetOutputInfo())
+    /// `unk` - Unknown, pass 0
+    /// Returns (width * 65536) + height on success, < 0 on error
+    pub extern fn sceJpegDecodeMJpegYCbCr(jpegbuf: [*c]u8, size: SceSize, yCbCr: [*c]u8, yCbCrSize: SceSize, unk: u32) callconv(.C) c_int;
 
     pub extern fn sceJpeg_9B36444C() callconv(.C) void;
 
@@ -2163,7 +2188,9 @@ const ModuleMgrForUser = struct {
     /// `argp` - A pointer to the arguments to the module.
     /// `status` - Returns the status of the start.
     /// `option` - Pointer to an optional ::SceKernelSMOption structure.
-    /// Returns ??? on success, otherwise one of ::PspKernelErrorCodes.
+    /// Returns modID (modID > 0) UID of the module that was started and made resident,
+    /// 0 on success for modules that don't need to be made resident,
+    /// otherwise one of ::PspKernelErrorCodes.
     pub extern fn sceKernelStartModule(modid: SceUID, argsize: SceSize, argp: ?*anyopaque, status: [*c]c_int, option: [*c]c_int) callconv(.C) c_int;
 
     /// Stop a running module.
@@ -4074,6 +4101,17 @@ const sceAudiocodec = struct {
 
 pub usingnamespace if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "sceAudiocodec") and options.sceAudiocodec)) sceAudiocodec else EMPTY;
 
+const sceKermitPeripheral = struct {
+    pub extern fn sceKermitPeripheral_4A26B7C8() callconv(.C) void;
+
+    pub extern fn sceKermitPeripheral_C0EBC631() callconv(.C) void;
+
+    pub extern fn sceKermitPeripheral_D27C5E03() callconv(.C) void;
+
+};
+
+pub usingnamespace if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "sceKermitPeripheral") and options.sceKermitPeripheral)) sceKermitPeripheral else EMPTY;
+
 const sceGe_user = struct {
     /// Get the size of VRAM.
     /// Returns The size of VRAM (in bytes).
@@ -4736,11 +4774,15 @@ const sceDisplay = struct {
     /// Set display mode
     /// @par Example1:
     /// `
+    /// int mode = PSP_DISPLAY_MODE_LCD;
+    /// int width = 480;
+    /// int height = 272;
+    /// sceDisplaySetMode(mode, width, height);
     /// `
-    /// `mode` - Display mode, normally 0.
+    /// `mode` - One of ::PspDisplayMode
     /// `width` - Width of screen in pixels.
     /// `height` - Height of screen in pixels.
-    /// Returns ???
+    /// Returns when error, a negative value is returned.
     pub extern fn sceDisplaySetMode(mode: c_int, width: c_int, height: c_int) callconv(.C) c_int;
 
     /// Get display mode

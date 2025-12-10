@@ -35,6 +35,7 @@ pub const Options = struct {
     sceDmac: bool = false,
     sceAudio: bool = false,
     sceAudiocodec: bool = false,
+    sceKermitPeripheral: bool = false,
     sceGe_user: bool = false,
     sceMp3: bool = false,
     sceRtc: bool = false,
@@ -88,6 +89,7 @@ pub fn addOptions(b: *std.Build, options: Options) *std.Build.Step.Options {
     step_options.addOption(bool, "sceDmac", options.sceDmac);
     step_options.addOption(bool, "sceAudio", options.sceAudio);
     step_options.addOption(bool, "sceAudiocodec", options.sceAudiocodec);
+    step_options.addOption(bool, "sceKermitPeripheral", options.sceKermitPeripheral);
     step_options.addOption(bool, "sceGe_user", options.sceGe_user);
     step_options.addOption(bool, "sceMp3", options.sceMp3);
     step_options.addOption(bool, "sceRtc", options.sceRtc);
