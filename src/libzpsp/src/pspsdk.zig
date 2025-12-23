@@ -239,6 +239,11 @@ const scePower = struct {
     /// busfreq*2 <= pllfreq
     pub extern fn scePowerSetClockFrequency(pllfreq: c_int, cpufreq: c_int, busfreq: c_int) callconv(.C) c_int;
 
+    /// Request the PSP to do a cold reboot.
+    /// `exitcode pass 0`
+    /// Returns 0 always
+    pub extern fn scePowerRequestColdReset(exitcode: c_int) callconv(.C) c_int;
+
 };
 
 pub usingnamespace if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "scePower") and options.scePower)) scePower else EMPTY;

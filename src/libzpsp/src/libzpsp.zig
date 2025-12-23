@@ -5,7 +5,7 @@ comptime {
     @setEvalBranchQuota(1000000);
 
     if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "scePower") and options.scePower)) {
-        asm(macro.import_module_start("scePower", "0x40010000", "46"));
+        asm(macro.import_module_start("scePower", "0x40010000", "47"));
         asm(macro.import_function("scePower", "0x2B51FE2F", "scePowerGetWlanActivity"));
         asm(macro.import_function("scePower", "0x442BFBAC", "scePowerGetBacklightMaximum"));
         asm(macro.import_function("scePower", "0xEFD3C963", "scePowerTick"));
@@ -52,6 +52,7 @@ comptime {
         asm(macro.import_function("scePower", "0xB1A52C83", "scePowerGetCpuClockFrequencyFloat"));
         asm(macro.import_function("scePower", "0x9BADB3EB", "scePowerGetBusClockFrequencyFloat"));
         asm(macro.import_function("scePower", "0x737486F2", "scePowerSetClockFrequency"));
+        asm(macro.import_function("scePower", "0x0442D852", "scePowerRequestColdReset"));
     }
 
     if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "sceNetInet") and options.sceNetInet)) {
