@@ -1,3 +1,4 @@
+// THIS FILE IS AUTO-GENERATED
 const macro = @import("pspmacros.zig");
 const options = @import("libzpsp_option");
 

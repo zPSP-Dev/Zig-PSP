@@ -485,6 +485,7 @@ def generate_zig_file(modules: Dict[str, Module], output_path: str):
     os.makedirs(os.path.dirname(output_path), exist_ok=True)
 
     with open(output_path, 'w') as f:
+        f.write('// THIS FILE IS AUTO-GENERATED\n')
         # Write header
         f.write('const macro = @import("pspmacros.zig");\n')
         f.write('const options = @import("libzpsp_option");\n\n')
@@ -523,6 +524,7 @@ def generate_pspsdk_file(modules: Dict[str, Module], output_path: str):
 
     with open(output_path, 'w') as f:
         # Write header
+        f.write('// THIS FILE IS AUTO-GENERATED\n')
         f.write('const options = @import("libzpsp_option");\n')
         f.write('const types = @import("psptypes.zig");\n\n')
 
@@ -624,6 +626,8 @@ def generate_options_file(modules: Dict[str, Module], output_path: str):
     os.makedirs(os.path.dirname(output_path), exist_ok=True)
 
     with open(output_path, 'w') as f:
+        f.write('// THIS FILE IS AUTO-GENERATED\n')
+
         # Write header
         f.write('const std = @import("std");\n\n')
 

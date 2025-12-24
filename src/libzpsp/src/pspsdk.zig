@@ -1,3 +1,4 @@
+// THIS FILE IS AUTO-GENERATED
 const options = @import("libzpsp_option");
 const types = @import("psptypes.zig");
 

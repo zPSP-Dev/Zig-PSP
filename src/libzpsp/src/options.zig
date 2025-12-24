@@ -1,3 +1,4 @@
+// THIS FILE IS AUTO-GENERATED
 const std = @import("std");
 
 pub const Options = struct {
