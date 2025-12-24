@@ -12,8 +12,7 @@
             .path = "tools/sfo",
         },
         .libzpsp = .{
-            .url = "git+https://github.com/zPSP-Dev/libzpsp#836d9cd94809071996cc788b429961f128de843e",
-            .hash = "libzpsp-0.0.0-NAgUb598BQBMsjLg55ZXDzHlzeZ2fg3TbgZUfgaoeerR",
+            .path = "src/libzpsp",
         },
     },
     .paths = .{
