@@ -73,6 +73,337 @@ pub const ScePspDateTime = types.ScePspDateTime;
 
 const EMPTY = struct {};
 
+const sceCtrl = struct {
+    /// Set the controller cycle setting.
+    /// `cycle` - Cycle.  Normally set to 0.
+    /// Returns The previous cycle setting.
+    pub extern fn sceCtrlSetSamplingCycle(cycle: c_int) callconv(.C) c_int;
+
+    /// Get the controller current cycle setting.
+    /// `pcycle` - Return value.
+    /// Returns 0.
+    pub extern fn sceCtrlGetSamplingCycle(pcycle: [*c]c_int) callconv(.C) c_int;
+
+    /// Set the controller mode.
+    /// `mode` - One of ::PspCtrlMode. If this is ::PSP_CTRL_MODE_DIGITAL, no data about the analog stick
+    /// will be present in the SceCtrlData struct read by SceCtrlReadBuffer.
+    /// Returns The previous mode.
+    pub extern fn sceCtrlSetSamplingMode(mode: c_int) callconv(.C) c_int;
+
+    /// Get the current controller mode.
+    /// `pmode` - Return value.
+    /// Returns 0.
+    pub extern fn sceCtrlGetSamplingMode(pmode: [*c]c_int) callconv(.C) c_int;
+
+    /// @brief Read latest controller data from the controller service.
+    /// Controller data contains current button and axis state.
+    /// @note Axis state is present only in ::PSP_CTRL_MODE_ANALOG controller mode.
+    /// `pad_data` - A pointer to ::SceCtrlData structure that receives controller data.
+    /// `count` - Number of ::SceCtrlData structures to read.
+    /// @see ::SceCtrlData
+    /// @see ::sceCtrlPeekBufferNegative()
+    /// @see ::sceCtrlReadBufferPositive()
+    pub extern fn sceCtrlPeekBufferPositive(pad_data: [*c]c_int, count: c_int) callconv(.C) c_int;
+
+    pub extern fn sceCtrlPeekBufferNegative(pad_data: [*c]c_int, count: c_int) callconv(.C) c_int;
+
+    /// @brief Read new controller data from the controller service.
+    /// Controller data contains current button and axis state.
+    /// **Example:**
+    /// `
+    /// SceCtrlData pad;
+    /// sceCtrlSetSamplingCycle(0);
+    /// sceCtrlSetSamplingMode(1);
+    /// sceCtrlReadBufferPositive(&pad, 1);
+    /// // Do something with the read controller data
+    /// `
+    /// @note Axis state is present only in ::PSP_CTRL_MODE_ANALOG controller mode.
+    /// @warning Controller data is collected once every controller sampling cycle.
+    /// If controller data was already read during a cycle, trying to read it again
+    /// will block the execution until the next one.
+    /// `pad_data` - A pointer to ::SceCtrlData structure that receives controller data.
+    /// `count` - Number of ::SceCtrlData structures to read.
+    /// @see ::SceCtrlData
+    /// @see ::sceCtrlReadBufferNegative()
+    /// @see ::sceCtrlPeekBufferPositive()
+    pub extern fn sceCtrlReadBufferPositive(pad_data: [*c]c_int, count: c_int) callconv(.C) c_int;
+
+    pub extern fn sceCtrlReadBufferNegative(pad_data: [*c]c_int, count: c_int) callconv(.C) c_int;
+
+    /// @brief Read latest latch data from the controller service.
+    /// Latch data contains information about button state changes between two controller service sampling cycles.
+    /// `latch_data A pointer to ::SceCtrlLatch structure that receives latch data.`
+    /// Returns On success, the number of times the controller service performed sampling since the last time
+    /// ::sceCtrlReadLatch() was called.
+    /// Returns < 0 on error.
+    /// @see ::SceCtrlLatch
+    /// @see ::sceCtrlReadLatch()
+    pub extern fn sceCtrlPeekLatch(latch_data: [*c]c_int) callconv(.C) c_int;
+
+    /// @brief Read new latch data from the controller service.
+    /// Latch data contains information about button state changes between two controller service sampling cycles.
+    /// **Example:**
+    /// `
+    /// SceCtrlLatch latchData;
+    /// while (1) {
+    /// // Obtain latch data
+    /// sceCtrlReadLatch(&latchData);
+    /// if (latchData.uiMake & PSP_CTRL_CROSS)
+    /// {
+    /// // The Cross button has just been pressed (transition from 'released' state to 'pressed' state)
+    /// }
+    /// if (latchData.uiPress & PSP_CTRL_SQUARE)
+    /// {
+    /// // The Square button is currently in the 'pressed' state
+    /// }
+    /// if (latchData.uiBreak & PSP_CTRL_TRIANGLE)
+    /// {
+    /// // The Triangle button has just been released (transition from 'pressed' state to 'released' state)
+    /// }
+    /// if (latchData.uiRelease & PSP_CTRL_CIRCLE)
+    /// {
+    /// // The Circle button is currently in the 'released' state
+    /// }
+    /// // As we clear the internal latch data with the ReadLatch() call, we can explicitly wait for the VBLANK interval
+    /// // to give the controller service the time it needs to collect new latch data again. This guarantees the next call
+    /// // to sceCtrlReadLatch() will return collected data again.
+    /// //
+    /// // Note: The sceCtrlReadBuffer*() APIs are implicitly waiting for a VBLANK interval if necessary.
+    /// sceDisplayWaitVBlank();
+    /// }
+    /// `
+    /// @warning Latch data is produced once every controller sampling cycle. If latch data was already read
+    /// during a cycle, trying to read it again will block the execution until the next one.
+    /// `latch_data A pointer to ::SceCtrlLatch structure that receives latch data.`
+    /// Returns On success, the number of times the controller service performed sampling since the last time
+    /// ::sceCtrlReadLatch() was called.
+    /// Returns < 0 on error.
+    /// @see ::SceCtrlLatch
+    /// @see ::sceCtrlPeekLatch()
+    pub extern fn sceCtrlReadLatch(latch_data: [*c]c_int) callconv(.C) c_int;
+
+    pub extern fn sceCtrl_348D99D4() callconv(.C) void;
+
+    pub extern fn sceCtrl_AF5960F3() callconv(.C) void;
+
+    pub extern fn sceCtrlClearRapidFire() callconv(.C) void;
+
+    pub extern fn sceCtrlSetRapidFire() callconv(.C) void;
+
+    /// Set analog threshold relating to the idle timer.
+    /// `idlereset` - Movement needed by the analog to reset the idle timer.
+    /// `idleback` - Movement needed by the analog to bring the PSP back from an idle state.
+    /// Set to -1 for analog to not cancel idle timer.
+    /// Set to 0 for idle timer to be cancelled even if the analog is not moved.
+    /// Set between 1 - 128 to specify the movement on either axis needed by the analog to fire the event.
+    /// Returns < 0 on error.
+    pub extern fn sceCtrlSetIdleCancelThreshold(idlereset: c_int, idleback: c_int) callconv(.C) c_int;
+
+    /// Get the idle threshold values.
+    /// `idlerest` - Movement needed by the analog to reset the idle timer.
+    /// `idleback` - Movement needed by the analog to bring the PSP back from an idle state.
+    /// Returns < 0 on error.
+    pub extern fn sceCtrlGetIdleCancelThreshold(idlerest: [*c]c_int, idleback: [*c]c_int) callconv(.C) c_int;
+
+};
+
+pub usingnamespace if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "sceCtrl") and options.sceCtrl)) sceCtrl else EMPTY;
+
+const sceAudio = struct {
+    /// Output audio of the specified channel
+    /// `channel` - The channel number.
+    /// `vol` - The volume.
+    /// `buf` - Pointer to the PCM data to output.
+    /// Returns 0 on success, an error if less than 0.
+    pub extern fn sceAudioOutput(channel: c_int, vol: c_int, buf: ?*anyopaque) callconv(.C) c_int;
+
+    /// Output audio of the specified channel (blocking)
+    /// `channel` - The channel number.
+    /// `vol` - The volume.
+    /// `buf` - Pointer to the PCM data to output.
+    /// Returns 0 on success, an error if less than 0.
+    pub extern fn sceAudioOutputBlocking(channel: c_int, vol: c_int, buf: ?*anyopaque) callconv(.C) c_int;
+
+    /// Output panned audio of the specified channel
+    /// `channel` - The channel number.
+    /// `leftvol` - The left volume.
+    /// `rightvol` - The right volume.
+    /// `buf` - Pointer to the PCM data to output.
+    /// Returns 0 on success, an error if less than 0.
+    pub extern fn sceAudioOutputPanned(channel: c_int, leftvol: c_int, rightvol: c_int, buf: ?*anyopaque) callconv(.C) c_int;
+
+    /// Output panned audio of the specified channel (blocking)
+    /// `channel` - The channel number.
+    /// `leftvol` - The left volume.
+    /// `rightvol` - The right volume.
+    /// `buf` - Pointer to the PCM data to output.
+    /// Returns 0 on success, an error if less than 0.
+    pub extern fn sceAudioOutputPannedBlocking(channel: c_int, leftvol: c_int, rightvol: c_int, buf: ?*anyopaque) callconv(.C) c_int;
+
+    /// Allocate and initialize a hardware output channel.
+    /// `channel` - Use a value between 0 - 7 to reserve a specific channel.
+    /// Pass PSP_AUDIO_NEXT_CHANNEL to get the first available channel.
+    /// `samplecount` - The number of samples that can be output on the channel per
+    /// output call.  It must be a value between ::PSP_AUDIO_SAMPLE_MIN
+    /// and ::PSP_AUDIO_SAMPLE_MAX, and it must be aligned to 64 bytes
+    /// (use the ::PSP_AUDIO_SAMPLE_ALIGN macro to align it).
+    /// `format` - The output format to use for the channel.  One of ::PspAudioFormats.
+    /// Returns The channel number on success, an error code if less than 0.
+    pub extern fn sceAudioChReserve(channel: c_int, samplecount: c_int, format: c_int) callconv(.C) c_int;
+
+    pub extern fn sceAudioOneshotOutput() callconv(.C) void;
+
+    /// Release a hardware output channel.
+    /// `channel` - The channel to release.
+    /// Returns 0 on success, an error if less than 0.
+    pub extern fn sceAudioChRelease(channel: c_int) callconv(.C) c_int;
+
+    /// Get count of unplayed samples remaining
+    /// `channel` - The channel number.
+    /// Returns Number of samples to be played, an error if less than 0.
+    pub extern fn sceAudioGetChannelRestLen(channel: c_int) callconv(.C) c_int;
+
+    /// Change the output sample count, after it's already been reserved
+    /// `channel` - The channel number.
+    /// `samplecount` - The number of samples to output in one output call.
+    /// Returns 0 on success, an error if less than 0.
+    pub extern fn sceAudioSetChannelDataLen(channel: c_int, samplecount: c_int) callconv(.C) c_int;
+
+    /// Change the format of a channel
+    /// `channel` - The channel number.
+    /// `format` - One of ::PspAudioFormats
+    /// Returns 0 on success, an error if less than 0.
+    pub extern fn sceAudioChangeChannelConfig(channel: c_int, format: c_int) callconv(.C) c_int;
+
+    /// Change the volume of a channel
+    /// `channel` - The channel number.
+    /// `leftvol` - The left volume.
+    /// `rightvol` - The right volume.
+    /// Returns 0 on success, an error if less than 0.
+    pub extern fn sceAudioChangeChannelVolume(channel: c_int, leftvol: c_int, rightvol: c_int) callconv(.C) c_int;
+
+    /// Reserve the audio output
+    /// `samplecount` - The number of samples to output in one output call (min 17, max 4111).
+    /// `freq` - The frequency. One of 48000, 44100, 32000, 24000, 22050, 16000, 12000, 11050, 8000.
+    /// `channels` - Number of channels. Pass 2 (stereo).
+    /// Returns 0 on success, an error if less than 0.
+    pub extern fn sceAudioSRCChReserve(samplecount: c_int, freq: c_int, channels: c_int) callconv(.C) c_int;
+
+    /// Release the audio output
+    /// Returns 0 on success, an error if less than 0.
+    pub extern fn sceAudioSRCChRelease() callconv(.C) c_int;
+
+    /// Output audio
+    /// `vol` - The volume.
+    /// `buf` - Pointer to the PCM data to output.
+    /// Returns 0 on success, an error if less than 0.
+    pub extern fn sceAudioSRCOutputBlocking(vol: c_int, buf: ?*anyopaque) callconv(.C) c_int;
+
+    /// Perform audio input (blocking)
+    /// `samplecount` - Number of samples.
+    /// `freq` - Either 44100, 22050 or 11025.
+    /// `buf` - Pointer to where the audio data will be stored.
+    /// Returns 0 on success, an error if less than 0.
+    pub extern fn sceAudioInputBlocking(samplecount: c_int, freq: c_int, buf: ?*anyopaque) callconv(.C) c_int;
+
+    /// Perform audio input
+    /// `samplecount` - Number of samples.
+    /// `freq` - Either 44100, 22050 or 11025.
+    /// `buf` - Pointer to where the audio data will be stored.
+    /// Returns 0 on success, an error if less than 0.
+    /// Perform audio input (blocking)
+    /// `samplecount` - Number of samples.
+    /// `freq` - Either 44100, 22050 or 11025.
+    /// `buf` - Pointer to where the audio data will be stored.
+    /// Returns 0 on success, an error if less than 0.
+    /// Init audio input (with extra arguments)
+    /// `params` - A pointer to a ::pspAudioInputParams struct.
+    /// Returns 0 on success, an error if less than 0.
+    /// Init audio input
+    /// `unknown1` - Unknown. Pass 0.
+    /// `gain` - Gain.
+    /// `unknown2` - Unknown. Pass 0.
+    /// Returns 0 on success, an error if less than 0.
+    pub extern fn sceAudioInput(samplecount: c_int, freq: c_int, buf: ?*anyopaque) callconv(.C) c_int;
+
+    /// Get the number of samples that were acquired
+    /// Returns Number of samples acquired, an error if less than 0.
+    pub extern fn sceAudioGetInputLength() callconv(.C) c_int;
+
+    /// Wait for non-blocking audio input to complete
+    /// Returns 0 on success, an error if less than 0.
+    pub extern fn sceAudioWaitInputEnd() callconv(.C) c_int;
+
+    /// Init audio input
+    /// `unknown1` - Unknown. Pass 0.
+    /// `gain` - Gain.
+    /// `unknown2` - Unknown. Pass 0.
+    /// Returns 0 on success, an error if less than 0.
+    pub extern fn sceAudioInputInit(unknown1: c_int, gain: c_int, unknown2: c_int) callconv(.C) c_int;
+
+    /// Poll for non-blocking audio input status
+    /// Returns 0 if input has completed, 1 if not completed or an error if less than 0.
+    pub extern fn sceAudioPollInputEnd() callconv(.C) c_int;
+
+    /// Get count of unplayed samples remaining
+    /// `channel` - The channel number.
+    /// Returns Number of samples to be played, an error if less than 0.
+    pub extern fn sceAudioGetChannelRestLength(channel: c_int) callconv(.C) c_int;
+
+    /// Init audio input (with extra arguments)
+    /// `params` - A pointer to a ::pspAudioInputParams struct.
+    /// Returns 0 on success, an error if less than 0.
+    pub extern fn sceAudioInputInitEx(params: [*c]c_int) callconv(.C) c_int;
+
+    /// Reserve the audio output and set the output sample count
+    /// `samplecount` - The number of samples to output in one output call (min 17, max 4111).
+    /// Returns 0 on success, an error if less than 0.
+    pub extern fn sceAudioOutput2Reserve(samplecount: c_int) callconv(.C) c_int;
+
+    /// Output audio (blocking)
+    /// `vol` - The volume.
+    /// `buf` - Pointer to the PCM data.
+    /// Returns 0 on success, an error if less than 0.
+    pub extern fn sceAudioOutput2OutputBlocking(vol: c_int, buf: ?*anyopaque) callconv(.C) c_int;
+
+    /// Release the audio output
+    /// Returns 0 on success, an error if less than 0.
+    pub extern fn sceAudioOutput2Release() callconv(.C) c_int;
+
+    /// Change the output sample count, after it's already been reserved
+    /// `samplecount` - The number of samples to output in one output call (min 17, max 4111).
+    /// Returns 0 on success, an error if less than 0.
+    pub extern fn sceAudioOutput2ChangeLength(samplecount: c_int) callconv(.C) c_int;
+
+    /// Get count of unplayed samples remaining
+    /// Returns Number of samples to be played, an error if less than 0.
+    pub extern fn sceAudioOutput2GetRestSample() callconv(.C) c_int;
+
+};
+
+pub usingnamespace if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "sceAudio") and options.sceAudio)) sceAudio else EMPTY;
+
+const sceAudiocodec = struct {
+    pub extern fn sceAudiocodecCheckNeedMem(Buffer: [*c]c_ulong, Type: c_int) callconv(.C) c_int;
+
+    pub extern fn sceAudiocodecInit(Buffer: [*c]c_ulong, Type: c_int) callconv(.C) c_int;
+
+    pub extern fn sceAudiocodecDecode(Buffer: [*c]c_ulong, Type: c_int) callconv(.C) c_int;
+
+    pub extern fn sceAudiocodecGetInfo() callconv(.C) void;
+
+    pub extern fn sceAudiocodec_6CD2A861() callconv(.C) void;
+
+    pub extern fn sceAudiocodec_59176A0F() callconv(.C) void;
+
+    pub extern fn sceAudiocodecGetEDRAM(Buffer: [*c]c_ulong, Type: c_int) callconv(.C) c_int;
+
+    pub extern fn sceAudiocodecReleaseEDRAM(Buffer: [*c]c_ulong) callconv(.C) c_int;
+
+};
+
+pub usingnamespace if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "sceAudiocodec") and options.sceAudiocodec)) sceAudiocodec else EMPTY;
+
 const scePower = struct {
     pub extern fn scePowerGetWlanActivity() callconv(.C) void;
 
@@ -248,6 +579,47 @@ const scePower = struct {
 
 pub usingnamespace if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "scePower") and options.scePower)) scePower else EMPTY;
 
+const sceVaudio = struct {
+    /// Output audio (blocking)
+    /// `volume` - It must be a value between 0 and ::PSP_VAUDIO_VOLUME_MAX
+    /// `buffer` - Pointer to the PCM data to output.
+    /// Returns 0 on success, an error if less than 0.
+    pub extern fn sceVaudioOutputBlocking(volume: c_int, buffer: ?*anyopaque) callconv(.C) c_int;
+
+    /// Allocate and initialize a virtual output channel.
+    /// `samplecount` - The number of samples that can be output on the channel per
+    /// output call. One of 256, 576, 1024, 1152, 2048.
+    /// It must be a value between ::PSP_VAUDIO_SAMPLE_MIN and ::PSP_VAUDIO_SAMPLE_MAX.
+    /// `frequency` - The frequency. One of 48000, 44100, 32000, 24000, 22050, 16000, 12000, 11050, 8000.
+    /// `format` - The output format to use for the channel. One of ::PSP_VAUDIO_FORMAT_MONO or ::PSP_VAUDIO_FORMAT_STEREO
+    /// Returns 0 if success, < 0 on error.
+    pub extern fn sceVaudioChReserve(samplecount: c_int, frequency: c_int, format: c_int) callconv(.C) c_int;
+
+    /// Release  a virtual output channel.
+    /// Returns 0 if success, < 0 on error.
+    pub extern fn sceVaudioChRelease() callconv(.C) c_int;
+
+    /// Set effect type
+    /// `effect` - The effect type. One of ::PSP_VAUDIO_EFFECT_OFF or ::PSP_VAUDIO_EFFECT_HEAVY or ::PSP_VAUDIO_EFFECT_POPS or ::PSP_VAUDIO_EFFECT_JAZZ or ::PSP_VAUDIO_EFFECT_UNIQUE or ::PSP_VAUDIO_EFFECT_MAX
+    /// `volume` - The volume. It must be a value between 0 and ::PSP_VAUDIO_VOLUME_MAX
+    /// Returns The volume value on success, < 0 on error.
+    pub extern fn sceVaudioSetEffectType(effect: c_int, volume: c_int) callconv(.C) c_int;
+
+    /// Set ALC(dynamic normalizer)
+    /// `mode` - The mode. One of ::PSP_VAUDIO_ALC_OFF or ::PSP_VAUDIO_ALC_MODE1 or ::PSP_VAUDIO_ALC_MODE_MAX
+    /// Returns 0 if success, < 0 on error.
+    pub extern fn sceVaudioSetAlcMode(mode: c_int) callconv(.C) c_int;
+
+    pub extern fn sceVaudio_504E4745() callconv(.C) void;
+
+    pub extern fn sceVaudioChReserveBuffering() callconv(.C) void;
+
+    pub extern fn sceVaudio_E8E78DC8() callconv(.C) void;
+
+};
+
+pub usingnamespace if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "sceVaudio") and options.sceVaudio)) sceVaudio else EMPTY;
+
 const sceNetInet = struct {
     pub extern fn sceNetInetInit() callconv(.C) c_int;
 
@@ -358,6 +730,745 @@ const sceNetApctl = struct {
 };
 
 pub usingnamespace if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "sceNetApctl") and options.sceNetApctl)) sceNetApctl else EMPTY;
+
+const sceNetAdhocctl = struct {
+    /// Initialise the Adhoc control library
+    /// `stacksize` - Stack size of the adhocctl thread. Set to 0x2000
+    /// `priority` - Priority of the adhocctl thread. Set to 0x30
+    /// `product` - Pass a filled in ::productStruct
+    /// Returns 0 on success, < 0 on error
+    pub extern fn sceNetAdhocctlInit(stacksize: c_int, priority: c_int, product: [*c]c_int) callconv(.C) c_int;
+
+    /// Terminate the Adhoc control library
+    /// Returns 0 on success, < on error.
+    pub extern fn sceNetAdhocctlTerm() callconv(.C) c_int;
+
+    /// Connect to the Adhoc control
+    /// `name` - The name of the connection (maximum 8 alphanumeric characters).
+    /// Returns 0 on success, < 0 on error.
+    pub extern fn sceNetAdhocctlConnect(name: [*c]const c_char) callconv(.C) c_int;
+
+    /// Connect to the Adhoc control (as a host)
+    /// `name` - The name of the connection (maximum 8 alphanumeric characters).
+    /// Returns 0 on success, < 0 on error.
+    pub extern fn sceNetAdhocctlCreate(name: [*c]const c_char) callconv(.C) c_int;
+
+    /// Connect to the Adhoc control (as a client)
+    /// `scaninfo` - A valid ::SceNetAdhocctlScanInfo struct that has been filled by sceNetAchocctlGetScanInfo
+    /// Returns 0 on success, < 0 on error.
+    pub extern fn sceNetAdhocctlJoin(scaninfo: [*c]c_int) callconv(.C) c_int;
+
+    /// Scan the adhoc channels
+    /// Returns 0 on success, < 0 on error.
+    pub extern fn sceNetAdhocctlScan() callconv(.C) c_int;
+
+    /// Disconnect from the Adhoc control
+    /// Returns 0 on success, < 0 on error
+    pub extern fn sceNetAdhocctlDisconnect() callconv(.C) c_int;
+
+    /// Register an adhoc event handler
+    /// `handler` - The event handler.
+    /// `unknown` - Pass NULL.
+    /// Returns Handler id on success, < 0 on error.
+    pub extern fn sceNetAdhocctlAddHandler(handler: c_int, unknown: ?*anyopaque) callconv(.C) c_int;
+
+    /// Delete an adhoc event handler
+    /// `id` - The handler id as returned by sceNetAdhocctlAddHandler.
+    /// Returns 0 on success, < 0 on error.
+    pub extern fn sceNetAdhocctlDelHandler(id: c_int) callconv(.C) c_int;
+
+    /// Get the state of the Adhoc control
+    /// `event` - Pointer to an integer to receive the status. Can continue when it becomes 1.
+    /// Returns 0 on success, < 0 on error
+    pub extern fn sceNetAdhocctlGetState(event: [*c]c_int) callconv(.C) c_int;
+
+    /// Get the adhoc ID
+    /// `product` - A pointer to a  ::productStruct
+    /// Returns 0 on success, < 0 on error.
+    pub extern fn sceNetAdhocctlGetAdhocId(product: [*c]c_int) callconv(.C) c_int;
+
+    /// Get a list of peers
+    /// `length` - The length of the list.
+    /// `buf` - An allocated area of size length.
+    /// Returns 0 on success, < 0 on error.
+    pub extern fn sceNetAdhocctlGetPeerList(length: [*c]c_int, buf: ?*anyopaque) callconv(.C) c_int;
+
+    /// Get mac address from nickname
+    /// `nickname` - The nickname.
+    /// `length` - The length of the list.
+    /// `buf` - An allocated area of size length.
+    /// Returns 0 on success, < 0 on error.
+    pub extern fn sceNetAdhocctlGetAddrByName(nickname: [*c]c_char, length: [*c]c_int, buf: ?*anyopaque) callconv(.C) c_int;
+
+    /// Get nickname from a mac address
+    /// `mac` - The mac address.
+    /// `nickname` - Pointer to a char buffer where the nickname will be stored.
+    /// Returns 0 on success, < 0 on error.
+    pub extern fn sceNetAdhocctlGetNameByAddr(mac: [*c]u8, nickname: [*c]c_char) callconv(.C) c_int;
+
+    /// Get Adhocctl parameter
+    /// `params` - Pointer to a ::SceNetAdhocctlParams
+    /// Returns 0 on success, < 0 on error.
+    pub extern fn sceNetAdhocctlGetParameter(params: [*c]c_int) callconv(.C) c_int;
+
+    /// Get the results of a scan
+    /// `length` - The length of the list.
+    /// `buf` - An allocated area of size length.
+    /// Returns 0 on success, < 0 on error.
+    pub extern fn sceNetAdhocctlGetScanInfo(length: [*c]c_int, buf: ?*anyopaque) callconv(.C) c_int;
+
+    /// Connect to the Adhoc control game mode (as a host)
+    /// `name` - The name of the connection (maximum 8 alphanumeric characters).
+    /// `unknown` - Pass 1.
+    /// `num` - The total number of players (including the host).
+    /// `macs` - A pointer to a list of the participating mac addresses, host first, then clients.
+    /// `timeout` - Timeout in microseconds.
+    /// `unknown2` - pass 0.
+    /// Returns 0 on success, < 0 on error.
+    pub extern fn sceNetAdhocctlCreateEnterGameMode(name: [*c]const c_char, unknown: c_int, num: c_int, macs: [*c]u8, timeout: c_uint, unknown2: c_int) callconv(.C) c_int;
+
+    /// Connect to the Adhoc control game mode (as a client)
+    /// `name` - The name of the connection (maximum 8 alphanumeric characters).
+    /// `hostmac` - The mac address of the host.
+    /// `timeout` - Timeout in microseconds.
+    /// `unknown` - pass 0.
+    /// Returns 0 on success, < 0 on error.
+    pub extern fn sceNetAdhocctlJoinEnterGameMode(name: [*c]const c_char, hostmac: [*c]u8, timeout: c_uint, unknown: c_int) callconv(.C) c_int;
+
+    /// Exit game mode.
+    /// Returns 0 on success, < 0 on error.
+    pub extern fn sceNetAdhocctlExitGameMode() callconv(.C) c_int;
+
+    /// Get game mode information
+    /// `gamemodeinfo` - Pointer to store the info.
+    /// Returns 0 on success, < 0 on error.
+    pub extern fn sceNetAdhocctlGetGameModeInfo(gamemodeinfo: [*c]c_int) callconv(.C) c_int;
+
+    /// Get peer information
+    /// `mac` - The mac address of the peer.
+    /// `size` - Size of peerinfo.
+    /// `peerinfo` - Pointer to store the information.
+    /// Returns 0 on success, < 0 on error.
+    pub extern fn sceNetAdhocctlGetPeerInfo(mac: [*c]u8, size: c_int, peerinfo: [*c]c_int) callconv(.C) c_int;
+
+};
+
+pub usingnamespace if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "sceNetAdhocctl") and options.sceNetAdhocctl)) sceNetAdhocctl else EMPTY;
+
+const sceSsl = struct {
+    pub extern fn sceSslGetNameEntryCount() callconv(.C) void;
+
+    /// Get the current memory size used by ssl.
+    /// `memory` - Pointer where the current memory used value will be stored.
+    /// Returns 0 on success
+    pub extern fn sceSslGetUsedMemoryCurrent(memory: [*c]c_uint) callconv(.C) c_int;
+
+    pub extern fn sceSslGetNotBefore() callconv(.C) void;
+
+    /// Terminate the ssl library.
+    /// Returns 0 on success
+    pub extern fn sceSslEnd() callconv(.C) c_int;
+
+    pub extern fn sceSslGetIssuerName() callconv(.C) void;
+
+    pub extern fn sceSslGetSubjectName() callconv(.C) void;
+
+    pub extern fn sceSslGetNotAfter() callconv(.C) void;
+
+    /// Init the ssl library.
+    /// `unknown1` - Memory size? Pass 0x28000
+    /// Returns 0 on success
+    pub extern fn sceSslInit(unknown1: c_int) callconv(.C) c_int;
+
+    /// Get the maximum memory size used by ssl.
+    /// `memory` - Pointer where the maximum memory used value will be stored.
+    /// Returns 0 on success
+    pub extern fn sceSslGetUsedMemoryMax(memory: [*c]c_uint) callconv(.C) c_int;
+
+    pub extern fn sceSslGetSerialNumber() callconv(.C) void;
+
+    pub extern fn sceSslGetNameEntryInfo() callconv(.C) void;
+
+};
+
+pub usingnamespace if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "sceSsl") and options.sceSsl)) sceSsl else EMPTY;
+
+const sceNetAdhoc = struct {
+    /// Initialise the adhoc library.
+    /// Returns 0 on success, < 0 on error
+    pub extern fn sceNetAdhocInit() callconv(.C) c_int;
+
+    /// Terminate the adhoc library
+    /// Returns 0 on success, < 0 on error
+    pub extern fn sceNetAdhocTerm() callconv(.C) c_int;
+
+    pub extern fn sceNetAdhocPollSocket() callconv(.C) void;
+
+    pub extern fn sceNetAdhocSetSocketAlert() callconv(.C) void;
+
+    pub extern fn sceNetAdhocGetSocketAlert() callconv(.C) void;
+
+    /// Create a PDP object.
+    /// `mac` - Your MAC address (from sceWlanGetEtherAddr)
+    /// `port` - Port to use, lumines uses 0x309
+    /// `bufsize` - Socket buffer size, lumines sets to 0x400
+    /// `unk1` - Unknown, lumines sets to 0
+    /// Returns The ID of the PDP object (< 0 on error)
+    pub extern fn sceNetAdhocPdpCreate(mac: [*c]u8, port: c_ushort, bufsize: c_uint, unk1: c_int) callconv(.C) c_int;
+
+    /// Set a PDP packet to a destination
+    /// `id` - The ID as returned by ::sceNetAdhocPdpCreate
+    /// `destMacAddr` - The destination MAC address, can be set to all 0xFF for broadcast
+    /// `port` - The port to send to
+    /// `data` - The data to send
+    /// `len` - The length of the data.
+    /// `timeout` - Timeout in microseconds.
+    /// `nonblock` - Set to 0 to block, 1 for non-blocking.
+    /// Returns Bytes sent, < 0 on error
+    pub extern fn sceNetAdhocPdpSend(id: c_int, destMacAddr: [*c]u8, port: c_ushort, data: ?*anyopaque, len: c_uint, timeout: c_uint, nonblock: c_int) callconv(.C) c_int;
+
+    /// Receive a PDP packet
+    /// `id` - The ID of the PDP object, as returned by ::sceNetAdhocPdpCreate
+    /// `srcMacAddr` - Buffer to hold the source mac address of the sender
+    /// `port` - Buffer to hold the port number of he received data
+    /// `data` - Data buffer
+    /// `dataLength` - The length of the data buffer
+    /// `timeout` - Timeout in microseconds.
+    /// `nonblock` - Set to 0 to block, 1 for non-blocking.
+    /// Returns Number of bytes received, < 0 on error.
+    pub extern fn sceNetAdhocPdpRecv(id: c_int, srcMacAddr: [*c]u8, port: [*c]c_ushort, data: ?*anyopaque, dataLength: ?*anyopaque, timeout: c_uint, nonblock: c_int) callconv(.C) c_int;
+
+    /// Delete a PDP object.
+    /// `id` - The ID returned from ::sceNetAdhocPdpCreate
+    /// `unk1` - Unknown, set to 0
+    /// Returns 0 on success, < 0 on error
+    pub extern fn sceNetAdhocPdpDelete(id: c_int, unk1: c_int) callconv(.C) c_int;
+
+    /// Get the status of all PDP objects
+    /// `size` - Pointer to the size of the stat array (e.g 20 for one structure)
+    /// `stat` - Pointer to a list of ::pdpStatStruct structures.
+    /// Returns 0 on success, < 0 on error
+    pub extern fn sceNetAdhocGetPdpStat(size: [*c]c_int, stat: [*c]c_int) callconv(.C) c_int;
+
+    /// Open a PTP connection
+    /// `srcmac` - Local mac address.
+    /// `srcport` - Local port.
+    /// `destmac` - Destination mac.
+    /// `destport` - Destination port
+    /// `bufsize` - Socket buffer size
+    /// `delay` - Interval between retrying (microseconds).
+    /// `count` - Number of retries.
+    /// `unk1` - Pass 0.
+    /// Returns A socket ID on success, < 0 on error.
+    pub extern fn sceNetAdhocPtpOpen(srcmac: [*c]u8, srcport: c_ushort, destmac: [*c]u8, destport: c_ushort, bufsize: c_uint, delay: c_uint, count: c_int, unk1: c_int) callconv(.C) c_int;
+
+    /// Wait for connection created by sceNetAdhocPtpOpen()
+    /// `id` - A socket ID.
+    /// `timeout` - Timeout in microseconds.
+    /// `nonblock` - Set to 0 to block, 1 for non-blocking.
+    /// Returns 0 on success, < 0 on error.
+    pub extern fn sceNetAdhocPtpConnect(id: c_int, timeout: c_uint, nonblock: c_int) callconv(.C) c_int;
+
+    /// Wait for an incoming PTP connection
+    /// `srcmac` - Local mac address.
+    /// `srcport` - Local port.
+    /// `bufsize` - Socket buffer size
+    /// `delay` - Interval between retrying (microseconds).
+    /// `count` - Number of retries.
+    /// `queue` - Connection queue length.
+    /// `unk1` - Pass 0.
+    /// Returns A socket ID on success, < 0 on error.
+    pub extern fn sceNetAdhocPtpListen(srcmac: [*c]u8, srcport: c_ushort, bufsize: c_uint, delay: c_uint, count: c_int, queue: c_int, unk1: c_int) callconv(.C) c_int;
+
+    /// Accept an incoming PTP connection
+    /// `id` - A socket ID.
+    /// `mac` - Connecting peers mac.
+    /// `port` - Connecting peers port.
+    /// `timeout` - Timeout in microseconds.
+    /// `nonblock` - Set to 0 to block, 1 for non-blocking.
+    /// Returns 0 on success, < 0 on error.
+    pub extern fn sceNetAdhocPtpAccept(id: c_int, mac: [*c]u8, port: [*c]c_ushort, timeout: c_uint, nonblock: c_int) callconv(.C) c_int;
+
+    /// Send data
+    /// `id` - A socket ID.
+    /// `data` - Data to send.
+    /// `datasize` - Size of the data.
+    /// `timeout` - Timeout in microseconds.
+    /// `nonblock` - Set to 0 to block, 1 for non-blocking.
+    /// Returns 0 success, < 0 on error.
+    pub extern fn sceNetAdhocPtpSend(id: c_int, data: ?*anyopaque, datasize: [*c]c_int, timeout: c_uint, nonblock: c_int) callconv(.C) c_int;
+
+    /// Receive data
+    /// `id` - A socket ID.
+    /// `data` - Buffer for the received data.
+    /// `datasize` - Size of the data received.
+    /// `timeout` - Timeout in microseconds.
+    /// `nonblock` - Set to 0 to block, 1 for non-blocking.
+    /// Returns 0 on success, < 0 on error.
+    pub extern fn sceNetAdhocPtpRecv(id: c_int, data: ?*anyopaque, datasize: [*c]c_int, timeout: c_uint, nonblock: c_int) callconv(.C) c_int;
+
+    /// Wait for data in the buffer to be sent
+    /// `id` - A socket ID.
+    /// `timeout` - Timeout in microseconds.
+    /// `nonblock` - Set to 0 to block, 1 for non-blocking.
+    /// Returns A socket ID on success, < 0 on error.
+    pub extern fn sceNetAdhocPtpFlush(id: c_int, timeout: c_uint, nonblock: c_int) callconv(.C) c_int;
+
+    /// Close a socket
+    /// `id` - A socket ID.
+    /// `unk1` - Pass 0.
+    /// Returns A socket ID on success, < 0 on error.
+    pub extern fn sceNetAdhocPtpClose(id: c_int, unk1: c_int) callconv(.C) c_int;
+
+    /// Get the status of all PTP objects
+    /// `size` - Pointer to the size of the stat array (e.g 20 for one structure)
+    /// `stat` - Pointer to a list of ::ptpStatStruct structures.
+    /// Returns 0 on success, < 0 on error
+    pub extern fn sceNetAdhocGetPtpStat(size: [*c]c_int, stat: [*c]c_int) callconv(.C) c_int;
+
+    /// Create own game object type data.
+    /// `data` - A pointer to the game object data.
+    /// `size` - Size of the game data.
+    /// Returns 0 on success, < 0 on error.
+    pub extern fn sceNetAdhocGameModeCreateMaster(data: ?*anyopaque, size: c_int) callconv(.C) c_int;
+
+    /// Create peer game object type data.
+    /// `mac` - The mac address of the peer.
+    /// `data` - A pointer to the game object data.
+    /// `size` - Size of the game data.
+    /// Returns The id of the replica on success, < 0 on error.
+    pub extern fn sceNetAdhocGameModeCreateReplica(mac: [*c]u8, data: ?*anyopaque, size: c_int) callconv(.C) c_int;
+
+    /// Update own game object type data.
+    /// Returns 0 on success, < 0 on error.
+    pub extern fn sceNetAdhocGameModeUpdateMaster() callconv(.C) c_int;
+
+    /// Update peer game object type data.
+    /// `id` - The id of the replica returned by sceNetAdhocGameModeCreateReplica.
+    /// `unk1` - Pass 0.
+    /// Returns 0 on success, < 0 on error.
+    pub extern fn sceNetAdhocGameModeUpdateReplica(id: c_int, unk1: c_int) callconv(.C) c_int;
+
+    /// Delete own game object type data.
+    /// Returns 0 on success, < 0 on error.
+    pub extern fn sceNetAdhocGameModeDeleteMaster() callconv(.C) c_int;
+
+    /// Delete peer game object type data.
+    /// `id` - The id of the replica.
+    /// Returns 0 on success, < 0 on error.
+    pub extern fn sceNetAdhocGameModeDeleteReplica(id: c_int) callconv(.C) c_int;
+
+};
+
+pub usingnamespace if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "sceNetAdhoc") and options.sceNetAdhoc)) sceNetAdhoc else EMPTY;
+
+const sceNetAdhocMatching = struct {
+    /// Initialise the Adhoc matching library
+    /// `memsize` - Internal memory pool size. Lumines uses 0x20000
+    /// Returns 0 on success, < 0 on error
+    pub extern fn sceNetAdhocMatchingInit(memsize: c_int) callconv(.C) c_int;
+
+    /// Terminate the Adhoc matching library
+    /// Returns 0 on success, < 0 on error
+    pub extern fn sceNetAdhocMatchingTerm() callconv(.C) c_int;
+
+    /// Create an Adhoc matching object
+    /// `mode` - One of ::pspAdhocMatchingModes
+    /// `maxpeers` - Maximum number of peers to match (only used when mode is PSP_ADHOC_MATCHING_MODE_HOST)
+    /// `port` - Port. Lumines uses 0x22B
+    /// `bufsize` - Receiving buffer size
+    /// `hellodelay` - Hello message send delay in microseconds (only used when mode is PSP_ADHOC_MATCHING_MODE_HOST or PSP_ADHOC_MATCHING_MODE_PTP)
+    /// `pingdelay` - Ping send delay in microseconds. Lumines uses 0x5B8D80 (only used when mode is PSP_ADHOC_MATCHING_MODE_HOST or PSP_ADHOC_MATCHING_MODE_PTP)
+    /// `initcount` - Initial count of the of the resend counter. Lumines uses 3
+    /// `msgdelay` - Message send delay in microseconds
+    /// `callback` - Callback to be called for matching
+    /// Returns ID of object on success, < 0 on error.
+    pub extern fn sceNetAdhocMatchingCreate(mode: c_int, maxpeers: c_int, port: c_ushort, bufsize: c_int, hellodelay: c_uint, pingdelay: c_uint, initcount: c_int, msgdelay: c_uint, callback: c_int) callconv(.C) c_int;
+
+    /// Start a matching object
+    /// `matchingid` - The ID returned from ::sceNetAdhocMatchingCreate
+    /// `evthpri` - Priority of the event handler thread. Lumines uses 0x10
+    /// `evthstack` - Stack size of the event handler thread. Lumines uses 0x2000
+    /// `inthpri` - Priority of the input handler thread. Lumines uses 0x10
+    /// `inthstack` - Stack size of the input handler thread. Lumines uses 0x2000
+    /// `optlen` - Size of hellodata
+    /// `optdata` - Pointer to block of data passed to callback
+    /// Returns 0 on success, < 0 on error
+    pub extern fn sceNetAdhocMatchingStart(matchingid: c_int, evthpri: c_int, evthstack: c_int, inthpri: c_int, inthstack: c_int, optlen: c_int, optdata: ?*anyopaque) callconv(.C) c_int;
+
+    /// Stop a matching object
+    /// `matchingid` - The ID returned from ::sceNetAdhocMatchingCreate
+    /// Returns 0 on success, < 0 on error.
+    pub extern fn sceNetAdhocMatchingStop(matchingid: c_int) callconv(.C) c_int;
+
+    /// Delete an Adhoc matching object
+    /// `matchingid` - The ID returned from ::sceNetAdhocMatchingCreate
+    /// Returns 0 on success, < 0 on error.
+    pub extern fn sceNetAdhocMatchingDelete(matchingid: c_int) callconv(.C) c_int;
+
+    /// Select a matching target
+    /// `matchingid` - The ID returned from ::sceNetAdhocMatchingCreate
+    /// `mac` - MAC address to select
+    /// `optlen` - Optional data length
+    /// `optdata` - Pointer to the optional data
+    /// Returns 0 on success, < 0 on error.
+    pub extern fn sceNetAdhocMatchingSelectTarget(matchingid: c_int, mac: [*c]u8, optlen: c_int, optdata: ?*anyopaque) callconv(.C) c_int;
+
+    /// Cancel a matching target
+    /// `matchingid` - The ID returned from ::sceNetAdhocMatchingCreate
+    /// `mac` - The MAC address to cancel
+    /// Returns 0 on success, < 0 on error.
+    pub extern fn sceNetAdhocMatchingCancelTarget(matchingid: c_int, mac: [*c]u8) callconv(.C) c_int;
+
+    /// Set the optional hello message
+    /// `matchingid` - The ID returned from ::sceNetAdhocMatchingCreate
+    /// `optlen` - Length of the hello data
+    /// `optdata` - Pointer to the hello data
+    /// Returns 0 on success, < 0 on error.
+    pub extern fn sceNetAdhocMatchingSetHelloOpt(matchingid: c_int, optlen: c_int, optdata: ?*anyopaque) callconv(.C) c_int;
+
+    /// Get the optional hello message
+    /// `matchingid` - The ID returned from ::sceNetAdhocMatchingCreate
+    /// `optlen` - Length of the hello data
+    /// `optdata` - Pointer to the hello data
+    /// Returns 0 on success, < 0 on error.
+    pub extern fn sceNetAdhocMatchingGetHelloOpt(matchingid: c_int, optlen: [*c]c_int, optdata: ?*anyopaque) callconv(.C) c_int;
+
+    /// Get a list of matching members
+    /// `matchingid` - The ID returned from ::sceNetAdhocMatchingCreate
+    /// `length` - The length of the list.
+    /// `buf` - An allocated area of size length.
+    /// Returns 0 on success, < 0 on error.
+    pub extern fn sceNetAdhocMatchingGetMembers(matchingid: c_int, length: [*c]c_int, buf: ?*anyopaque) callconv(.C) c_int;
+
+    /// Get the maximum memory usage by the matching library
+    /// Returns The memory usage on success, < 0 on error.
+    pub extern fn sceNetAdhocMatchingGetPoolMaxAlloc() callconv(.C) c_int;
+
+    /// Cancel a matching target (with optional data)
+    /// `matchingid` - The ID returned from ::sceNetAdhocMatchingCreate
+    /// `mac` - The MAC address to cancel
+    /// `optlen` - Optional data length
+    /// `optdata` - Pointer to the optional data
+    /// Returns 0 on success, < 0 on error.
+    pub extern fn sceNetAdhocMatchingCancelTargetWithOpt(matchingid: c_int, mac: [*c]u8, optlen: c_int, optdata: ?*anyopaque) callconv(.C) c_int;
+
+    /// Get the status of the memory pool used by the matching library
+    /// `poolstat` - A ::pspAdhocPoolStat.
+    /// Returns 0 on success, < 0 on error.
+    pub extern fn sceNetAdhocMatchingGetPoolStat(poolstat: [*c]c_int) callconv(.C) c_int;
+
+    /// Send data to a matching target
+    /// `matchingid` - The ID returned from ::sceNetAdhocMatchingCreate
+    /// `mac` - The MAC address to send the data to
+    /// `datalen` - Length of the data
+    /// `data` - Pointer to the data
+    /// Returns 0 on success, < 0 on error.
+    pub extern fn sceNetAdhocMatchingSendData(matchingid: c_int, mac: [*c]u8, datalen: c_int, data: ?*anyopaque) callconv(.C) c_int;
+
+    /// Abort a data send to a matching target
+    /// `matchingid` - The ID returned from ::sceNetAdhocMatchingCreate
+    /// `mac` - The MAC address to send the data to
+    /// Returns 0 on success, < 0 on error.
+    pub extern fn sceNetAdhocMatchingAbortSendData(matchingid: c_int, mac: [*c]u8) callconv(.C) c_int;
+
+};
+
+pub usingnamespace if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "sceNetAdhocMatching") and options.sceNetAdhocMatching)) sceNetAdhocMatching else EMPTY;
+
+const sceNet = struct {
+    /// Initialise the networking library
+    /// `poolsize` - Memory pool size (appears to be for the whole of the networking library).
+    /// `calloutprio` - Priority of the SceNetCallout thread.
+    /// `calloutstack` - Stack size of the SceNetCallout thread (defaults to 4096 on non 1.5 firmware regardless of what value is passed).
+    /// `netintrprio` - Priority of the SceNetNetintr thread.
+    /// `netintrstack` - Stack size of the SceNetNetintr thread (defaults to 4096 on non 1.5 firmware regardless of what value is passed).
+    /// Returns 0 on success, < 0 on error
+    pub extern fn sceNetInit(poolsize: c_int, calloutprio: c_int, calloutstack: c_int, netintrprio: c_int, netintrstack: c_int) callconv(.C) c_int;
+
+    /// Terminate the networking library
+    /// Returns 0 on success, < 0 on error
+    pub extern fn sceNetTerm() callconv(.C) c_int;
+
+    /// Free (delete) thread info/data
+    /// `thid` - The thread id.
+    /// Returns 0 on success, < 0 on error
+    pub extern fn sceNetFreeThreadinfo(thid: c_int) callconv(.C) c_int;
+
+    /// Abort a thread
+    /// `thid` - The thread id.
+    /// Returns 0 on success, < 0 on error
+    pub extern fn sceNetThreadAbort(thid: c_int) callconv(.C) c_int;
+
+    /// Convert Mac address to a string
+    /// `mac` - The Mac address to convert.
+    /// `name` - Pointer to a buffer to store the result.
+    pub extern fn sceNetEtherNtostr(mac: [*c]u8, name: [*c]c_char) callconv(.C) void;
+
+    /// Convert string to a Mac address
+    /// `name` - The string to convert.
+    /// `mac` - Pointer to a buffer to store the result.
+    pub extern fn sceNetEtherStrton(name: [*c]c_char, mac: [*c]u8) callconv(.C) void;
+
+    /// Retrieve the local Mac address
+    /// `mac` - Pointer to a buffer to store the result.
+    /// Returns 0 on success, < 0 on error
+    pub extern fn sceNetGetLocalEtherAddr(mac: [*c]u8) callconv(.C) c_int;
+
+    /// Retrieve the networking library memory usage
+    /// `stat` - Pointer to a ::SceNetMallocStat type to store the result.
+    /// Returns 0 on success, < 0 on error
+    pub extern fn sceNetGetMallocStat(stat: [*c]c_int) callconv(.C) c_int;
+
+};
+
+pub usingnamespace if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "sceNet") and options.sceNet)) sceNet else EMPTY;
+
+const sceNetResolver = struct {
+    /// Inititalise the resolver library
+    /// Returns 0 on sucess, < 0 on error.
+    pub extern fn sceNetResolverInit() callconv(.C) c_int;
+
+    /// Terminate the resolver library
+    /// Returns 0 on success, < 0 on error
+    pub extern fn sceNetResolverTerm() callconv(.C) c_int;
+
+    /// Create a resolver object
+    /// `rid` - Pointer to receive the resolver id
+    /// `buf` - Temporary buffer
+    /// `buflen` - Length of the temporary buffer
+    /// Returns 0 on success, < 0 on error
+    pub extern fn sceNetResolverCreate(rid: [*c]c_int, buf: ?*anyopaque, buflen: SceSize) callconv(.C) c_int;
+
+    /// Delete a resolver
+    /// `rid` - The resolver to delete
+    /// Returns 0 on success, < 0 on error
+    pub extern fn sceNetResolverDelete(rid: c_int) callconv(.C) c_int;
+
+    /// Begin a name to address lookup
+    /// `rid` - Resolver id
+    /// `hostname` - Name to resolve
+    /// `addr` - Pointer to in_addr structure to receive the address
+    /// `timeout` - Number of seconds before timeout
+    /// `retry` - Number of retires
+    /// Returns 0 on success, < 0 on error
+    pub extern fn sceNetResolverStartNtoA(rid: c_int, hostname: [*c]const c_char, addr: [*c]c_int, timeout: c_uint, retry: c_int) callconv(.C) c_int;
+
+    /// Begin a address to name lookup
+    /// `rid -Resolver id`
+    /// `addr` - Pointer to the address to resolve
+    /// `hostname` - Buffer to receive the name
+    /// `hostname_len` - Length of the buffer
+    /// `timeout` - Number of seconds before timeout
+    /// `retry` - Number of retries
+    /// Returns 0 on success, < 0 on error
+    pub extern fn sceNetResolverStartAtoN(rid: c_int, addr: [*c]const c_int, hostname: [*c]c_char, hostname_len: SceSize, timeout: c_uint, retry: c_int) callconv(.C) c_int;
+
+    /// Stop a resolver operation
+    /// `rid` - Resolver id
+    /// Returns 0 on success, < 0 on error
+    pub extern fn sceNetResolverStop(rid: c_int) callconv(.C) c_int;
+
+};
+
+pub usingnamespace if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "sceNetResolver") and options.sceNetResolver)) sceNetResolver else EMPTY;
+
+const sceNet_lib = struct {
+    pub extern fn sceNet_lib_3B617AA0() callconv(.C) void;
+
+    pub extern fn sceNet_lib_DB88F458() callconv(.C) void;
+
+    pub extern fn sceNet_lib_B6FC0A5B() callconv(.C) void;
+
+    pub extern fn sceNet_lib_C431A214() callconv(.C) void;
+
+    pub extern fn sceNet_lib_BFCFEFF6() callconv(.C) void;
+
+    pub extern fn sceNet_lib_E1F4696F() callconv(.C) void;
+
+    pub extern fn sceNet_lib_5216CBF5() callconv(.C) void;
+
+    pub extern fn sceNet_lib_D2422E4D() callconv(.C) void;
+
+    pub extern fn sceNet_lib_D1BE2CE9() callconv(.C) void;
+
+    pub extern fn sceNet_lib_AB7DD9A5() callconv(.C) void;
+
+    pub extern fn sceNet_lib_80E1933E() callconv(.C) void;
+
+    pub extern fn sceNet_lib_7BA3ED91() callconv(.C) void;
+
+    pub extern fn sceNet_lib_03164B12() callconv(.C) void;
+
+    pub extern fn sceNet_lib_389728AB() callconv(.C) void;
+
+    pub extern fn sceNet_lib_4BF9E1DE() callconv(.C) void;
+
+    pub extern fn sceNet_lib_D5B64E37() callconv(.C) void;
+
+    pub extern fn sceNet_lib_DA02F383() callconv(.C) void;
+
+    pub extern fn sceNet_lib_AFA11338() callconv(.C) void;
+
+    pub extern fn sceNet_lib_B20F84F8() callconv(.C) void;
+
+    pub extern fn sceNet_lib_83FE280A() callconv(.C) void;
+
+    pub extern fn sceNet_lib_4F8F3808() callconv(.C) void;
+
+    pub extern fn sceNet_lib_891723D5() callconv(.C) void;
+
+    pub extern fn sceNet_lib_0DFF67F9() callconv(.C) void;
+
+    pub extern fn sceNet_lib_F355C73B() callconv(.C) void;
+
+    pub extern fn sceNet_lib_A55C914F() callconv(.C) void;
+
+    pub extern fn sceNet_lib_0D633F53() callconv(.C) void;
+
+    pub extern fn sceNetConfigGetEtherAddr() callconv(.C) void;
+
+    pub extern fn sceNet_lib_522A971B() callconv(.C) void;
+
+    pub extern fn sceNetRand() callconv(.C) void;
+
+    pub extern fn sceNet_lib_75D9985C() callconv(.C) void;
+
+    pub extern fn sceNet_lib_25CC373A() callconv(.C) void;
+
+    pub extern fn sceNet_lib_DCBC596E() callconv(.C) void;
+
+    pub extern fn sceNet_lib_7C86FBA4() callconv(.C) void;
+
+    pub extern fn sceNet_lib_A8B6205A() callconv(.C) void;
+
+    pub extern fn sceNet_lib_A93A93E9() callconv(.C) void;
+
+    pub extern fn sceNet_lib_6B294EE4() callconv(.C) void;
+
+    pub extern fn sceNet_lib_51C209B2() callconv(.C) void;
+
+    pub extern fn sceNet_lib_C9C97945() callconv(.C) void;
+
+    pub extern fn sceNet_lib_B8C4A858() callconv(.C) void;
+
+    pub extern fn sceNet_lib_205E8D17() callconv(.C) void;
+
+    pub extern fn sceNet_lib_F6DB0A0B() callconv(.C) void;
+
+    pub extern fn sceNet_lib_7574FDA1() callconv(.C) void;
+
+    pub extern fn sceNet_lib_CA3CF5EB() callconv(.C) void;
+
+    pub extern fn sceNet_lib_757085B0() callconv(.C) void;
+
+    pub extern fn sceNet_lib_435843CB() callconv(.C) void;
+
+    pub extern fn sceNet_lib_D861EF33() callconv(.C) void;
+
+    pub extern fn sceNet_lib_BB2B3DDB() callconv(.C) void;
+
+    pub extern fn sceNet_lib_6D5D42D7() callconv(.C) void;
+
+    pub extern fn sceNet_lib_C21E18B2() callconv(.C) void;
+
+    pub extern fn sceNet_lib_45452B7B() callconv(.C) void;
+
+    pub extern fn sceNet_lib_94B44F26() callconv(.C) void;
+
+    pub extern fn sceNet_lib_515B2F33() callconv(.C) void;
+
+    pub extern fn sceNet_lib_6DC71518() callconv(.C) void;
+
+    pub extern fn sceNet_lib_7C3B86C5() callconv(.C) void;
+
+    pub extern fn sceNet_lib_05D525E4() callconv(.C) void;
+
+    pub extern fn sceNet_lib_1D10419C() callconv(.C) void;
+
+    pub extern fn sceNet_lib_C2EC2EEA() callconv(.C) void;
+
+    pub extern fn sceNet_lib_710BD467() callconv(.C) void;
+
+    pub extern fn sceNet_lib_701DDDC3() callconv(.C) void;
+
+    pub extern fn sceNet_lib_D5A03BC0() callconv(.C) void;
+
+    pub extern fn sceNet_lib_FA6DE6A6() callconv(.C) void;
+
+    pub extern fn sceNet_lib_EDB11CB4() callconv(.C) void;
+
+    pub extern fn sceNet_lib_8C55B410() callconv(.C) void;
+
+    pub extern fn sceNet_lib_13A8B98A() callconv(.C) void;
+
+    pub extern fn sceNet_lib_EA42B353() callconv(.C) void;
+
+    pub extern fn sceNet_lib_45945E8D() callconv(.C) void;
+
+    pub extern fn sceNet_lib_D60225A3() callconv(.C) void;
+
+    pub extern fn sceNet_lib_EB6DE71A() callconv(.C) void;
+
+    pub extern fn sceNet_lib_EDCC871E() callconv(.C) void;
+
+    pub extern fn sceNet_lib_4B2B3416() callconv(.C) void;
+
+    pub extern fn sceNet_lib_2B42872F() callconv(.C) void;
+
+    pub extern fn sceNet_lib_C4261339() callconv(.C) void;
+
+    pub extern fn sceNet_lib_41FD8B5C() callconv(.C) void;
+
+    pub extern fn sceNet_lib_92633D8D() callconv(.C) void;
+
+    pub extern fn sceNet_lib_B9C780C7() callconv(.C) void;
+
+    pub extern fn sceNet_lib_B68E1EEA() callconv(.C) void;
+
+    pub extern fn sceNet_lib_E155112D() callconv(.C) void;
+
+    pub extern fn sceNet_lib_41621EB0() callconv(.C) void;
+
+    pub extern fn sceNet_lib_2E005032() callconv(.C) void;
+
+    pub extern fn sceNet_lib_33B230BD() callconv(.C) void;
+
+    pub extern fn sceNet_lib_976AB1E9() callconv(.C) void;
+
+    pub extern fn sceNet_lib_4C8FD452() callconv(.C) void;
+
+    pub extern fn sceNet_lib_5ED457BE() callconv(.C) void;
+
+    pub extern fn sceNet_lib_31F3CDA1() callconv(.C) void;
+
+    pub extern fn sceNet_lib_1F94AFD9() callconv(.C) void;
+
+    pub extern fn sceNet_lib_0A5A8751() callconv(.C) void;
+
+    pub extern fn sceNet_lib_B3A48B7F() callconv(.C) void;
+
+    pub extern fn sceNet_lib_949F1FBB() callconv(.C) void;
+
+    pub extern fn sceNet_lib_13672F83() callconv(.C) void;
+
+    pub extern fn sceNet_lib_5C7C7381() callconv(.C) void;
+
+    pub extern fn sceNet_lib_86B6DCD9() callconv(.C) void;
+
+    pub extern fn sceNet_lib_7AE91FB4() callconv(.C) void;
+
+    pub extern fn sceNet_lib_572AD6ED() callconv(.C) void;
+
+    pub extern fn sceNet_lib_87DC7A7E() callconv(.C) void;
+
+    pub extern fn sceNet_lib_991FF86D() callconv(.C) void;
+
+    pub extern fn sceNet_lib_5505D820() callconv(.C) void;
+
+};
+
+pub usingnamespace if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "sceNet_lib") and options.sceNet_lib)) sceNet_lib else EMPTY;
 
 const sceHttp = struct {
     /// Get http request response length.
@@ -658,1468 +1769,110 @@ const sceHttp = struct {
 
 pub usingnamespace if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "sceHttp") and options.sceHttp)) sceHttp else EMPTY;
 
-const sceNet = struct {
-    /// Initialise the networking library
-    /// `poolsize` - Memory pool size (appears to be for the whole of the networking library).
-    /// `calloutprio` - Priority of the SceNetCallout thread.
-    /// `calloutstack` - Stack size of the SceNetCallout thread (defaults to 4096 on non 1.5 firmware regardless of what value is passed).
-    /// `netintrprio` - Priority of the SceNetNetintr thread.
-    /// `netintrstack` - Stack size of the SceNetNetintr thread (defaults to 4096 on non 1.5 firmware regardless of what value is passed).
-    /// Returns 0 on success, < 0 on error
-    pub extern fn sceNetInit(poolsize: c_int, calloutprio: c_int, calloutstack: c_int, netintrprio: c_int, netintrstack: c_int) callconv(.C) c_int;
-
-    /// Terminate the networking library
-    /// Returns 0 on success, < 0 on error
-    pub extern fn sceNetTerm() callconv(.C) c_int;
-
-    /// Free (delete) thread info/data
-    /// `thid` - The thread id.
-    /// Returns 0 on success, < 0 on error
-    pub extern fn sceNetFreeThreadinfo(thid: c_int) callconv(.C) c_int;
-
-    /// Abort a thread
-    /// `thid` - The thread id.
-    /// Returns 0 on success, < 0 on error
-    pub extern fn sceNetThreadAbort(thid: c_int) callconv(.C) c_int;
-
-    /// Convert Mac address to a string
-    /// `mac` - The Mac address to convert.
-    /// `name` - Pointer to a buffer to store the result.
-    pub extern fn sceNetEtherNtostr(mac: [*c]u8, name: [*c]c_char) callconv(.C) void;
-
-    /// Convert string to a Mac address
-    /// `name` - The string to convert.
-    /// `mac` - Pointer to a buffer to store the result.
-    pub extern fn sceNetEtherStrton(name: [*c]c_char, mac: [*c]u8) callconv(.C) void;
-
-    /// Retrieve the local Mac address
-    /// `mac` - Pointer to a buffer to store the result.
-    /// Returns 0 on success, < 0 on error
-    pub extern fn sceNetGetLocalEtherAddr(mac: [*c]u8) callconv(.C) c_int;
-
-    /// Retrieve the networking library memory usage
-    /// `stat` - Pointer to a ::SceNetMallocStat type to store the result.
-    /// Returns 0 on success, < 0 on error
-    pub extern fn sceNetGetMallocStat(stat: [*c]c_int) callconv(.C) c_int;
+const sceOpenPSID = struct {
+    pub extern fn sceOpenPSIDGetOpenPSID(openpsid: [*c]c_int) callconv(.C) c_int;
 
 };
 
-pub usingnamespace if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "sceNet") and options.sceNet)) sceNet else EMPTY;
+pub usingnamespace if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "sceOpenPSID") and options.sceOpenPSID)) sceOpenPSID else EMPTY;
 
-const sceNetResolver = struct {
-    /// Inititalise the resolver library
-    /// Returns 0 on sucess, < 0 on error.
-    pub extern fn sceNetResolverInit() callconv(.C) c_int;
+const sceAtrac3plus = struct {
+    pub extern fn sceAtracStartEntry() callconv(.C) void;
 
-    /// Terminate the resolver library
-    /// Returns 0 on success, < 0 on error
-    pub extern fn sceNetResolverTerm() callconv(.C) c_int;
+    pub extern fn sceAtracEndEntry() callconv(.C) void;
 
-    /// Create a resolver object
-    /// `rid` - Pointer to receive the resolver id
-    /// `buf` - Temporary buffer
-    /// `buflen` - Length of the temporary buffer
-    /// Returns 0 on success, < 0 on error
-    pub extern fn sceNetResolverCreate(rid: [*c]c_int, buf: ?*anyopaque, buflen: SceSize) callconv(.C) c_int;
+    pub extern fn sceAtracGetAtracID() callconv(.C) void;
 
-    /// Delete a resolver
-    /// `rid` - The resolver to delete
-    /// Returns 0 on success, < 0 on error
-    pub extern fn sceNetResolverDelete(rid: c_int) callconv(.C) c_int;
-
-    /// Begin a name to address lookup
-    /// `rid` - Resolver id
-    /// `hostname` - Name to resolve
-    /// `addr` - Pointer to in_addr structure to receive the address
-    /// `timeout` - Number of seconds before timeout
-    /// `retry` - Number of retires
-    /// Returns 0 on success, < 0 on error
-    pub extern fn sceNetResolverStartNtoA(rid: c_int, hostname: [*c]const c_char, addr: [*c]c_int, timeout: c_uint, retry: c_int) callconv(.C) c_int;
-
-    /// Begin a address to name lookup
-    /// `rid -Resolver id`
-    /// `addr` - Pointer to the address to resolve
-    /// `hostname` - Buffer to receive the name
-    /// `hostname_len` - Length of the buffer
-    /// `timeout` - Number of seconds before timeout
-    /// `retry` - Number of retries
-    /// Returns 0 on success, < 0 on error
-    pub extern fn sceNetResolverStartAtoN(rid: c_int, addr: [*c]const c_int, hostname: [*c]c_char, hostname_len: SceSize, timeout: c_uint, retry: c_int) callconv(.C) c_int;
-
-    /// Stop a resolver operation
-    /// `rid` - Resolver id
-    /// Returns 0 on success, < 0 on error
-    pub extern fn sceNetResolverStop(rid: c_int) callconv(.C) c_int;
-
-};
-
-pub usingnamespace if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "sceNetResolver") and options.sceNetResolver)) sceNetResolver else EMPTY;
-
-const sceNet_lib = struct {
-    pub extern fn sceNet_lib_3B617AA0() callconv(.C) void;
-
-    pub extern fn sceNet_lib_DB88F458() callconv(.C) void;
-
-    pub extern fn sceNet_lib_B6FC0A5B() callconv(.C) void;
-
-    pub extern fn sceNet_lib_C431A214() callconv(.C) void;
-
-    pub extern fn sceNet_lib_BFCFEFF6() callconv(.C) void;
-
-    pub extern fn sceNet_lib_E1F4696F() callconv(.C) void;
-
-    pub extern fn sceNet_lib_5216CBF5() callconv(.C) void;
-
-    pub extern fn sceNet_lib_D2422E4D() callconv(.C) void;
-
-    pub extern fn sceNet_lib_D1BE2CE9() callconv(.C) void;
-
-    pub extern fn sceNet_lib_AB7DD9A5() callconv(.C) void;
-
-    pub extern fn sceNet_lib_80E1933E() callconv(.C) void;
-
-    pub extern fn sceNet_lib_7BA3ED91() callconv(.C) void;
-
-    pub extern fn sceNet_lib_03164B12() callconv(.C) void;
-
-    pub extern fn sceNet_lib_389728AB() callconv(.C) void;
-
-    pub extern fn sceNet_lib_4BF9E1DE() callconv(.C) void;
-
-    pub extern fn sceNet_lib_D5B64E37() callconv(.C) void;
-
-    pub extern fn sceNet_lib_DA02F383() callconv(.C) void;
-
-    pub extern fn sceNet_lib_AFA11338() callconv(.C) void;
-
-    pub extern fn sceNet_lib_B20F84F8() callconv(.C) void;
-
-    pub extern fn sceNet_lib_83FE280A() callconv(.C) void;
-
-    pub extern fn sceNet_lib_4F8F3808() callconv(.C) void;
-
-    pub extern fn sceNet_lib_891723D5() callconv(.C) void;
-
-    pub extern fn sceNet_lib_0DFF67F9() callconv(.C) void;
-
-    pub extern fn sceNet_lib_F355C73B() callconv(.C) void;
-
-    pub extern fn sceNet_lib_A55C914F() callconv(.C) void;
-
-    pub extern fn sceNet_lib_0D633F53() callconv(.C) void;
-
-    pub extern fn sceNetConfigGetEtherAddr() callconv(.C) void;
-
-    pub extern fn sceNet_lib_522A971B() callconv(.C) void;
-
-    pub extern fn sceNetRand() callconv(.C) void;
-
-    pub extern fn sceNet_lib_75D9985C() callconv(.C) void;
-
-    pub extern fn sceNet_lib_25CC373A() callconv(.C) void;
-
-    pub extern fn sceNet_lib_DCBC596E() callconv(.C) void;
-
-    pub extern fn sceNet_lib_7C86FBA4() callconv(.C) void;
-
-    pub extern fn sceNet_lib_A8B6205A() callconv(.C) void;
-
-    pub extern fn sceNet_lib_A93A93E9() callconv(.C) void;
-
-    pub extern fn sceNet_lib_6B294EE4() callconv(.C) void;
-
-    pub extern fn sceNet_lib_51C209B2() callconv(.C) void;
-
-    pub extern fn sceNet_lib_C9C97945() callconv(.C) void;
-
-    pub extern fn sceNet_lib_B8C4A858() callconv(.C) void;
-
-    pub extern fn sceNet_lib_205E8D17() callconv(.C) void;
-
-    pub extern fn sceNet_lib_F6DB0A0B() callconv(.C) void;
-
-    pub extern fn sceNet_lib_7574FDA1() callconv(.C) void;
-
-    pub extern fn sceNet_lib_CA3CF5EB() callconv(.C) void;
-
-    pub extern fn sceNet_lib_757085B0() callconv(.C) void;
-
-    pub extern fn sceNet_lib_435843CB() callconv(.C) void;
-
-    pub extern fn sceNet_lib_D861EF33() callconv(.C) void;
-
-    pub extern fn sceNet_lib_BB2B3DDB() callconv(.C) void;
-
-    pub extern fn sceNet_lib_6D5D42D7() callconv(.C) void;
-
-    pub extern fn sceNet_lib_C21E18B2() callconv(.C) void;
-
-    pub extern fn sceNet_lib_45452B7B() callconv(.C) void;
-
-    pub extern fn sceNet_lib_94B44F26() callconv(.C) void;
-
-    pub extern fn sceNet_lib_515B2F33() callconv(.C) void;
-
-    pub extern fn sceNet_lib_6DC71518() callconv(.C) void;
-
-    pub extern fn sceNet_lib_7C3B86C5() callconv(.C) void;
-
-    pub extern fn sceNet_lib_05D525E4() callconv(.C) void;
-
-    pub extern fn sceNet_lib_1D10419C() callconv(.C) void;
-
-    pub extern fn sceNet_lib_C2EC2EEA() callconv(.C) void;
-
-    pub extern fn sceNet_lib_710BD467() callconv(.C) void;
-
-    pub extern fn sceNet_lib_701DDDC3() callconv(.C) void;
-
-    pub extern fn sceNet_lib_D5A03BC0() callconv(.C) void;
-
-    pub extern fn sceNet_lib_FA6DE6A6() callconv(.C) void;
-
-    pub extern fn sceNet_lib_EDB11CB4() callconv(.C) void;
-
-    pub extern fn sceNet_lib_8C55B410() callconv(.C) void;
-
-    pub extern fn sceNet_lib_13A8B98A() callconv(.C) void;
-
-    pub extern fn sceNet_lib_EA42B353() callconv(.C) void;
-
-    pub extern fn sceNet_lib_45945E8D() callconv(.C) void;
-
-    pub extern fn sceNet_lib_D60225A3() callconv(.C) void;
-
-    pub extern fn sceNet_lib_EB6DE71A() callconv(.C) void;
-
-    pub extern fn sceNet_lib_EDCC871E() callconv(.C) void;
-
-    pub extern fn sceNet_lib_4B2B3416() callconv(.C) void;
-
-    pub extern fn sceNet_lib_2B42872F() callconv(.C) void;
-
-    pub extern fn sceNet_lib_C4261339() callconv(.C) void;
-
-    pub extern fn sceNet_lib_41FD8B5C() callconv(.C) void;
-
-    pub extern fn sceNet_lib_92633D8D() callconv(.C) void;
-
-    pub extern fn sceNet_lib_B9C780C7() callconv(.C) void;
-
-    pub extern fn sceNet_lib_B68E1EEA() callconv(.C) void;
-
-    pub extern fn sceNet_lib_E155112D() callconv(.C) void;
-
-    pub extern fn sceNet_lib_41621EB0() callconv(.C) void;
-
-    pub extern fn sceNet_lib_2E005032() callconv(.C) void;
-
-    pub extern fn sceNet_lib_33B230BD() callconv(.C) void;
-
-    pub extern fn sceNet_lib_976AB1E9() callconv(.C) void;
-
-    pub extern fn sceNet_lib_4C8FD452() callconv(.C) void;
-
-    pub extern fn sceNet_lib_5ED457BE() callconv(.C) void;
-
-    pub extern fn sceNet_lib_31F3CDA1() callconv(.C) void;
-
-    pub extern fn sceNet_lib_1F94AFD9() callconv(.C) void;
-
-    pub extern fn sceNet_lib_0A5A8751() callconv(.C) void;
-
-    pub extern fn sceNet_lib_B3A48B7F() callconv(.C) void;
-
-    pub extern fn sceNet_lib_949F1FBB() callconv(.C) void;
-
-    pub extern fn sceNet_lib_13672F83() callconv(.C) void;
-
-    pub extern fn sceNet_lib_5C7C7381() callconv(.C) void;
-
-    pub extern fn sceNet_lib_86B6DCD9() callconv(.C) void;
-
-    pub extern fn sceNet_lib_7AE91FB4() callconv(.C) void;
-
-    pub extern fn sceNet_lib_572AD6ED() callconv(.C) void;
-
-    pub extern fn sceNet_lib_87DC7A7E() callconv(.C) void;
-
-    pub extern fn sceNet_lib_991FF86D() callconv(.C) void;
-
-    pub extern fn sceNet_lib_5505D820() callconv(.C) void;
-
-};
-
-pub usingnamespace if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "sceNet_lib") and options.sceNet_lib)) sceNet_lib else EMPTY;
-
-const sceNetAdhocctl = struct {
-    /// Initialise the Adhoc control library
-    /// `stacksize` - Stack size of the adhocctl thread. Set to 0x2000
-    /// `priority` - Priority of the adhocctl thread. Set to 0x30
-    /// `product` - Pass a filled in ::productStruct
-    /// Returns 0 on success, < 0 on error
-    pub extern fn sceNetAdhocctlInit(stacksize: c_int, priority: c_int, product: [*c]c_int) callconv(.C) c_int;
-
-    /// Terminate the Adhoc control library
-    /// Returns 0 on success, < on error.
-    pub extern fn sceNetAdhocctlTerm() callconv(.C) c_int;
-
-    /// Connect to the Adhoc control
-    /// `name` - The name of the connection (maximum 8 alphanumeric characters).
-    /// Returns 0 on success, < 0 on error.
-    pub extern fn sceNetAdhocctlConnect(name: [*c]const c_char) callconv(.C) c_int;
-
-    /// Connect to the Adhoc control (as a host)
-    /// `name` - The name of the connection (maximum 8 alphanumeric characters).
-    /// Returns 0 on success, < 0 on error.
-    pub extern fn sceNetAdhocctlCreate(name: [*c]const c_char) callconv(.C) c_int;
-
-    /// Connect to the Adhoc control (as a client)
-    /// `scaninfo` - A valid ::SceNetAdhocctlScanInfo struct that has been filled by sceNetAchocctlGetScanInfo
-    /// Returns 0 on success, < 0 on error.
-    pub extern fn sceNetAdhocctlJoin(scaninfo: [*c]c_int) callconv(.C) c_int;
-
-    /// Scan the adhoc channels
-    /// Returns 0 on success, < 0 on error.
-    pub extern fn sceNetAdhocctlScan() callconv(.C) c_int;
-
-    /// Disconnect from the Adhoc control
-    /// Returns 0 on success, < 0 on error
-    pub extern fn sceNetAdhocctlDisconnect() callconv(.C) c_int;
-
-    /// Register an adhoc event handler
-    /// `handler` - The event handler.
-    /// `unknown` - Pass NULL.
-    /// Returns Handler id on success, < 0 on error.
-    pub extern fn sceNetAdhocctlAddHandler(handler: c_int, unknown: ?*anyopaque) callconv(.C) c_int;
-
-    /// Delete an adhoc event handler
-    /// `id` - The handler id as returned by sceNetAdhocctlAddHandler.
-    /// Returns 0 on success, < 0 on error.
-    pub extern fn sceNetAdhocctlDelHandler(id: c_int) callconv(.C) c_int;
-
-    /// Get the state of the Adhoc control
-    /// `event` - Pointer to an integer to receive the status. Can continue when it becomes 1.
-    /// Returns 0 on success, < 0 on error
-    pub extern fn sceNetAdhocctlGetState(event: [*c]c_int) callconv(.C) c_int;
-
-    /// Get the adhoc ID
-    /// `product` - A pointer to a  ::productStruct
-    /// Returns 0 on success, < 0 on error.
-    pub extern fn sceNetAdhocctlGetAdhocId(product: [*c]c_int) callconv(.C) c_int;
-
-    /// Get a list of peers
-    /// `length` - The length of the list.
-    /// `buf` - An allocated area of size length.
-    /// Returns 0 on success, < 0 on error.
-    pub extern fn sceNetAdhocctlGetPeerList(length: [*c]c_int, buf: ?*anyopaque) callconv(.C) c_int;
-
-    /// Get mac address from nickname
-    /// `nickname` - The nickname.
-    /// `length` - The length of the list.
-    /// `buf` - An allocated area of size length.
-    /// Returns 0 on success, < 0 on error.
-    pub extern fn sceNetAdhocctlGetAddrByName(nickname: [*c]c_char, length: [*c]c_int, buf: ?*anyopaque) callconv(.C) c_int;
-
-    /// Get nickname from a mac address
-    /// `mac` - The mac address.
-    /// `nickname` - Pointer to a char buffer where the nickname will be stored.
-    /// Returns 0 on success, < 0 on error.
-    pub extern fn sceNetAdhocctlGetNameByAddr(mac: [*c]u8, nickname: [*c]c_char) callconv(.C) c_int;
-
-    /// Get Adhocctl parameter
-    /// `params` - Pointer to a ::SceNetAdhocctlParams
-    /// Returns 0 on success, < 0 on error.
-    pub extern fn sceNetAdhocctlGetParameter(params: [*c]c_int) callconv(.C) c_int;
-
-    /// Get the results of a scan
-    /// `length` - The length of the list.
-    /// `buf` - An allocated area of size length.
-    /// Returns 0 on success, < 0 on error.
-    pub extern fn sceNetAdhocctlGetScanInfo(length: [*c]c_int, buf: ?*anyopaque) callconv(.C) c_int;
-
-    /// Connect to the Adhoc control game mode (as a host)
-    /// `name` - The name of the connection (maximum 8 alphanumeric characters).
-    /// `unknown` - Pass 1.
-    /// `num` - The total number of players (including the host).
-    /// `macs` - A pointer to a list of the participating mac addresses, host first, then clients.
-    /// `timeout` - Timeout in microseconds.
-    /// `unknown2` - pass 0.
-    /// Returns 0 on success, < 0 on error.
-    pub extern fn sceNetAdhocctlCreateEnterGameMode(name: [*c]const c_char, unknown: c_int, num: c_int, macs: [*c]u8, timeout: c_uint, unknown2: c_int) callconv(.C) c_int;
-
-    /// Connect to the Adhoc control game mode (as a client)
-    /// `name` - The name of the connection (maximum 8 alphanumeric characters).
-    /// `hostmac` - The mac address of the host.
-    /// `timeout` - Timeout in microseconds.
-    /// `unknown` - pass 0.
-    /// Returns 0 on success, < 0 on error.
-    pub extern fn sceNetAdhocctlJoinEnterGameMode(name: [*c]const c_char, hostmac: [*c]u8, timeout: c_uint, unknown: c_int) callconv(.C) c_int;
-
-    /// Exit game mode.
-    /// Returns 0 on success, < 0 on error.
-    pub extern fn sceNetAdhocctlExitGameMode() callconv(.C) c_int;
-
-    /// Get game mode information
-    /// `gamemodeinfo` - Pointer to store the info.
-    /// Returns 0 on success, < 0 on error.
-    pub extern fn sceNetAdhocctlGetGameModeInfo(gamemodeinfo: [*c]c_int) callconv(.C) c_int;
-
-    /// Get peer information
-    /// `mac` - The mac address of the peer.
-    /// `size` - Size of peerinfo.
-    /// `peerinfo` - Pointer to store the information.
-    /// Returns 0 on success, < 0 on error.
-    pub extern fn sceNetAdhocctlGetPeerInfo(mac: [*c]u8, size: c_int, peerinfo: [*c]c_int) callconv(.C) c_int;
-
-};
-
-pub usingnamespace if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "sceNetAdhocctl") and options.sceNetAdhocctl)) sceNetAdhocctl else EMPTY;
-
-const sceNetAdhocMatching = struct {
-    /// Initialise the Adhoc matching library
-    /// `memsize` - Internal memory pool size. Lumines uses 0x20000
-    /// Returns 0 on success, < 0 on error
-    pub extern fn sceNetAdhocMatchingInit(memsize: c_int) callconv(.C) c_int;
-
-    /// Terminate the Adhoc matching library
-    /// Returns 0 on success, < 0 on error
-    pub extern fn sceNetAdhocMatchingTerm() callconv(.C) c_int;
-
-    /// Create an Adhoc matching object
-    /// `mode` - One of ::pspAdhocMatchingModes
-    /// `maxpeers` - Maximum number of peers to match (only used when mode is PSP_ADHOC_MATCHING_MODE_HOST)
-    /// `port` - Port. Lumines uses 0x22B
-    /// `bufsize` - Receiving buffer size
-    /// `hellodelay` - Hello message send delay in microseconds (only used when mode is PSP_ADHOC_MATCHING_MODE_HOST or PSP_ADHOC_MATCHING_MODE_PTP)
-    /// `pingdelay` - Ping send delay in microseconds. Lumines uses 0x5B8D80 (only used when mode is PSP_ADHOC_MATCHING_MODE_HOST or PSP_ADHOC_MATCHING_MODE_PTP)
-    /// `initcount` - Initial count of the of the resend counter. Lumines uses 3
-    /// `msgdelay` - Message send delay in microseconds
-    /// `callback` - Callback to be called for matching
-    /// Returns ID of object on success, < 0 on error.
-    pub extern fn sceNetAdhocMatchingCreate(mode: c_int, maxpeers: c_int, port: c_ushort, bufsize: c_int, hellodelay: c_uint, pingdelay: c_uint, initcount: c_int, msgdelay: c_uint, callback: c_int) callconv(.C) c_int;
-
-    /// Start a matching object
-    /// `matchingid` - The ID returned from ::sceNetAdhocMatchingCreate
-    /// `evthpri` - Priority of the event handler thread. Lumines uses 0x10
-    /// `evthstack` - Stack size of the event handler thread. Lumines uses 0x2000
-    /// `inthpri` - Priority of the input handler thread. Lumines uses 0x10
-    /// `inthstack` - Stack size of the input handler thread. Lumines uses 0x2000
-    /// `optlen` - Size of hellodata
-    /// `optdata` - Pointer to block of data passed to callback
-    /// Returns 0 on success, < 0 on error
-    pub extern fn sceNetAdhocMatchingStart(matchingid: c_int, evthpri: c_int, evthstack: c_int, inthpri: c_int, inthstack: c_int, optlen: c_int, optdata: ?*anyopaque) callconv(.C) c_int;
-
-    /// Stop a matching object
-    /// `matchingid` - The ID returned from ::sceNetAdhocMatchingCreate
-    /// Returns 0 on success, < 0 on error.
-    pub extern fn sceNetAdhocMatchingStop(matchingid: c_int) callconv(.C) c_int;
-
-    /// Delete an Adhoc matching object
-    /// `matchingid` - The ID returned from ::sceNetAdhocMatchingCreate
-    /// Returns 0 on success, < 0 on error.
-    pub extern fn sceNetAdhocMatchingDelete(matchingid: c_int) callconv(.C) c_int;
-
-    /// Select a matching target
-    /// `matchingid` - The ID returned from ::sceNetAdhocMatchingCreate
-    /// `mac` - MAC address to select
-    /// `optlen` - Optional data length
-    /// `optdata` - Pointer to the optional data
-    /// Returns 0 on success, < 0 on error.
-    pub extern fn sceNetAdhocMatchingSelectTarget(matchingid: c_int, mac: [*c]u8, optlen: c_int, optdata: ?*anyopaque) callconv(.C) c_int;
-
-    /// Cancel a matching target
-    /// `matchingid` - The ID returned from ::sceNetAdhocMatchingCreate
-    /// `mac` - The MAC address to cancel
-    /// Returns 0 on success, < 0 on error.
-    pub extern fn sceNetAdhocMatchingCancelTarget(matchingid: c_int, mac: [*c]u8) callconv(.C) c_int;
-
-    /// Set the optional hello message
-    /// `matchingid` - The ID returned from ::sceNetAdhocMatchingCreate
-    /// `optlen` - Length of the hello data
-    /// `optdata` - Pointer to the hello data
-    /// Returns 0 on success, < 0 on error.
-    pub extern fn sceNetAdhocMatchingSetHelloOpt(matchingid: c_int, optlen: c_int, optdata: ?*anyopaque) callconv(.C) c_int;
-
-    /// Get the optional hello message
-    /// `matchingid` - The ID returned from ::sceNetAdhocMatchingCreate
-    /// `optlen` - Length of the hello data
-    /// `optdata` - Pointer to the hello data
-    /// Returns 0 on success, < 0 on error.
-    pub extern fn sceNetAdhocMatchingGetHelloOpt(matchingid: c_int, optlen: [*c]c_int, optdata: ?*anyopaque) callconv(.C) c_int;
-
-    /// Get a list of matching members
-    /// `matchingid` - The ID returned from ::sceNetAdhocMatchingCreate
-    /// `length` - The length of the list.
-    /// `buf` - An allocated area of size length.
-    /// Returns 0 on success, < 0 on error.
-    pub extern fn sceNetAdhocMatchingGetMembers(matchingid: c_int, length: [*c]c_int, buf: ?*anyopaque) callconv(.C) c_int;
-
-    /// Get the maximum memory usage by the matching library
-    /// Returns The memory usage on success, < 0 on error.
-    pub extern fn sceNetAdhocMatchingGetPoolMaxAlloc() callconv(.C) c_int;
-
-    /// Cancel a matching target (with optional data)
-    /// `matchingid` - The ID returned from ::sceNetAdhocMatchingCreate
-    /// `mac` - The MAC address to cancel
-    /// `optlen` - Optional data length
-    /// `optdata` - Pointer to the optional data
-    /// Returns 0 on success, < 0 on error.
-    pub extern fn sceNetAdhocMatchingCancelTargetWithOpt(matchingid: c_int, mac: [*c]u8, optlen: c_int, optdata: ?*anyopaque) callconv(.C) c_int;
-
-    /// Get the status of the memory pool used by the matching library
-    /// `poolstat` - A ::pspAdhocPoolStat.
-    /// Returns 0 on success, < 0 on error.
-    pub extern fn sceNetAdhocMatchingGetPoolStat(poolstat: [*c]c_int) callconv(.C) c_int;
-
-    /// Send data to a matching target
-    /// `matchingid` - The ID returned from ::sceNetAdhocMatchingCreate
-    /// `mac` - The MAC address to send the data to
-    /// `datalen` - Length of the data
-    /// `data` - Pointer to the data
-    /// Returns 0 on success, < 0 on error.
-    pub extern fn sceNetAdhocMatchingSendData(matchingid: c_int, mac: [*c]u8, datalen: c_int, data: ?*anyopaque) callconv(.C) c_int;
-
-    /// Abort a data send to a matching target
-    /// `matchingid` - The ID returned from ::sceNetAdhocMatchingCreate
-    /// `mac` - The MAC address to send the data to
-    /// Returns 0 on success, < 0 on error.
-    pub extern fn sceNetAdhocMatchingAbortSendData(matchingid: c_int, mac: [*c]u8) callconv(.C) c_int;
-
-};
-
-pub usingnamespace if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "sceNetAdhocMatching") and options.sceNetAdhocMatching)) sceNetAdhocMatching else EMPTY;
-
-const sceNetAdhoc = struct {
-    /// Initialise the adhoc library.
-    /// Returns 0 on success, < 0 on error
-    pub extern fn sceNetAdhocInit() callconv(.C) c_int;
-
-    /// Terminate the adhoc library
-    /// Returns 0 on success, < 0 on error
-    pub extern fn sceNetAdhocTerm() callconv(.C) c_int;
-
-    pub extern fn sceNetAdhocPollSocket() callconv(.C) void;
-
-    pub extern fn sceNetAdhocSetSocketAlert() callconv(.C) void;
-
-    pub extern fn sceNetAdhocGetSocketAlert() callconv(.C) void;
-
-    /// Create a PDP object.
-    /// `mac` - Your MAC address (from sceWlanGetEtherAddr)
-    /// `port` - Port to use, lumines uses 0x309
-    /// `bufsize` - Socket buffer size, lumines sets to 0x400
-    /// `unk1` - Unknown, lumines sets to 0
-    /// Returns The ID of the PDP object (< 0 on error)
-    pub extern fn sceNetAdhocPdpCreate(mac: [*c]u8, port: c_ushort, bufsize: c_uint, unk1: c_int) callconv(.C) c_int;
-
-    /// Set a PDP packet to a destination
-    /// `id` - The ID as returned by ::sceNetAdhocPdpCreate
-    /// `destMacAddr` - The destination MAC address, can be set to all 0xFF for broadcast
-    /// `port` - The port to send to
-    /// `data` - The data to send
-    /// `len` - The length of the data.
-    /// `timeout` - Timeout in microseconds.
-    /// `nonblock` - Set to 0 to block, 1 for non-blocking.
-    /// Returns Bytes sent, < 0 on error
-    pub extern fn sceNetAdhocPdpSend(id: c_int, destMacAddr: [*c]u8, port: c_ushort, data: ?*anyopaque, len: c_uint, timeout: c_uint, nonblock: c_int) callconv(.C) c_int;
-
-    /// Receive a PDP packet
-    /// `id` - The ID of the PDP object, as returned by ::sceNetAdhocPdpCreate
-    /// `srcMacAddr` - Buffer to hold the source mac address of the sender
-    /// `port` - Buffer to hold the port number of he received data
-    /// `data` - Data buffer
-    /// `dataLength` - The length of the data buffer
-    /// `timeout` - Timeout in microseconds.
-    /// `nonblock` - Set to 0 to block, 1 for non-blocking.
-    /// Returns Number of bytes received, < 0 on error.
-    pub extern fn sceNetAdhocPdpRecv(id: c_int, srcMacAddr: [*c]u8, port: [*c]c_ushort, data: ?*anyopaque, dataLength: ?*anyopaque, timeout: c_uint, nonblock: c_int) callconv(.C) c_int;
-
-    /// Delete a PDP object.
-    /// `id` - The ID returned from ::sceNetAdhocPdpCreate
-    /// `unk1` - Unknown, set to 0
-    /// Returns 0 on success, < 0 on error
-    pub extern fn sceNetAdhocPdpDelete(id: c_int, unk1: c_int) callconv(.C) c_int;
-
-    /// Get the status of all PDP objects
-    /// `size` - Pointer to the size of the stat array (e.g 20 for one structure)
-    /// `stat` - Pointer to a list of ::pdpStatStruct structures.
-    /// Returns 0 on success, < 0 on error
-    pub extern fn sceNetAdhocGetPdpStat(size: [*c]c_int, stat: [*c]c_int) callconv(.C) c_int;
-
-    /// Open a PTP connection
-    /// `srcmac` - Local mac address.
-    /// `srcport` - Local port.
-    /// `destmac` - Destination mac.
-    /// `destport` - Destination port
-    /// `bufsize` - Socket buffer size
-    /// `delay` - Interval between retrying (microseconds).
-    /// `count` - Number of retries.
-    /// `unk1` - Pass 0.
-    /// Returns A socket ID on success, < 0 on error.
-    pub extern fn sceNetAdhocPtpOpen(srcmac: [*c]u8, srcport: c_ushort, destmac: [*c]u8, destport: c_ushort, bufsize: c_uint, delay: c_uint, count: c_int, unk1: c_int) callconv(.C) c_int;
-
-    /// Wait for connection created by sceNetAdhocPtpOpen()
-    /// `id` - A socket ID.
-    /// `timeout` - Timeout in microseconds.
-    /// `nonblock` - Set to 0 to block, 1 for non-blocking.
-    /// Returns 0 on success, < 0 on error.
-    pub extern fn sceNetAdhocPtpConnect(id: c_int, timeout: c_uint, nonblock: c_int) callconv(.C) c_int;
-
-    /// Wait for an incoming PTP connection
-    /// `srcmac` - Local mac address.
-    /// `srcport` - Local port.
-    /// `bufsize` - Socket buffer size
-    /// `delay` - Interval between retrying (microseconds).
-    /// `count` - Number of retries.
-    /// `queue` - Connection queue length.
-    /// `unk1` - Pass 0.
-    /// Returns A socket ID on success, < 0 on error.
-    pub extern fn sceNetAdhocPtpListen(srcmac: [*c]u8, srcport: c_ushort, bufsize: c_uint, delay: c_uint, count: c_int, queue: c_int, unk1: c_int) callconv(.C) c_int;
-
-    /// Accept an incoming PTP connection
-    /// `id` - A socket ID.
-    /// `mac` - Connecting peers mac.
-    /// `port` - Connecting peers port.
-    /// `timeout` - Timeout in microseconds.
-    /// `nonblock` - Set to 0 to block, 1 for non-blocking.
-    /// Returns 0 on success, < 0 on error.
-    pub extern fn sceNetAdhocPtpAccept(id: c_int, mac: [*c]u8, port: [*c]c_ushort, timeout: c_uint, nonblock: c_int) callconv(.C) c_int;
-
-    /// Send data
-    /// `id` - A socket ID.
-    /// `data` - Data to send.
-    /// `datasize` - Size of the data.
-    /// `timeout` - Timeout in microseconds.
-    /// `nonblock` - Set to 0 to block, 1 for non-blocking.
-    /// Returns 0 success, < 0 on error.
-    pub extern fn sceNetAdhocPtpSend(id: c_int, data: ?*anyopaque, datasize: [*c]c_int, timeout: c_uint, nonblock: c_int) callconv(.C) c_int;
-
-    /// Receive data
-    /// `id` - A socket ID.
-    /// `data` - Buffer for the received data.
-    /// `datasize` - Size of the data received.
-    /// `timeout` - Timeout in microseconds.
-    /// `nonblock` - Set to 0 to block, 1 for non-blocking.
-    /// Returns 0 on success, < 0 on error.
-    pub extern fn sceNetAdhocPtpRecv(id: c_int, data: ?*anyopaque, datasize: [*c]c_int, timeout: c_uint, nonblock: c_int) callconv(.C) c_int;
-
-    /// Wait for data in the buffer to be sent
-    /// `id` - A socket ID.
-    /// `timeout` - Timeout in microseconds.
-    /// `nonblock` - Set to 0 to block, 1 for non-blocking.
-    /// Returns A socket ID on success, < 0 on error.
-    pub extern fn sceNetAdhocPtpFlush(id: c_int, timeout: c_uint, nonblock: c_int) callconv(.C) c_int;
-
-    /// Close a socket
-    /// `id` - A socket ID.
-    /// `unk1` - Pass 0.
-    /// Returns A socket ID on success, < 0 on error.
-    pub extern fn sceNetAdhocPtpClose(id: c_int, unk1: c_int) callconv(.C) c_int;
-
-    /// Get the status of all PTP objects
-    /// `size` - Pointer to the size of the stat array (e.g 20 for one structure)
-    /// `stat` - Pointer to a list of ::ptpStatStruct structures.
-    /// Returns 0 on success, < 0 on error
-    pub extern fn sceNetAdhocGetPtpStat(size: [*c]c_int, stat: [*c]c_int) callconv(.C) c_int;
-
-    /// Create own game object type data.
-    /// `data` - A pointer to the game object data.
-    /// `size` - Size of the game data.
-    /// Returns 0 on success, < 0 on error.
-    pub extern fn sceNetAdhocGameModeCreateMaster(data: ?*anyopaque, size: c_int) callconv(.C) c_int;
-
-    /// Create peer game object type data.
-    /// `mac` - The mac address of the peer.
-    /// `data` - A pointer to the game object data.
-    /// `size` - Size of the game data.
-    /// Returns The id of the replica on success, < 0 on error.
-    pub extern fn sceNetAdhocGameModeCreateReplica(mac: [*c]u8, data: ?*anyopaque, size: c_int) callconv(.C) c_int;
-
-    /// Update own game object type data.
-    /// Returns 0 on success, < 0 on error.
-    pub extern fn sceNetAdhocGameModeUpdateMaster() callconv(.C) c_int;
-
-    /// Update peer game object type data.
-    /// `id` - The id of the replica returned by sceNetAdhocGameModeCreateReplica.
-    /// `unk1` - Pass 0.
-    /// Returns 0 on success, < 0 on error.
-    pub extern fn sceNetAdhocGameModeUpdateReplica(id: c_int, unk1: c_int) callconv(.C) c_int;
-
-    /// Delete own game object type data.
-    /// Returns 0 on success, < 0 on error.
-    pub extern fn sceNetAdhocGameModeDeleteMaster() callconv(.C) c_int;
-
-    /// Delete peer game object type data.
-    /// `id` - The id of the replica.
-    /// Returns 0 on success, < 0 on error.
-    pub extern fn sceNetAdhocGameModeDeleteReplica(id: c_int) callconv(.C) c_int;
-
-};
-
-pub usingnamespace if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "sceNetAdhoc") and options.sceNetAdhoc)) sceNetAdhoc else EMPTY;
-
-const sceSsl = struct {
-    pub extern fn sceSslGetNameEntryCount() callconv(.C) void;
-
-    /// Get the current memory size used by ssl.
-    /// `memory` - Pointer where the current memory used value will be stored.
-    /// Returns 0 on success
-    pub extern fn sceSslGetUsedMemoryCurrent(memory: [*c]c_uint) callconv(.C) c_int;
-
-    pub extern fn sceSslGetNotBefore() callconv(.C) void;
-
-    /// Terminate the ssl library.
-    /// Returns 0 on success
-    pub extern fn sceSslEnd() callconv(.C) c_int;
-
-    pub extern fn sceSslGetIssuerName() callconv(.C) void;
-
-    pub extern fn sceSslGetSubjectName() callconv(.C) void;
-
-    pub extern fn sceSslGetNotAfter() callconv(.C) void;
-
-    /// Init the ssl library.
-    /// `unknown1` - Memory size? Pass 0x28000
-    /// Returns 0 on success
-    pub extern fn sceSslInit(unknown1: c_int) callconv(.C) c_int;
-
-    /// Get the maximum memory size used by ssl.
-    /// `memory` - Pointer where the maximum memory used value will be stored.
-    /// Returns 0 on success
-    pub extern fn sceSslGetUsedMemoryMax(memory: [*c]c_uint) callconv(.C) c_int;
-
-    pub extern fn sceSslGetSerialNumber() callconv(.C) void;
-
-    pub extern fn sceSslGetNameEntryInfo() callconv(.C) void;
-
-};
-
-pub usingnamespace if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "sceSsl") and options.sceSsl)) sceSsl else EMPTY;
-
-const sceJpeg = struct {
-    pub extern fn sceJpeg_0425B986() callconv(.C) void;
-
-    pub extern fn sceJpegMJpegCsc() callconv(.C) void;
-
-    /// Decodes a mjpeg frame to RGBA encoding.
-    /// @note Input frame should be encoded as either yuv420p or yuvj420p,
-    /// returns SCE_JPEG_ERROR_UNSUPPORT_SAMPLING otherwise
-    /// `jpegbuf` - the buffer with the mjpeg frame
-    /// `size` - size of the buffer pointed by jpegbuf
-    /// `rgba` - buffer where the decoded data in RGBA format will be stored.
-    /// It should have a size of (width * height * 4).
-    /// `unk` - Unknown, pass 0
-    /// Returns (width * 65536) + height on success, < 0 on error
-    pub extern fn sceJpegDecodeMJpeg(jpegbuf: [*c]u8, size: SceSize, rgba: [*c]u8, unk: u32) callconv(.C) c_int;
-
-    pub extern fn sceJpeg_227662D7() callconv(.C) void;
-
-    /// Deletes the current decoder context.
-    /// Returns 0 on success, < 0 on error
-    pub extern fn sceJpegDeleteMJpeg() callconv(.C) c_int;
-
-    pub extern fn sceJpeg_64B6F978() callconv(.C) void;
-
-    /// Converts a frame from YCbCr to RGBA
-    /// `imageAddr` - buffer where the converted data in RGBA format will be stored.
-    /// `yCbCrAddr` - the buffer with the YCbCr data
-    /// `widthHeight` - width and height of the frame (width * 65536) + height,
-    /// as returned by sceJpegDecodeMJpegYCbCr() or sceJpegDecodeMJpeg()
-    /// `bufferWidth` - number of pixels per row of the buffer
-    /// `colourInfo` - chroma subsampling mode, as provided by sceJpegGetOutputInfo()
-    /// Returns 0 on success, < 0 on error
-    pub extern fn sceJpegCsc(imageAddr: [*c]u8, yCbCrAddr: [*c]u8, widthHeight: c_int, bufferWidth: c_int, colourInfo: c_int) callconv(.C) c_int;
-
-    /// Finishes the MJpeg library
-    /// Returns 0 on success, < 0 on error
-    pub extern fn sceJpegFinishMJpeg() callconv(.C) c_int;
-
-    /// Reads information from mjpeg frame
-    /// `jpegbuf` - the buffer with the mjpeg frame
-    /// `size` - size of the mjpeg frame
-    /// `colourInfo` - address where the mjpeg chroma information will be stored
-    /// `unk` - Unknown, pass 0
-    /// Returns number of bytes needed in the buffer that will be used for YCbCr decoding, <= 0 on error
-    pub extern fn sceJpegGetOutputInfo(jpegbuf: [*c]u8, size: SceSize, colourInfo: [*c]c_int, unk: c_int) callconv(.C) c_int;
-
-    /// Decodes a mjpeg frame to YCbCr encoding
-    /// @note Input frame should be encoded as either yuv420p or yuvj420p,
-    /// returns SCE_JPEG_ERROR_UNSUPPORT_SAMPLING otherwise
-    /// `jpegbuf` - the buffer with the mjpeg frame
-    /// `size` - size of the buffer pointed by jpegbuf
-    /// `yCbCr` - buffer where the decoded data in YCbCr format will be stored
-    /// `yCbCrSize` - size of the buffer pointed by yCbCr (see sceJpegGetOutputInfo())
-    /// `unk` - Unknown, pass 0
-    /// Returns (width * 65536) + height on success, < 0 on error
-    pub extern fn sceJpegDecodeMJpegYCbCr(jpegbuf: [*c]u8, size: SceSize, yCbCr: [*c]u8, yCbCrSize: SceSize, unk: u32) callconv(.C) c_int;
-
-    pub extern fn sceJpeg_9B36444C() callconv(.C) void;
-
-    /// Creates the decoder context.
-    /// `width` - The width of the frame
-    /// `height` - The height of the frame
-    /// Returns 0 on success, < 0 on error
-    pub extern fn sceJpegCreateMJpeg(width: c_int, height: c_int) callconv(.C) c_int;
-
-    /// Inits the MJpeg library
-    /// Returns 0 on success, < 0 on error
-    pub extern fn sceJpegInitMJpeg() callconv(.C) c_int;
-
-};
-
-pub usingnamespace if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "sceJpeg") and options.sceJpeg)) sceJpeg else EMPTY;
-
-const sceMpegbase = struct {
-    pub extern fn sceMpegBaseYCrCbCopyVme(YUVBuffer: ScePVoid, Buffer: [*c]SceInt32, Type: SceInt32) callconv(.C) SceInt32;
-
-    pub extern fn sceMpegBaseCscInit(width: SceInt32) callconv(.C) SceInt32;
-
-    pub extern fn sceMpegBaseCscVme(pRGBbuffer: ScePVoid, pRGBbuffer2: ScePVoid, width: SceInt32, pYCrCbBuffer: [*c]c_int) callconv(.C) SceInt32;
-
-    pub extern fn sceMpegbase_0530BE4E() callconv(.C) void;
-
-    pub extern fn sceMpegbase_304882E1() callconv(.C) void;
-
-    pub extern fn sceMpegBaseYCrCbCopy() callconv(.C) void;
-
-    pub extern fn sceMpegBaseCscAvc() callconv(.C) void;
-
-    pub extern fn sceMpegbase_AC9E717E() callconv(.C) void;
-
-    pub extern fn sceMpegbase_BEA18F91(pLLI: [*c]c_int) callconv(.C) SceInt32;
-
-};
-
-pub usingnamespace if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "sceMpegbase") and options.sceMpegbase)) sceMpegbase else EMPTY;
-
-const sceMpeg = struct {
-    /// sceMpegQueryStreamOffset
-    /// `Mpeg` - SceMpeg handle
-    /// `pBuffer` - pointer to file header
-    /// `iOffset` - will contain stream offset in bytes, usually 2048
-    /// Returns 0 if success.
-    pub extern fn sceMpegQueryStreamOffset(Mpeg: [*c]c_int, pBuffer: ScePVoid, iOffset: [*c]SceInt32) callconv(.C) SceInt32;
-
-    /// sceMpegQueryStreamSize
-    /// `pBuffer` - pointer to file header
-    /// `iSize` - will contain stream size in bytes
-    /// Returns 0 if success.
-    pub extern fn sceMpegQueryStreamSize(pBuffer: ScePVoid, iSize: [*c]SceInt32) callconv(.C) SceInt32;
-
-    /// sceMpegInit
-    /// Returns 0 if success.
-    pub extern fn sceMpegInit() callconv(.C) SceInt32;
-
-    /// sceMpegFinish
-    pub extern fn sceMpegFinish() callconv(.C) SceVoid;
-
-    /// sceMpegQueryMemSize
-    /// `iUnk` - Unknown, set to 0
-    /// Returns < 0 if error else decoder data size.
-    pub extern fn sceMpegQueryMemSize(iUnk: c_int) callconv(.C) SceInt32;
-
-    /// sceMpegCreate
-    /// `Mpeg` - will be filled
-    /// `pData` - pointer to allocated memory of size = sceMpegQueryMemSize()
-    /// `iSize` - size of data, should be = sceMpegQueryMemSize()
-    /// `Ringbuffer` - a ringbuffer
-    /// `iFrameWidth` - display buffer width, set to 512 if writing to framebuffer
-    /// `iUnk1` - unknown, set to 0
-    /// `iUnk2` - unknown, set to 0
-    /// Returns 0 if success.
-    pub extern fn sceMpegCreate(Mpeg: [*c]c_int, pData: ScePVoid, iSize: SceInt32, Ringbuffer: [*c]c_int, iFrameWidth: SceInt32, iUnk1: SceInt32, iUnk2: SceInt32) callconv(.C) SceInt32;
-
-    /// sceMpegDelete
-    /// `Mpeg` - SceMpeg handle
-    pub extern fn sceMpegDelete(Mpeg: [*c]c_int) callconv(.C) SceVoid;
-
-    /// sceMpegRegistStream
-    /// `Mpeg` - SceMpeg handle
-    /// `iStreamID` - stream id, 0 for video, 1 for audio
-    /// `iUnk` - unknown, set to 0
-    /// Returns 0 if error.
-    pub extern fn sceMpegRegistStream(Mpeg: [*c]c_int, iStreamID: SceInt32, iUnk: SceInt32) callconv(.C) [*c]c_int;
-
-    /// sceMpegUnRegistStream
-    /// `Mpeg` - SceMpeg handle
-    /// `pStream` - pointer to stream
-    pub extern fn sceMpegUnRegistStream(Mpeg: c_int, pStream: [*c]c_int) callconv(.C) SceVoid;
-
-    /// sceMpegMallocAvcEsBuf
-    /// Returns 0 if error else pointer to buffer.
-    pub extern fn sceMpegMallocAvcEsBuf(Mpeg: [*c]c_int) callconv(.C) ScePVoid;
-
-    /// sceMpegFreeAvcEsBuf
-    pub extern fn sceMpegFreeAvcEsBuf(Mpeg: [*c]c_int, pBuf: ScePVoid) callconv(.C) SceVoid;
-
-    /// sceMpegQueryAtracEsSize
-    /// `Mpeg` - SceMpeg handle
-    /// `iEsSize` - will contain size of Es
-    /// `iOutSize` - will contain size of decoded data
-    /// Returns 0 if success.
-    pub extern fn sceMpegQueryAtracEsSize(Mpeg: [*c]c_int, iEsSize: [*c]SceInt32, iOutSize: [*c]SceInt32) callconv(.C) SceInt32;
-
-    pub extern fn sceMpegQueryPcmEsSize() callconv(.C) void;
-
-    /// sceMpegInitAu
-    /// `Mpeg` - SceMpeg handle
-    /// `pEsBuffer` - prevously allocated Es buffer
-    /// `pAu` - will contain pointer to Au
-    /// Returns 0 if success.
-    pub extern fn sceMpegInitAu(Mpeg: [*c]c_int, pEsBuffer: ScePVoid, pAu: [*c]c_int) callconv(.C) SceInt32;
-
-    pub extern fn sceMpegChangeGetAvcAuMode() callconv(.C) void;
-
-    pub extern fn sceMpegChangeGetAuMode() callconv(.C) void;
-
-    /// sceMpegGetAvcAu
-    /// `Mpeg` - SceMpeg handle
-    /// `pStream` - associated stream
-    /// `pAu` - will contain pointer to Au
-    /// `iUnk` - unknown
-    /// Returns 0 if success.
-    pub extern fn sceMpegGetAvcAu(Mpeg: [*c]c_int, pStream: [*c]c_int, pAu: [*c]c_int, iUnk: [*c]SceInt32) callconv(.C) SceInt32;
-
-    pub extern fn sceMpegGetPcmAu() callconv(.C) void;
-
-    /// sceMpegGetAtracAu
-    /// `Mpeg` - SceMpeg handle
-    /// `pStream` - associated stream
-    /// `pAu` - will contain pointer to Au
-    /// `pUnk` - unknown
-    /// Returns 0 if success.
-    pub extern fn sceMpegGetAtracAu(Mpeg: [*c]c_int, pStream: [*c]c_int, pAu: [*c]c_int, pUnk: ScePVoid) callconv(.C) SceInt32;
-
-    pub extern fn sceMpegFlushStream() callconv(.C) void;
-
-    /// sceMpegFlushAllStreams
-    /// Returns 0 if success.
-    pub extern fn sceMpegFlushAllStream(Mpeg: [*c]c_int) callconv(.C) SceInt32;
-
-    /// sceMpegAvcDecode
-    /// `Mpeg` - SceMpeg handle
-    /// `pAu` - video Au
-    /// `iFrameWidth` - output buffer width, set to 512 if writing to framebuffer
-    /// `pBuffer` - buffer that will contain the decoded frame
-    /// `iInit` - will be set to 0 on first call, then 1
-    /// Returns 0 if success.
-    /// sceMpegAvcDecodeMode
-    /// `Mpeg` - SceMpeg handle
-    /// `pMode` - pointer to SceMpegAvcMode struct defining the decode mode (pixelformat)
-    /// Returns 0 if success.
-    pub extern fn sceMpegAvcDecode(Mpeg: [*c]c_int, pAu: [*c]c_int, iFrameWidth: SceInt32, pBuffer: ScePVoid, iInit: [*c]SceInt32) callconv(.C) SceInt32;
-
-    pub extern fn sceMpegAvcDecodeDetail() callconv(.C) void;
-
-    /// sceMpegAvcDecodeMode
-    /// `Mpeg` - SceMpeg handle
-    /// `pMode` - pointer to SceMpegAvcMode struct defining the decode mode (pixelformat)
-    /// Returns 0 if success.
-    pub extern fn sceMpegAvcDecodeMode(Mpeg: [*c]c_int, pMode: [*c]c_int) callconv(.C) SceInt32;
-
-    /// sceMpegAvcDecodeStop
-    /// `Mpeg` - SceMpeg handle
-    /// `iFrameWidth` - output buffer width, set to 512 if writing to framebuffer
-    /// `pBuffer` - buffer that will contain the decoded frame
-    /// `iStatus` - frame number
-    /// Returns 0 if success.
-    pub extern fn sceMpegAvcDecodeStop(Mpeg: [*c]c_int, iFrameWidth: SceInt32, pBuffer: ScePVoid, iStatus: [*c]SceInt32) callconv(.C) SceInt32;
-
-    /// sceMpegAtracDecode
-    /// `Mpeg` - SceMpeg handle
-    /// `pAu` - video Au
-    /// `pBuffer` - buffer that will contain the decoded frame
-    /// `iInit` - set this to 1 on first call
-    /// Returns 0 if success.
-    pub extern fn sceMpegAtracDecode(Mpeg: [*c]c_int, pAu: [*c]c_int, pBuffer: ScePVoid, iInit: SceInt32) callconv(.C) SceInt32;
-
-    /// sceMpegRingbufferQueryMemSize
-    /// `iPackets` - number of packets in the ringbuffer
-    /// Returns < 0 if error else ringbuffer data size.
-    pub extern fn sceMpegRingbufferQueryMemSize(iPackets: SceInt32) callconv(.C) SceInt32;
-
-    /// sceMpegRingbufferConstruct
-    /// `Ringbuffer` - pointer to a sceMpegRingbuffer struct
-    /// `iPackets` - number of packets in the ringbuffer
-    /// `pData` - pointer to allocated memory
-    /// `iSize` - size of allocated memory, shoud be sceMpegRingbufferQueryMemSize(iPackets)
-    /// `Callback` - ringbuffer callback
-    /// `pCBparam` - param passed to callback
-    /// Returns 0 if success.
-    pub extern fn sceMpegRingbufferConstruct(Ringbuffer: [*c]c_int, iPackets: SceInt32, pData: ScePVoid, iSize: SceInt32, Callback: c_int, pCBparam: ScePVoid) callconv(.C) SceInt32;
-
-    /// sceMpegRingbufferDestruct
-    /// `Ringbuffer` - pointer to a sceMpegRingbuffer struct
-    pub extern fn sceMpegRingbufferDestruct(Ringbuffer: [*c]c_int) callconv(.C) SceVoid;
-
-    /// sceMpegRingbufferPut
-    /// `Ringbuffer` - pointer to a sceMpegRingbuffer struct
-    /// `iNumPackets` - num packets to put into the ringbuffer
-    /// `iAvailable` - free packets in the ringbuffer, should be sceMpegRingbufferAvailableSize()
-    /// Returns < 0 if error else number of packets.
-    pub extern fn sceMpegRingbufferPut(Ringbuffer: [*c]c_int, iNumPackets: SceInt32, iAvailable: SceInt32) callconv(.C) SceInt32;
-
-    /// sceMpegQueryMemSize
-    /// `Ringbuffer` - pointer to a sceMpegRingbuffer struct
-    /// Returns < 0 if error else number of free packets in the ringbuffer.
-    pub extern fn sceMpegRingbufferAvailableSize(Ringbuffer: [*c]c_int) callconv(.C) SceInt32;
-
-    pub extern fn sceMpeg_11CAB459() callconv(.C) void;
-
-    pub extern fn sceMpeg_3C37A7A6() callconv(.C) void;
-
-    pub extern fn sceMpeg_B27711A8() callconv(.C) void;
-
-    pub extern fn sceMpeg_D4DD6E75() callconv(.C) void;
-
-    pub extern fn sceMpeg_C345DED2() callconv(.C) void;
-
-    pub extern fn sceMpegAvcDecodeDetail2() callconv(.C) void;
-
-    pub extern fn sceMpeg_988E9E12() callconv(.C) void;
-
-};
-
-pub usingnamespace if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "sceMpeg") and options.sceMpeg)) sceMpeg else EMPTY;
-
-const sceHprm = struct {
-    pub extern fn sceHprmRegisterCallback() callconv(.C) void;
-
-    pub extern fn sceHprmUnregisterCallback() callconv(.C) void;
-
-    /// Determines whether the remote is plugged in.
-    /// Returns 1 if the remote is plugged in, else 0.
-    pub extern fn sceHprmIsRemoteExist() callconv(.C) c_int;
-
-    /// Determines whether the headphones are plugged in.
-    /// Returns 1 if the headphones are plugged in, else 0.
-    pub extern fn sceHprmIsHeadphoneExist() callconv(.C) c_int;
-
-    /// Determines whether the microphone is plugged in.
-    /// Returns 1 if the microphone is plugged in, else 0.
-    pub extern fn sceHprmIsMicrophoneExist() callconv(.C) c_int;
-
-    /// Peek at the current being pressed on the remote.
-    /// `key` - Pointer to the u32 to receive the key bitmap, should be one or
-    /// more of ::PspHprmKeys
+    /// It releases an atrac ID
+    /// `atracID` - the atrac ID to release
     /// Returns < 0 on error
-    pub extern fn sceHprmPeekCurrentKey(key: [*c]u32) callconv(.C) c_int;
+    pub extern fn sceAtracReleaseAtracID(atracID: c_int) callconv(.C) c_int;
 
-    /// Peek at the current latch data.
-    /// `latch` - Pointer a to a 4 dword array to contain the latch data.
-    /// Returns < 0 on error.
-    pub extern fn sceHprmPeekLatch(latch: [*c]u32) callconv(.C) c_int;
+    /// Creates a new Atrac ID from the specified data
+    /// `buf` - the buffer holding the atrac3 data, including the RIFF/WAVE header.
+    /// `bufsize` - the size of the buffer pointed by buf
+    /// Returns the new atrac ID, or < 0 on error
+    pub extern fn sceAtracSetData(atracID: c_int, pucBufferAddr: [*c]u8, uiBufferByte: u32) callconv(.C) c_int;
 
-    /// Read the current latch data.
-    /// `latch` - Pointer a to a 4 dword array to contain the latch data.
-    /// Returns < 0 on error.
-    pub extern fn sceHprmReadLatch(latch: [*c]u32) callconv(.C) c_int;
+    pub extern fn sceAtracSetHalfwayBuffer(atracID: c_int, pucBufferAddr: [*c]u8, uiReadByte: u32, uiBufferByte: u32) callconv(.C) c_int;
 
-};
+    /// Creates a new Atrac ID from the specified data
+    /// `buf` - the buffer holding the atrac3 data, including the RIFF/WAVE header.
+    /// `bufsize` - the size of the buffer pointed by buf
+    /// Returns the new atrac ID, or < 0 on error
+    pub extern fn sceAtracSetDataAndGetID(buf: ?*anyopaque, bufsize: SceSize) callconv(.C) c_int;
 
-pub usingnamespace if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "sceHprm") and options.sceHprm)) sceHprm else EMPTY;
+    pub extern fn sceAtracSetHalfwayBufferAndGetID(pucBufferAddr: [*c]u8, uiReadByte: u32, uiBufferByte: u32) callconv(.C) c_int;
 
-const sceUmdUser = struct {
-    /// Get the error code associated with a failed event
-    /// Returns < 0 on error, the error code on success
-    pub extern fn sceUmdGetErrorStat() callconv(.C) c_int;
+    /// Decode a frame of data.
+    /// `atracID` - the atrac ID
+    /// `outSamples` - pointer to a buffer that receives the decoded data of the current frame
+    /// `outN` - pointer to a integer that receives the number of audio samples of the decoded frame
+    /// `outEnd` - pointer to a integer that receives a boolean value indicating if the decoded frame is the last one
+    /// `outRemainFrame` - pointer to a integer that receives either -1 if all at3 data is already on memory,
+    /// or the remaining (not decoded yet) frames at memory if not all at3 data is on memory
+    /// Returns < 0 on error, otherwise 0
+    pub extern fn sceAtracDecodeData(atracID: c_int, outSamples: [*c]u16, outN: [*c]c_int, outEnd: [*c]c_int, outRemainFrame: [*c]c_int) callconv(.C) c_int;
 
-    /// Get the disc info
-    /// `info` - A pointer to a ::pspUmdInfo struct
-    /// Returns < 0 on error
-    pub extern fn sceUmdGetDiscInfo(info: [*c]c_int) callconv(.C) c_int;
+    /// Gets the remaining (not decoded) number of frames
+    /// `atracID` - the atrac ID
+    /// `outRemainFrame` - pointer to a integer that receives either -1 if all at3 data is already on memory,
+    /// or the remaining (not decoded yet) frames at memory if not all at3 data is on memory
+    /// Returns < 0 on error, otherwise 0
+    pub extern fn sceAtracGetRemainFrame(atracID: c_int, outRemainFrame: [*c]c_int) callconv(.C) c_int;
 
-    /// Check whether there is a disc in the UMD drive
-    /// Returns 0 if no disc present, anything else indicates a disc is inserted.
-    pub extern fn sceUmdCheckMedium() callconv(.C) c_int;
+    pub extern fn sceAtracGetStreamDataInfo(atracID: c_int, writePointer: [*c]u8, availableBytes: [*c]u32, readOffset: [*c]u32) callconv(.C) c_int;
 
-    /// Wait for the UMD drive to reach a certain state (plus callback)
-    /// `stat` - One or more of ::pspUmdState
-    /// `timeout` - Timeout value in microseconds
-    /// Returns < 0 on error
-    pub extern fn sceUmdWaitDriveStatCB(stat: c_int, timeout: c_uint) callconv(.C) c_int;
+    /// `atracID` - the atrac ID
+    /// `bytesToAdd` - Number of bytes read into location given by sceAtracGetStreamDataInfo().
+    /// Returns < 0 on error, otherwise 0
+    pub extern fn sceAtracAddStreamData(atracID: c_int, bytesToAdd: c_uint) callconv(.C) c_int;
 
-    /// Wait for the UMD drive to reach a certain state
-    /// `stat` - One or more of ::pspUmdState
-    /// `timeout` - Timeout value in microseconds
-    /// Returns < 0 on error
-    pub extern fn sceUmdWaitDriveStatWithTimer(stat: c_int, timeout: c_uint) callconv(.C) c_int;
+    pub extern fn sceAtracGetSecondBufferInfo(atracID: c_int, puiPosition: [*c]u32, puiDataByte: [*c]u32) callconv(.C) c_int;
 
-    /// Cancel a sceUmdWait* call
-    /// Returns < 0 on error
-    pub extern fn sceUmdCancelWaitDriveStat() callconv(.C) c_int;
+    pub extern fn sceAtracSetSecondBuffer(atracID: c_int, pucSecondBufferAddr: [*c]u8, uiSecondBufferByte: u32) callconv(.C) c_int;
 
-    /// Get (poll) the current state of the UMD drive
-    /// Returns < 0 on error, one or more of ::pspUmdState on success
-    pub extern fn sceUmdGetDriveStat() callconv(.C) c_int;
+    pub extern fn sceAtracGetNextDecodePosition(atracID: c_int, puiSamplePosition: [*c]u32) callconv(.C) c_int;
 
-    /// Prohibit UMD disc being replaced
-    /// Returns < 0 on error
-    pub extern fn sceUmdReplaceProhibit() callconv(.C) c_int;
+    pub extern fn sceAtracGetSoundSample(atracID: c_int, piEndSample: [*c]c_int, piLoopStartSample: [*c]c_int, piLoopEndSample: [*c]c_int) callconv(.C) c_int;
 
-    /// Wait for the UMD drive to reach a certain state
-    /// `stat` - One or more of ::pspUmdState
-    /// Returns < 0 on error
-    pub extern fn sceUmdWaitDriveStat(stat: c_int) callconv(.C) c_int;
+    pub extern fn sceAtracGetChannel(atracID: c_int, puiChannel: [*c]u32) callconv(.C) c_int;
 
-    /// Register a callback for the UMD drive
-    /// @note Callback is of type UmdCallback
-    /// `cbid` - A callback ID created from sceKernelCreateCallback
-    /// Returns < 0 on error
-    /// @par Example:
-    /// `
-    /// int umd_callback(int unknown, int event)
-    /// {
-    /// //do something
-    /// }
-    /// int cbid = sceKernelCreateCallback("UMD Callback", umd_callback, NULL);
-    /// sceUmdRegisterUMDCallBack(cbid);
-    /// `
-    pub extern fn sceUmdRegisterUMDCallBack(cbid: c_int) callconv(.C) c_int;
+    /// Gets the maximum number of samples of the atrac3 stream.
+    /// `atracID` - the atrac ID
+    /// `outMax` - pointer to a integer that receives the maximum number of samples.
+    /// Returns < 0 on error, otherwise 0
+    pub extern fn sceAtracGetMaxSample(atracID: c_int, outMax: [*c]c_int) callconv(.C) c_int;
 
-    /// Un-register a callback for the UMD drive
-    /// `cbid` - A callback ID created from sceKernelCreateCallback
-    /// Returns < 0 on error
-    pub extern fn sceUmdUnRegisterUMDCallBack(cbid: c_int) callconv(.C) c_int;
+    /// Gets the number of samples of the next frame to be decoded.
+    /// `atracID` - the atrac ID
+    /// `outN` - pointer to receives the number of samples of the next frame.
+    /// Returns < 0 on error, otherwise 0
+    pub extern fn sceAtracGetNextSample(atracID: c_int, outN: [*c]c_int) callconv(.C) c_int;
 
-    /// Activates the UMD drive
-    /// `unit` - The unit to initialise (probably). Should be set to 1.
-    /// `drive` - A prefix string for the fs device to mount the UMD on (e.g. "disc0:")
-    /// Returns < 0 on error
-    /// @par Example:
-    /// `
-    /// // Wait for disc and mount to filesystem
-    /// int i;
-    /// i = sceUmdCheckMedium();
-    /// if(i == 0)
-    /// {
-    /// sceUmdWaitDriveStat(PSP_UMD_PRESENT);
-    /// }
-    /// sceUmdActivate(1, "disc0:"); // Mount UMD to disc0: file system
-    /// sceUmdWaitDriveStat(PSP_UMD_READY);
-    /// // Now you can access the UMD using standard sceIo functions
-    /// `
-    pub extern fn sceUmdActivate(unit: c_int, drive: [*c]const c_char) callconv(.C) c_int;
+    /// Gets the bitrate.
+    /// `atracID` - the atracID
+    /// `outBitrate` - pointer to a integer that receives the bitrate in kbps
+    /// Returns < 0 on error, otherwise 0
+    pub extern fn sceAtracGetBitrate(atracID: c_int, outBitrate: [*c]c_int) callconv(.C) c_int;
 
-    /// Permit UMD disc being replaced
-    /// Returns < 0 on error
-    pub extern fn sceUmdReplacePermit() callconv(.C) c_int;
+    pub extern fn sceAtracGetLoopStatus(atracID: c_int, piLoopNum: [*c]c_int, puiLoopStatus: [*c]u32) callconv(.C) c_int;
 
-    /// Deativates the UMD drive
-    /// `unit` - The unit to initialise (probably). Should be set to 1.
-    /// `drive` - A prefix string for the fs device to mount the UMD on (e.g. "disc0:")
-    /// Returns < 0 on error
-    pub extern fn sceUmdDeactivate(unit: c_int, drive: [*c]const c_char) callconv(.C) c_int;
+    /// Sets the number of loops for this atrac ID
+    /// `atracID` - the atracID
+    /// `nloops` - the number of loops to set
+    /// Returns < 0 on error, otherwise 0
+    pub extern fn sceAtracSetLoopNum(atracID: c_int, nloops: c_int) callconv(.C) c_int;
+
+    pub extern fn sceAtracGetBufferInfoForReseting(atracID: c_int, uiSample: u32, pBufferInfo: [*c]c_int) callconv(.C) c_int;
+
+    pub extern fn sceAtracResetPlayPosition(atracID: c_int, uiSample: u32, uiWriteByteFirstBuf: u32, uiWriteByteSecondBuf: u32) callconv(.C) c_int;
+
+    pub extern fn sceAtracGetInternalErrorInfo(atracID: c_int, piResult: [*c]c_int) callconv(.C) c_int;
 
 };
 
-pub usingnamespace if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "sceUmdUser") and options.sceUmdUser)) sceUmdUser else EMPTY;
-
-const sceCtrl = struct {
-    /// Set the controller cycle setting.
-    /// `cycle` - Cycle.  Normally set to 0.
-    /// Returns The previous cycle setting.
-    pub extern fn sceCtrlSetSamplingCycle(cycle: c_int) callconv(.C) c_int;
-
-    /// Get the controller current cycle setting.
-    /// `pcycle` - Return value.
-    /// Returns 0.
-    pub extern fn sceCtrlGetSamplingCycle(pcycle: [*c]c_int) callconv(.C) c_int;
-
-    /// Set the controller mode.
-    /// `mode` - One of ::PspCtrlMode. If this is ::PSP_CTRL_MODE_DIGITAL, no data about the analog stick
-    /// will be present in the SceCtrlData struct read by SceCtrlReadBuffer.
-    /// Returns The previous mode.
-    pub extern fn sceCtrlSetSamplingMode(mode: c_int) callconv(.C) c_int;
-
-    /// Get the current controller mode.
-    /// `pmode` - Return value.
-    /// Returns 0.
-    pub extern fn sceCtrlGetSamplingMode(pmode: [*c]c_int) callconv(.C) c_int;
-
-    /// @brief Read latest controller data from the controller service.
-    /// Controller data contains current button and axis state.
-    /// @note Axis state is present only in ::PSP_CTRL_MODE_ANALOG controller mode.
-    /// `pad_data` - A pointer to ::SceCtrlData structure that receives controller data.
-    /// `count` - Number of ::SceCtrlData structures to read.
-    /// @see ::SceCtrlData
-    /// @see ::sceCtrlPeekBufferNegative()
-    /// @see ::sceCtrlReadBufferPositive()
-    pub extern fn sceCtrlPeekBufferPositive(pad_data: [*c]c_int, count: c_int) callconv(.C) c_int;
-
-    pub extern fn sceCtrlPeekBufferNegative(pad_data: [*c]c_int, count: c_int) callconv(.C) c_int;
-
-    /// @brief Read new controller data from the controller service.
-    /// Controller data contains current button and axis state.
-    /// **Example:**
-    /// `
-    /// SceCtrlData pad;
-    /// sceCtrlSetSamplingCycle(0);
-    /// sceCtrlSetSamplingMode(1);
-    /// sceCtrlReadBufferPositive(&pad, 1);
-    /// // Do something with the read controller data
-    /// `
-    /// @note Axis state is present only in ::PSP_CTRL_MODE_ANALOG controller mode.
-    /// @warning Controller data is collected once every controller sampling cycle.
-    /// If controller data was already read during a cycle, trying to read it again
-    /// will block the execution until the next one.
-    /// `pad_data` - A pointer to ::SceCtrlData structure that receives controller data.
-    /// `count` - Number of ::SceCtrlData structures to read.
-    /// @see ::SceCtrlData
-    /// @see ::sceCtrlReadBufferNegative()
-    /// @see ::sceCtrlPeekBufferPositive()
-    pub extern fn sceCtrlReadBufferPositive(pad_data: [*c]c_int, count: c_int) callconv(.C) c_int;
-
-    pub extern fn sceCtrlReadBufferNegative(pad_data: [*c]c_int, count: c_int) callconv(.C) c_int;
-
-    /// @brief Read latest latch data from the controller service.
-    /// Latch data contains information about button state changes between two controller service sampling cycles.
-    /// `latch_data A pointer to ::SceCtrlLatch structure that receives latch data.`
-    /// Returns On success, the number of times the controller service performed sampling since the last time
-    /// ::sceCtrlReadLatch() was called.
-    /// Returns < 0 on error.
-    /// @see ::SceCtrlLatch
-    /// @see ::sceCtrlReadLatch()
-    pub extern fn sceCtrlPeekLatch(latch_data: [*c]c_int) callconv(.C) c_int;
-
-    /// @brief Read new latch data from the controller service.
-    /// Latch data contains information about button state changes between two controller service sampling cycles.
-    /// **Example:**
-    /// `
-    /// SceCtrlLatch latchData;
-    /// while (1) {
-    /// // Obtain latch data
-    /// sceCtrlReadLatch(&latchData);
-    /// if (latchData.uiMake & PSP_CTRL_CROSS)
-    /// {
-    /// // The Cross button has just been pressed (transition from 'released' state to 'pressed' state)
-    /// }
-    /// if (latchData.uiPress & PSP_CTRL_SQUARE)
-    /// {
-    /// // The Square button is currently in the 'pressed' state
-    /// }
-    /// if (latchData.uiBreak & PSP_CTRL_TRIANGLE)
-    /// {
-    /// // The Triangle button has just been released (transition from 'pressed' state to 'released' state)
-    /// }
-    /// if (latchData.uiRelease & PSP_CTRL_CIRCLE)
-    /// {
-    /// // The Circle button is currently in the 'released' state
-    /// }
-    /// // As we clear the internal latch data with the ReadLatch() call, we can explicitly wait for the VBLANK interval
-    /// // to give the controller service the time it needs to collect new latch data again. This guarantees the next call
-    /// // to sceCtrlReadLatch() will return collected data again.
-    /// //
-    /// // Note: The sceCtrlReadBuffer*() APIs are implicitly waiting for a VBLANK interval if necessary.
-    /// sceDisplayWaitVBlank();
-    /// }
-    /// `
-    /// @warning Latch data is produced once every controller sampling cycle. If latch data was already read
-    /// during a cycle, trying to read it again will block the execution until the next one.
-    /// `latch_data A pointer to ::SceCtrlLatch structure that receives latch data.`
-    /// Returns On success, the number of times the controller service performed sampling since the last time
-    /// ::sceCtrlReadLatch() was called.
-    /// Returns < 0 on error.
-    /// @see ::SceCtrlLatch
-    /// @see ::sceCtrlPeekLatch()
-    pub extern fn sceCtrlReadLatch(latch_data: [*c]c_int) callconv(.C) c_int;
-
-    pub extern fn sceCtrl_348D99D4() callconv(.C) void;
-
-    pub extern fn sceCtrl_AF5960F3() callconv(.C) void;
-
-    pub extern fn sceCtrlClearRapidFire() callconv(.C) void;
-
-    pub extern fn sceCtrlSetRapidFire() callconv(.C) void;
-
-    /// Set analog threshold relating to the idle timer.
-    /// `idlereset` - Movement needed by the analog to reset the idle timer.
-    /// `idleback` - Movement needed by the analog to bring the PSP back from an idle state.
-    /// Set to -1 for analog to not cancel idle timer.
-    /// Set to 0 for idle timer to be cancelled even if the analog is not moved.
-    /// Set between 1 - 128 to specify the movement on either axis needed by the analog to fire the event.
-    /// Returns < 0 on error.
-    pub extern fn sceCtrlSetIdleCancelThreshold(idlereset: c_int, idleback: c_int) callconv(.C) c_int;
-
-    /// Get the idle threshold values.
-    /// `idlerest` - Movement needed by the analog to reset the idle timer.
-    /// `idleback` - Movement needed by the analog to bring the PSP back from an idle state.
-    /// Returns < 0 on error.
-    pub extern fn sceCtrlGetIdleCancelThreshold(idlerest: [*c]c_int, idleback: [*c]c_int) callconv(.C) c_int;
-
-};
-
-pub usingnamespace if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "sceCtrl") and options.sceCtrl)) sceCtrl else EMPTY;
-
-const LoadExecForUser = struct {
-    /// Execute a new game executable, limited when not running in kernel mode.
-    /// `file` - The file to execute.
-    /// `param` - Pointer to a ::SceKernelLoadExecParam structure, or NULL.
-    /// Returns < 0 on error, probably.
-    pub extern fn sceKernelLoadExec(file: [*c]const c_char, param: [*c]c_int) callconv(.C) c_int;
-
-    pub extern fn sceKernelExitGameWithStatus() callconv(.C) void;
-
-    /// Exit game and go back to the PSP browser.
-    /// @note You need to be in a thread in order for this function to work
-    pub extern fn sceKernelExitGame() callconv(.C) void;
-
-    /// Register callback
-    /// @note By installing the exit callback the home button becomes active. However if sceKernelExitGame
-    /// is not called in the callback it is likely that the psp will just crash.
-    /// @par Example:
-    /// `
-    /// int exit_callback(void) { sceKernelExitGame(); }
-    /// cbid = sceKernelCreateCallback("ExitCallback", exit_callback, NULL);
-    /// sceKernelRegisterExitCallback(cbid);
-    /// `
-    /// `cbid Callback id`
-    /// Returns < 0 on error
-    pub extern fn sceKernelRegisterExitCallback(cbid: c_int) callconv(.C) c_int;
-
-};
-
-pub usingnamespace if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "LoadExecForUser") and options.LoadExecForUser)) LoadExecForUser else EMPTY;
-
-const Kernel_Library = struct {
-    /// Suspend all interrupts.
-    /// Returns The current state of the interrupt controller, to be used with ::sceKernelCpuResumeIntr().
-    pub extern fn sceKernelCpuSuspendIntr() callconv(.C) c_uint;
-
-    /// Resume all interrupts.
-    /// `flags` - The value returned from ::sceKernelCpuSuspendIntr().
-    pub extern fn sceKernelCpuResumeIntr(flags: c_uint) callconv(.C) void;
-
-    /// Resume all interrupts (using sync instructions).
-    /// `flags` - The value returned from ::sceKernelCpuSuspendIntr()
-    pub extern fn sceKernelCpuResumeIntrWithSync(flags: c_uint) callconv(.C) void;
-
-    /// Determine if interrupts are suspended or active, based on the given flags.
-    /// `flags` - The value returned from ::sceKernelCpuSuspendIntr().
-    /// Returns 1 if flags indicate that interrupts were not suspended, 0 otherwise.
-    pub extern fn sceKernelIsCpuIntrSuspended(flags: c_uint) callconv(.C) c_int;
-
-    /// Determine if interrupts are enabled or disabled.
-    /// Returns 1 if interrupts are currently enabled.
-    pub extern fn sceKernelIsCpuIntrEnable() callconv(.C) c_int;
-
-    /// Lock a lightweight mutex
-    /// `workarea` - The pointer to the workarea
-    /// `lockCount` - value of increase the lock counter
-    /// `pTimeout` - The pointer for timeout waiting
-    /// Returns 0 on success, otherwise one of ::PspKernelErrorCodes
-    pub extern fn sceKernelLockLwMutex(workarea: [*c]c_int, lockCount: c_int, pTimeout: [*c]c_uint) callconv(.C) c_int;
-
-    /// Lock a lightweight mutex
-    /// `workarea` - The pointer to the workarea
-    /// `lockCount` - value of decrease the lock counter
-    /// Returns 0 on success, otherwise one of ::PspKernelErrorCodes
-    pub extern fn sceKernelUnlockLwMutex(workarea: [*c]c_int, lockCount: c_int) callconv(.C) c_int;
-
-    /// Try to lock a lightweight mutex
-    /// `workarea` - The pointer to the workarea
-    /// `lockCount` - value of increase the lock counter
-    /// Returns 0 on success, otherwise one of ::PspKernelErrorCodes
-    pub extern fn sceKernelTryLockLwMutex(workarea: [*c]c_int, lockCount: c_int) callconv(.C) c_int;
-
-};
-
-pub usingnamespace if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "Kernel_Library") and options.Kernel_Library)) Kernel_Library else EMPTY;
-
-const sceImpose = struct {
-    pub extern fn sceImposeGetHomePopup() callconv(.C) void;
-
-    pub extern fn sceImposeGetLanguageMode() callconv(.C) void;
-
-    pub extern fn sceImposeSetLanguageMode() callconv(.C) void;
-
-    pub extern fn sceImposeHomeButton() callconv(.C) void;
-
-    pub extern fn sceImposeSetHomePopup() callconv(.C) void;
-
-    pub extern fn sceImposeSetUMDPopup() callconv(.C) void;
-
-    pub extern fn sceImposeBatteryIconStatus() callconv(.C) void;
-
-    pub extern fn sceImposeGetBacklightOffTime() callconv(.C) void;
-
-    pub extern fn sceImposeSetBacklightOffTime() callconv(.C) void;
-
-    pub extern fn sceImpose_9BA61B49() callconv(.C) void;
-
-    pub extern fn sceImpose_A9884B00() callconv(.C) void;
-
-    pub extern fn sceImpose_BB3F5DEC() callconv(.C) void;
-
-    pub extern fn sceImposeGetUMDPopup() callconv(.C) void;
-
-    pub extern fn sceImpose_FCD44963() callconv(.C) void;
-
-    pub extern fn sceImpose_FF1A2F07() callconv(.C) void;
-
-};
-
-pub usingnamespace if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "sceImpose") and options.sceImpose)) sceImpose else EMPTY;
-
-const SysMemUserForUser = struct {
-    /// Get the size of the largest free memory block.
-    /// Returns The size of the largest free memory block, in bytes.
-    pub extern fn sceKernelMaxFreeMemSize() callconv(.C) SceSize;
-
-    /// Get the total amount of free memory.
-    /// Returns The total amount of free memory, in bytes.
-    pub extern fn sceKernelTotalFreeMemSize() callconv(.C) SceSize;
-
-    /// Allocate a memory block from a memory partition.
-    /// `partitionid` - The UID of the partition to allocate from.
-    /// `name` - Name assigned to the new block.
-    /// `type` - Specifies how the block is allocated within the partition.  One of ::PspSysMemBlockTypes.
-    /// `size` - Size of the memory block, in bytes.
-    /// `addr` - If type is PSP_SMEM_Addr, then addr specifies the lowest address allocate the block from.
-    /// Returns The UID of the new block, or if less than 0 an error.
-    pub extern fn sceKernelAllocPartitionMemory(partitionid: SceUID, name: [*c]const c_char, type: c_int, size: SceSize, addr: ?*anyopaque) callconv(.C) SceUID;
-
-    /// Free a memory block allocated with ::sceKernelAllocPartitionMemory.
-    /// `blockid` - UID of the block to free.
-    /// Returns ? on success, less than 0 on error.
-    pub extern fn sceKernelFreePartitionMemory(blockid: SceUID) callconv(.C) c_int;
-
-    /// Get the address of a memory block.
-    /// `blockid` - UID of the memory block.
-    /// Returns The lowest address belonging to the memory block.
-    pub extern fn sceKernelGetBlockHeadAddr(blockid: SceUID) callconv(.C) ?*anyopaque;
-
-    /// Get the firmware version.
-    /// Returns The firmware version.
-    /// 0x01000300 on v1.00 unit,
-    /// 0x01050001 on v1.50 unit,
-    /// 0x01050100 on v1.51 unit,
-    /// 0x01050200 on v1.52 unit,
-    /// 0x02000010 on v2.00/v2.01 unit,
-    /// 0x02050010 on v2.50 unit,
-    /// 0x02060010 on v2.60 unit,
-    /// 0x02070010 on v2.70 unit,
-    /// 0x02070110 on v2.71 unit.
-    pub extern fn sceKernelDevkitVersion() callconv(.C) c_int;
-
-    /// Kernel printf function.
-    /// `format` - The format string.
-    /// `...` - Arguments for the format string.
-    pub extern fn sceKernelPrintf(format: [*c]const c_char, ...) callconv(.C) void;
-
-    /// Set the version of the SDK with which the caller was compiled.
-    /// Version numbers are as for sceKernelDevkitVersion().
-    /// Returns 0 on success, < 0 on error.
-    pub extern fn sceKernelSetCompiledSdkVersion(version: c_int) callconv(.C) c_int;
-
-    /// Get the SDK version set with sceKernelSetCompiledSdkVersion().
-    /// Returns Version number, or 0 if unset.
-    pub extern fn sceKernelGetCompiledSdkVersion() callconv(.C) c_int;
-
-};
-
-pub usingnamespace if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "SysMemUserForUser") and options.SysMemUserForUser)) SysMemUserForUser else EMPTY;
+pub usingnamespace if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "sceAtrac3plus") and options.sceAtrac3plus)) sceAtrac3plus else EMPTY;
 
 const sceSuspendForUser = struct {
     pub extern fn sceKernelPowerLock() callconv(.C) void;
@@ -2151,108 +1904,6 @@ const sceSuspendForUser = struct {
 };
 
 pub usingnamespace if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "sceSuspendForUser") and options.sceSuspendForUser)) sceSuspendForUser else EMPTY;
-
-const ModuleMgrForUser = struct {
-    /// Load a module from the given file UID.
-    /// `fid` - The module's file UID.
-    /// `flags` - Unused, always 0.
-    /// `option` - Pointer to an optional ::SceKernelLMOption structure.
-    /// Returns The UID of the loaded module on success, otherwise one of ::PspKernelErrorCodes.
-    pub extern fn sceKernelLoadModuleByID(fid: SceUID, flags: c_int, option: [*c]c_int) callconv(.C) SceUID;
-
-    /// Load a module.
-    /// @note This function restricts where it can load from (such as from flash0)
-    /// unless you call it in kernel mode. It also must be called from a thread.
-    /// `path` - The path to the module to load.
-    /// `flags` - Unused, always 0 .
-    /// `option` - Pointer to a mod_param_t structure. Can be NULL.
-    /// Returns The UID of the loaded module on success, otherwise one of ::PspKernelErrorCodes.
-    pub extern fn sceKernelLoadModule(path: [*c]const c_char, flags: c_int, option: [*c]c_int) callconv(.C) SceUID;
-
-    /// Load a module from MS.
-    /// @note This function restricts what it can load, e.g. it wont load plain executables.
-    /// `path` - The path to the module to load.
-    /// `flags` - Unused, set to 0.
-    /// `option` - Pointer to a mod_param_t structure. Can be NULL.
-    /// Returns The UID of the loaded module on success, otherwise one of ::PspKernelErrorCodes.
-    pub extern fn sceKernelLoadModuleMs(path: [*c]const c_char, flags: c_int, option: [*c]c_int) callconv(.C) SceUID;
-
-    /// Load a module from a buffer using the USB/WLAN API.
-    /// Can only be called from kernel mode, or from a thread that has attributes of 0xa0000000.
-    /// `bufsize` - Size (in bytes) of the buffer pointed to by buf.
-    /// `buf` - Pointer to a buffer containing the module to load.  The buffer must reside at an
-    /// address that is a multiple to 64 bytes.
-    /// `flags` - Unused, always 0.
-    /// `option` - Pointer to an optional ::SceKernelLMOption structure.
-    /// Returns The UID of the loaded module on success, otherwise one of ::PspKernelErrorCodes.
-    pub extern fn sceKernelLoadModuleBufferUsbWlan(bufsize: SceSize, buf: ?*anyopaque, flags: c_int, option: [*c]c_int) callconv(.C) SceUID;
-
-    /// Start a loaded module.
-    /// `modid` - The ID of the module returned from LoadModule.
-    /// `argsize` - Length of the args.
-    /// `argp` - A pointer to the arguments to the module.
-    /// `status` - Returns the status of the start.
-    /// `option` - Pointer to an optional ::SceKernelSMOption structure.
-    /// Returns modID (modID > 0) UID of the module that was started and made resident,
-    /// 0 on success for modules that don't need to be made resident,
-    /// otherwise one of ::PspKernelErrorCodes.
-    pub extern fn sceKernelStartModule(modid: SceUID, argsize: SceSize, argp: ?*anyopaque, status: [*c]c_int, option: [*c]c_int) callconv(.C) c_int;
-
-    /// Stop a running module.
-    /// `modid` - The UID of the module to stop.
-    /// `argsize` - The length of the arguments pointed to by argp.
-    /// `argp` - Pointer to arguments to pass to the module's module_stop() routine.
-    /// `status` - Return value of the module's module_stop() routine.
-    /// `option` - Pointer to an optional ::SceKernelSMOption structure.
-    /// Returns ??? on success, otherwise one of ::PspKernelErrorCodes.
-    pub extern fn sceKernelStopModule(modid: SceUID, argsize: SceSize, argp: ?*anyopaque, status: [*c]c_int, option: [*c]c_int) callconv(.C) c_int;
-
-    /// Unload a stopped module.
-    /// `modid` - The UID of the module to unload.
-    /// Returns ??? on success, otherwise one of ::PspKernelErrorCodes.
-    pub extern fn sceKernelUnloadModule(modid: SceUID) callconv(.C) c_int;
-
-    /// Stop and unload the current module.
-    /// `unknown` - Unknown (I've seen 1 passed).
-    /// `argsize` - Size (in bytes) of the arguments that will be passed to module_stop().
-    /// `argp` - Pointer to arguments that will be passed to module_stop().
-    /// Returns ??? on success, otherwise one of ::PspKernelErrorCodes.
-    pub extern fn sceKernelSelfStopUnloadModule(unknown: c_int, argsize: SceSize, argp: ?*anyopaque) callconv(.C) c_int;
-
-    /// Stop and unload the current module.
-    /// `argsize` - Size (in bytes) of the arguments that will be passed to module_stop().
-    /// `argp` - Poitner to arguments that will be passed to module_stop().
-    /// `status` - Return value from module_stop().
-    /// `option` - Pointer to an optional ::SceKernelSMOption structure.
-    /// Returns ??? on success, otherwise one of ::PspKernelErrorCodes.
-    pub extern fn sceKernelStopUnloadSelfModule(argsize: SceSize, argp: ?*anyopaque, status: [*c]c_int, option: [*c]c_int) callconv(.C) c_int;
-
-    /// Query the information about a loaded module from its UID.
-    /// @note This fails on v1.0 firmware (and even it worked has a limited structure)
-    /// so if you want to be compatible with both 1.5 and 1.0 (and you are running in
-    /// kernel mode) then call this function first then ::pspSdkQueryModuleInfoV1
-    /// if it fails, or make separate v1 and v1.5+ builds.
-    /// `modid` - The UID of the loaded module.
-    /// `info` - Pointer to a ::SceKernelModuleInfo structure.
-    /// Returns 0 on success, otherwise one of ::PspKernelErrorCodes.
-    pub extern fn sceKernelQueryModuleInfo(modid: SceUID, info: [*c]c_int) callconv(.C) c_int;
-
-    /// Get a list of module IDs. NOTE: This is only available on 1.5 firmware
-    /// and above. For V1 use ::pspSdkGetModuleIdList.
-    /// `readbuf` - Buffer to store the module list.
-    /// `readbufsize` - Number of elements in the readbuffer.
-    /// `idcount` - Returns the number of module ids
-    /// Returns >= 0 on success
-    pub extern fn sceKernelGetModuleIdList(readbuf: [*c]SceUID, readbufsize: c_int, idcount: [*c]c_int) callconv(.C) c_int;
-
-    /// Get the ID of the module occupying the address
-    /// `moduleAddr` - A pointer to the module
-    /// Returns >= 0 on success, otherwise one of ::PspKernelErrorCodes
-    pub extern fn sceKernelGetModuleIdByAddress(moduleAddr: ?*const anyopaque) callconv(.C) c_int;
-
-};
-
-pub usingnamespace if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "ModuleMgrForUser") and options.ModuleMgrForUser)) ModuleMgrForUser else EMPTY;
 
 const IoFileMgrForUser = struct {
     /// Poll for asyncronous completion.
@@ -2552,6 +2203,41 @@ const IoFileMgrForUser = struct {
 
 pub usingnamespace if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "IoFileMgrForUser") and options.IoFileMgrForUser)) IoFileMgrForUser else EMPTY;
 
+const sceImpose = struct {
+    pub extern fn sceImposeGetHomePopup() callconv(.C) void;
+
+    pub extern fn sceImposeGetLanguageMode() callconv(.C) void;
+
+    pub extern fn sceImposeSetLanguageMode() callconv(.C) void;
+
+    pub extern fn sceImposeHomeButton() callconv(.C) void;
+
+    pub extern fn sceImposeSetHomePopup() callconv(.C) void;
+
+    pub extern fn sceImposeSetUMDPopup() callconv(.C) void;
+
+    pub extern fn sceImposeBatteryIconStatus() callconv(.C) void;
+
+    pub extern fn sceImposeGetBacklightOffTime() callconv(.C) void;
+
+    pub extern fn sceImposeSetBacklightOffTime() callconv(.C) void;
+
+    pub extern fn sceImpose_9BA61B49() callconv(.C) void;
+
+    pub extern fn sceImpose_A9884B00() callconv(.C) void;
+
+    pub extern fn sceImpose_BB3F5DEC() callconv(.C) void;
+
+    pub extern fn sceImposeGetUMDPopup() callconv(.C) void;
+
+    pub extern fn sceImpose_FCD44963() callconv(.C) void;
+
+    pub extern fn sceImpose_FF1A2F07() callconv(.C) void;
+
+};
+
+pub usingnamespace if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "sceImpose") and options.sceImpose)) sceImpose else EMPTY;
+
 const UtilsForUser = struct {
     /// Invalidate a range of addresses in data cache
     pub extern fn sceKernelDcacheInvalidateRange(p: ?*const anyopaque, size: c_uint) callconv(.C) void;
@@ -2681,47 +2367,6 @@ const UtilsForUser = struct {
 };
 
 pub usingnamespace if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "UtilsForUser") and options.UtilsForUser)) UtilsForUser else EMPTY;
-
-const InterruptManager = struct {
-    /// Register a sub interrupt handler.
-    /// `intno` - The interrupt number to register.
-    /// `no` - The sub interrupt handler number (user controlled)
-    /// `handler` - The interrupt handler
-    /// `arg` - An argument passed to the interrupt handler
-    /// Returns < 0 on error.
-    pub extern fn sceKernelRegisterSubIntrHandler(intno: c_int, no: c_int, handler: ?*anyopaque, arg: ?*anyopaque) callconv(.C) c_int;
-
-    /// Release a sub interrupt handler.
-    /// `intno` - The interrupt number to register.
-    /// `no` - The sub interrupt handler number
-    /// Returns < 0 on error.
-    pub extern fn sceKernelReleaseSubIntrHandler(intno: c_int, no: c_int) callconv(.C) c_int;
-
-    /// Enable a sub interrupt.
-    /// `intno` - The sub interrupt to enable.
-    /// `no` - The sub interrupt handler number
-    /// Returns < 0 on error.
-    pub extern fn sceKernelEnableSubIntr(intno: c_int, no: c_int) callconv(.C) c_int;
-
-    /// Disable a sub interrupt handler.
-    /// `intno` - The sub interrupt to disable.
-    /// `no` - The sub interrupt handler number
-    /// Returns < 0 on error.
-    pub extern fn sceKernelDisableSubIntr(intno: c_int, no: c_int) callconv(.C) c_int;
-
-    pub extern fn sceKernelSuspendSubIntr() callconv(.C) void;
-
-    pub extern fn sceKernelResumeSubIntr() callconv(.C) void;
-
-    pub extern fn sceKernelIsSubInterruptOccurred() callconv(.C) void;
-
-    pub extern fn QueryIntrHandlerInfo(intr_code: SceUID, sub_intr_code: SceUID, data: [*c]c_int) callconv(.C) c_int;
-
-    pub extern fn sceKernelRegisterUserSpaceIntrStack() callconv(.C) void;
-
-};
-
-pub usingnamespace if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "InterruptManager") and options.InterruptManager)) InterruptManager else EMPTY;
 
 const ThreadManForUser = struct {
     /// Return from a callback (used as a syscall for the return
@@ -3586,6 +3231,238 @@ const ThreadManForUser = struct {
 
 pub usingnamespace if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "ThreadManForUser") and options.ThreadManForUser)) ThreadManForUser else EMPTY;
 
+const LoadExecForUser = struct {
+    /// Execute a new game executable, limited when not running in kernel mode.
+    /// `file` - The file to execute.
+    /// `param` - Pointer to a ::SceKernelLoadExecParam structure, or NULL.
+    /// Returns < 0 on error, probably.
+    pub extern fn sceKernelLoadExec(file: [*c]const c_char, param: [*c]c_int) callconv(.C) c_int;
+
+    pub extern fn sceKernelExitGameWithStatus() callconv(.C) void;
+
+    /// Exit game and go back to the PSP browser.
+    /// @note You need to be in a thread in order for this function to work
+    pub extern fn sceKernelExitGame() callconv(.C) void;
+
+    /// Register callback
+    /// @note By installing the exit callback the home button becomes active. However if sceKernelExitGame
+    /// is not called in the callback it is likely that the psp will just crash.
+    /// @par Example:
+    /// `
+    /// int exit_callback(void) { sceKernelExitGame(); }
+    /// cbid = sceKernelCreateCallback("ExitCallback", exit_callback, NULL);
+    /// sceKernelRegisterExitCallback(cbid);
+    /// `
+    /// `cbid Callback id`
+    /// Returns < 0 on error
+    pub extern fn sceKernelRegisterExitCallback(cbid: c_int) callconv(.C) c_int;
+
+};
+
+pub usingnamespace if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "LoadExecForUser") and options.LoadExecForUser)) LoadExecForUser else EMPTY;
+
+const InterruptManager = struct {
+    /// Register a sub interrupt handler.
+    /// `intno` - The interrupt number to register.
+    /// `no` - The sub interrupt handler number (user controlled)
+    /// `handler` - The interrupt handler
+    /// `arg` - An argument passed to the interrupt handler
+    /// Returns < 0 on error.
+    pub extern fn sceKernelRegisterSubIntrHandler(intno: c_int, no: c_int, handler: ?*anyopaque, arg: ?*anyopaque) callconv(.C) c_int;
+
+    /// Release a sub interrupt handler.
+    /// `intno` - The interrupt number to register.
+    /// `no` - The sub interrupt handler number
+    /// Returns < 0 on error.
+    pub extern fn sceKernelReleaseSubIntrHandler(intno: c_int, no: c_int) callconv(.C) c_int;
+
+    /// Enable a sub interrupt.
+    /// `intno` - The sub interrupt to enable.
+    /// `no` - The sub interrupt handler number
+    /// Returns < 0 on error.
+    pub extern fn sceKernelEnableSubIntr(intno: c_int, no: c_int) callconv(.C) c_int;
+
+    /// Disable a sub interrupt handler.
+    /// `intno` - The sub interrupt to disable.
+    /// `no` - The sub interrupt handler number
+    /// Returns < 0 on error.
+    pub extern fn sceKernelDisableSubIntr(intno: c_int, no: c_int) callconv(.C) c_int;
+
+    pub extern fn sceKernelSuspendSubIntr() callconv(.C) void;
+
+    pub extern fn sceKernelResumeSubIntr() callconv(.C) void;
+
+    pub extern fn sceKernelIsSubInterruptOccurred() callconv(.C) void;
+
+    pub extern fn QueryIntrHandlerInfo(intr_code: SceUID, sub_intr_code: SceUID, data: [*c]c_int) callconv(.C) c_int;
+
+    pub extern fn sceKernelRegisterUserSpaceIntrStack() callconv(.C) void;
+
+};
+
+pub usingnamespace if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "InterruptManager") and options.InterruptManager)) InterruptManager else EMPTY;
+
+const SysMemUserForUser = struct {
+    /// Get the size of the largest free memory block.
+    /// Returns The size of the largest free memory block, in bytes.
+    pub extern fn sceKernelMaxFreeMemSize() callconv(.C) SceSize;
+
+    /// Get the total amount of free memory.
+    /// Returns The total amount of free memory, in bytes.
+    pub extern fn sceKernelTotalFreeMemSize() callconv(.C) SceSize;
+
+    /// Allocate a memory block from a memory partition.
+    /// `partitionid` - The UID of the partition to allocate from.
+    /// `name` - Name assigned to the new block.
+    /// `type` - Specifies how the block is allocated within the partition.  One of ::PspSysMemBlockTypes.
+    /// `size` - Size of the memory block, in bytes.
+    /// `addr` - If type is PSP_SMEM_Addr, then addr specifies the lowest address allocate the block from.
+    /// Returns The UID of the new block, or if less than 0 an error.
+    pub extern fn sceKernelAllocPartitionMemory(partitionid: SceUID, name: [*c]const c_char, type: c_int, size: SceSize, addr: ?*anyopaque) callconv(.C) SceUID;
+
+    /// Free a memory block allocated with ::sceKernelAllocPartitionMemory.
+    /// `blockid` - UID of the block to free.
+    /// Returns ? on success, less than 0 on error.
+    pub extern fn sceKernelFreePartitionMemory(blockid: SceUID) callconv(.C) c_int;
+
+    /// Get the address of a memory block.
+    /// `blockid` - UID of the memory block.
+    /// Returns The lowest address belonging to the memory block.
+    pub extern fn sceKernelGetBlockHeadAddr(blockid: SceUID) callconv(.C) ?*anyopaque;
+
+    /// Get the firmware version.
+    /// Returns The firmware version.
+    /// 0x01000300 on v1.00 unit,
+    /// 0x01050001 on v1.50 unit,
+    /// 0x01050100 on v1.51 unit,
+    /// 0x01050200 on v1.52 unit,
+    /// 0x02000010 on v2.00/v2.01 unit,
+    /// 0x02050010 on v2.50 unit,
+    /// 0x02060010 on v2.60 unit,
+    /// 0x02070010 on v2.70 unit,
+    /// 0x02070110 on v2.71 unit.
+    pub extern fn sceKernelDevkitVersion() callconv(.C) c_int;
+
+    /// Kernel printf function.
+    /// `format` - The format string.
+    /// `...` - Arguments for the format string.
+    pub extern fn sceKernelPrintf(format: [*c]const c_char, ...) callconv(.C) void;
+
+    /// Set the version of the SDK with which the caller was compiled.
+    /// Version numbers are as for sceKernelDevkitVersion().
+    /// Returns 0 on success, < 0 on error.
+    pub extern fn sceKernelSetCompiledSdkVersion(version: c_int) callconv(.C) c_int;
+
+    /// Get the SDK version set with sceKernelSetCompiledSdkVersion().
+    /// Returns Version number, or 0 if unset.
+    pub extern fn sceKernelGetCompiledSdkVersion() callconv(.C) c_int;
+
+};
+
+pub usingnamespace if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "SysMemUserForUser") and options.SysMemUserForUser)) SysMemUserForUser else EMPTY;
+
+const ModuleMgrForUser = struct {
+    /// Load a module from the given file UID.
+    /// `fid` - The module's file UID.
+    /// `flags` - Unused, always 0.
+    /// `option` - Pointer to an optional ::SceKernelLMOption structure.
+    /// Returns The UID of the loaded module on success, otherwise one of ::PspKernelErrorCodes.
+    pub extern fn sceKernelLoadModuleByID(fid: SceUID, flags: c_int, option: [*c]c_int) callconv(.C) SceUID;
+
+    /// Load a module.
+    /// @note This function restricts where it can load from (such as from flash0)
+    /// unless you call it in kernel mode. It also must be called from a thread.
+    /// `path` - The path to the module to load.
+    /// `flags` - Unused, always 0 .
+    /// `option` - Pointer to a mod_param_t structure. Can be NULL.
+    /// Returns The UID of the loaded module on success, otherwise one of ::PspKernelErrorCodes.
+    pub extern fn sceKernelLoadModule(path: [*c]const c_char, flags: c_int, option: [*c]c_int) callconv(.C) SceUID;
+
+    /// Load a module from MS.
+    /// @note This function restricts what it can load, e.g. it wont load plain executables.
+    /// `path` - The path to the module to load.
+    /// `flags` - Unused, set to 0.
+    /// `option` - Pointer to a mod_param_t structure. Can be NULL.
+    /// Returns The UID of the loaded module on success, otherwise one of ::PspKernelErrorCodes.
+    pub extern fn sceKernelLoadModuleMs(path: [*c]const c_char, flags: c_int, option: [*c]c_int) callconv(.C) SceUID;
+
+    /// Load a module from a buffer using the USB/WLAN API.
+    /// Can only be called from kernel mode, or from a thread that has attributes of 0xa0000000.
+    /// `bufsize` - Size (in bytes) of the buffer pointed to by buf.
+    /// `buf` - Pointer to a buffer containing the module to load.  The buffer must reside at an
+    /// address that is a multiple to 64 bytes.
+    /// `flags` - Unused, always 0.
+    /// `option` - Pointer to an optional ::SceKernelLMOption structure.
+    /// Returns The UID of the loaded module on success, otherwise one of ::PspKernelErrorCodes.
+    pub extern fn sceKernelLoadModuleBufferUsbWlan(bufsize: SceSize, buf: ?*anyopaque, flags: c_int, option: [*c]c_int) callconv(.C) SceUID;
+
+    /// Start a loaded module.
+    /// `modid` - The ID of the module returned from LoadModule.
+    /// `argsize` - Length of the args.
+    /// `argp` - A pointer to the arguments to the module.
+    /// `status` - Returns the status of the start.
+    /// `option` - Pointer to an optional ::SceKernelSMOption structure.
+    /// Returns modID (modID > 0) UID of the module that was started and made resident,
+    /// 0 on success for modules that don't need to be made resident,
+    /// otherwise one of ::PspKernelErrorCodes.
+    pub extern fn sceKernelStartModule(modid: SceUID, argsize: SceSize, argp: ?*anyopaque, status: [*c]c_int, option: [*c]c_int) callconv(.C) c_int;
+
+    /// Stop a running module.
+    /// `modid` - The UID of the module to stop.
+    /// `argsize` - The length of the arguments pointed to by argp.
+    /// `argp` - Pointer to arguments to pass to the module's module_stop() routine.
+    /// `status` - Return value of the module's module_stop() routine.
+    /// `option` - Pointer to an optional ::SceKernelSMOption structure.
+    /// Returns ??? on success, otherwise one of ::PspKernelErrorCodes.
+    pub extern fn sceKernelStopModule(modid: SceUID, argsize: SceSize, argp: ?*anyopaque, status: [*c]c_int, option: [*c]c_int) callconv(.C) c_int;
+
+    /// Unload a stopped module.
+    /// `modid` - The UID of the module to unload.
+    /// Returns ??? on success, otherwise one of ::PspKernelErrorCodes.
+    pub extern fn sceKernelUnloadModule(modid: SceUID) callconv(.C) c_int;
+
+    /// Stop and unload the current module.
+    /// `unknown` - Unknown (I've seen 1 passed).
+    /// `argsize` - Size (in bytes) of the arguments that will be passed to module_stop().
+    /// `argp` - Pointer to arguments that will be passed to module_stop().
+    /// Returns ??? on success, otherwise one of ::PspKernelErrorCodes.
+    pub extern fn sceKernelSelfStopUnloadModule(unknown: c_int, argsize: SceSize, argp: ?*anyopaque) callconv(.C) c_int;
+
+    /// Stop and unload the current module.
+    /// `argsize` - Size (in bytes) of the arguments that will be passed to module_stop().
+    /// `argp` - Poitner to arguments that will be passed to module_stop().
+    /// `status` - Return value from module_stop().
+    /// `option` - Pointer to an optional ::SceKernelSMOption structure.
+    /// Returns ??? on success, otherwise one of ::PspKernelErrorCodes.
+    pub extern fn sceKernelStopUnloadSelfModule(argsize: SceSize, argp: ?*anyopaque, status: [*c]c_int, option: [*c]c_int) callconv(.C) c_int;
+
+    /// Query the information about a loaded module from its UID.
+    /// @note This fails on v1.0 firmware (and even it worked has a limited structure)
+    /// so if you want to be compatible with both 1.5 and 1.0 (and you are running in
+    /// kernel mode) then call this function first then ::pspSdkQueryModuleInfoV1
+    /// if it fails, or make separate v1 and v1.5+ builds.
+    /// `modid` - The UID of the loaded module.
+    /// `info` - Pointer to a ::SceKernelModuleInfo structure.
+    /// Returns 0 on success, otherwise one of ::PspKernelErrorCodes.
+    pub extern fn sceKernelQueryModuleInfo(modid: SceUID, info: [*c]c_int) callconv(.C) c_int;
+
+    /// Get a list of module IDs. NOTE: This is only available on 1.5 firmware
+    /// and above. For V1 use ::pspSdkGetModuleIdList.
+    /// `readbuf` - Buffer to store the module list.
+    /// `readbufsize` - Number of elements in the readbuffer.
+    /// `idcount` - Returns the number of module ids
+    /// Returns >= 0 on success
+    pub extern fn sceKernelGetModuleIdList(readbuf: [*c]SceUID, readbufsize: c_int, idcount: [*c]c_int) callconv(.C) c_int;
+
+    /// Get the ID of the module occupying the address
+    /// `moduleAddr` - A pointer to the module
+    /// Returns >= 0 on success, otherwise one of ::PspKernelErrorCodes
+    pub extern fn sceKernelGetModuleIdByAddress(moduleAddr: ?*const anyopaque) callconv(.C) c_int;
+
+};
+
+pub usingnamespace if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "ModuleMgrForUser") and options.ModuleMgrForUser)) ModuleMgrForUser else EMPTY;
+
 const StdioForUser = struct {
     pub extern fn sceKernelStdioRead() callconv(.C) void;
 
@@ -3615,617 +3492,151 @@ const StdioForUser = struct {
 
 pub usingnamespace if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "StdioForUser") and options.StdioForUser)) StdioForUser else EMPTY;
 
-const sceUsbCam = struct {
-    pub extern fn sceUsbCamSetupMic() callconv(.C) void;
+const Kernel_Library = struct {
+    /// Suspend all interrupts.
+    /// Returns The current state of the interrupt controller, to be used with ::sceKernelCpuResumeIntr().
+    pub extern fn sceKernelCpuSuspendIntr() callconv(.C) c_uint;
 
-    pub extern fn sceUsbCamSetMicGain() callconv(.C) void;
+    /// Resume all interrupts.
+    /// `flags` - The value returned from ::sceKernelCpuSuspendIntr().
+    pub extern fn sceKernelCpuResumeIntr(flags: c_uint) callconv(.C) void;
 
-    /// Sets the contrast
-    /// `contrast` - The contrast (0-255)
-    /// Returns 0 on success, < 0 on error
-    pub extern fn sceUsbCamSetContrast(contrast: c_int) callconv(.C) c_int;
+    /// Resume all interrupts (using sync instructions).
+    /// `flags` - The value returned from ::sceKernelCpuSuspendIntr()
+    pub extern fn sceKernelCpuResumeIntrWithSync(flags: c_uint) callconv(.C) void;
 
-    /// Setups the parameters to take a still image (with more options)
-    /// `param` - pointer to a ::PspUsbCamSetupStillExParam
-    /// Returns 0 on success, < 0 on error
-    pub extern fn sceUsbCamSetupStillEx(param: [*c]c_int) callconv(.C) c_int;
+    /// Determine if interrupts are suspended or active, based on the given flags.
+    /// `flags` - The value returned from ::sceKernelCpuSuspendIntr().
+    /// Returns 1 if flags indicate that interrupts were not suspended, 0 otherwise.
+    pub extern fn sceKernelIsCpuIntrSuspended(flags: c_uint) callconv(.C) c_int;
 
-    /// Gets the state of the autoreversal of the image.
-    /// Returns 1 if it is set to automatic, 0 otherwise
-    pub extern fn sceUsbCamGetAutoImageReverseState() callconv(.C) c_int;
+    /// Determine if interrupts are enabled or disabled.
+    /// Returns 1 if interrupts are currently enabled.
+    pub extern fn sceKernelIsCpuIntrEnable() callconv(.C) c_int;
 
-    /// Set ups the parameters for video capture.
-    /// `param` - Pointer to a ::PspUsbCamSetupVideoParam structure.
-    /// `workarea` - Pointer to a buffer used as work area by the driver.
-    /// `wasize` - Size of the work area.
-    /// Returns 0 on success, < 0 on error
-    pub extern fn sceUsbCamSetupVideo(param: [*c]c_int, workarea: ?*anyopaque, wasize: c_int) callconv(.C) c_int;
+    /// Lock a lightweight mutex
+    /// `workarea` - The pointer to the workarea
+    /// `lockCount` - value of increase the lock counter
+    /// `pTimeout` - The pointer for timeout waiting
+    /// Returns 0 on success, otherwise one of ::PspKernelErrorCodes
+    pub extern fn sceKernelLockLwMutex(workarea: [*c]c_int, lockCount: c_int, pTimeout: [*c]c_uint) callconv(.C) c_int;
 
-    /// Polls the status of still input completion.
-    /// Returns the size of the acquired image if still input has ended,
-    /// 0 if the input has not ended, < 0 on error.
-    pub extern fn sceUsbCamStillPollInputEnd() callconv(.C) c_int;
+    /// Lock a lightweight mutex
+    /// `workarea` - The pointer to the workarea
+    /// `lockCount` - value of decrease the lock counter
+    /// Returns 0 on success, otherwise one of ::PspKernelErrorCodes
+    pub extern fn sceKernelUnlockLwMutex(workarea: [*c]c_int, lockCount: c_int) callconv(.C) c_int;
 
-    /// Sets the exposure level
-    /// `ev` - The exposure level, one of ::PspUsbCamEVLevel
-    /// Returns 0 on success, < 0 on error
-    pub extern fn sceUsbCamSetEvLevel(ev: c_int) callconv(.C) c_int;
-
-    pub extern fn sceUsbCam_1E958148() callconv(.C) void;
-
-    /// Gets the current exposure level.
-    /// `ev` - pointer to a variable that receives the current exposure level
-    /// Returns 0 on success, < 0 on error
-    pub extern fn sceUsbCamGetEvLevel(ev: [*c]c_int) callconv(.C) c_int;
-
-    pub extern fn sceUsbCamSetupMicEx() callconv(.C) void;
-
-    pub extern fn sceUsbCamReadMicBlocking() callconv(.C) void;
-
-    /// Gets the current saturation
-    /// `saturation` - pointer to a variable that receives the current saturation
-    /// Returns 0 on success, < 0 on error
-    pub extern fn sceUsbCamGetSaturation(saturation: [*c]c_int) callconv(.C) c_int;
-
-    pub extern fn sceUsbCamReadMic() callconv(.C) void;
-
-    /// Setups the parameters to take a still image.
-    /// `param` - pointer to a ::PspUsbCamSetupStillParam
-    /// Returns 0 on success, < 0 on error
-    pub extern fn sceUsbCamSetupStill(param: [*c]c_int) callconv(.C) c_int;
-
-    /// Polls the status of video frame read completion.
-    /// Returns the size of the acquired frame if it has been read,
-    /// 0 if the frame has not yet been read, < 0 on error.
-    pub extern fn sceUsbCamPollReadVideoFrameEnd() callconv(.C) c_int;
-
-    pub extern fn sceUsbCamUnregisterLensRotationCallback() callconv(.C) void;
-
-    /// Gets the direction of the camera lens
-    /// Returns 1 if the camera is "looking to you", 0 if the camera
-    /// is "looking to the other side".
-    pub extern fn sceUsbCamGetLensDirection() callconv(.C) c_int;
-
-    /// Sets the brightness
-    /// `brightness` - The brightness (0-255)
-    /// Returns 0 on success, < 0 on error
-    pub extern fn sceUsbCamSetBrightness(brightness: c_int) callconv(.C) c_int;
-
-    pub extern fn sceUsbCamStopMic() callconv(.C) void;
-
-    /// Starts video input from the camera.
-    /// Returns 0 on success, < 0 on error
-    pub extern fn sceUsbCamStartVideo() callconv(.C) c_int;
-
-    pub extern fn sceUsbCamGetMicDataLength() callconv(.C) void;
-
-    /// Gets a still image. The function doesn't return until the image
-    /// has been acquired.
-    /// `buf` - The buffer that receives the image jpeg data
-    /// `size` - The size of the buffer.
-    /// Returns size of acquired image on success, < 0 on error
-    pub extern fn sceUsbCamStillInputBlocking(buf: [*c]u8, size: SceSize) callconv(.C) c_int;
-
-    /// Sets the sharpness
-    /// `sharpness` - The sharpness (0-255)
-    /// Returns 0 on success, < 0 on error
-    pub extern fn sceUsbCamSetSharpness(sharpness: c_int) callconv(.C) c_int;
-
-    pub extern fn sceUsbCamSetAntiFlicker() callconv(.C) void;
-
-    /// Stops video input from the camera.
-    /// Returns 0 on success, < 0 on error
-    pub extern fn sceUsbCamStopVideo() callconv(.C) c_int;
-
-    /// Sets the saturation
-    /// `saturation` - The saturation (0-255)
-    /// Returns 0 on success, < 0 on error
-    pub extern fn sceUsbCamSetSaturation(saturation: c_int) callconv(.C) c_int;
-
-    /// Gets the current brightness
-    /// `brightness` - pointer to a variable that receives the current brightness
-    /// Returns 0 on success, < 0 on error
-    pub extern fn sceUsbCamGetBrightness(brightness: [*c]c_int) callconv(.C) c_int;
-
-    /// Waits untils still input has been finished.
-    /// Returns the size of the acquired image on sucess, < 0 on error
-    pub extern fn sceUsbCamStillWaitInputEnd() callconv(.C) c_int;
-
-    /// Reads a video frame. The function doesn't return until the frame
-    /// has been acquired.
-    /// `buf` - The buffer that receives the frame jpeg data
-    /// `size` - The size of the buffer.
-    /// Returns size of acquired frame on success, < 0 on error
-    pub extern fn sceUsbCamReadVideoFrameBlocking(buf: [*c]u8, size: SceSize) callconv(.C) c_int;
-
-    pub extern fn sceUsbCamStartMic() callconv(.C) void;
-
-    /// Sets the reverse mode
-    /// `reverseflags` - The reverse flags, zero or more of ::PspUsbCamReverseFlags
-    /// Returns 0 on success, < 0 on error
-    pub extern fn sceUsbCamSetReverseMode(reverseflags: c_int) callconv(.C) c_int;
-
-    pub extern fn sceUsbCam_95F8901E() callconv(.C) void;
-
-    /// Gets the current image efect mode
-    /// `effectmode` - pointer to a variable that receives the current effect mode
-    /// Returns 0 on success, < 0 on error
-    pub extern fn sceUsbCamGetImageEffectMode(effectmode: [*c]c_int) callconv(.C) c_int;
-
-    /// Reads a video frame. The function returns inmediately, and
-    /// the completion has to be handled by calling ::sceUsbCamWaitReadVideoFrameEnd
-    /// or ::sceUsbCamPollReadVideoFrameEnd.
-    /// `buf` - The buffer that receives the frame jpeg data
-    /// `size` - The size of the buffer.
-    /// Returns 0 on success, < 0 on error
-    /// Reads a video frame. The function doesn't return until the frame
-    /// has been acquired.
-    /// `buf` - The buffer that receives the frame jpeg data
-    /// `size` - The size of the buffer.
-    /// Returns size of acquired frame on success, < 0 on error
-    pub extern fn sceUsbCamReadVideoFrame(buf: [*c]u8, size: SceSize) callconv(.C) c_int;
-
-    /// Gets the current zoom.
-    /// `zoom` - pointer to a variable that receives the current zoom
-    /// Returns 0 on success, < 0 on error
-    pub extern fn sceUsbCamGetZoom(zoom: [*c]c_int) callconv(.C) c_int;
-
-    /// Gets the current contrast
-    /// `contrast` - pointer to a variable that receives the current contrast
-    /// Returns 0 on success, < 0 on error
-    pub extern fn sceUsbCamGetContrast(contrast: [*c]c_int) callconv(.C) c_int;
-
-    /// Cancels the still input.
-    /// Returns 0 on success, < 0 on error
-    pub extern fn sceUsbCamStillCancelInput() callconv(.C) c_int;
-
-    pub extern fn sceUsbCamGetAntiFlicker() callconv(.C) void;
-
-    pub extern fn sceUsbCamWaitReadMicEnd() callconv(.C) void;
-
-    /// Sets the zoom.
-    /// `zoom` - The zoom level starting by 10. (10 = 1X, 11 = 1.1X, etc)
-    /// Returns s 0 on success, < 0 on error
-    pub extern fn sceUsbCamSetZoom(zoom: c_int) callconv(.C) c_int;
-
-    pub extern fn sceUsbCam_C72ED6D3() callconv(.C) void;
-
-    /// Set ups the parameters for video capture (with more options)
-    /// `param` - Pointer to a ::PspUsbCamSetupVideoExParam structure.
-    /// `workarea` - Pointer to a buffer used as work area by the driver.
-    /// `wasize` - Size of the work area.
-    /// Returns 0 on success, < 0 on error
-    pub extern fn sceUsbCamSetupVideoEx(param: [*c]c_int, workarea: ?*anyopaque, wasize: c_int) callconv(.C) c_int;
-
-    pub extern fn sceUsbCamRegisterLensRotationCallback() callconv(.C) void;
-
-    /// Sets the image effect mode
-    /// `effectmode` - The effect mode, one of ::PspUsbCamEffectMode
-    /// Returns 0 on success, < 0 on error
-    pub extern fn sceUsbCamSetImageEffectMode(effectmode: c_int) callconv(.C) c_int;
-
-    /// Gets the current reverse mode.
-    /// `reverseflags` - pointer to a variable that receives the current reverse mode flags
-    /// Returns 0 on success, < 0 on error
-    pub extern fn sceUsbCamGetReverseMode(reverseflags: [*c]c_int) callconv(.C) c_int;
-
-    pub extern fn sceUsbCam_D865997B() callconv(.C) void;
-
-    /// Gets the size of the acquired frame.
-    /// Returns the size of the acquired frame on success, < 0 on error
-    pub extern fn sceUsbCamGetReadVideoFrameSize() callconv(.C) c_int;
-
-    /// Gets the size of the acquired still image.
-    /// Returns the size of the acquired image on success, < 0 on error
-    pub extern fn sceUsbCamStillGetInputLength() callconv(.C) c_int;
-
-    pub extern fn sceUsbCamPollReadMicEnd() callconv(.C) void;
-
-    /// Waits untils the current frame has been read.
-    /// Returns the size of the acquired frame on sucess, < 0 on error
-    pub extern fn sceUsbCamWaitReadVideoFrameEnd() callconv(.C) c_int;
-
-    /// Sets if the image should be automatically reversed, depending of the position
-    /// of the camera.
-    /// `on` - 1 to set the automatical reversal of the image, 0 to set it off
-    /// Returns 0 on success, < 0 on error
-    pub extern fn sceUsbCamAutoImageReverseSW(on: c_int) callconv(.C) c_int;
-
-    /// Gets a still image. The function returns inmediately, and
-    /// the completion has to be handled by calling ::sceUsbCamStillWaitInputEnd
-    /// or ::sceUsbCamStillPollInputEnd.
-    /// `buf` - The buffer that receives the image jpeg data
-    /// `size` - The size of the buffer.
-    /// Returns 0 on success, < 0 on error
-    /// Gets a still image. The function doesn't return until the image
-    /// has been acquired.
-    /// `buf` - The buffer that receives the image jpeg data
-    /// `size` - The size of the buffer.
-    /// Returns size of acquired image on success, < 0 on error
-    pub extern fn sceUsbCamStillInput(buf: [*c]u8, size: SceSize) callconv(.C) c_int;
-
-    /// Gets the current sharpness
-    /// `sharpness` - pointer to a variable that receives the current sharpness
-    /// Returns 0 on success, < 0 on error
-    pub extern fn sceUsbCamGetSharpness(sharpness: [*c]c_int) callconv(.C) c_int;
+    /// Try to lock a lightweight mutex
+    /// `workarea` - The pointer to the workarea
+    /// `lockCount` - value of increase the lock counter
+    /// Returns 0 on success, otherwise one of ::PspKernelErrorCodes
+    pub extern fn sceKernelTryLockLwMutex(workarea: [*c]c_int, lockCount: c_int) callconv(.C) c_int;
 
 };
 
-pub usingnamespace if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "sceUsbCam") and options.sceUsbCam)) sceUsbCam else EMPTY;
+pub usingnamespace if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "Kernel_Library") and options.Kernel_Library)) Kernel_Library else EMPTY;
 
-const sceUsb = struct {
-    /// Start a USB driver.
-    /// `driverName` - name of the USB driver to start
-    /// `size` - Size of arguments to pass to USB driver start
-    /// `args` - Arguments to pass to USB driver start
-    /// Returns 0 on success
-    pub extern fn sceUsbStart(driverName: [*c]const c_char, size: c_int, args: ?*anyopaque) callconv(.C) c_int;
+const sceWlanDrv = struct {
+    /// Determine if the wlan device is currently powered on
+    /// Returns 0 if off, 1 if on
+    pub extern fn sceWlanDevIsPowerOn() callconv(.C) c_int;
 
-    /// Stop a USB driver.
-    /// `driverName` - name of the USB driver to stop
-    /// `size` - Size of arguments to pass to USB driver stop
-    /// `args` - Arguments to pass to USB driver stop
-    /// Returns 0 on success
-    pub extern fn sceUsbStop(driverName: [*c]const c_char, size: c_int, args: ?*anyopaque) callconv(.C) c_int;
+    /// Determine the state of the Wlan power switch
+    /// Returns 0 if off, 1 if on
+    pub extern fn sceWlanGetSwitchState() callconv(.C) c_int;
 
-    /// Get USB state
-    /// Returns OR'd PSP_USB_* constants
-    pub extern fn sceUsbGetState() callconv(.C) c_int;
-
-    pub extern fn sceUsbGetDrvList(r4one: u32, r5ret: [*c]u32, r6one: u32) callconv(.C) c_int;
-
-    /// Get state of a specific USB driver
-    /// `driverName` - name of USB driver to get status from
-    /// Returns 1 if the driver has been started, 2 if it is stopped
-    pub extern fn sceUsbGetDrvState(driverName: [*c]const c_char) callconv(.C) c_int;
-
-    /// Activate a USB driver.
-    /// `pid` - Product ID for the default USB Driver
-    /// Returns 0 on success
-    pub extern fn sceUsbActivate(pid: u32) callconv(.C) c_int;
-
-    /// Deactivate USB driver.
-    /// `pid` - Product ID for the default USB driver
-    /// Returns 0 on success
-    pub extern fn sceUsbDeactivate(pid: u32) callconv(.C) c_int;
-
-    pub extern fn sceUsbWaitState(state: u32, waitmode: c_int, timeout: [*c]u32) callconv(.C) c_int;
-
-    pub extern fn sceUsbWaitCancel() callconv(.C) c_int;
+    /// Get the Ethernet Address of the wlan controller
+    /// `etherAddr` - pointer to a buffer of uint8_t (NOTE: it only writes to 6 bytes, but
+    /// requests 8 so pass it 8 bytes just in case)
+    /// Returns 0 on success, < 0 on error
+    pub extern fn sceWlanGetEtherAddr(etherAddr: [*c]u8) callconv(.C) c_int;
 
 };
 
-pub usingnamespace if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "sceUsb") and options.sceUsb)) sceUsb else EMPTY;
+pub usingnamespace if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "sceWlanDrv") and options.sceWlanDrv)) sceWlanDrv else EMPTY;
 
-const sceDmac = struct {
-    /// Copy data in memory using DMAC
-    /// `dst` - The pointer to the destination
-    /// `src` - The pointer to the source
-    /// `n` - The size of data
-    /// Returns 0 on success; otherwise an error code
-    pub extern fn sceDmacMemcpy(dst: ?*anyopaque, src: ?*const anyopaque, n: SceSize) callconv(.C) c_int;
+const sceWlanDrv_lib = struct {
+    /// Attach to the wlan device
+    /// Returns 0 on success, < 0 on error.
+    pub extern fn sceWlanDevAttach() callconv(.C) c_int;
 
-    pub extern fn sceDmacTryMemcpy(dst: ?*anyopaque, src: ?*const anyopaque, n: SceSize) callconv(.C) c_int;
+    /// Detach from the wlan device
+    /// Returns 0 on success, < 0 on error/
+    pub extern fn sceWlanDevDetach() callconv(.C) c_int;
 
-};
+    pub extern fn sceWlanDrv_lib_19E51F54() callconv(.C) void;
 
-pub usingnamespace if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "sceDmac") and options.sceDmac)) sceDmac else EMPTY;
+    pub extern fn sceWlanDevIsGameMode() callconv(.C) void;
 
-const sceAudio = struct {
-    /// Output audio of the specified channel
-    /// `channel` - The channel number.
-    /// `vol` - The volume.
-    /// `buf` - Pointer to the PCM data to output.
-    /// Returns 0 on success, an error if less than 0.
-    pub extern fn sceAudioOutput(channel: c_int, vol: c_int, buf: ?*anyopaque) callconv(.C) c_int;
+    pub extern fn sceWlanGPPrevEstablishActive() callconv(.C) void;
 
-    /// Output audio of the specified channel (blocking)
-    /// `channel` - The channel number.
-    /// `vol` - The volume.
-    /// `buf` - Pointer to the PCM data to output.
-    /// Returns 0 on success, an error if less than 0.
-    pub extern fn sceAudioOutputBlocking(channel: c_int, vol: c_int, buf: ?*anyopaque) callconv(.C) c_int;
+    pub extern fn sceWlanGPSend() callconv(.C) void;
 
-    /// Output panned audio of the specified channel
-    /// `channel` - The channel number.
-    /// `leftvol` - The left volume.
-    /// `rightvol` - The right volume.
-    /// `buf` - Pointer to the PCM data to output.
-    /// Returns 0 on success, an error if less than 0.
-    pub extern fn sceAudioOutputPanned(channel: c_int, leftvol: c_int, rightvol: c_int, buf: ?*anyopaque) callconv(.C) c_int;
+    pub extern fn sceWlanGPRecv() callconv(.C) void;
 
-    /// Output panned audio of the specified channel (blocking)
-    /// `channel` - The channel number.
-    /// `leftvol` - The left volume.
-    /// `rightvol` - The right volume.
-    /// `buf` - Pointer to the PCM data to output.
-    /// Returns 0 on success, an error if less than 0.
-    pub extern fn sceAudioOutputPannedBlocking(channel: c_int, leftvol: c_int, rightvol: c_int, buf: ?*anyopaque) callconv(.C) c_int;
+    pub extern fn sceWlanGPRegisterCallback() callconv(.C) void;
 
-    /// Allocate and initialize a hardware output channel.
-    /// `channel` - Use a value between 0 - 7 to reserve a specific channel.
-    /// Pass PSP_AUDIO_NEXT_CHANNEL to get the first available channel.
-    /// `samplecount` - The number of samples that can be output on the channel per
-    /// output call.  It must be a value between ::PSP_AUDIO_SAMPLE_MIN
-    /// and ::PSP_AUDIO_SAMPLE_MAX, and it must be aligned to 64 bytes
-    /// (use the ::PSP_AUDIO_SAMPLE_ALIGN macro to align it).
-    /// `format` - The output format to use for the channel.  One of ::PspAudioFormats.
-    /// Returns The channel number on success, an error code if less than 0.
-    pub extern fn sceAudioChReserve(channel: c_int, samplecount: c_int, format: c_int) callconv(.C) c_int;
+    pub extern fn sceWlanGPUnRegisterCallback() callconv(.C) void;
 
-    pub extern fn sceAudioOneshotOutput() callconv(.C) void;
+    pub extern fn sceWlanDrv_lib_81579D36() callconv(.C) void;
 
-    /// Release a hardware output channel.
-    /// `channel` - The channel to release.
-    /// Returns 0 on success, an error if less than 0.
-    pub extern fn sceAudioChRelease(channel: c_int) callconv(.C) c_int;
+    pub extern fn sceWlanDrv_lib_5BAA1FE5() callconv(.C) void;
 
-    /// Get count of unplayed samples remaining
-    /// `channel` - The channel number.
-    /// Returns Number of samples to be played, an error if less than 0.
-    pub extern fn sceAudioGetChannelRestLen(channel: c_int) callconv(.C) c_int;
+    pub extern fn sceWlanDrv_lib_4C14BACA() callconv(.C) void;
 
-    /// Change the output sample count, after it's already been reserved
-    /// `channel` - The channel number.
-    /// `samplecount` - The number of samples to output in one output call.
-    /// Returns 0 on success, an error if less than 0.
-    pub extern fn sceAudioSetChannelDataLen(channel: c_int, samplecount: c_int) callconv(.C) c_int;
+    pub extern fn sceWlanDrv_lib_2D0FAE4E() callconv(.C) void;
 
-    /// Change the format of a channel
-    /// `channel` - The channel number.
-    /// `format` - One of ::PspAudioFormats
-    /// Returns 0 on success, an error if less than 0.
-    pub extern fn sceAudioChangeChannelConfig(channel: c_int, format: c_int) callconv(.C) c_int;
+    pub extern fn sceWlanDrv_lib_56F467CA() callconv(.C) void;
 
-    /// Change the volume of a channel
-    /// `channel` - The channel number.
-    /// `leftvol` - The left volume.
-    /// `rightvol` - The right volume.
-    /// Returns 0 on success, an error if less than 0.
-    pub extern fn sceAudioChangeChannelVolume(channel: c_int, leftvol: c_int, rightvol: c_int) callconv(.C) c_int;
+    pub extern fn sceWlanDrv_lib_FE8A0B46() callconv(.C) void;
 
-    /// Reserve the audio output
-    /// `samplecount` - The number of samples to output in one output call (min 17, max 4111).
-    /// `freq` - The frequency. One of 48000, 44100, 32000, 24000, 22050, 16000, 12000, 11050, 8000.
-    /// `channels` - Number of channels. Pass 2 (stereo).
-    /// Returns 0 on success, an error if less than 0.
-    pub extern fn sceAudioSRCChReserve(samplecount: c_int, freq: c_int, channels: c_int) callconv(.C) c_int;
+    pub extern fn sceWlanDrv_lib_40B0AA4A() callconv(.C) void;
 
-    /// Release the audio output
-    /// Returns 0 on success, an error if less than 0.
-    pub extern fn sceAudioSRCChRelease() callconv(.C) c_int;
+    pub extern fn sceWlanDevSetGPIO() callconv(.C) void;
 
-    /// Output audio
-    /// `vol` - The volume.
-    /// `buf` - Pointer to the PCM data to output.
-    /// Returns 0 on success, an error if less than 0.
-    pub extern fn sceAudioSRCOutputBlocking(vol: c_int, buf: ?*anyopaque) callconv(.C) c_int;
-
-    /// Perform audio input (blocking)
-    /// `samplecount` - Number of samples.
-    /// `freq` - Either 44100, 22050 or 11025.
-    /// `buf` - Pointer to where the audio data will be stored.
-    /// Returns 0 on success, an error if less than 0.
-    pub extern fn sceAudioInputBlocking(samplecount: c_int, freq: c_int, buf: ?*anyopaque) callconv(.C) c_int;
-
-    /// Perform audio input
-    /// `samplecount` - Number of samples.
-    /// `freq` - Either 44100, 22050 or 11025.
-    /// `buf` - Pointer to where the audio data will be stored.
-    /// Returns 0 on success, an error if less than 0.
-    /// Perform audio input (blocking)
-    /// `samplecount` - Number of samples.
-    /// `freq` - Either 44100, 22050 or 11025.
-    /// `buf` - Pointer to where the audio data will be stored.
-    /// Returns 0 on success, an error if less than 0.
-    /// Init audio input (with extra arguments)
-    /// `params` - A pointer to a ::pspAudioInputParams struct.
-    /// Returns 0 on success, an error if less than 0.
-    /// Init audio input
-    /// `unknown1` - Unknown. Pass 0.
-    /// `gain` - Gain.
-    /// `unknown2` - Unknown. Pass 0.
-    /// Returns 0 on success, an error if less than 0.
-    pub extern fn sceAudioInput(samplecount: c_int, freq: c_int, buf: ?*anyopaque) callconv(.C) c_int;
-
-    /// Get the number of samples that were acquired
-    /// Returns Number of samples acquired, an error if less than 0.
-    pub extern fn sceAudioGetInputLength() callconv(.C) c_int;
-
-    /// Wait for non-blocking audio input to complete
-    /// Returns 0 on success, an error if less than 0.
-    pub extern fn sceAudioWaitInputEnd() callconv(.C) c_int;
-
-    /// Init audio input
-    /// `unknown1` - Unknown. Pass 0.
-    /// `gain` - Gain.
-    /// `unknown2` - Unknown. Pass 0.
-    /// Returns 0 on success, an error if less than 0.
-    pub extern fn sceAudioInputInit(unknown1: c_int, gain: c_int, unknown2: c_int) callconv(.C) c_int;
-
-    /// Poll for non-blocking audio input status
-    /// Returns 0 if input has completed, 1 if not completed or an error if less than 0.
-    pub extern fn sceAudioPollInputEnd() callconv(.C) c_int;
-
-    /// Get count of unplayed samples remaining
-    /// `channel` - The channel number.
-    /// Returns Number of samples to be played, an error if less than 0.
-    pub extern fn sceAudioGetChannelRestLength(channel: c_int) callconv(.C) c_int;
-
-    /// Init audio input (with extra arguments)
-    /// `params` - A pointer to a ::pspAudioInputParams struct.
-    /// Returns 0 on success, an error if less than 0.
-    pub extern fn sceAudioInputInitEx(params: [*c]c_int) callconv(.C) c_int;
-
-    /// Reserve the audio output and set the output sample count
-    /// `samplecount` - The number of samples to output in one output call (min 17, max 4111).
-    /// Returns 0 on success, an error if less than 0.
-    pub extern fn sceAudioOutput2Reserve(samplecount: c_int) callconv(.C) c_int;
-
-    /// Output audio (blocking)
-    /// `vol` - The volume.
-    /// `buf` - Pointer to the PCM data.
-    /// Returns 0 on success, an error if less than 0.
-    pub extern fn sceAudioOutput2OutputBlocking(vol: c_int, buf: ?*anyopaque) callconv(.C) c_int;
-
-    /// Release the audio output
-    /// Returns 0 on success, an error if less than 0.
-    pub extern fn sceAudioOutput2Release() callconv(.C) c_int;
-
-    /// Change the output sample count, after it's already been reserved
-    /// `samplecount` - The number of samples to output in one output call (min 17, max 4111).
-    /// Returns 0 on success, an error if less than 0.
-    pub extern fn sceAudioOutput2ChangeLength(samplecount: c_int) callconv(.C) c_int;
-
-    /// Get count of unplayed samples remaining
-    /// Returns Number of samples to be played, an error if less than 0.
-    pub extern fn sceAudioOutput2GetRestSample() callconv(.C) c_int;
+    pub extern fn sceWlanDevGetStateGPIO() callconv(.C) void;
 
 };
 
-pub usingnamespace if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "sceAudio") and options.sceAudio)) sceAudio else EMPTY;
+pub usingnamespace if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "sceWlanDrv_lib") and options.sceWlanDrv_lib)) sceWlanDrv_lib else EMPTY;
 
-const sceAudiocodec = struct {
-    pub extern fn sceAudiocodecCheckNeedMem(Buffer: [*c]c_ulong, Type: c_int) callconv(.C) c_int;
+const sceHprm = struct {
+    pub extern fn sceHprmRegisterCallback() callconv(.C) void;
 
-    pub extern fn sceAudiocodecInit(Buffer: [*c]c_ulong, Type: c_int) callconv(.C) c_int;
+    pub extern fn sceHprmUnregisterCallback() callconv(.C) void;
 
-    pub extern fn sceAudiocodecDecode(Buffer: [*c]c_ulong, Type: c_int) callconv(.C) c_int;
+    /// Determines whether the remote is plugged in.
+    /// Returns 1 if the remote is plugged in, else 0.
+    pub extern fn sceHprmIsRemoteExist() callconv(.C) c_int;
 
-    pub extern fn sceAudiocodecGetInfo() callconv(.C) void;
+    /// Determines whether the headphones are plugged in.
+    /// Returns 1 if the headphones are plugged in, else 0.
+    pub extern fn sceHprmIsHeadphoneExist() callconv(.C) c_int;
 
-    pub extern fn sceAudiocodec_6CD2A861() callconv(.C) void;
+    /// Determines whether the microphone is plugged in.
+    /// Returns 1 if the microphone is plugged in, else 0.
+    pub extern fn sceHprmIsMicrophoneExist() callconv(.C) c_int;
 
-    pub extern fn sceAudiocodec_59176A0F() callconv(.C) void;
-
-    pub extern fn sceAudiocodecGetEDRAM(Buffer: [*c]c_ulong, Type: c_int) callconv(.C) c_int;
-
-    pub extern fn sceAudiocodecReleaseEDRAM(Buffer: [*c]c_ulong) callconv(.C) c_int;
-
-};
-
-pub usingnamespace if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "sceAudiocodec") and options.sceAudiocodec)) sceAudiocodec else EMPTY;
-
-const sceKermitPeripheral = struct {
-    pub extern fn sceKermitPeripheral_4A26B7C8() callconv(.C) void;
-
-    pub extern fn sceKermitPeripheral_C0EBC631() callconv(.C) void;
-
-    pub extern fn sceKermitPeripheral_D27C5E03() callconv(.C) void;
-
-};
-
-pub usingnamespace if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "sceKermitPeripheral") and options.sceKermitPeripheral)) sceKermitPeripheral else EMPTY;
-
-const sceGe_user = struct {
-    /// Get the size of VRAM.
-    /// Returns The size of VRAM (in bytes).
-    pub extern fn sceGeEdramGetSize() callconv(.C) c_uint;
-
-    /// Get the eDRAM address.
-    /// Returns A pointer to the base of the eDRAM.
-    pub extern fn sceGeEdramGetAddr() callconv(.C) ?*anyopaque;
-
-    /// Set the eDRAM address translation mode.
-    /// `width` - 0 to not set the translation width, otherwise 512, 1024, 2048 or 4096.
-    /// Returns The previous width if it was set, otherwise 0, < 0 on error.
-    pub extern fn sceGeEdramSetAddrTranslation(width: c_int) callconv(.C) c_int;
-
-    /// Retrieve the current value of a GE command.
-    /// `cmd` - The GE command register to retrieve (0 to 0xFF, both included).
-    /// Returns The value of the GE command, < 0 on error.
-    pub extern fn sceGeGetCmd(cmd: c_int) callconv(.C) c_uint;
-
-    /// Retrieve a matrix of the given type.
-    /// `type` - One of ::PspGeMatrixTypes.
-    /// `matrix` - Pointer to a variable to store the matrix.
-    /// Returns < 0 on error.
-    pub extern fn sceGeGetMtx(type: c_int, matrix: ?*anyopaque) callconv(.C) c_int;
-
-    /// Retrieve the stack of the display list currently being executed.
-    /// `stackId` - The ID of the stack to retrieve.
-    /// `stack` - Pointer to a structure to store the stack, or NULL to not store it.
-    /// Returns The number of stacks of the current display list, < 0 on error.
-    pub extern fn sceGeGetStack(stackId: c_int, stack: [*c]c_int) callconv(.C) c_int;
-
-    /// Save the GE's current state.
-    /// `context` - Pointer to a ::PspGeContext.
-    /// Returns < 0 on error.
-    pub extern fn sceGeSaveContext(context: [*c]c_int) callconv(.C) c_int;
-
-    /// Restore a previously saved GE context.
-    /// `context` - Pointer to a ::PspGeContext.
-    /// Returns < 0 on error.
-    pub extern fn sceGeRestoreContext(context: [*c]const c_int) callconv(.C) c_int;
-
-    /// Enqueue a display list at the tail of the GE display list queue.
-    /// `list` - The head of the list to queue.
-    /// `stall` - The stall address.
-    /// If NULL then no stall address is set and the list is transferred immediately.
-    /// `cbid` - ID of the callback set by calling sceGeSetCallback
-    /// `arg` - Structure containing GE context buffer address
-    /// Returns The ID of the queue, < 0 on error.
-    pub extern fn sceGeListEnQueue(list: ?*const anyopaque, stall: ?*anyopaque, cbid: c_int, arg: [*c]c_int) callconv(.C) c_int;
-
-    /// Enqueue a display list at the head of the GE display list queue.
-    /// `list` - The head of the list to queue.
-    /// `stall` - The stall address.
-    /// If NULL then no stall address is set and the list is transferred immediately.
-    /// `cbid` - ID of the callback set by calling sceGeSetCallback
-    /// `arg` - Structure containing GE context buffer address
-    /// Returns The ID of the queue, < 0 on error.
-    pub extern fn sceGeListEnQueueHead(list: ?*const anyopaque, stall: ?*anyopaque, cbid: c_int, arg: [*c]c_int) callconv(.C) c_int;
-
-    /// Cancel a queued or running list.
-    /// `qid` - The ID of the queue.
-    /// Returns < 0 on error.
-    pub extern fn sceGeListDeQueue(qid: c_int) callconv(.C) c_int;
-
-    /// Update the stall address for the specified queue.
-    /// `qid` - The ID of the queue.
-    /// `stall` - The new stall address.
+    /// Peek at the current being pressed on the remote.
+    /// `key` - Pointer to the u32 to receive the key bitmap, should be one or
+    /// more of ::PspHprmKeys
     /// Returns < 0 on error
-    pub extern fn sceGeListUpdateStallAddr(qid: c_int, stall: ?*anyopaque) callconv(.C) c_int;
+    pub extern fn sceHprmPeekCurrentKey(key: [*c]u32) callconv(.C) c_int;
 
-    /// Wait for syncronisation of a list.
-    /// `qid` - The queue ID of the list to sync.
-    /// `syncType` - 0 if you want to wait for the list to be completed, or 1 if you just want to peek the actual state.
-    /// Returns The specified queue status, one of ::PspGeListState.
-    pub extern fn sceGeListSync(qid: c_int, syncType: c_int) callconv(.C) c_int;
-
-    /// Wait for drawing to complete.
-    /// `syncType` - 0 if you want to wait for the drawing to be completed, or 1 if you just want to peek the state of the display list currently being executed.
-    /// Returns The current queue status, one of ::PspGeListState.
-    pub extern fn sceGeDrawSync(syncType: c_int) callconv(.C) c_int;
-
-    /// Interrupt drawing queue.
-    /// `mode` - If set to 1, reset all the queues.
-    /// `pParam` - Unused (just K1-checked).
-    /// Returns The stopped queue ID if mode isn't set to 0, otherwise 0, and < 0 on error.
-    pub extern fn sceGeBreak(mode: c_int, pParam: [*c]c_int) callconv(.C) c_int;
-
-    /// Restart drawing queue.
+    /// Peek at the current latch data.
+    /// `latch` - Pointer a to a 4 dword array to contain the latch data.
     /// Returns < 0 on error.
-    pub extern fn sceGeContinue() callconv(.C) c_int;
+    pub extern fn sceHprmPeekLatch(latch: [*c]u32) callconv(.C) c_int;
 
-    /// Register callback handlers for the the GE.
-    /// `cb` - Configured callback data structure.
-    /// Returns The callback ID, < 0 on error.
-    pub extern fn sceGeSetCallback(cb: [*c]c_int) callconv(.C) c_int;
-
-    /// Unregister the callback handlers.
-    /// `cbid` - The ID of the callbacks, returned by sceGeSetCallback().
-    /// Returns < 0 on error
-    pub extern fn sceGeUnsetCallback(cbid: c_int) callconv(.C) c_int;
-
-    /// Sets the EDRAM size to be enabled.
-    /// `size -size    The size (0x200000 or 0x400000). Will return an error if 0x400000 is specified for the PSP FAT.`
-    /// Returns Zero on success, otherwise less than zero.
-    pub extern fn sceGeEdramSetSize(size: c_int) callconv(.C) c_int;
+    /// Read the current latch data.
+    /// `latch` - Pointer a to a 4 dword array to contain the latch data.
+    /// Returns < 0 on error.
+    pub extern fn sceHprmReadLatch(latch: [*c]u32) callconv(.C) c_int;
 
 };
 
-pub usingnamespace if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "sceGe_user") and options.sceGe_user)) sceGe_user else EMPTY;
+pub usingnamespace if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "sceHprm") and options.sceHprm)) sceHprm else EMPTY;
 
 const sceMp3 = struct {
     /// sceMp3ReserveMp3Handle
@@ -4357,608 +3768,6 @@ const sceMp3 = struct {
 };
 
 pub usingnamespace if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "sceMp3") and options.sceMp3)) sceMp3 else EMPTY;
-
-const sceRtc = struct {
-    /// Get the resolution of the tick counter
-    /// Returns # of ticks per second
-    pub extern fn sceRtcGetTickResolution() callconv(.C) u32;
-
-    /// Get current tick count
-    /// `tick` - pointer to u64 to receive tick count
-    /// Returns 0 on success, < 0 on error
-    pub extern fn sceRtcGetCurrentTick(tick: [*c]u64) callconv(.C) c_int;
-
-    pub extern fn sceRtc_029CA3B3() callconv(.C) void;
-
-    /// Get current tick count, adjusted for local time zone
-    /// `time` - pointer to ScePspDateTime struct to receive time
-    /// `tz` - time zone to adjust to (minutes from UTC)
-    /// Returns 0 on success, < 0 on error
-    pub extern fn sceRtcGetCurrentClock(time: [*c]c_int, tz: c_int) callconv(.C) c_int;
-
-    /// Get current local time into a ScePspDateTime struct
-    /// `time` - pointer to ScePspDateTime struct to receive time
-    /// Returns 0 on success, < 0 on error
-    pub extern fn sceRtcGetCurrentClockLocalTime(time: [*c]c_int) callconv(.C) c_int;
-
-    /// Convert a UTC-based tickcount into a local time tick count
-    /// `tickUTC` - pointer to u64 tick in UTC time
-    /// `tickLocal` - pointer to u64 to receive tick in local time
-    /// Returns 0 on success, < 0 on error
-    pub extern fn sceRtcConvertUtcToLocalTime(tickUTC: [*c]const u64, tickLocal: [*c]u64) callconv(.C) c_int;
-
-    /// Convert a local time based tickcount into a UTC-based tick count
-    /// `tickLocal` - pointer to u64 tick in local time
-    /// `tickUTC` - pointer to u64 to receive tick in UTC based time
-    /// Returns 0 on success, < 0 on error
-    pub extern fn sceRtcConvertLocalTimeToUTC(tickLocal: [*c]const u64, tickUTC: [*c]u64) callconv(.C) c_int;
-
-    /// Check if a year is a leap year
-    /// `year` - year to check if is a leap year
-    /// Returns 1 on leapyear, 0 if not
-    pub extern fn sceRtcIsLeapYear(year: c_int) callconv(.C) c_int;
-
-    /// Get number of days in a specific month
-    /// `year` - year in which to check (accounts for leap year)
-    /// `month` - month to get number of days for
-    /// Returns # of days in month, <0 on error (?)
-    pub extern fn sceRtcGetDaysInMonth(year: c_int, month: c_int) callconv(.C) c_int;
-
-    /// Get day of the week for a date
-    /// `year` - year in which to check (accounts for leap year)
-    /// `month` - month that day is in
-    /// `day` - day to get day of week for
-    /// Returns day of week with 0 representing Monday
-    pub extern fn sceRtcGetDayOfWeek(year: c_int, month: c_int, day: c_int) callconv(.C) c_int;
-
-    /// Validate pspDate component ranges
-    /// `date` - pointer to pspDate struct to be checked
-    /// Returns 0 on success, one of ::pspRtcCheckValidErrors on error
-    pub extern fn sceRtcCheckValid(date: [*c]const c_int) callconv(.C) c_int;
-
-    pub extern fn sceRtcSetTime_t(date: [*c]c_int, time: c_int) callconv(.C) c_int;
-
-    pub extern fn sceRtcGetTime_t(date: [*c]const c_int, time: [*c]c_int) callconv(.C) c_int;
-
-    pub extern fn sceRtcSetDosTime(date: [*c]c_int, dosTime: u32) callconv(.C) c_int;
-
-    pub extern fn sceRtcGetDosTime(date: [*c]c_int, dosTime: u32) callconv(.C) c_int;
-
-    pub extern fn sceRtcSetWin32FileTime(date: [*c]c_int, win32Time: [*c]u64) callconv(.C) c_int;
-
-    pub extern fn sceRtcGetWin32FileTime(date: [*c]c_int, win32Time: [*c]u64) callconv(.C) c_int;
-
-    /// Set a ScePspDateTime struct based on ticks
-    /// `date` - pointer to ScePspDateTime struct to set
-    /// `tick` - pointer to ticks to convert
-    /// Returns 0 on success, < 0 on error
-    pub extern fn sceRtcSetTick(date: [*c]c_int, tick: [*c]const u64) callconv(.C) c_int;
-
-    /// Set ticks based on a ScePspDateTime struct
-    /// `date` - pointer to ScePspDateTime to convert
-    /// `tick` - pointer to tick to set
-    /// Returns 0 on success, < 0 on error
-    /// Get the resolution of the tick counter
-    /// Returns # of ticks per second
-    pub extern fn sceRtcGetTick(date: [*c]const c_int, tick: [*c]u64) callconv(.C) c_int;
-
-    /// Compare two ticks
-    /// `tick1` - pointer to first tick
-    /// `tick2` - poiinter to second tick
-    /// Returns 0 on equal, <0 when tick1 < tick2, >0 when tick1 > tick2
-    pub extern fn sceRtcCompareTick(tick1: [*c]const u64, tick2: [*c]const u64) callconv(.C) c_int;
-
-    /// Add two ticks
-    /// `destTick` - pointer to tick to hold result
-    /// `srcTick` - pointer to source tick
-    /// `numTicks` - number of ticks to add
-    /// Returns 0 on success, <0 on error
-    pub extern fn sceRtcTickAddTicks(destTick: [*c]u64, srcTick: [*c]const u64, numTicks: u64) callconv(.C) c_int;
-
-    /// Add an amount of ms to a tick
-    /// `destTick` - pointer to tick to hold result
-    /// `srcTick` - pointer to source tick
-    /// `numMS` - number of ms to add
-    /// Returns 0 on success, <0 on error
-    pub extern fn sceRtcTickAddMicroseconds(destTick: [*c]u64, srcTick: [*c]const u64, numMS: u64) callconv(.C) c_int;
-
-    /// Add an amount of seconds to a tick
-    /// `destTick` - pointer to tick to hold result
-    /// `srcTick` - pointer to source tick
-    /// `numSecs` - number of seconds to add
-    /// Returns 0 on success, <0 on error
-    pub extern fn sceRtcTickAddSeconds(destTick: [*c]u64, srcTick: [*c]const u64, numSecs: u64) callconv(.C) c_int;
-
-    /// Add an amount of minutes to a tick
-    /// `destTick` - pointer to tick to hold result
-    /// `srcTick` - pointer to source tick
-    /// `numMins` - number of minutes to add
-    /// Returns 0 on success, <0 on error
-    pub extern fn sceRtcTickAddMinutes(destTick: [*c]u64, srcTick: [*c]const u64, numMins: u64) callconv(.C) c_int;
-
-    /// Add an amount of hours to a tick
-    /// `destTick` - pointer to tick to hold result
-    /// `srcTick` - pointer to source tick
-    /// `numHours` - number of hours to add
-    /// Returns 0 on success, <0 on error
-    pub extern fn sceRtcTickAddHours(destTick: [*c]u64, srcTick: [*c]const u64, numHours: c_int) callconv(.C) c_int;
-
-    /// Add an amount of days to a tick
-    /// `destTick` - pointer to tick to hold result
-    /// `srcTick` - pointer to source tick
-    /// `numDays` - number of days to add
-    /// Returns 0 on success, <0 on error
-    pub extern fn sceRtcTickAddDays(destTick: [*c]u64, srcTick: [*c]const u64, numDays: c_int) callconv(.C) c_int;
-
-    /// Add an amount of weeks to a tick
-    /// `destTick` - pointer to tick to hold result
-    /// `srcTick` - pointer to source tick
-    /// `numWeeks` - number of weeks to add
-    /// Returns 0 on success, <0 on error
-    pub extern fn sceRtcTickAddWeeks(destTick: [*c]u64, srcTick: [*c]const u64, numWeeks: c_int) callconv(.C) c_int;
-
-    /// Add an amount of months to a tick
-    /// `destTick` - pointer to tick to hold result
-    /// `srcTick` - pointer to source tick
-    /// `numMonths` - number of months to add
-    /// Returns 0 on success, <0 on error
-    pub extern fn sceRtcTickAddMonths(destTick: [*c]u64, srcTick: [*c]const u64, numMonths: c_int) callconv(.C) c_int;
-
-    /// Add an amount of years to a tick
-    /// `destTick` - pointer to tick to hold result
-    /// `srcTick` - pointer to source tick
-    /// `numYears` - number of years to add
-    /// Returns 0 on success, <0 on error
-    pub extern fn sceRtcTickAddYears(destTick: [*c]u64, srcTick: [*c]const u64, numYears: c_int) callconv(.C) c_int;
-
-    /// Format Tick-representation UTC time in RFC2822 format
-    pub extern fn sceRtcFormatRFC2822(pszDateTime: [*c]c_char, pUtc: [*c]const u64, iTimeZoneMinutes: c_int) callconv(.C) c_int;
-
-    /// Format Tick-representation UTC time in RFC2822 format
-    pub extern fn sceRtcFormatRFC2822LocalTime(pszDateTime: [*c]c_char, pUtc: [*c]const u64) callconv(.C) c_int;
-
-    /// Format Tick-representation UTC time in RFC3339(ISO8601) format
-    pub extern fn sceRtcFormatRFC3339(pszDateTime: [*c]c_char, pUtc: [*c]const u64, iTimeZoneMinutes: c_int) callconv(.C) c_int;
-
-    /// Format Tick-representation UTC time in RFC3339(ISO8601) format
-    pub extern fn sceRtcFormatRFC3339LocalTime(pszDateTime: [*c]c_char, pUtc: [*c]const u64) callconv(.C) c_int;
-
-    pub extern fn sceRtcParseDateTime(destTick: [*c]u64, dateString: [*c]const c_char) callconv(.C) c_int;
-
-    /// Parse time information represented in RFC3339 format
-    pub extern fn sceRtcParseRFC3339(pUtc: [*c]u64, pszDateTime: [*c]const c_char) callconv(.C) c_int;
-
-    pub extern fn sceRtcGetAccumulativeTime() callconv(.C) void;
-
-    pub extern fn sceRtcSetTime64_t() callconv(.C) void;
-
-    pub extern fn sceRtcGetLastReincarnatedTime() callconv(.C) void;
-
-    pub extern fn sceRtcGetLastAdjustedTime() callconv(.C) void;
-
-    pub extern fn sceRtcGetTime64_t() callconv(.C) void;
-
-};
-
-pub usingnamespace if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "sceRtc") and options.sceRtc)) sceRtc else EMPTY;
-
-const sceVaudio = struct {
-    /// Output audio (blocking)
-    /// `volume` - It must be a value between 0 and ::PSP_VAUDIO_VOLUME_MAX
-    /// `buffer` - Pointer to the PCM data to output.
-    /// Returns 0 on success, an error if less than 0.
-    pub extern fn sceVaudioOutputBlocking(volume: c_int, buffer: ?*anyopaque) callconv(.C) c_int;
-
-    /// Allocate and initialize a virtual output channel.
-    /// `samplecount` - The number of samples that can be output on the channel per
-    /// output call. One of 256, 576, 1024, 1152, 2048.
-    /// It must be a value between ::PSP_VAUDIO_SAMPLE_MIN and ::PSP_VAUDIO_SAMPLE_MAX.
-    /// `frequency` - The frequency. One of 48000, 44100, 32000, 24000, 22050, 16000, 12000, 11050, 8000.
-    /// `format` - The output format to use for the channel. One of ::PSP_VAUDIO_FORMAT_MONO or ::PSP_VAUDIO_FORMAT_STEREO
-    /// Returns 0 if success, < 0 on error.
-    pub extern fn sceVaudioChReserve(samplecount: c_int, frequency: c_int, format: c_int) callconv(.C) c_int;
-
-    /// Release  a virtual output channel.
-    /// Returns 0 if success, < 0 on error.
-    pub extern fn sceVaudioChRelease() callconv(.C) c_int;
-
-    /// Set effect type
-    /// `effect` - The effect type. One of ::PSP_VAUDIO_EFFECT_OFF or ::PSP_VAUDIO_EFFECT_HEAVY or ::PSP_VAUDIO_EFFECT_POPS or ::PSP_VAUDIO_EFFECT_JAZZ or ::PSP_VAUDIO_EFFECT_UNIQUE or ::PSP_VAUDIO_EFFECT_MAX
-    /// `volume` - The volume. It must be a value between 0 and ::PSP_VAUDIO_VOLUME_MAX
-    /// Returns The volume value on success, < 0 on error.
-    pub extern fn sceVaudioSetEffectType(effect: c_int, volume: c_int) callconv(.C) c_int;
-
-    /// Set ALC(dynamic normalizer)
-    /// `mode` - The mode. One of ::PSP_VAUDIO_ALC_OFF or ::PSP_VAUDIO_ALC_MODE1 or ::PSP_VAUDIO_ALC_MODE_MAX
-    /// Returns 0 if success, < 0 on error.
-    pub extern fn sceVaudioSetAlcMode(mode: c_int) callconv(.C) c_int;
-
-    pub extern fn sceVaudio_504E4745() callconv(.C) void;
-
-    pub extern fn sceVaudioChReserveBuffering() callconv(.C) void;
-
-    pub extern fn sceVaudio_E8E78DC8() callconv(.C) void;
-
-};
-
-pub usingnamespace if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "sceVaudio") and options.sceVaudio)) sceVaudio else EMPTY;
-
-const sceReg = struct {
-    pub extern fn sceRegExit() callconv(.C) void;
-
-    /// Open the registry
-    /// `reg` - A filled in ::RegParam structure
-    /// `mode` - Open mode (set to 1)
-    /// `h` - Pointer to a REGHANDLE to receive the registry handle
-    /// Returns 0 on success, < 0 on error
-    pub extern fn sceRegOpenRegistry(reg: [*c]c_int, mode: c_int, h: [*c]c_int) callconv(.C) c_int;
-
-    /// Close the registry
-    /// `h` - The open registry handle
-    /// Returns 0 on success, < 0 on error
-    pub extern fn sceRegCloseRegistry(h: c_int) callconv(.C) c_int;
-
-    /// Remove a registry (HONESTLY, DO NOT USE)
-    /// `reg` - Filled out registry parameter
-    /// Returns 0 on success, < 0 on error
-    pub extern fn sceRegRemoveRegistry(reg: [*c]c_int) callconv(.C) c_int;
-
-    /// Open a registry directory
-    /// `h` - The open registry handle
-    /// `name` - The path to the dir to open (e.g. /CONFIG/SYSTEM)
-    /// `mode` - Open mode (can be 1 or 2, probably read or read/write
-    /// `hd` - Pointer to a REGHANDLE to receive the registry dir handle
-    /// Returns 0 on success, < 0 on error
-    pub extern fn sceRegOpenCategory(h: c_int, name: [*c]const c_char, mode: c_int, hd: [*c]c_int) callconv(.C) c_int;
-
-    /// Close the registry directory
-    /// `hd` - The open registry dir handle
-    /// Returns 0 on success, < 0 on error
-    pub extern fn sceRegCloseCategory(hd: c_int) callconv(.C) c_int;
-
-    /// Flush the registry to disk
-    /// `h` - The open registry handle
-    /// Returns 0 on success, < 0 on error
-    pub extern fn sceRegFlushRegistry(h: c_int) callconv(.C) c_int;
-
-    /// Flush the registry directory to disk
-    /// `hd` - The open registry dir handle
-    /// Returns 0 on success, < 0 on error
-    pub extern fn sceRegFlushCategory(hd: c_int) callconv(.C) c_int;
-
-    /// Create a key
-    /// `hd` - The open registry dir handle
-    /// `name` - Name of the key to create
-    /// `type` - Type of key (note cannot be a directory type)
-    /// `size` - Size of the allocated value space
-    /// Returns 0 on success, < 0 on error
-    pub extern fn sceRegCreateKey(hd: c_int, name: [*c]const c_char, type: c_int, size: SceSize) callconv(.C) c_int;
-
-    /// Set a key's value
-    /// `hd` - The open registry dir handle
-    /// `name` - The key name
-    /// `buf` - Buffer to hold the value
-    /// `size` - The size of the buffer
-    /// Returns 0 on success, < 0 on error
-    pub extern fn sceRegSetKeyValue(hd: c_int, name: [*c]const c_char, buf: ?*const anyopaque, size: SceSize) callconv(.C) c_int;
-
-    /// Get a key's information
-    /// `hd` - The open registry dir handle
-    /// `name` - Name of the key
-    /// `hk` - Pointer to a REGHANDLE to get registry key handle
-    /// `type` - Type of the key, on of ::RegKeyTypes
-    /// `size` - The size of the key's value in bytes
-    /// Returns 0 on success, < 0 on error
-    pub extern fn sceRegGetKeyInfo(hd: c_int, name: [*c]const c_char, hk: [*c]c_int, type: [*c]c_uint, size: [*c]SceSize) callconv(.C) c_int;
-
-    /// Get a key's value
-    /// `hd` - The open registry dir handle
-    /// `hk` - The open registry key handler (from ::sceRegGetKeyInfo)
-    /// `buf` - Buffer to hold the value
-    /// `size` - The size of the buffer
-    /// Returns 0 on success, < 0 on error
-    pub extern fn sceRegGetKeyValue(hd: c_int, hk: c_int, buf: ?*anyopaque, size: SceSize) callconv(.C) c_int;
-
-    /// Get number of subkeys in the current dir
-    /// `hd` - The open registry dir handle
-    /// `num` - Pointer to an integer to receive the number
-    /// Returns 0 on success, < 0 on error
-    pub extern fn sceRegGetKeysNum(hd: c_int, num: [*c]c_int) callconv(.C) c_int;
-
-    /// Get the key names in the current directory
-    /// `hd` - The open registry dir handle
-    /// `buf` - Buffer to hold the NUL terminated strings, should be num*REG_KEYNAME_SIZE
-    /// `num` - Number of elements in buf
-    /// Returns 0 on success, < 0 on error
-    /// Get number of subkeys in the current dir
-    /// `hd` - The open registry dir handle
-    /// `num` - Pointer to an integer to receive the number
-    /// Returns 0 on success, < 0 on error
-    pub extern fn sceRegGetKeys(hd: c_int, buf: [*c]c_char, num: c_int) callconv(.C) c_int;
-
-    /// Remove a registry dir
-    /// `h` - The open registry dir handle
-    /// `name` - The name of the key
-    /// Returns 0 on success, < 0 on error
-    pub extern fn sceRegRemoveCategory(h: c_int, name: [*c]const c_char) callconv(.C) c_int;
-
-    pub extern fn sceRegRemoveKey() callconv(.C) void;
-
-    /// Get a key's information by name
-    /// `hd` - The open registry dir handle
-    /// `name` - Name of the key
-    /// `type` - Type of the key, on of ::RegKeyTypes
-    /// `size` - The size of the key's value in bytes
-    /// Returns 0 on success, < 0 on error
-    pub extern fn sceRegGetKeyInfoByName(hd: c_int, name: [*c]const c_char, type: [*c]c_uint, size: [*c]SceSize) callconv(.C) c_int;
-
-    /// Get a key's value by name
-    /// `hd` - The open registry dir handle
-    /// `name` - The key name
-    /// `buf` - Buffer to hold the value
-    /// `size` - The size of the buffer
-    /// Returns 0 on success, < 0 on error
-    pub extern fn sceRegGetKeyValueByName(hd: c_int, name: [*c]const c_char, buf: ?*anyopaque, size: SceSize) callconv(.C) c_int;
-
-};
-
-pub usingnamespace if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "sceReg") and options.sceReg)) sceReg else EMPTY;
-
-const sceWlanDrv_lib = struct {
-    /// Attach to the wlan device
-    /// Returns 0 on success, < 0 on error.
-    pub extern fn sceWlanDevAttach() callconv(.C) c_int;
-
-    /// Detach from the wlan device
-    /// Returns 0 on success, < 0 on error/
-    pub extern fn sceWlanDevDetach() callconv(.C) c_int;
-
-    pub extern fn sceWlanDrv_lib_19E51F54() callconv(.C) void;
-
-    pub extern fn sceWlanDevIsGameMode() callconv(.C) void;
-
-    pub extern fn sceWlanGPPrevEstablishActive() callconv(.C) void;
-
-    pub extern fn sceWlanGPSend() callconv(.C) void;
-
-    pub extern fn sceWlanGPRecv() callconv(.C) void;
-
-    pub extern fn sceWlanGPRegisterCallback() callconv(.C) void;
-
-    pub extern fn sceWlanGPUnRegisterCallback() callconv(.C) void;
-
-    pub extern fn sceWlanDrv_lib_81579D36() callconv(.C) void;
-
-    pub extern fn sceWlanDrv_lib_5BAA1FE5() callconv(.C) void;
-
-    pub extern fn sceWlanDrv_lib_4C14BACA() callconv(.C) void;
-
-    pub extern fn sceWlanDrv_lib_2D0FAE4E() callconv(.C) void;
-
-    pub extern fn sceWlanDrv_lib_56F467CA() callconv(.C) void;
-
-    pub extern fn sceWlanDrv_lib_FE8A0B46() callconv(.C) void;
-
-    pub extern fn sceWlanDrv_lib_40B0AA4A() callconv(.C) void;
-
-    pub extern fn sceWlanDevSetGPIO() callconv(.C) void;
-
-    pub extern fn sceWlanDevGetStateGPIO() callconv(.C) void;
-
-};
-
-pub usingnamespace if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "sceWlanDrv_lib") and options.sceWlanDrv_lib)) sceWlanDrv_lib else EMPTY;
-
-const sceWlanDrv = struct {
-    /// Determine if the wlan device is currently powered on
-    /// Returns 0 if off, 1 if on
-    pub extern fn sceWlanDevIsPowerOn() callconv(.C) c_int;
-
-    /// Determine the state of the Wlan power switch
-    /// Returns 0 if off, 1 if on
-    pub extern fn sceWlanGetSwitchState() callconv(.C) c_int;
-
-    /// Get the Ethernet Address of the wlan controller
-    /// `etherAddr` - pointer to a buffer of uint8_t (NOTE: it only writes to 6 bytes, but
-    /// requests 8 so pass it 8 bytes just in case)
-    /// Returns 0 on success, < 0 on error
-    pub extern fn sceWlanGetEtherAddr(etherAddr: [*c]u8) callconv(.C) c_int;
-
-};
-
-pub usingnamespace if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "sceWlanDrv") and options.sceWlanDrv)) sceWlanDrv else EMPTY;
-
-const sceOpenPSID = struct {
-    pub extern fn sceOpenPSIDGetOpenPSID(openpsid: [*c]c_int) callconv(.C) c_int;
-
-};
-
-pub usingnamespace if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "sceOpenPSID") and options.sceOpenPSID)) sceOpenPSID else EMPTY;
-
-const sceDisplay = struct {
-    /// Set display mode
-    /// @par Example1:
-    /// `
-    /// int mode = PSP_DISPLAY_MODE_LCD;
-    /// int width = 480;
-    /// int height = 272;
-    /// sceDisplaySetMode(mode, width, height);
-    /// `
-    /// `mode` - One of ::PspDisplayMode
-    /// `width` - Width of screen in pixels.
-    /// `height` - Height of screen in pixels.
-    /// Returns when error, a negative value is returned.
-    pub extern fn sceDisplaySetMode(mode: c_int, width: c_int, height: c_int) callconv(.C) c_int;
-
-    /// Get display mode
-    /// `pmode` - Pointer to an integer to receive the current mode.
-    /// `pwidth` - Pointer to an integer to receive the current width.
-    /// `pheight` - Pointer to an integer to receive the current height,
-    /// Returns 0 on success
-    pub extern fn sceDisplayGetMode(pmode: [*c]c_int, pwidth: [*c]c_int, pheight: [*c]c_int) callconv(.C) c_int;
-
-    /// Get number of frames per second
-    pub extern fn sceDisplayGetFramePerSec() callconv(.C) f32;
-
-    pub extern fn sceDisplaySetHoldMode() callconv(.C) void;
-
-    pub extern fn sceDisplaySetResumeMode() callconv(.C) void;
-
-    /// Display set framebuf
-    /// `topaddr` - address of start of framebuffer
-    /// `bufferwidth` - buffer width (must be power of 2)
-    /// `pixelformat` - One of ::PspDisplayPixelFormats.
-    /// `sync` - One of ::PspDisplaySetBufSync
-    /// Returns 0 on success
-    pub extern fn sceDisplaySetFrameBuf(topaddr: ?*anyopaque, bufferwidth: c_int, pixelformat: c_int, sync: c_int) callconv(.C) c_int;
-
-    /// Get Display Framebuffer information
-    /// `topaddr` - pointer to void* to receive address of start of framebuffer
-    /// `bufferwidth` - pointer to int to receive buffer width (must be power of 2)
-    /// `pixelformat` - pointer to int to receive one of ::PspDisplayPixelFormats.
-    /// `sync` - One of ::PspDisplaySetBufSync
-    /// Returns 0 on success
-    pub extern fn sceDisplayGetFrameBuf(topaddr: ?*anyopaque, bufferwidth: [*c]c_int, pixelformat: [*c]c_int, sync: c_int) callconv(.C) c_int;
-
-    /// Get whether or not frame buffer is being displayed
-    pub extern fn sceDisplayIsForeground() callconv(.C) c_int;
-
-    pub extern fn sceDisplay_31C4BAA8() callconv(.C) void;
-
-    /// Number of vertical blank pulses up to now
-    pub extern fn sceDisplayGetVcount() callconv(.C) c_uint;
-
-    /// Test whether VBLANK is active
-    pub extern fn sceDisplayIsVblank() callconv(.C) c_int;
-
-    /// Wait for vertical blank
-    /// Wait for vertical blank start with callback
-    /// Wait for vertical blank start
-    pub extern fn sceDisplayWaitVblank() callconv(.C) c_int;
-
-    /// Wait for vertical blank with callback
-    pub extern fn sceDisplayWaitVblankCB() callconv(.C) c_int;
-
-    /// Wait for vertical blank start
-    pub extern fn sceDisplayWaitVblankStart() callconv(.C) c_int;
-
-    /// Wait for vertical blank start with callback
-    pub extern fn sceDisplayWaitVblankStartCB() callconv(.C) c_int;
-
-    /// Get current HSYNC count
-    pub extern fn sceDisplayGetCurrentHcount() callconv(.C) c_int;
-
-    /// Get accumlated HSYNC count
-    pub extern fn sceDisplayGetAccumulatedHcount() callconv(.C) c_int;
-
-};
-
-pub usingnamespace if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "sceDisplay") and options.sceDisplay)) sceDisplay else EMPTY;
-
-const sceAtrac3plus = struct {
-    pub extern fn sceAtracStartEntry() callconv(.C) void;
-
-    pub extern fn sceAtracEndEntry() callconv(.C) void;
-
-    pub extern fn sceAtracGetAtracID() callconv(.C) void;
-
-    /// It releases an atrac ID
-    /// `atracID` - the atrac ID to release
-    /// Returns < 0 on error
-    pub extern fn sceAtracReleaseAtracID(atracID: c_int) callconv(.C) c_int;
-
-    /// Creates a new Atrac ID from the specified data
-    /// `buf` - the buffer holding the atrac3 data, including the RIFF/WAVE header.
-    /// `bufsize` - the size of the buffer pointed by buf
-    /// Returns the new atrac ID, or < 0 on error
-    pub extern fn sceAtracSetData(atracID: c_int, pucBufferAddr: [*c]u8, uiBufferByte: u32) callconv(.C) c_int;
-
-    pub extern fn sceAtracSetHalfwayBuffer(atracID: c_int, pucBufferAddr: [*c]u8, uiReadByte: u32, uiBufferByte: u32) callconv(.C) c_int;
-
-    /// Creates a new Atrac ID from the specified data
-    /// `buf` - the buffer holding the atrac3 data, including the RIFF/WAVE header.
-    /// `bufsize` - the size of the buffer pointed by buf
-    /// Returns the new atrac ID, or < 0 on error
-    pub extern fn sceAtracSetDataAndGetID(buf: ?*anyopaque, bufsize: SceSize) callconv(.C) c_int;
-
-    pub extern fn sceAtracSetHalfwayBufferAndGetID(pucBufferAddr: [*c]u8, uiReadByte: u32, uiBufferByte: u32) callconv(.C) c_int;
-
-    /// Decode a frame of data.
-    /// `atracID` - the atrac ID
-    /// `outSamples` - pointer to a buffer that receives the decoded data of the current frame
-    /// `outN` - pointer to a integer that receives the number of audio samples of the decoded frame
-    /// `outEnd` - pointer to a integer that receives a boolean value indicating if the decoded frame is the last one
-    /// `outRemainFrame` - pointer to a integer that receives either -1 if all at3 data is already on memory,
-    /// or the remaining (not decoded yet) frames at memory if not all at3 data is on memory
-    /// Returns < 0 on error, otherwise 0
-    pub extern fn sceAtracDecodeData(atracID: c_int, outSamples: [*c]u16, outN: [*c]c_int, outEnd: [*c]c_int, outRemainFrame: [*c]c_int) callconv(.C) c_int;
-
-    /// Gets the remaining (not decoded) number of frames
-    /// `atracID` - the atrac ID
-    /// `outRemainFrame` - pointer to a integer that receives either -1 if all at3 data is already on memory,
-    /// or the remaining (not decoded yet) frames at memory if not all at3 data is on memory
-    /// Returns < 0 on error, otherwise 0
-    pub extern fn sceAtracGetRemainFrame(atracID: c_int, outRemainFrame: [*c]c_int) callconv(.C) c_int;
-
-    pub extern fn sceAtracGetStreamDataInfo(atracID: c_int, writePointer: [*c]u8, availableBytes: [*c]u32, readOffset: [*c]u32) callconv(.C) c_int;
-
-    /// `atracID` - the atrac ID
-    /// `bytesToAdd` - Number of bytes read into location given by sceAtracGetStreamDataInfo().
-    /// Returns < 0 on error, otherwise 0
-    pub extern fn sceAtracAddStreamData(atracID: c_int, bytesToAdd: c_uint) callconv(.C) c_int;
-
-    pub extern fn sceAtracGetSecondBufferInfo(atracID: c_int, puiPosition: [*c]u32, puiDataByte: [*c]u32) callconv(.C) c_int;
-
-    pub extern fn sceAtracSetSecondBuffer(atracID: c_int, pucSecondBufferAddr: [*c]u8, uiSecondBufferByte: u32) callconv(.C) c_int;
-
-    pub extern fn sceAtracGetNextDecodePosition(atracID: c_int, puiSamplePosition: [*c]u32) callconv(.C) c_int;
-
-    pub extern fn sceAtracGetSoundSample(atracID: c_int, piEndSample: [*c]c_int, piLoopStartSample: [*c]c_int, piLoopEndSample: [*c]c_int) callconv(.C) c_int;
-
-    pub extern fn sceAtracGetChannel(atracID: c_int, puiChannel: [*c]u32) callconv(.C) c_int;
-
-    /// Gets the maximum number of samples of the atrac3 stream.
-    /// `atracID` - the atrac ID
-    /// `outMax` - pointer to a integer that receives the maximum number of samples.
-    /// Returns < 0 on error, otherwise 0
-    pub extern fn sceAtracGetMaxSample(atracID: c_int, outMax: [*c]c_int) callconv(.C) c_int;
-
-    /// Gets the number of samples of the next frame to be decoded.
-    /// `atracID` - the atrac ID
-    /// `outN` - pointer to receives the number of samples of the next frame.
-    /// Returns < 0 on error, otherwise 0
-    pub extern fn sceAtracGetNextSample(atracID: c_int, outN: [*c]c_int) callconv(.C) c_int;
-
-    /// Gets the bitrate.
-    /// `atracID` - the atracID
-    /// `outBitrate` - pointer to a integer that receives the bitrate in kbps
-    /// Returns < 0 on error, otherwise 0
-    pub extern fn sceAtracGetBitrate(atracID: c_int, outBitrate: [*c]c_int) callconv(.C) c_int;
-
-    pub extern fn sceAtracGetLoopStatus(atracID: c_int, piLoopNum: [*c]c_int, puiLoopStatus: [*c]u32) callconv(.C) c_int;
-
-    /// Sets the number of loops for this atrac ID
-    /// `atracID` - the atracID
-    /// `nloops` - the number of loops to set
-    /// Returns < 0 on error, otherwise 0
-    pub extern fn sceAtracSetLoopNum(atracID: c_int, nloops: c_int) callconv(.C) c_int;
-
-    pub extern fn sceAtracGetBufferInfoForReseting(atracID: c_int, uiSample: u32, pBufferInfo: [*c]c_int) callconv(.C) c_int;
-
-    pub extern fn sceAtracResetPlayPosition(atracID: c_int, uiSample: u32, uiWriteByteFirstBuf: u32, uiWriteByteSecondBuf: u32) callconv(.C) c_int;
-
-    pub extern fn sceAtracGetInternalErrorInfo(atracID: c_int, piResult: [*c]c_int) callconv(.C) c_int;
-
-};
-
-pub usingnamespace if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "sceAtrac3plus") and options.sceAtrac3plus)) sceAtrac3plus else EMPTY;
-
-const sceUsbstor = struct {
-    pub extern fn sceUsbstorGetStatus() callconv(.C) void;
-
-};
-
-pub usingnamespace if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "sceUsbstor") and options.sceUsbstor)) sceUsbstor else EMPTY;
 
 const sceUtility = struct {
     /// Init the game sharing
@@ -5233,4 +4042,1195 @@ const sceUtility_netparam_internal = struct {
 };
 
 pub usingnamespace if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "sceUtility_netparam_internal") and options.sceUtility_netparam_internal)) sceUtility_netparam_internal else EMPTY;
+
+const sceKermitPeripheral = struct {
+    pub extern fn sceKermitPeripheral_4A26B7C8() callconv(.C) void;
+
+    pub extern fn sceKermitPeripheral_C0EBC631() callconv(.C) void;
+
+    pub extern fn sceKermitPeripheral_D27C5E03() callconv(.C) void;
+
+};
+
+pub usingnamespace if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "sceKermitPeripheral") and options.sceKermitPeripheral)) sceKermitPeripheral else EMPTY;
+
+const sceGe_user = struct {
+    /// Get the size of VRAM.
+    /// Returns The size of VRAM (in bytes).
+    pub extern fn sceGeEdramGetSize() callconv(.C) c_uint;
+
+    /// Get the eDRAM address.
+    /// Returns A pointer to the base of the eDRAM.
+    pub extern fn sceGeEdramGetAddr() callconv(.C) ?*anyopaque;
+
+    /// Set the eDRAM address translation mode.
+    /// `width` - 0 to not set the translation width, otherwise 512, 1024, 2048 or 4096.
+    /// Returns The previous width if it was set, otherwise 0, < 0 on error.
+    pub extern fn sceGeEdramSetAddrTranslation(width: c_int) callconv(.C) c_int;
+
+    /// Retrieve the current value of a GE command.
+    /// `cmd` - The GE command register to retrieve (0 to 0xFF, both included).
+    /// Returns The value of the GE command, < 0 on error.
+    pub extern fn sceGeGetCmd(cmd: c_int) callconv(.C) c_uint;
+
+    /// Retrieve a matrix of the given type.
+    /// `type` - One of ::PspGeMatrixTypes.
+    /// `matrix` - Pointer to a variable to store the matrix.
+    /// Returns < 0 on error.
+    pub extern fn sceGeGetMtx(type: c_int, matrix: ?*anyopaque) callconv(.C) c_int;
+
+    /// Retrieve the stack of the display list currently being executed.
+    /// `stackId` - The ID of the stack to retrieve.
+    /// `stack` - Pointer to a structure to store the stack, or NULL to not store it.
+    /// Returns The number of stacks of the current display list, < 0 on error.
+    pub extern fn sceGeGetStack(stackId: c_int, stack: [*c]c_int) callconv(.C) c_int;
+
+    /// Save the GE's current state.
+    /// `context` - Pointer to a ::PspGeContext.
+    /// Returns < 0 on error.
+    pub extern fn sceGeSaveContext(context: [*c]c_int) callconv(.C) c_int;
+
+    /// Restore a previously saved GE context.
+    /// `context` - Pointer to a ::PspGeContext.
+    /// Returns < 0 on error.
+    pub extern fn sceGeRestoreContext(context: [*c]const c_int) callconv(.C) c_int;
+
+    /// Enqueue a display list at the tail of the GE display list queue.
+    /// `list` - The head of the list to queue.
+    /// `stall` - The stall address.
+    /// If NULL then no stall address is set and the list is transferred immediately.
+    /// `cbid` - ID of the callback set by calling sceGeSetCallback
+    /// `arg` - Structure containing GE context buffer address
+    /// Returns The ID of the queue, < 0 on error.
+    pub extern fn sceGeListEnQueue(list: ?*const anyopaque, stall: ?*anyopaque, cbid: c_int, arg: [*c]c_int) callconv(.C) c_int;
+
+    /// Enqueue a display list at the head of the GE display list queue.
+    /// `list` - The head of the list to queue.
+    /// `stall` - The stall address.
+    /// If NULL then no stall address is set and the list is transferred immediately.
+    /// `cbid` - ID of the callback set by calling sceGeSetCallback
+    /// `arg` - Structure containing GE context buffer address
+    /// Returns The ID of the queue, < 0 on error.
+    pub extern fn sceGeListEnQueueHead(list: ?*const anyopaque, stall: ?*anyopaque, cbid: c_int, arg: [*c]c_int) callconv(.C) c_int;
+
+    /// Cancel a queued or running list.
+    /// `qid` - The ID of the queue.
+    /// Returns < 0 on error.
+    pub extern fn sceGeListDeQueue(qid: c_int) callconv(.C) c_int;
+
+    /// Update the stall address for the specified queue.
+    /// `qid` - The ID of the queue.
+    /// `stall` - The new stall address.
+    /// Returns < 0 on error
+    pub extern fn sceGeListUpdateStallAddr(qid: c_int, stall: ?*anyopaque) callconv(.C) c_int;
+
+    /// Wait for syncronisation of a list.
+    /// `qid` - The queue ID of the list to sync.
+    /// `syncType` - 0 if you want to wait for the list to be completed, or 1 if you just want to peek the actual state.
+    /// Returns The specified queue status, one of ::PspGeListState.
+    pub extern fn sceGeListSync(qid: c_int, syncType: c_int) callconv(.C) c_int;
+
+    /// Wait for drawing to complete.
+    /// `syncType` - 0 if you want to wait for the drawing to be completed, or 1 if you just want to peek the state of the display list currently being executed.
+    /// Returns The current queue status, one of ::PspGeListState.
+    pub extern fn sceGeDrawSync(syncType: c_int) callconv(.C) c_int;
+
+    /// Interrupt drawing queue.
+    /// `mode` - If set to 1, reset all the queues.
+    /// `pParam` - Unused (just K1-checked).
+    /// Returns The stopped queue ID if mode isn't set to 0, otherwise 0, and < 0 on error.
+    pub extern fn sceGeBreak(mode: c_int, pParam: [*c]c_int) callconv(.C) c_int;
+
+    /// Restart drawing queue.
+    /// Returns < 0 on error.
+    pub extern fn sceGeContinue() callconv(.C) c_int;
+
+    /// Register callback handlers for the the GE.
+    /// `cb` - Configured callback data structure.
+    /// Returns The callback ID, < 0 on error.
+    pub extern fn sceGeSetCallback(cb: [*c]c_int) callconv(.C) c_int;
+
+    /// Unregister the callback handlers.
+    /// `cbid` - The ID of the callbacks, returned by sceGeSetCallback().
+    /// Returns < 0 on error
+    pub extern fn sceGeUnsetCallback(cbid: c_int) callconv(.C) c_int;
+
+    /// Sets the EDRAM size to be enabled.
+    /// `size -size    The size (0x200000 or 0x400000). Will return an error if 0x400000 is specified for the PSP FAT.`
+    /// Returns Zero on success, otherwise less than zero.
+    pub extern fn sceGeEdramSetSize(size: c_int) callconv(.C) c_int;
+
+};
+
+pub usingnamespace if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "sceGe_user") and options.sceGe_user)) sceGe_user else EMPTY;
+
+const sceJpeg = struct {
+    pub extern fn sceJpeg_0425B986() callconv(.C) void;
+
+    pub extern fn sceJpegMJpegCsc() callconv(.C) void;
+
+    /// Decodes a mjpeg frame to RGBA encoding.
+    /// @note Input frame should be encoded as either yuv420p or yuvj420p,
+    /// returns SCE_JPEG_ERROR_UNSUPPORT_SAMPLING otherwise
+    /// `jpegbuf` - the buffer with the mjpeg frame
+    /// `size` - size of the buffer pointed by jpegbuf
+    /// `rgba` - buffer where the decoded data in RGBA format will be stored.
+    /// It should have a size of (width * height * 4).
+    /// `unk` - Unknown, pass 0
+    /// Returns (width * 65536) + height on success, < 0 on error
+    pub extern fn sceJpegDecodeMJpeg(jpegbuf: [*c]u8, size: SceSize, rgba: [*c]u8, unk: u32) callconv(.C) c_int;
+
+    pub extern fn sceJpeg_227662D7() callconv(.C) void;
+
+    /// Deletes the current decoder context.
+    /// Returns 0 on success, < 0 on error
+    pub extern fn sceJpegDeleteMJpeg() callconv(.C) c_int;
+
+    pub extern fn sceJpeg_64B6F978() callconv(.C) void;
+
+    /// Converts a frame from YCbCr to RGBA
+    /// `imageAddr` - buffer where the converted data in RGBA format will be stored.
+    /// `yCbCrAddr` - the buffer with the YCbCr data
+    /// `widthHeight` - width and height of the frame (width * 65536) + height,
+    /// as returned by sceJpegDecodeMJpegYCbCr() or sceJpegDecodeMJpeg()
+    /// `bufferWidth` - number of pixels per row of the buffer
+    /// `colourInfo` - chroma subsampling mode, as provided by sceJpegGetOutputInfo()
+    /// Returns 0 on success, < 0 on error
+    pub extern fn sceJpegCsc(imageAddr: [*c]u8, yCbCrAddr: [*c]u8, widthHeight: c_int, bufferWidth: c_int, colourInfo: c_int) callconv(.C) c_int;
+
+    /// Finishes the MJpeg library
+    /// Returns 0 on success, < 0 on error
+    pub extern fn sceJpegFinishMJpeg() callconv(.C) c_int;
+
+    /// Reads information from mjpeg frame
+    /// `jpegbuf` - the buffer with the mjpeg frame
+    /// `size` - size of the mjpeg frame
+    /// `colourInfo` - address where the mjpeg chroma information will be stored
+    /// `unk` - Unknown, pass 0
+    /// Returns number of bytes needed in the buffer that will be used for YCbCr decoding, <= 0 on error
+    pub extern fn sceJpegGetOutputInfo(jpegbuf: [*c]u8, size: SceSize, colourInfo: [*c]c_int, unk: c_int) callconv(.C) c_int;
+
+    /// Decodes a mjpeg frame to YCbCr encoding
+    /// @note Input frame should be encoded as either yuv420p or yuvj420p,
+    /// returns SCE_JPEG_ERROR_UNSUPPORT_SAMPLING otherwise
+    /// `jpegbuf` - the buffer with the mjpeg frame
+    /// `size` - size of the buffer pointed by jpegbuf
+    /// `yCbCr` - buffer where the decoded data in YCbCr format will be stored
+    /// `yCbCrSize` - size of the buffer pointed by yCbCr (see sceJpegGetOutputInfo())
+    /// `unk` - Unknown, pass 0
+    /// Returns (width * 65536) + height on success, < 0 on error
+    pub extern fn sceJpegDecodeMJpegYCbCr(jpegbuf: [*c]u8, size: SceSize, yCbCr: [*c]u8, yCbCrSize: SceSize, unk: u32) callconv(.C) c_int;
+
+    pub extern fn sceJpeg_9B36444C() callconv(.C) void;
+
+    /// Creates the decoder context.
+    /// `width` - The width of the frame
+    /// `height` - The height of the frame
+    /// Returns 0 on success, < 0 on error
+    pub extern fn sceJpegCreateMJpeg(width: c_int, height: c_int) callconv(.C) c_int;
+
+    /// Inits the MJpeg library
+    /// Returns 0 on success, < 0 on error
+    pub extern fn sceJpegInitMJpeg() callconv(.C) c_int;
+
+};
+
+pub usingnamespace if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "sceJpeg") and options.sceJpeg)) sceJpeg else EMPTY;
+
+const sceMpegbase = struct {
+    pub extern fn sceMpegBaseYCrCbCopyVme(YUVBuffer: ScePVoid, Buffer: [*c]SceInt32, Type: SceInt32) callconv(.C) SceInt32;
+
+    pub extern fn sceMpegBaseCscInit(width: SceInt32) callconv(.C) SceInt32;
+
+    pub extern fn sceMpegBaseCscVme(pRGBbuffer: ScePVoid, pRGBbuffer2: ScePVoid, width: SceInt32, pYCrCbBuffer: [*c]c_int) callconv(.C) SceInt32;
+
+    pub extern fn sceMpegbase_0530BE4E() callconv(.C) void;
+
+    pub extern fn sceMpegbase_304882E1() callconv(.C) void;
+
+    pub extern fn sceMpegBaseYCrCbCopy() callconv(.C) void;
+
+    pub extern fn sceMpegBaseCscAvc() callconv(.C) void;
+
+    pub extern fn sceMpegbase_AC9E717E() callconv(.C) void;
+
+    pub extern fn sceMpegbase_BEA18F91(pLLI: [*c]c_int) callconv(.C) SceInt32;
+
+};
+
+pub usingnamespace if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "sceMpegbase") and options.sceMpegbase)) sceMpegbase else EMPTY;
+
+const sceMpeg = struct {
+    /// sceMpegQueryStreamOffset
+    /// `Mpeg` - SceMpeg handle
+    /// `pBuffer` - pointer to file header
+    /// `iOffset` - will contain stream offset in bytes, usually 2048
+    /// Returns 0 if success.
+    pub extern fn sceMpegQueryStreamOffset(Mpeg: [*c]c_int, pBuffer: ScePVoid, iOffset: [*c]SceInt32) callconv(.C) SceInt32;
+
+    /// sceMpegQueryStreamSize
+    /// `pBuffer` - pointer to file header
+    /// `iSize` - will contain stream size in bytes
+    /// Returns 0 if success.
+    pub extern fn sceMpegQueryStreamSize(pBuffer: ScePVoid, iSize: [*c]SceInt32) callconv(.C) SceInt32;
+
+    /// sceMpegInit
+    /// Returns 0 if success.
+    pub extern fn sceMpegInit() callconv(.C) SceInt32;
+
+    /// sceMpegFinish
+    pub extern fn sceMpegFinish() callconv(.C) SceVoid;
+
+    /// sceMpegQueryMemSize
+    /// `iUnk` - Unknown, set to 0
+    /// Returns < 0 if error else decoder data size.
+    pub extern fn sceMpegQueryMemSize(iUnk: c_int) callconv(.C) SceInt32;
+
+    /// sceMpegCreate
+    /// `Mpeg` - will be filled
+    /// `pData` - pointer to allocated memory of size = sceMpegQueryMemSize()
+    /// `iSize` - size of data, should be = sceMpegQueryMemSize()
+    /// `Ringbuffer` - a ringbuffer
+    /// `iFrameWidth` - display buffer width, set to 512 if writing to framebuffer
+    /// `iUnk1` - unknown, set to 0
+    /// `iUnk2` - unknown, set to 0
+    /// Returns 0 if success.
+    pub extern fn sceMpegCreate(Mpeg: [*c]c_int, pData: ScePVoid, iSize: SceInt32, Ringbuffer: [*c]c_int, iFrameWidth: SceInt32, iUnk1: SceInt32, iUnk2: SceInt32) callconv(.C) SceInt32;
+
+    /// sceMpegDelete
+    /// `Mpeg` - SceMpeg handle
+    pub extern fn sceMpegDelete(Mpeg: [*c]c_int) callconv(.C) SceVoid;
+
+    /// sceMpegRegistStream
+    /// `Mpeg` - SceMpeg handle
+    /// `iStreamID` - stream id, 0 for video, 1 for audio
+    /// `iUnk` - unknown, set to 0
+    /// Returns 0 if error.
+    pub extern fn sceMpegRegistStream(Mpeg: [*c]c_int, iStreamID: SceInt32, iUnk: SceInt32) callconv(.C) [*c]c_int;
+
+    /// sceMpegUnRegistStream
+    /// `Mpeg` - SceMpeg handle
+    /// `pStream` - pointer to stream
+    pub extern fn sceMpegUnRegistStream(Mpeg: c_int, pStream: [*c]c_int) callconv(.C) SceVoid;
+
+    /// sceMpegMallocAvcEsBuf
+    /// Returns 0 if error else pointer to buffer.
+    pub extern fn sceMpegMallocAvcEsBuf(Mpeg: [*c]c_int) callconv(.C) ScePVoid;
+
+    /// sceMpegFreeAvcEsBuf
+    pub extern fn sceMpegFreeAvcEsBuf(Mpeg: [*c]c_int, pBuf: ScePVoid) callconv(.C) SceVoid;
+
+    /// sceMpegQueryAtracEsSize
+    /// `Mpeg` - SceMpeg handle
+    /// `iEsSize` - will contain size of Es
+    /// `iOutSize` - will contain size of decoded data
+    /// Returns 0 if success.
+    pub extern fn sceMpegQueryAtracEsSize(Mpeg: [*c]c_int, iEsSize: [*c]SceInt32, iOutSize: [*c]SceInt32) callconv(.C) SceInt32;
+
+    pub extern fn sceMpegQueryPcmEsSize() callconv(.C) void;
+
+    /// sceMpegInitAu
+    /// `Mpeg` - SceMpeg handle
+    /// `pEsBuffer` - prevously allocated Es buffer
+    /// `pAu` - will contain pointer to Au
+    /// Returns 0 if success.
+    pub extern fn sceMpegInitAu(Mpeg: [*c]c_int, pEsBuffer: ScePVoid, pAu: [*c]c_int) callconv(.C) SceInt32;
+
+    pub extern fn sceMpegChangeGetAvcAuMode() callconv(.C) void;
+
+    pub extern fn sceMpegChangeGetAuMode() callconv(.C) void;
+
+    /// sceMpegGetAvcAu
+    /// `Mpeg` - SceMpeg handle
+    /// `pStream` - associated stream
+    /// `pAu` - will contain pointer to Au
+    /// `iUnk` - unknown
+    /// Returns 0 if success.
+    pub extern fn sceMpegGetAvcAu(Mpeg: [*c]c_int, pStream: [*c]c_int, pAu: [*c]c_int, iUnk: [*c]SceInt32) callconv(.C) SceInt32;
+
+    pub extern fn sceMpegGetPcmAu() callconv(.C) void;
+
+    /// sceMpegGetAtracAu
+    /// `Mpeg` - SceMpeg handle
+    /// `pStream` - associated stream
+    /// `pAu` - will contain pointer to Au
+    /// `pUnk` - unknown
+    /// Returns 0 if success.
+    pub extern fn sceMpegGetAtracAu(Mpeg: [*c]c_int, pStream: [*c]c_int, pAu: [*c]c_int, pUnk: ScePVoid) callconv(.C) SceInt32;
+
+    pub extern fn sceMpegFlushStream() callconv(.C) void;
+
+    /// sceMpegFlushAllStreams
+    /// Returns 0 if success.
+    pub extern fn sceMpegFlushAllStream(Mpeg: [*c]c_int) callconv(.C) SceInt32;
+
+    /// sceMpegAvcDecode
+    /// `Mpeg` - SceMpeg handle
+    /// `pAu` - video Au
+    /// `iFrameWidth` - output buffer width, set to 512 if writing to framebuffer
+    /// `pBuffer` - buffer that will contain the decoded frame
+    /// `iInit` - will be set to 0 on first call, then 1
+    /// Returns 0 if success.
+    /// sceMpegAvcDecodeMode
+    /// `Mpeg` - SceMpeg handle
+    /// `pMode` - pointer to SceMpegAvcMode struct defining the decode mode (pixelformat)
+    /// Returns 0 if success.
+    pub extern fn sceMpegAvcDecode(Mpeg: [*c]c_int, pAu: [*c]c_int, iFrameWidth: SceInt32, pBuffer: ScePVoid, iInit: [*c]SceInt32) callconv(.C) SceInt32;
+
+    pub extern fn sceMpegAvcDecodeDetail() callconv(.C) void;
+
+    /// sceMpegAvcDecodeMode
+    /// `Mpeg` - SceMpeg handle
+    /// `pMode` - pointer to SceMpegAvcMode struct defining the decode mode (pixelformat)
+    /// Returns 0 if success.
+    pub extern fn sceMpegAvcDecodeMode(Mpeg: [*c]c_int, pMode: [*c]c_int) callconv(.C) SceInt32;
+
+    /// sceMpegAvcDecodeStop
+    /// `Mpeg` - SceMpeg handle
+    /// `iFrameWidth` - output buffer width, set to 512 if writing to framebuffer
+    /// `pBuffer` - buffer that will contain the decoded frame
+    /// `iStatus` - frame number
+    /// Returns 0 if success.
+    pub extern fn sceMpegAvcDecodeStop(Mpeg: [*c]c_int, iFrameWidth: SceInt32, pBuffer: ScePVoid, iStatus: [*c]SceInt32) callconv(.C) SceInt32;
+
+    /// sceMpegAtracDecode
+    /// `Mpeg` - SceMpeg handle
+    /// `pAu` - video Au
+    /// `pBuffer` - buffer that will contain the decoded frame
+    /// `iInit` - set this to 1 on first call
+    /// Returns 0 if success.
+    pub extern fn sceMpegAtracDecode(Mpeg: [*c]c_int, pAu: [*c]c_int, pBuffer: ScePVoid, iInit: SceInt32) callconv(.C) SceInt32;
+
+    /// sceMpegRingbufferQueryMemSize
+    /// `iPackets` - number of packets in the ringbuffer
+    /// Returns < 0 if error else ringbuffer data size.
+    pub extern fn sceMpegRingbufferQueryMemSize(iPackets: SceInt32) callconv(.C) SceInt32;
+
+    /// sceMpegRingbufferConstruct
+    /// `Ringbuffer` - pointer to a sceMpegRingbuffer struct
+    /// `iPackets` - number of packets in the ringbuffer
+    /// `pData` - pointer to allocated memory
+    /// `iSize` - size of allocated memory, shoud be sceMpegRingbufferQueryMemSize(iPackets)
+    /// `Callback` - ringbuffer callback
+    /// `pCBparam` - param passed to callback
+    /// Returns 0 if success.
+    pub extern fn sceMpegRingbufferConstruct(Ringbuffer: [*c]c_int, iPackets: SceInt32, pData: ScePVoid, iSize: SceInt32, Callback: c_int, pCBparam: ScePVoid) callconv(.C) SceInt32;
+
+    /// sceMpegRingbufferDestruct
+    /// `Ringbuffer` - pointer to a sceMpegRingbuffer struct
+    pub extern fn sceMpegRingbufferDestruct(Ringbuffer: [*c]c_int) callconv(.C) SceVoid;
+
+    /// sceMpegRingbufferPut
+    /// `Ringbuffer` - pointer to a sceMpegRingbuffer struct
+    /// `iNumPackets` - num packets to put into the ringbuffer
+    /// `iAvailable` - free packets in the ringbuffer, should be sceMpegRingbufferAvailableSize()
+    /// Returns < 0 if error else number of packets.
+    pub extern fn sceMpegRingbufferPut(Ringbuffer: [*c]c_int, iNumPackets: SceInt32, iAvailable: SceInt32) callconv(.C) SceInt32;
+
+    /// sceMpegQueryMemSize
+    /// `Ringbuffer` - pointer to a sceMpegRingbuffer struct
+    /// Returns < 0 if error else number of free packets in the ringbuffer.
+    pub extern fn sceMpegRingbufferAvailableSize(Ringbuffer: [*c]c_int) callconv(.C) SceInt32;
+
+    pub extern fn sceMpeg_11CAB459() callconv(.C) void;
+
+    pub extern fn sceMpeg_3C37A7A6() callconv(.C) void;
+
+    pub extern fn sceMpeg_B27711A8() callconv(.C) void;
+
+    pub extern fn sceMpeg_D4DD6E75() callconv(.C) void;
+
+    pub extern fn sceMpeg_C345DED2() callconv(.C) void;
+
+    pub extern fn sceMpegAvcDecodeDetail2() callconv(.C) void;
+
+    pub extern fn sceMpeg_988E9E12() callconv(.C) void;
+
+};
+
+pub usingnamespace if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "sceMpeg") and options.sceMpeg)) sceMpeg else EMPTY;
+
+const sceUsbstor = struct {
+    pub extern fn sceUsbstorGetStatus() callconv(.C) void;
+
+};
+
+pub usingnamespace if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "sceUsbstor") and options.sceUsbstor)) sceUsbstor else EMPTY;
+
+const sceRtc = struct {
+    /// Get the resolution of the tick counter
+    /// Returns # of ticks per second
+    pub extern fn sceRtcGetTickResolution() callconv(.C) u32;
+
+    /// Get current tick count
+    /// `tick` - pointer to u64 to receive tick count
+    /// Returns 0 on success, < 0 on error
+    pub extern fn sceRtcGetCurrentTick(tick: [*c]u64) callconv(.C) c_int;
+
+    pub extern fn sceRtc_029CA3B3() callconv(.C) void;
+
+    /// Get current tick count, adjusted for local time zone
+    /// `time` - pointer to ScePspDateTime struct to receive time
+    /// `tz` - time zone to adjust to (minutes from UTC)
+    /// Returns 0 on success, < 0 on error
+    pub extern fn sceRtcGetCurrentClock(time: [*c]c_int, tz: c_int) callconv(.C) c_int;
+
+    /// Get current local time into a ScePspDateTime struct
+    /// `time` - pointer to ScePspDateTime struct to receive time
+    /// Returns 0 on success, < 0 on error
+    pub extern fn sceRtcGetCurrentClockLocalTime(time: [*c]c_int) callconv(.C) c_int;
+
+    /// Convert a UTC-based tickcount into a local time tick count
+    /// `tickUTC` - pointer to u64 tick in UTC time
+    /// `tickLocal` - pointer to u64 to receive tick in local time
+    /// Returns 0 on success, < 0 on error
+    pub extern fn sceRtcConvertUtcToLocalTime(tickUTC: [*c]const u64, tickLocal: [*c]u64) callconv(.C) c_int;
+
+    /// Convert a local time based tickcount into a UTC-based tick count
+    /// `tickLocal` - pointer to u64 tick in local time
+    /// `tickUTC` - pointer to u64 to receive tick in UTC based time
+    /// Returns 0 on success, < 0 on error
+    pub extern fn sceRtcConvertLocalTimeToUTC(tickLocal: [*c]const u64, tickUTC: [*c]u64) callconv(.C) c_int;
+
+    /// Check if a year is a leap year
+    /// `year` - year to check if is a leap year
+    /// Returns 1 on leapyear, 0 if not
+    pub extern fn sceRtcIsLeapYear(year: c_int) callconv(.C) c_int;
+
+    /// Get number of days in a specific month
+    /// `year` - year in which to check (accounts for leap year)
+    /// `month` - month to get number of days for
+    /// Returns # of days in month, <0 on error (?)
+    pub extern fn sceRtcGetDaysInMonth(year: c_int, month: c_int) callconv(.C) c_int;
+
+    /// Get day of the week for a date
+    /// `year` - year in which to check (accounts for leap year)
+    /// `month` - month that day is in
+    /// `day` - day to get day of week for
+    /// Returns day of week with 0 representing Monday
+    pub extern fn sceRtcGetDayOfWeek(year: c_int, month: c_int, day: c_int) callconv(.C) c_int;
+
+    /// Validate pspDate component ranges
+    /// `date` - pointer to pspDate struct to be checked
+    /// Returns 0 on success, one of ::pspRtcCheckValidErrors on error
+    pub extern fn sceRtcCheckValid(date: [*c]const c_int) callconv(.C) c_int;
+
+    pub extern fn sceRtcSetTime_t(date: [*c]c_int, time: c_int) callconv(.C) c_int;
+
+    pub extern fn sceRtcGetTime_t(date: [*c]const c_int, time: [*c]c_int) callconv(.C) c_int;
+
+    pub extern fn sceRtcSetDosTime(date: [*c]c_int, dosTime: u32) callconv(.C) c_int;
+
+    pub extern fn sceRtcGetDosTime(date: [*c]c_int, dosTime: u32) callconv(.C) c_int;
+
+    pub extern fn sceRtcSetWin32FileTime(date: [*c]c_int, win32Time: [*c]u64) callconv(.C) c_int;
+
+    pub extern fn sceRtcGetWin32FileTime(date: [*c]c_int, win32Time: [*c]u64) callconv(.C) c_int;
+
+    /// Set a ScePspDateTime struct based on ticks
+    /// `date` - pointer to ScePspDateTime struct to set
+    /// `tick` - pointer to ticks to convert
+    /// Returns 0 on success, < 0 on error
+    pub extern fn sceRtcSetTick(date: [*c]c_int, tick: [*c]const u64) callconv(.C) c_int;
+
+    /// Set ticks based on a ScePspDateTime struct
+    /// `date` - pointer to ScePspDateTime to convert
+    /// `tick` - pointer to tick to set
+    /// Returns 0 on success, < 0 on error
+    /// Get the resolution of the tick counter
+    /// Returns # of ticks per second
+    pub extern fn sceRtcGetTick(date: [*c]const c_int, tick: [*c]u64) callconv(.C) c_int;
+
+    /// Compare two ticks
+    /// `tick1` - pointer to first tick
+    /// `tick2` - poiinter to second tick
+    /// Returns 0 on equal, <0 when tick1 < tick2, >0 when tick1 > tick2
+    pub extern fn sceRtcCompareTick(tick1: [*c]const u64, tick2: [*c]const u64) callconv(.C) c_int;
+
+    /// Add two ticks
+    /// `destTick` - pointer to tick to hold result
+    /// `srcTick` - pointer to source tick
+    /// `numTicks` - number of ticks to add
+    /// Returns 0 on success, <0 on error
+    pub extern fn sceRtcTickAddTicks(destTick: [*c]u64, srcTick: [*c]const u64, numTicks: u64) callconv(.C) c_int;
+
+    /// Add an amount of ms to a tick
+    /// `destTick` - pointer to tick to hold result
+    /// `srcTick` - pointer to source tick
+    /// `numMS` - number of ms to add
+    /// Returns 0 on success, <0 on error
+    pub extern fn sceRtcTickAddMicroseconds(destTick: [*c]u64, srcTick: [*c]const u64, numMS: u64) callconv(.C) c_int;
+
+    /// Add an amount of seconds to a tick
+    /// `destTick` - pointer to tick to hold result
+    /// `srcTick` - pointer to source tick
+    /// `numSecs` - number of seconds to add
+    /// Returns 0 on success, <0 on error
+    pub extern fn sceRtcTickAddSeconds(destTick: [*c]u64, srcTick: [*c]const u64, numSecs: u64) callconv(.C) c_int;
+
+    /// Add an amount of minutes to a tick
+    /// `destTick` - pointer to tick to hold result
+    /// `srcTick` - pointer to source tick
+    /// `numMins` - number of minutes to add
+    /// Returns 0 on success, <0 on error
+    pub extern fn sceRtcTickAddMinutes(destTick: [*c]u64, srcTick: [*c]const u64, numMins: u64) callconv(.C) c_int;
+
+    /// Add an amount of hours to a tick
+    /// `destTick` - pointer to tick to hold result
+    /// `srcTick` - pointer to source tick
+    /// `numHours` - number of hours to add
+    /// Returns 0 on success, <0 on error
+    pub extern fn sceRtcTickAddHours(destTick: [*c]u64, srcTick: [*c]const u64, numHours: c_int) callconv(.C) c_int;
+
+    /// Add an amount of days to a tick
+    /// `destTick` - pointer to tick to hold result
+    /// `srcTick` - pointer to source tick
+    /// `numDays` - number of days to add
+    /// Returns 0 on success, <0 on error
+    pub extern fn sceRtcTickAddDays(destTick: [*c]u64, srcTick: [*c]const u64, numDays: c_int) callconv(.C) c_int;
+
+    /// Add an amount of weeks to a tick
+    /// `destTick` - pointer to tick to hold result
+    /// `srcTick` - pointer to source tick
+    /// `numWeeks` - number of weeks to add
+    /// Returns 0 on success, <0 on error
+    pub extern fn sceRtcTickAddWeeks(destTick: [*c]u64, srcTick: [*c]const u64, numWeeks: c_int) callconv(.C) c_int;
+
+    /// Add an amount of months to a tick
+    /// `destTick` - pointer to tick to hold result
+    /// `srcTick` - pointer to source tick
+    /// `numMonths` - number of months to add
+    /// Returns 0 on success, <0 on error
+    pub extern fn sceRtcTickAddMonths(destTick: [*c]u64, srcTick: [*c]const u64, numMonths: c_int) callconv(.C) c_int;
+
+    /// Add an amount of years to a tick
+    /// `destTick` - pointer to tick to hold result
+    /// `srcTick` - pointer to source tick
+    /// `numYears` - number of years to add
+    /// Returns 0 on success, <0 on error
+    pub extern fn sceRtcTickAddYears(destTick: [*c]u64, srcTick: [*c]const u64, numYears: c_int) callconv(.C) c_int;
+
+    /// Format Tick-representation UTC time in RFC2822 format
+    pub extern fn sceRtcFormatRFC2822(pszDateTime: [*c]c_char, pUtc: [*c]const u64, iTimeZoneMinutes: c_int) callconv(.C) c_int;
+
+    /// Format Tick-representation UTC time in RFC2822 format
+    pub extern fn sceRtcFormatRFC2822LocalTime(pszDateTime: [*c]c_char, pUtc: [*c]const u64) callconv(.C) c_int;
+
+    /// Format Tick-representation UTC time in RFC3339(ISO8601) format
+    pub extern fn sceRtcFormatRFC3339(pszDateTime: [*c]c_char, pUtc: [*c]const u64, iTimeZoneMinutes: c_int) callconv(.C) c_int;
+
+    /// Format Tick-representation UTC time in RFC3339(ISO8601) format
+    pub extern fn sceRtcFormatRFC3339LocalTime(pszDateTime: [*c]c_char, pUtc: [*c]const u64) callconv(.C) c_int;
+
+    pub extern fn sceRtcParseDateTime(destTick: [*c]u64, dateString: [*c]const c_char) callconv(.C) c_int;
+
+    /// Parse time information represented in RFC3339 format
+    pub extern fn sceRtcParseRFC3339(pUtc: [*c]u64, pszDateTime: [*c]const c_char) callconv(.C) c_int;
+
+    pub extern fn sceRtcGetAccumulativeTime() callconv(.C) void;
+
+    pub extern fn sceRtcSetTime64_t() callconv(.C) void;
+
+    pub extern fn sceRtcGetLastReincarnatedTime() callconv(.C) void;
+
+    pub extern fn sceRtcGetLastAdjustedTime() callconv(.C) void;
+
+    pub extern fn sceRtcGetTime64_t() callconv(.C) void;
+
+};
+
+pub usingnamespace if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "sceRtc") and options.sceRtc)) sceRtc else EMPTY;
+
+const sceUmdUser = struct {
+    /// Get the error code associated with a failed event
+    /// Returns < 0 on error, the error code on success
+    pub extern fn sceUmdGetErrorStat() callconv(.C) c_int;
+
+    /// Get the disc info
+    /// `info` - A pointer to a ::pspUmdInfo struct
+    /// Returns < 0 on error
+    pub extern fn sceUmdGetDiscInfo(info: [*c]c_int) callconv(.C) c_int;
+
+    /// Check whether there is a disc in the UMD drive
+    /// Returns 0 if no disc present, anything else indicates a disc is inserted.
+    pub extern fn sceUmdCheckMedium() callconv(.C) c_int;
+
+    /// Wait for the UMD drive to reach a certain state (plus callback)
+    /// `stat` - One or more of ::pspUmdState
+    /// `timeout` - Timeout value in microseconds
+    /// Returns < 0 on error
+    pub extern fn sceUmdWaitDriveStatCB(stat: c_int, timeout: c_uint) callconv(.C) c_int;
+
+    /// Wait for the UMD drive to reach a certain state
+    /// `stat` - One or more of ::pspUmdState
+    /// `timeout` - Timeout value in microseconds
+    /// Returns < 0 on error
+    pub extern fn sceUmdWaitDriveStatWithTimer(stat: c_int, timeout: c_uint) callconv(.C) c_int;
+
+    /// Cancel a sceUmdWait* call
+    /// Returns < 0 on error
+    pub extern fn sceUmdCancelWaitDriveStat() callconv(.C) c_int;
+
+    /// Get (poll) the current state of the UMD drive
+    /// Returns < 0 on error, one or more of ::pspUmdState on success
+    pub extern fn sceUmdGetDriveStat() callconv(.C) c_int;
+
+    /// Prohibit UMD disc being replaced
+    /// Returns < 0 on error
+    pub extern fn sceUmdReplaceProhibit() callconv(.C) c_int;
+
+    /// Wait for the UMD drive to reach a certain state
+    /// `stat` - One or more of ::pspUmdState
+    /// Returns < 0 on error
+    pub extern fn sceUmdWaitDriveStat(stat: c_int) callconv(.C) c_int;
+
+    /// Register a callback for the UMD drive
+    /// @note Callback is of type UmdCallback
+    /// `cbid` - A callback ID created from sceKernelCreateCallback
+    /// Returns < 0 on error
+    /// @par Example:
+    /// `
+    /// int umd_callback(int unknown, int event)
+    /// {
+    /// //do something
+    /// }
+    /// int cbid = sceKernelCreateCallback("UMD Callback", umd_callback, NULL);
+    /// sceUmdRegisterUMDCallBack(cbid);
+    /// `
+    pub extern fn sceUmdRegisterUMDCallBack(cbid: c_int) callconv(.C) c_int;
+
+    /// Un-register a callback for the UMD drive
+    /// `cbid` - A callback ID created from sceKernelCreateCallback
+    /// Returns < 0 on error
+    pub extern fn sceUmdUnRegisterUMDCallBack(cbid: c_int) callconv(.C) c_int;
+
+    /// Activates the UMD drive
+    /// `unit` - The unit to initialise (probably). Should be set to 1.
+    /// `drive` - A prefix string for the fs device to mount the UMD on (e.g. "disc0:")
+    /// Returns < 0 on error
+    /// @par Example:
+    /// `
+    /// // Wait for disc and mount to filesystem
+    /// int i;
+    /// i = sceUmdCheckMedium();
+    /// if(i == 0)
+    /// {
+    /// sceUmdWaitDriveStat(PSP_UMD_PRESENT);
+    /// }
+    /// sceUmdActivate(1, "disc0:"); // Mount UMD to disc0: file system
+    /// sceUmdWaitDriveStat(PSP_UMD_READY);
+    /// // Now you can access the UMD using standard sceIo functions
+    /// `
+    pub extern fn sceUmdActivate(unit: c_int, drive: [*c]const c_char) callconv(.C) c_int;
+
+    /// Permit UMD disc being replaced
+    /// Returns < 0 on error
+    pub extern fn sceUmdReplacePermit() callconv(.C) c_int;
+
+    /// Deativates the UMD drive
+    /// `unit` - The unit to initialise (probably). Should be set to 1.
+    /// `drive` - A prefix string for the fs device to mount the UMD on (e.g. "disc0:")
+    /// Returns < 0 on error
+    pub extern fn sceUmdDeactivate(unit: c_int, drive: [*c]const c_char) callconv(.C) c_int;
+
+};
+
+pub usingnamespace if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "sceUmdUser") and options.sceUmdUser)) sceUmdUser else EMPTY;
+
+const sceReg = struct {
+    pub extern fn sceRegExit() callconv(.C) void;
+
+    /// Open the registry
+    /// `reg` - A filled in ::RegParam structure
+    /// `mode` - Open mode (set to 1)
+    /// `h` - Pointer to a REGHANDLE to receive the registry handle
+    /// Returns 0 on success, < 0 on error
+    pub extern fn sceRegOpenRegistry(reg: [*c]c_int, mode: c_int, h: [*c]c_int) callconv(.C) c_int;
+
+    /// Close the registry
+    /// `h` - The open registry handle
+    /// Returns 0 on success, < 0 on error
+    pub extern fn sceRegCloseRegistry(h: c_int) callconv(.C) c_int;
+
+    /// Remove a registry (HONESTLY, DO NOT USE)
+    /// `reg` - Filled out registry parameter
+    /// Returns 0 on success, < 0 on error
+    pub extern fn sceRegRemoveRegistry(reg: [*c]c_int) callconv(.C) c_int;
+
+    /// Open a registry directory
+    /// `h` - The open registry handle
+    /// `name` - The path to the dir to open (e.g. /CONFIG/SYSTEM)
+    /// `mode` - Open mode (can be 1 or 2, probably read or read/write
+    /// `hd` - Pointer to a REGHANDLE to receive the registry dir handle
+    /// Returns 0 on success, < 0 on error
+    pub extern fn sceRegOpenCategory(h: c_int, name: [*c]const c_char, mode: c_int, hd: [*c]c_int) callconv(.C) c_int;
+
+    /// Close the registry directory
+    /// `hd` - The open registry dir handle
+    /// Returns 0 on success, < 0 on error
+    pub extern fn sceRegCloseCategory(hd: c_int) callconv(.C) c_int;
+
+    /// Flush the registry to disk
+    /// `h` - The open registry handle
+    /// Returns 0 on success, < 0 on error
+    pub extern fn sceRegFlushRegistry(h: c_int) callconv(.C) c_int;
+
+    /// Flush the registry directory to disk
+    /// `hd` - The open registry dir handle
+    /// Returns 0 on success, < 0 on error
+    pub extern fn sceRegFlushCategory(hd: c_int) callconv(.C) c_int;
+
+    /// Create a key
+    /// `hd` - The open registry dir handle
+    /// `name` - Name of the key to create
+    /// `type` - Type of key (note cannot be a directory type)
+    /// `size` - Size of the allocated value space
+    /// Returns 0 on success, < 0 on error
+    pub extern fn sceRegCreateKey(hd: c_int, name: [*c]const c_char, type: c_int, size: SceSize) callconv(.C) c_int;
+
+    /// Set a key's value
+    /// `hd` - The open registry dir handle
+    /// `name` - The key name
+    /// `buf` - Buffer to hold the value
+    /// `size` - The size of the buffer
+    /// Returns 0 on success, < 0 on error
+    pub extern fn sceRegSetKeyValue(hd: c_int, name: [*c]const c_char, buf: ?*const anyopaque, size: SceSize) callconv(.C) c_int;
+
+    /// Get a key's information
+    /// `hd` - The open registry dir handle
+    /// `name` - Name of the key
+    /// `hk` - Pointer to a REGHANDLE to get registry key handle
+    /// `type` - Type of the key, on of ::RegKeyTypes
+    /// `size` - The size of the key's value in bytes
+    /// Returns 0 on success, < 0 on error
+    pub extern fn sceRegGetKeyInfo(hd: c_int, name: [*c]const c_char, hk: [*c]c_int, type: [*c]c_uint, size: [*c]SceSize) callconv(.C) c_int;
+
+    /// Get a key's value
+    /// `hd` - The open registry dir handle
+    /// `hk` - The open registry key handler (from ::sceRegGetKeyInfo)
+    /// `buf` - Buffer to hold the value
+    /// `size` - The size of the buffer
+    /// Returns 0 on success, < 0 on error
+    pub extern fn sceRegGetKeyValue(hd: c_int, hk: c_int, buf: ?*anyopaque, size: SceSize) callconv(.C) c_int;
+
+    /// Get number of subkeys in the current dir
+    /// `hd` - The open registry dir handle
+    /// `num` - Pointer to an integer to receive the number
+    /// Returns 0 on success, < 0 on error
+    pub extern fn sceRegGetKeysNum(hd: c_int, num: [*c]c_int) callconv(.C) c_int;
+
+    /// Get the key names in the current directory
+    /// `hd` - The open registry dir handle
+    /// `buf` - Buffer to hold the NUL terminated strings, should be num*REG_KEYNAME_SIZE
+    /// `num` - Number of elements in buf
+    /// Returns 0 on success, < 0 on error
+    /// Get number of subkeys in the current dir
+    /// `hd` - The open registry dir handle
+    /// `num` - Pointer to an integer to receive the number
+    /// Returns 0 on success, < 0 on error
+    pub extern fn sceRegGetKeys(hd: c_int, buf: [*c]c_char, num: c_int) callconv(.C) c_int;
+
+    /// Remove a registry dir
+    /// `h` - The open registry dir handle
+    /// `name` - The name of the key
+    /// Returns 0 on success, < 0 on error
+    pub extern fn sceRegRemoveCategory(h: c_int, name: [*c]const c_char) callconv(.C) c_int;
+
+    pub extern fn sceRegRemoveKey() callconv(.C) void;
+
+    /// Get a key's information by name
+    /// `hd` - The open registry dir handle
+    /// `name` - Name of the key
+    /// `type` - Type of the key, on of ::RegKeyTypes
+    /// `size` - The size of the key's value in bytes
+    /// Returns 0 on success, < 0 on error
+    pub extern fn sceRegGetKeyInfoByName(hd: c_int, name: [*c]const c_char, type: [*c]c_uint, size: [*c]SceSize) callconv(.C) c_int;
+
+    /// Get a key's value by name
+    /// `hd` - The open registry dir handle
+    /// `name` - The key name
+    /// `buf` - Buffer to hold the value
+    /// `size` - The size of the buffer
+    /// Returns 0 on success, < 0 on error
+    pub extern fn sceRegGetKeyValueByName(hd: c_int, name: [*c]const c_char, buf: ?*anyopaque, size: SceSize) callconv(.C) c_int;
+
+};
+
+pub usingnamespace if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "sceReg") and options.sceReg)) sceReg else EMPTY;
+
+const sceUsb = struct {
+    /// Start a USB driver.
+    /// `driverName` - name of the USB driver to start
+    /// `size` - Size of arguments to pass to USB driver start
+    /// `args` - Arguments to pass to USB driver start
+    /// Returns 0 on success
+    pub extern fn sceUsbStart(driverName: [*c]const c_char, size: c_int, args: ?*anyopaque) callconv(.C) c_int;
+
+    /// Stop a USB driver.
+    /// `driverName` - name of the USB driver to stop
+    /// `size` - Size of arguments to pass to USB driver stop
+    /// `args` - Arguments to pass to USB driver stop
+    /// Returns 0 on success
+    pub extern fn sceUsbStop(driverName: [*c]const c_char, size: c_int, args: ?*anyopaque) callconv(.C) c_int;
+
+    /// Get USB state
+    /// Returns OR'd PSP_USB_* constants
+    pub extern fn sceUsbGetState() callconv(.C) c_int;
+
+    pub extern fn sceUsbGetDrvList(r4one: u32, r5ret: [*c]u32, r6one: u32) callconv(.C) c_int;
+
+    /// Get state of a specific USB driver
+    /// `driverName` - name of USB driver to get status from
+    /// Returns 1 if the driver has been started, 2 if it is stopped
+    pub extern fn sceUsbGetDrvState(driverName: [*c]const c_char) callconv(.C) c_int;
+
+    /// Activate a USB driver.
+    /// `pid` - Product ID for the default USB Driver
+    /// Returns 0 on success
+    pub extern fn sceUsbActivate(pid: u32) callconv(.C) c_int;
+
+    /// Deactivate USB driver.
+    /// `pid` - Product ID for the default USB driver
+    /// Returns 0 on success
+    pub extern fn sceUsbDeactivate(pid: u32) callconv(.C) c_int;
+
+    pub extern fn sceUsbWaitState(state: u32, waitmode: c_int, timeout: [*c]u32) callconv(.C) c_int;
+
+    pub extern fn sceUsbWaitCancel() callconv(.C) c_int;
+
+};
+
+pub usingnamespace if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "sceUsb") and options.sceUsb)) sceUsb else EMPTY;
+
+const sceUsbCam = struct {
+    pub extern fn sceUsbCamSetupMic() callconv(.C) void;
+
+    pub extern fn sceUsbCamSetMicGain() callconv(.C) void;
+
+    /// Sets the contrast
+    /// `contrast` - The contrast (0-255)
+    /// Returns 0 on success, < 0 on error
+    pub extern fn sceUsbCamSetContrast(contrast: c_int) callconv(.C) c_int;
+
+    /// Setups the parameters to take a still image (with more options)
+    /// `param` - pointer to a ::PspUsbCamSetupStillExParam
+    /// Returns 0 on success, < 0 on error
+    pub extern fn sceUsbCamSetupStillEx(param: [*c]c_int) callconv(.C) c_int;
+
+    /// Gets the state of the autoreversal of the image.
+    /// Returns 1 if it is set to automatic, 0 otherwise
+    pub extern fn sceUsbCamGetAutoImageReverseState() callconv(.C) c_int;
+
+    /// Set ups the parameters for video capture.
+    /// `param` - Pointer to a ::PspUsbCamSetupVideoParam structure.
+    /// `workarea` - Pointer to a buffer used as work area by the driver.
+    /// `wasize` - Size of the work area.
+    /// Returns 0 on success, < 0 on error
+    pub extern fn sceUsbCamSetupVideo(param: [*c]c_int, workarea: ?*anyopaque, wasize: c_int) callconv(.C) c_int;
+
+    /// Polls the status of still input completion.
+    /// Returns the size of the acquired image if still input has ended,
+    /// 0 if the input has not ended, < 0 on error.
+    pub extern fn sceUsbCamStillPollInputEnd() callconv(.C) c_int;
+
+    /// Sets the exposure level
+    /// `ev` - The exposure level, one of ::PspUsbCamEVLevel
+    /// Returns 0 on success, < 0 on error
+    pub extern fn sceUsbCamSetEvLevel(ev: c_int) callconv(.C) c_int;
+
+    pub extern fn sceUsbCam_1E958148() callconv(.C) void;
+
+    /// Gets the current exposure level.
+    /// `ev` - pointer to a variable that receives the current exposure level
+    /// Returns 0 on success, < 0 on error
+    pub extern fn sceUsbCamGetEvLevel(ev: [*c]c_int) callconv(.C) c_int;
+
+    pub extern fn sceUsbCamSetupMicEx() callconv(.C) void;
+
+    pub extern fn sceUsbCamReadMicBlocking() callconv(.C) void;
+
+    /// Gets the current saturation
+    /// `saturation` - pointer to a variable that receives the current saturation
+    /// Returns 0 on success, < 0 on error
+    pub extern fn sceUsbCamGetSaturation(saturation: [*c]c_int) callconv(.C) c_int;
+
+    pub extern fn sceUsbCamReadMic() callconv(.C) void;
+
+    /// Setups the parameters to take a still image.
+    /// `param` - pointer to a ::PspUsbCamSetupStillParam
+    /// Returns 0 on success, < 0 on error
+    pub extern fn sceUsbCamSetupStill(param: [*c]c_int) callconv(.C) c_int;
+
+    /// Polls the status of video frame read completion.
+    /// Returns the size of the acquired frame if it has been read,
+    /// 0 if the frame has not yet been read, < 0 on error.
+    pub extern fn sceUsbCamPollReadVideoFrameEnd() callconv(.C) c_int;
+
+    pub extern fn sceUsbCamUnregisterLensRotationCallback() callconv(.C) void;
+
+    /// Gets the direction of the camera lens
+    /// Returns 1 if the camera is "looking to you", 0 if the camera
+    /// is "looking to the other side".
+    pub extern fn sceUsbCamGetLensDirection() callconv(.C) c_int;
+
+    /// Sets the brightness
+    /// `brightness` - The brightness (0-255)
+    /// Returns 0 on success, < 0 on error
+    pub extern fn sceUsbCamSetBrightness(brightness: c_int) callconv(.C) c_int;
+
+    pub extern fn sceUsbCamStopMic() callconv(.C) void;
+
+    /// Starts video input from the camera.
+    /// Returns 0 on success, < 0 on error
+    pub extern fn sceUsbCamStartVideo() callconv(.C) c_int;
+
+    pub extern fn sceUsbCamGetMicDataLength() callconv(.C) void;
+
+    /// Gets a still image. The function doesn't return until the image
+    /// has been acquired.
+    /// `buf` - The buffer that receives the image jpeg data
+    /// `size` - The size of the buffer.
+    /// Returns size of acquired image on success, < 0 on error
+    pub extern fn sceUsbCamStillInputBlocking(buf: [*c]u8, size: SceSize) callconv(.C) c_int;
+
+    /// Sets the sharpness
+    /// `sharpness` - The sharpness (0-255)
+    /// Returns 0 on success, < 0 on error
+    pub extern fn sceUsbCamSetSharpness(sharpness: c_int) callconv(.C) c_int;
+
+    pub extern fn sceUsbCamSetAntiFlicker() callconv(.C) void;
+
+    /// Stops video input from the camera.
+    /// Returns 0 on success, < 0 on error
+    pub extern fn sceUsbCamStopVideo() callconv(.C) c_int;
+
+    /// Sets the saturation
+    /// `saturation` - The saturation (0-255)
+    /// Returns 0 on success, < 0 on error
+    pub extern fn sceUsbCamSetSaturation(saturation: c_int) callconv(.C) c_int;
+
+    /// Gets the current brightness
+    /// `brightness` - pointer to a variable that receives the current brightness
+    /// Returns 0 on success, < 0 on error
+    pub extern fn sceUsbCamGetBrightness(brightness: [*c]c_int) callconv(.C) c_int;
+
+    /// Waits untils still input has been finished.
+    /// Returns the size of the acquired image on sucess, < 0 on error
+    pub extern fn sceUsbCamStillWaitInputEnd() callconv(.C) c_int;
+
+    /// Reads a video frame. The function doesn't return until the frame
+    /// has been acquired.
+    /// `buf` - The buffer that receives the frame jpeg data
+    /// `size` - The size of the buffer.
+    /// Returns size of acquired frame on success, < 0 on error
+    pub extern fn sceUsbCamReadVideoFrameBlocking(buf: [*c]u8, size: SceSize) callconv(.C) c_int;
+
+    pub extern fn sceUsbCamStartMic() callconv(.C) void;
+
+    /// Sets the reverse mode
+    /// `reverseflags` - The reverse flags, zero or more of ::PspUsbCamReverseFlags
+    /// Returns 0 on success, < 0 on error
+    pub extern fn sceUsbCamSetReverseMode(reverseflags: c_int) callconv(.C) c_int;
+
+    pub extern fn sceUsbCam_95F8901E() callconv(.C) void;
+
+    /// Gets the current image efect mode
+    /// `effectmode` - pointer to a variable that receives the current effect mode
+    /// Returns 0 on success, < 0 on error
+    pub extern fn sceUsbCamGetImageEffectMode(effectmode: [*c]c_int) callconv(.C) c_int;
+
+    /// Reads a video frame. The function returns inmediately, and
+    /// the completion has to be handled by calling ::sceUsbCamWaitReadVideoFrameEnd
+    /// or ::sceUsbCamPollReadVideoFrameEnd.
+    /// `buf` - The buffer that receives the frame jpeg data
+    /// `size` - The size of the buffer.
+    /// Returns 0 on success, < 0 on error
+    /// Reads a video frame. The function doesn't return until the frame
+    /// has been acquired.
+    /// `buf` - The buffer that receives the frame jpeg data
+    /// `size` - The size of the buffer.
+    /// Returns size of acquired frame on success, < 0 on error
+    pub extern fn sceUsbCamReadVideoFrame(buf: [*c]u8, size: SceSize) callconv(.C) c_int;
+
+    /// Gets the current zoom.
+    /// `zoom` - pointer to a variable that receives the current zoom
+    /// Returns 0 on success, < 0 on error
+    pub extern fn sceUsbCamGetZoom(zoom: [*c]c_int) callconv(.C) c_int;
+
+    /// Gets the current contrast
+    /// `contrast` - pointer to a variable that receives the current contrast
+    /// Returns 0 on success, < 0 on error
+    pub extern fn sceUsbCamGetContrast(contrast: [*c]c_int) callconv(.C) c_int;
+
+    /// Cancels the still input.
+    /// Returns 0 on success, < 0 on error
+    pub extern fn sceUsbCamStillCancelInput() callconv(.C) c_int;
+
+    pub extern fn sceUsbCamGetAntiFlicker() callconv(.C) void;
+
+    pub extern fn sceUsbCamWaitReadMicEnd() callconv(.C) void;
+
+    /// Sets the zoom.
+    /// `zoom` - The zoom level starting by 10. (10 = 1X, 11 = 1.1X, etc)
+    /// Returns s 0 on success, < 0 on error
+    pub extern fn sceUsbCamSetZoom(zoom: c_int) callconv(.C) c_int;
+
+    pub extern fn sceUsbCam_C72ED6D3() callconv(.C) void;
+
+    /// Set ups the parameters for video capture (with more options)
+    /// `param` - Pointer to a ::PspUsbCamSetupVideoExParam structure.
+    /// `workarea` - Pointer to a buffer used as work area by the driver.
+    /// `wasize` - Size of the work area.
+    /// Returns 0 on success, < 0 on error
+    pub extern fn sceUsbCamSetupVideoEx(param: [*c]c_int, workarea: ?*anyopaque, wasize: c_int) callconv(.C) c_int;
+
+    pub extern fn sceUsbCamRegisterLensRotationCallback() callconv(.C) void;
+
+    /// Sets the image effect mode
+    /// `effectmode` - The effect mode, one of ::PspUsbCamEffectMode
+    /// Returns 0 on success, < 0 on error
+    pub extern fn sceUsbCamSetImageEffectMode(effectmode: c_int) callconv(.C) c_int;
+
+    /// Gets the current reverse mode.
+    /// `reverseflags` - pointer to a variable that receives the current reverse mode flags
+    /// Returns 0 on success, < 0 on error
+    pub extern fn sceUsbCamGetReverseMode(reverseflags: [*c]c_int) callconv(.C) c_int;
+
+    pub extern fn sceUsbCam_D865997B() callconv(.C) void;
+
+    /// Gets the size of the acquired frame.
+    /// Returns the size of the acquired frame on success, < 0 on error
+    pub extern fn sceUsbCamGetReadVideoFrameSize() callconv(.C) c_int;
+
+    /// Gets the size of the acquired still image.
+    /// Returns the size of the acquired image on success, < 0 on error
+    pub extern fn sceUsbCamStillGetInputLength() callconv(.C) c_int;
+
+    pub extern fn sceUsbCamPollReadMicEnd() callconv(.C) void;
+
+    /// Waits untils the current frame has been read.
+    /// Returns the size of the acquired frame on sucess, < 0 on error
+    pub extern fn sceUsbCamWaitReadVideoFrameEnd() callconv(.C) c_int;
+
+    /// Sets if the image should be automatically reversed, depending of the position
+    /// of the camera.
+    /// `on` - 1 to set the automatical reversal of the image, 0 to set it off
+    /// Returns 0 on success, < 0 on error
+    pub extern fn sceUsbCamAutoImageReverseSW(on: c_int) callconv(.C) c_int;
+
+    /// Gets a still image. The function returns inmediately, and
+    /// the completion has to be handled by calling ::sceUsbCamStillWaitInputEnd
+    /// or ::sceUsbCamStillPollInputEnd.
+    /// `buf` - The buffer that receives the image jpeg data
+    /// `size` - The size of the buffer.
+    /// Returns 0 on success, < 0 on error
+    /// Gets a still image. The function doesn't return until the image
+    /// has been acquired.
+    /// `buf` - The buffer that receives the image jpeg data
+    /// `size` - The size of the buffer.
+    /// Returns size of acquired image on success, < 0 on error
+    pub extern fn sceUsbCamStillInput(buf: [*c]u8, size: SceSize) callconv(.C) c_int;
+
+    /// Gets the current sharpness
+    /// `sharpness` - pointer to a variable that receives the current sharpness
+    /// Returns 0 on success, < 0 on error
+    pub extern fn sceUsbCamGetSharpness(sharpness: [*c]c_int) callconv(.C) c_int;
+
+};
+
+pub usingnamespace if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "sceUsbCam") and options.sceUsbCam)) sceUsbCam else EMPTY;
+
+const sceDmac = struct {
+    /// Copy data in memory using DMAC
+    /// `dst` - The pointer to the destination
+    /// `src` - The pointer to the source
+    /// `n` - The size of data
+    /// Returns 0 on success; otherwise an error code
+    pub extern fn sceDmacMemcpy(dst: ?*anyopaque, src: ?*const anyopaque, n: SceSize) callconv(.C) c_int;
+
+    pub extern fn sceDmacTryMemcpy(dst: ?*anyopaque, src: ?*const anyopaque, n: SceSize) callconv(.C) c_int;
+
+};
+
+pub usingnamespace if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "sceDmac") and options.sceDmac)) sceDmac else EMPTY;
+
+const sceDisplay = struct {
+    /// Set display mode
+    /// @par Example1:
+    /// `
+    /// int mode = PSP_DISPLAY_MODE_LCD;
+    /// int width = 480;
+    /// int height = 272;
+    /// sceDisplaySetMode(mode, width, height);
+    /// `
+    /// `mode` - One of ::PspDisplayMode
+    /// `width` - Width of screen in pixels.
+    /// `height` - Height of screen in pixels.
+    /// Returns when error, a negative value is returned.
+    pub extern fn sceDisplaySetMode(mode: c_int, width: c_int, height: c_int) callconv(.C) c_int;
+
+    /// Get display mode
+    /// `pmode` - Pointer to an integer to receive the current mode.
+    /// `pwidth` - Pointer to an integer to receive the current width.
+    /// `pheight` - Pointer to an integer to receive the current height,
+    /// Returns 0 on success
+    pub extern fn sceDisplayGetMode(pmode: [*c]c_int, pwidth: [*c]c_int, pheight: [*c]c_int) callconv(.C) c_int;
+
+    /// Get number of frames per second
+    pub extern fn sceDisplayGetFramePerSec() callconv(.C) f32;
+
+    pub extern fn sceDisplaySetHoldMode() callconv(.C) void;
+
+    pub extern fn sceDisplaySetResumeMode() callconv(.C) void;
+
+    /// Display set framebuf
+    /// `topaddr` - address of start of framebuffer
+    /// `bufferwidth` - buffer width (must be power of 2)
+    /// `pixelformat` - One of ::PspDisplayPixelFormats.
+    /// `sync` - One of ::PspDisplaySetBufSync
+    /// Returns 0 on success
+    pub extern fn sceDisplaySetFrameBuf(topaddr: ?*anyopaque, bufferwidth: c_int, pixelformat: c_int, sync: c_int) callconv(.C) c_int;
+
+    /// Get Display Framebuffer information
+    /// `topaddr` - pointer to void* to receive address of start of framebuffer
+    /// `bufferwidth` - pointer to int to receive buffer width (must be power of 2)
+    /// `pixelformat` - pointer to int to receive one of ::PspDisplayPixelFormats.
+    /// `sync` - One of ::PspDisplaySetBufSync
+    /// Returns 0 on success
+    pub extern fn sceDisplayGetFrameBuf(topaddr: ?*anyopaque, bufferwidth: [*c]c_int, pixelformat: [*c]c_int, sync: c_int) callconv(.C) c_int;
+
+    /// Get whether or not frame buffer is being displayed
+    pub extern fn sceDisplayIsForeground() callconv(.C) c_int;
+
+    pub extern fn sceDisplay_31C4BAA8() callconv(.C) void;
+
+    /// Number of vertical blank pulses up to now
+    pub extern fn sceDisplayGetVcount() callconv(.C) c_uint;
+
+    /// Test whether VBLANK is active
+    pub extern fn sceDisplayIsVblank() callconv(.C) c_int;
+
+    /// Wait for vertical blank
+    /// Wait for vertical blank start with callback
+    /// Wait for vertical blank start
+    pub extern fn sceDisplayWaitVblank() callconv(.C) c_int;
+
+    /// Wait for vertical blank with callback
+    pub extern fn sceDisplayWaitVblankCB() callconv(.C) c_int;
+
+    /// Wait for vertical blank start
+    pub extern fn sceDisplayWaitVblankStart() callconv(.C) c_int;
+
+    /// Wait for vertical blank start with callback
+    pub extern fn sceDisplayWaitVblankStartCB() callconv(.C) c_int;
+
+    /// Get current HSYNC count
+    pub extern fn sceDisplayGetCurrentHcount() callconv(.C) c_int;
+
+    /// Get accumlated HSYNC count
+    pub extern fn sceDisplayGetAccumulatedHcount() callconv(.C) c_int;
+
+};
+
+pub usingnamespace if ((@hasDecl(options, "everything") and options.everything) or (@hasDecl(options, "sceDisplay") and options.sceDisplay)) sceDisplay else EMPTY;
 
