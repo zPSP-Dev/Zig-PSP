@@ -156,10 +156,12 @@ pub fn build_psp(b: *std.Build, comptime build_info: PSPBuildInfo, comptime buil
     //Build from your main file!
     const exe = b.addExecutable(.{
         .name = "main",
-        .root_source_file = b.path(build_info.src_file),
-        .target = target,
-        .optimize = optimize,
-        .strip = false, // disable as cannot be used with "link_emit_relocs = true"
+        .root_module = b.createModule(.{
+            .root_source_file = b.path(build_info.src_file),
+            .target = target,
+            .optimize = optimize,
+            .strip = false, // disable as cannot be used with "link_emit_relocs = true"
+        }),
     });
     exe.root_module.addImport("psp", libzpsp_module);
 
@@ -173,10 +175,12 @@ pub fn build_psp(b: *std.Build, comptime build_info: PSPBuildInfo, comptime buil
     const hostOptimize = b.standardOptimizeOption(.{});
     const prx = b.addExecutable(.{
         .name = "prxgen",
-        .root_source_file = b.path(build_info.path_to_sdk ++ "tools/prxgen/stub.zig"),
-        .link_libc = true,
-        .target = hostTarget,
-        .optimize = .ReleaseFast,
+        .root_module = b.createModule(.{
+            .root_source_file = b.path(build_info.path_to_sdk ++ "tools/prxgen/stub.zig"),
+            .link_libc = true,
+            .target = hostTarget,
+            .optimize = .ReleaseFast,
+        }),
     });
     prx.addCSourceFile(.{
         .file = b.path(build_info.path_to_sdk ++ "tools/prxgen/psp-prxgen.c"),
