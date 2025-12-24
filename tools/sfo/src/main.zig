@@ -61,23 +61,20 @@ fn readSFO(allocator: std.mem.Allocator, path: []const u8) !SFOStructure {
     var file = try std.fs.cwd().openFile(path, .{});
     defer file.close();
 
-    var buf: [4096]u8 = undefined;
-    var reader = file.reader(&buf).interface;
+    var reader = file.reader().any();
 
-    var header: SFOHeader = undefined;
-    try reader.readSliceAll(std.mem.asBytes(&header));
-
+    const header = try reader.readStruct(SFOHeader);
     var entries = try allocator.alloc(TableEntry, header.entry_count);
     for (0..header.entry_count) |i| {
-        try reader.readSliceAll(std.mem.asBytes(&entries[i]));
+        entries[i] = try reader.readStruct(TableEntry);
     }
 
     const currPos = try file.getPos();
     std.debug.assert(currPos == header.key_start);
 
     const keyLen = header.data_start - header.key_start;
-    var key_pool = try allocator.alloc(u8, keyLen);
-    try reader.readSliceAll(std.mem.asBytes(&key_pool));
+    const key_pool = try allocator.alloc(u8, keyLen);
+    _ = try reader.readAll(key_pool);
 
     const data_pool = try file.readToEndAlloc(allocator, std.math.maxInt(u24));
 
@@ -90,8 +87,7 @@ fn readSFO(allocator: std.mem.Allocator, path: []const u8) !SFOStructure {
 }
 
 fn get_arg_list(allocator: std.mem.Allocator, iterator: *std.process.ArgIterator) ![]const []const u8 {
-    var list = std.array_list.Managed([]const u8).init(allocator);
-    defer list.deinit();
+    var list = std.ArrayList([]const u8).init(allocator);
     while (iterator.next()) |arg| {
         try list.append(arg);
     }
@@ -139,13 +135,10 @@ pub fn prettyPrintSFO(allocator: std.mem.Allocator, path: []const u8) !void {
 }
 
 pub fn writeSFO(allocator: std.mem.Allocator, path: []const u8, entries: []InternalEntry) !void {
-    var data_segment = std.array_list.Managed(u8).init(allocator);
-    defer data_segment.deinit();
-    var key_segment = std.array_list.Managed(u8).init(allocator);
-    defer key_segment.deinit();
+    var data_segment = std.ArrayList(u8).init(allocator);
+    var key_segment = std.ArrayList(u8).init(allocator);
 
-    var table_entries = std.array_list.Managed(TableEntry).init(allocator);
-    defer table_entries.deinit();
+    var table_entries = std.ArrayList(TableEntry).init(allocator);
     const PAD = [_]u8{0} ** 4;
     for (entries) |entry| {
         const data_len = if (entry.type == .Int32) @sizeOf(i32) else if (entry.type == .Bin) entry.data.?.len else entry.data.?.len + 1;
@@ -196,12 +189,11 @@ pub fn writeSFO(allocator: std.mem.Allocator, path: []const u8, entries: []Inter
     const file = try std.fs.cwd().createFile(path, .{});
     defer file.close();
 
-    var buf: [4096]u8 = undefined;
-    var file_writer = file.writer(&buf).interface;
+    const file_writer = file.writer().any();
 
-    try file_writer.writeStruct(sfo.header, std.builtin.Endian.little);
+    try file_writer.writeStruct(sfo.header);
     for (sfo.table) |entry| {
-        try file_writer.writeStruct(entry, std.builtin.Endian.little);
+        try file_writer.writeStruct(entry);
     }
     try file_writer.writeAll(sfo.key_pool);
     try file_writer.writeAll(sfo.data_pool);
@@ -233,7 +225,6 @@ pub fn main() !void {
         }
         try prettyPrintSFO(allocator, commands[1]);
     } else if (std.mem.eql(u8, com, "write")) {
-        // TODO: Shall we make other fields writeable? Like DISC_ID, PSP_SYSTEM_VER, etc
         if (commands.len < 3) {
             std.debug.print("Usage: sfotool write <TITLE> <out.sfo>\n", .{});
             std.posix.exit(1);
