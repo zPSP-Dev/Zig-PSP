@@ -31,7 +31,7 @@ pub const SceMpegYCrCbBuffer = extern struct {
 
 pub const SceMpeg = ScePVoid;
 pub const SceMpegStream = SceVoid;
-pub const sceMpegRingbufferCB = ?*const fn (ScePVoid, SceInt32, ScePVoid) callconv(.c) SceInt32;
+pub const sceMpegRingbufferCB = ?*const fn (ScePVoid, SceInt32, ScePVoid) callconv(.C) SceInt32;
 
 pub const SceMpegRingbuffer = extern struct {
     iPackets: SceInt32,

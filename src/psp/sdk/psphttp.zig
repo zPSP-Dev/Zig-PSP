@@ -38,10 +38,10 @@ const enum_unnamed_9 = enum(c_int) {
     _,
 };
 pub const PspHttpAddHeaderMode = enum_unnamed_9;
-pub const PspHttpMallocFunction = ?*const fn (SceSize) callconv(.c) ?*anyopaque;
-pub const PspHttpReallocFunction = ?*const fn (?*anyopaque, SceSize) callconv(.c) ?*anyopaque;
-pub const PspHttpFreeFunction = ?*const fn (?*anyopaque) callconv(.c) void;
-pub const PspHttpPasswordCB = ?*const fn (c_int, PspHttpAuthType, [*c]const u8, [*c]u8, [*c]u8, SceBool, [*c][*c]u8, [*c]SceSize, [*c]SceBool) callconv(.c) c_int;
+pub const PspHttpMallocFunction = ?*const fn (SceSize) callconv(.C) ?*anyopaque;
+pub const PspHttpReallocFunction = ?*const fn (?*anyopaque, SceSize) callconv(.C) ?*anyopaque;
+pub const PspHttpFreeFunction = ?*const fn (?*anyopaque) callconv(.C) void;
+pub const PspHttpPasswordCB = ?*const fn (c_int, PspHttpAuthType, [*c]const u8, [*c]u8, [*c]u8, SceBool, [*c][*c]u8, [*c]SceSize, [*c]SceBool) callconv(.C) c_int;
 pub extern fn sceHttpInit(unknown1: c_uint) c_int;
 pub extern fn sceHttpEnd() c_int;
 pub extern fn sceHttpCreateTemplate(agent: [*c]u8, unknown1: c_int, unknown2: c_int) c_int;

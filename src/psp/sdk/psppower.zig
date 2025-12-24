@@ -20,7 +20,7 @@ pub const PSPPowerCB = enum(u32) {
 
 pub const PSPPowerTick = enum(u32) { All = 0, Suspend = 1, Display = 6 };
 
-pub const powerCallback_t = ?*const fn (c_int, c_int) callconv(.c) void;
+pub const powerCallback_t = ?*const fn (c_int, c_int) callconv(.C) void;
 
 // Register Power Callback Function
 //

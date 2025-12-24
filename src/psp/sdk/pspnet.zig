@@ -102,7 +102,7 @@ pub extern fn sceNetAdhocctlGetPeerList(length: [*c]c_int, buf: ?*anyopaque) c_i
 pub extern fn sceNetAdhocctlGetPeerInfo(mac: [*c]u8, size: c_int, peerinfo: [*c]struct_SceNetAdhocctlPeerInfo) c_int;
 pub extern fn sceNetAdhocctlScan() c_int;
 pub extern fn sceNetAdhocctlGetScanInfo(length: [*c]c_int, buf: ?*anyopaque) c_int;
-pub const sceNetAdhocctlHandler = ?*const fn (c_int, c_int, ?*anyopaque) callconv(.c) void;
+pub const sceNetAdhocctlHandler = ?*const fn (c_int, c_int, ?*anyopaque) callconv(.C) void;
 pub extern fn sceNetAdhocctlAddHandler(handler: sceNetAdhocctlHandler, unknown: ?*anyopaque) c_int;
 pub extern fn sceNetAdhocctlDelHandler(id: c_int) c_int;
 pub extern fn sceNetAdhocctlGetNameByAddr(mac: [*c]u8, nickname: [*c]u8) c_int;
@@ -144,7 +144,7 @@ pub const struct_pspAdhocPoolStat = extern struct {
 };
 pub extern fn sceNetAdhocMatchingInit(memsize: c_int) c_int;
 pub extern fn sceNetAdhocMatchingTerm() c_int;
-pub const pspAdhocMatchingCallback = ?*const fn (c_int, c_int, [*c]u8, c_int, ?*anyopaque) callconv(.c) void;
+pub const pspAdhocMatchingCallback = ?*const fn (c_int, c_int, [*c]u8, c_int, ?*anyopaque) callconv(.C) void;
 pub extern fn sceNetAdhocMatchingCreate(mode: c_int, maxpeers: c_int, port: c_ushort, bufsize: c_int, hellodelay: c_uint, pingdelay: c_uint, initcount: c_int, msgdelay: c_uint, callback: pspAdhocMatchingCallback) c_int;
 pub extern fn sceNetAdhocMatchingDelete(matchingid: c_int) c_int;
 pub extern fn sceNetAdhocMatchingStart(matchingid: c_int, evthpri: c_int, evthstack: c_int, inthpri: c_int, inthstack: c_int, optlen: c_int, optdata: ?*anyopaque) c_int;
@@ -181,7 +181,7 @@ pub const union_SceNetApctlInfo = extern union {
     startBrowser: c_uint,
     wifisp: c_uint,
 };
-pub const sceNetApctlHandler = ?*const fn (c_int, c_int, c_int, c_int, ?*anyopaque) callconv(.c) void;
+pub const sceNetApctlHandler = ?*const fn (c_int, c_int, c_int, c_int, ?*anyopaque) callconv(.C) void;
 pub extern fn sceNetApctlInit(stackSize: c_int, initPriority: c_int) c_int;
 pub extern fn sceNetApctlTerm() c_int;
 pub extern fn sceNetApctlGetInfo(code: c_int, pInfo: [*c]union_SceNetApctlInfo) c_int;
@@ -267,92 +267,20 @@ pub const struct_sockaddr = extern struct {
 };
 pub const sockaddr = struct_sockaddr;
 
-pub const struct_pollfd = extern struct {
-    fd: c_int,
-    events: c_short,
-    revents: c_short,
-};
-
-pub const nfds_t = c_uint;
-
-pub const struct_io_vec = extern struct {
-    iov_base: *[]u8,
-    iov_len: isize,
-};
-
-pub const struct_msg_hdr = extern struct {
-    name: *[]u8,
-    msg_namelen: socklen_t,
-    msg_iov: *struct_io_vec,
-    msg_iov_len: c_int,
-    msg_control: *[]u8,
-    msg_controllen: socklen_t,
-    msg_flags: c_int,
-};
-
-const PSP_NET_INET_FD_SETSIZE = 256;
-const PSP_NET_INET_NFDBITS = 32;
-const PSP_NET_INET_NFDBITS_SHIFT = 5;
-const PSP_NET_INET_NFDBITS_MASK = 0x1F;
-const PSP_NET_INET_FD_MASK = 0xFF;
-
-pub const SceNetInetFdSet = extern struct {
-    fds_bits: [(PSP_NET_INET_FD_SETSIZE + (PSP_NET_INET_NFDBITS - 1)) / PSP_NET_INET_NFDBITS]u32,
-};
-
-pub fn FD_ZERO(set: *SceNetInetFdSet) void {
-    @memset(set.fds_bits[0..], 0);
-}
-
-pub fn FD_SET(fd: usize, set: *SceNetInetFdSet) void {
-    const value = fd & PSP_NET_INET_FD_MASK;
-    set.fds_bits[value >> PSP_NET_INET_NFDBITS_SHIFT] |= (@as(u32, 1) << @intCast(value));
-}
-
-pub fn FD_CLR(fd: usize, set: *SceNetInetFdSet) void {
-    const value = fd & PSP_NET_INET_FD_MASK;
-    set.fds_bits[value >> PSP_NET_INET_NFDBITS_SHIFT] &= ~(@as(u32, 1) << @intCast(value));
-}
-
-pub fn FD_ISSET(fd: usize, set: *const SceNetInetFdSet) bool {
-    const value = fd & PSP_NET_INET_FD_MASK;
-    return set.fds_bits[value >> PSP_NET_INET_NFDBITS_SHIFT] & (@as(u32, 1) << @intCast(value)) != 0;
-}
-
-pub const inet_timeinterval = extern struct {
-    tv_sec: u32,
-    tv_usec: u32,
-};
-pub const SceNetInetTimeval = inet_timeinterval;
-
 pub extern fn sceNetInetAccept(s: c_int, addr: [*c]struct_sockaddr, addrlen: [*c]socklen_t) c_int;
 pub extern fn sceNetInetBind(s: c_int, my_addr: [*c]const struct_sockaddr, addrlen: socklen_t) c_int;
-pub extern fn sceNetInetClose(s: c_int) c_int;
-// pub extern fn sceNetInetCloseWithRST(params) return;
 pub extern fn sceNetInetConnect(s: c_int, serv_addr: [*c]const struct_sockaddr, addrlen: socklen_t) c_int;
-pub extern fn sceNetInetGetpeername(s: c_int, name: [*c]struct_sockaddr, namelen: [*c]socklen_t) c_int;
-pub extern fn sceNetInetGetsockname(s: c_int, name: [*c]struct_sockaddr, namelen: [*c]socklen_t) c_int;
 pub extern fn sceNetInetGetsockopt(s: c_int, level: c_int, optname: c_int, optval: ?*anyopaque, optlen: [*c]socklen_t) c_int;
 pub extern fn sceNetInetListen(s: c_int, backlog: c_int) c_int;
-pub extern fn sceNetInetPoll(fds: [*c]struct_pollfd, nfds: nfds_t, timeout: c_int) c_int;
 pub extern fn sceNetInetRecv(s: c_int, buf: ?*anyopaque, len: u32, flags: c_int) u32;
-pub extern fn sceNetInetRecvfrom(s: c_int, buf: ?*anyopaque, len: u32, flags: c_int, from: [*c]struct_sockaddr, fromlen: [*c]socklen_t) u32;
-pub extern fn sceNetInetRecvmsg(s: c_int, msg: [*c]struct_msg_hdr, flags: c_int) isize;
-pub extern fn sceNetInetSelect(nfds: c_int, readfds: ?*SceNetInetFdSet, writefds: ?*SceNetInetFdSet, exceptfds: ?*SceNetInetFdSet, timeout: ?*SceNetInetTimeval) c_int;
+pub extern fn sceNetInetRecvfrom(s: c_int, buf: ?*anyopaque, flags: u32, c_int, from: [*c]struct_sockaddr, fromlen: [*c]socklen_t) u32;
 pub extern fn sceNetInetSend(s: c_int, buf: ?*const anyopaque, len: u32, flags: c_int) u32;
 pub extern fn sceNetInetSendto(s: c_int, buf: ?*const anyopaque, len: u32, flags: c_int, to: [*c]const struct_sockaddr, tolen: socklen_t) u32;
-pub extern fn sceNetInetSendmsg(s: c_int, msg: [*c]const struct_msg_hdr, flags: c_int) isize;
 pub extern fn sceNetInetSetsockopt(s: c_int, level: c_int, optname: c_int, optval: ?*const anyopaque, optlen: socklen_t) c_int;
 pub extern fn sceNetInetShutdown(s: c_int, how: c_int) c_int;
 pub extern fn sceNetInetSocket(domain: c_int, type: c_int, protocol: c_int) c_int;
-// pub extern fn sceNetInetSocketAbort(params) return;
+pub extern fn sceNetInetClose(s: c_int) c_int;
 pub extern fn sceNetInetGetErrno() c_int;
-// pub extern fn sceNetInetGetTcpcbstat(params) return;
-// pub extern fn sceNetInetGetUdpcbstat(params) return;
-pub extern fn sceNetInetInetAddr(ip: [*:0]const u8) in_addr_t;
-pub extern fn sceNetInetInetAton(ip: [*:0]const u8, in: [*c]struct_sockaddr) c_int;
-pub extern fn sceNetInetInetNtop(af: c_int, src: ?*const anyopaque, dst: [*c]u8, cnt: socklen_t) ?[*:0]const u8;
-pub extern fn sceNetInetInetPton(af: c_int, src: [*:0]const u8, dst: *anyopaque) c_int;
 
 pub const in_addr_t = u32;
 pub const struct_in_addr = packed struct {

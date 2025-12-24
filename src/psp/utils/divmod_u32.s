@@ -1,4 +1,4 @@
-    .module softfloat
+    .module hardfloat
     .set noreorder
     .set nomacro
 
@@ -16,10 +16,6 @@
 #   v0 = quotient
 
 mips_div_mod_u32:
-    # Emulate TEQ without trap, return 0, 0
-    beq     $a1, $zero, .div_by_zero
-    nop
-
     # Perform unsigned divide
     divu    $a0, $a1        # dividend / divisor
 
@@ -30,13 +26,6 @@ mips_div_mod_u32:
     # Store remainder into *residue_ptr
     sw      $t0, 0($a2)
 
-    jr      $ra
-    nop
-
-.div_by_zero:
-    # Return 0, 0
-    sw      $zero, 0($a2)
-    move    $v0, $zero
     jr      $ra
     nop
 
