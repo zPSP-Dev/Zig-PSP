@@ -2,7 +2,6 @@
 <p align="center">A cross-platform multi-tool for reading and writing PSP SFO files.</p>
 
 ## Why zSFOTool?
-This tool is meant to ship with the [Zig-PSP Toolchain](https://github.com/zPSP-Dev/Zig-PSP).
 
 zSFOTool replaces PSPSDK's `mksfo` tool. In addition to this - it also can be used to read an SFO and display technical data!
 

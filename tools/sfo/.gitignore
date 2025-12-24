@@ -1,12 +1,2 @@
 .zig-cache
 zig-out
-*.o
-*.SFO
-*.sfo
-*.elf
-*.PBP
-*.prx
-*.log
-.DS_STORE
-.DS_Store
-*.json

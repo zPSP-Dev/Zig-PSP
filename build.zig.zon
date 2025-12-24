@@ -9,8 +9,7 @@
             .path = "tools/pbp",
         },
         .zSFOTool = .{
-            .url = "git+https://github.com/zPSP-Dev/zSFOTool.git#cda98b6f5fa970e42eed596c557a8bd328537a14",
-            .hash = "zSFOTool-0.0.0-liqp5RA3AAAxZ09q9C5h5kgBhNq-gC2BpxO6vSlbGI9m",
+            .path = "tools/sfo",
         },
         .libzpsp = .{
             .url = "git+https://github.com/zPSP-Dev/libzpsp#836d9cd94809071996cc788b429961f128de843e",
