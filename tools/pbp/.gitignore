@@ -1,5 +1,2 @@
 .zig-cache
 zig-out
-*.pbp
-out
-.DS_STORE
