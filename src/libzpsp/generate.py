@@ -8,6 +8,8 @@ from dataclasses import dataclass
 from typing import List, Dict, Optional, Tuple
 from contextlib import contextmanager
 
+PSPSDK_COMMIT_SHA = "c993d5a"
+
 @dataclass
 class ImportFunc:
     nid: str
@@ -39,7 +41,8 @@ def clone_repository(repo_url: str, target_dir: str) -> str:
     """Clone the PSPSDK repository."""
     if os.path.exists(target_dir):
         shutil.rmtree(target_dir)
-    subprocess.run(["git", "clone", repo_url, target_dir], check=True)
+    subprocess.run(["git", "clone", "--no-checkout", repo_url, target_dir], check=True)
+    subprocess.run(["git", "checkout", PSPSDK_COMMIT_SHA], check=True, cwd=target_dir)
     return target_dir
 
 def remove_bad_folders(base_dir: str, bad_folders: List[str]):
