@@ -1,5 +1,3 @@
-usingnamespace @import("psp");
-
 pub const time_t = u32;
 const struct_unnamed_5 = extern struct {
     year: u16,
