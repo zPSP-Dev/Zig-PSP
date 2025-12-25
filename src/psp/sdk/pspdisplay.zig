@@ -1,3 +1,5 @@
+const module = @import("psp").sceDisplay;
+
 pub const PspDisplayPixelFormats = enum(c_int) {
     Format565 = 0,
     Format5551 = 1,
@@ -16,97 +18,111 @@ pub const PspDisplayErrorCodes = enum(c_int) {
     Argument = 2147483911,
 };
 
-// Set display mode
-//
-// @param mode - Display mode, normally 0.
-// @param width - Width of screen in pixels.
-// @param height - Height of screen in pixels.
-//
-// @return ???
-pub extern fn sceDisplaySetMode(mode: c_int, width: c_int, height: c_int) c_int;
-pub fn displaySetMode(mode: c_int, width: c_int, height: c_int) void {
-    _ = sceDisplaySetMode(mode, width, height);
+/// Set display mode
+/// @par Example1:
+/// `
+/// int mode = PSP_DISPLAY_MODE_LCD;
+/// int width = 480;
+/// int height = 272;
+/// sceDisplaySetMode(mode, width, height);
+/// `
+/// `mode` - One of ::PspDisplayMode
+/// `width` - Width of screen in pixels.
+/// `height` - Height of screen in pixels.
+/// Returns when error, a negative value is returned.
+pub fn sceDisplaySetMode(mode: c_int, width: c_int, height: c_int) c_int {
+    return module.sceDisplaySetMode(mode, width, height);
 }
 
-// Get display mode
-//
-// @param pmode - Pointer to an integer to receive the current mode.
-// @param pwidth - Pointer to an integer to receive the current width.
-// @param pheight - Pointer to an integer to receive the current height,
-//
-// @return 0 on success
-pub extern fn sceDisplayGetMode(pmode: *c_int, pwidth: *c_int, pheight: *c_int) c_int;
-pub fn displayGetMode(pmode: *c_int, pwidth: *c_int, pheight: *c_int) bool {
-    const res = sceDisplayGetMode(pmode, pwidth, pheight);
-    return res == 0;
+/// Get display mode
+/// `pmode` - Pointer to an integer to receive the current mode.
+/// `pwidth` - Pointer to an integer to receive the current width.
+/// `pheight` - Pointer to an integer to receive the current height,
+/// Returns 0 on success
+pub fn sceDisplayGetMode(pmode: [*c]c_int, pwidth: [*c]c_int, pheight: [*c]c_int) c_int {
+    return module.sceDisplayGetMode(pmode, pwidth, pheight);
 }
 
-// Display set framebuf
-//
-// @param topaddr - address of start of framebuffer
-// @param bufferwidth - buffer width (must be power of 2)
-// @param pixelformat - One of ::PspDisplayPixelFormats.
-// @param sync - One of ::PspDisplaySetBufSync
-//
-// @return 0 on success
-pub extern fn sceDisplaySetFrameBuf(topaddr: ?*anyopaque, bufferwidth: c_int, pixelformat: c_int, sync: c_int) c_int;
-pub fn displaySetFrameBuf(topaddr: ?*anyopaque, bufferwidth: c_int, pixelformat: c_int, sync: c_int) bool {
-    const res = sceDisplaySetFrameBuf(topaddr, bufferwidth, pixelformat, sync);
-    return res;
+/// Get number of frames per second
+pub fn sceDisplayGetFramePerSec() f32 {
+    return module.sceDisplayGetFramePerSec();
 }
 
-// Get Display Framebuffer information
-//
-// @param topaddr - pointer to void* to receive address of start of framebuffer
-// @param bufferwidth - pointer to int to receive buffer width (must be power of 2)
-// @param pixelformat - pointer to int to receive one of ::PspDisplayPixelFormats.
-// @param sync - One of ::PspDisplaySetBufSync
-//
-// @return 0 on success
-pub extern fn sceDisplayGetFrameBuf(topaddr: **anyopaque, bufferwidth: *c_int, pixelformat: *c_int, sync: c_int) c_int;
-pub fn displayGetFrameBuf(topaddr: **anyopaque, bufferwidth: *c_int, pixelformat: *c_int, sync: c_int) bool {
-    const res = sceDisplayGetFrameBuf(topaddr, bufferwidth, pixelformat, sync);
-    return res == 0;
+pub fn sceDisplaySetHoldMode() void {
+    module.sceDisplaySetHoldMode();
 }
 
-//Number of vertical blank pulses up to now
-pub extern fn sceDisplayGetVcount() c_uint;
-
-//Wait for vertical blank start
-pub extern fn sceDisplayWaitVblankStart() c_int;
-pub fn displayWaitVblankStart() void {
-    _ = sceDisplayWaitVblankStart();
+pub fn sceDisplaySetResumeMode() void {
+    module.sceDisplaySetResumeMode();
 }
 
-//Wait for vertical blank start with callback
-pub extern fn sceDisplayWaitVblankStartCB() c_int;
-pub fn displayWaitVblankStartCB() void {
-    _ = sceDisplayWaitVblankStartCB();
+/// Display set framebuf
+/// `topaddr` - address of start of framebuffer
+/// `bufferwidth` - buffer width (must be power of 2)
+/// `pixelformat` - One of ::PspDisplayPixelFormats.
+/// `sync` - One of ::PspDisplaySetBufSync
+/// Returns 0 on success
+pub fn sceDisplaySetFrameBuf(topaddr: ?*anyopaque, bufferwidth: c_int, pixelformat: PspDisplayPixelFormats, sync: PspDisplaySetBufSync) c_int {
+    return module.sceDisplaySetFrameBuf(topaddr, bufferwidth, @intFromEnum(pixelformat), @intFromEnum(sync));
 }
 
-//Wait for vertical blank
-pub extern fn sceDisplayWaitVblank() c_int;
-pub fn displayWaitVblank() void {
-    _ = sceDisplayWaitVblank();
+/// Get Display Framebuffer information
+/// `topaddr` - pointer to void* to receive address of start of framebuffer
+/// `bufferwidth` - pointer to int to receive buffer width (must be power of 2)
+/// `pixelformat` - pointer to int to receive one of ::PspDisplayPixelFormats.
+/// `sync` - One of ::PspDisplaySetBufSync
+/// Returns 0 on success
+pub fn sceDisplayGetFrameBuf(topaddr: ?*anyopaque, bufferwidth: [*c]c_int, pixelformat: [*c]PspDisplayPixelFormats, sync: PspDisplaySetBufSync) c_int {
+    return module.sceDisplayGetFrameBuf(topaddr, bufferwidth, pixelformat, sync);
 }
 
-//Wait for vertical blank with callback
-pub extern fn sceDisplayWaitVblankCB() c_int;
-pub fn displayWaitVblankCB() void {
-    _ = sceDisplayWaitVblankCB();
+/// Get whether or not frame buffer is being displayed
+pub fn sceDisplayIsForeground() c_int {
+    return module.sceDisplayIsForeground();
 }
 
-//Get accumlated HSYNC count
-pub extern fn sceDisplayGetAccumulatedHcount() c_int;
+pub fn sceDisplay_31C4BAA8() void {
+    return module.sceDisplay_31C4BAA8();
+}
 
-//Get current HSYNC count
-pub extern fn sceDisplayGetCurrentHcount() c_int;
+/// Number of vertical blank pulses up to now
+pub fn sceDisplayGetVcount() c_uint {
+    return module.sceDisplayGetVcount();
+}
 
-//Get number of frames per second
-pub extern fn sceDisplayGetFramePerSec() f32;
+/// Test whether VBLANK is active
+pub fn sceDisplayIsVblank() c_int {
+    return module.sceDisplayIsVblank();
+}
 
-//Get whether or not frame buffer is being displayed
-pub extern fn sceDisplayIsForeground() c_int;
+/// Wait for vertical blank
+/// Wait for vertical blank start with callback
+/// Wait for vertical blank start
+pub fn sceDisplayWaitVblank() c_int {
+    return module.sceDisplayWaitVblank();
+}
 
-//Test whether VBLANK is active
-pub extern fn sceDisplayIsVblank() c_int;
+/// Wait for vertical blank with callback
+pub fn sceDisplayWaitVblankCB() c_int {
+    return module.sceDisplayWaitVblankCB();
+}
+
+/// Wait for vertical blank start
+pub fn sceDisplayWaitVblankStart() c_int {
+    return module.sceDisplayWaitVblankStart();
+}
+
+/// Wait for vertical blank start with callback
+pub fn sceDisplayWaitVblankStartCB() c_int {
+    return module.sceDisplayWaitVblankStartCB();
+}
+
+/// Get current HSYNC count
+pub fn sceDisplayGetCurrentHcount() c_int {
+    return module.sceDisplayGetCurrentHcount();
+}
+
+/// Get accumlated HSYNC count
+pub fn sceDisplayGetAccumulatedHcount() c_int {
+    return module.sceDisplayGetAccumulatedHcount();
+}

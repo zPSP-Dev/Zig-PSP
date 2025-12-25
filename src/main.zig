@@ -89,7 +89,7 @@ pub fn main() !void {
 
     gu.guFinish();
     gu.guSync(.Finish, .Wait);
-    psp.display.displayWaitVblankStart();
+    _ = psp.display.sceDisplayWaitVblankStart();
     gu.sceGuDisplay(true);
 
     var i: u32 = 0;
@@ -127,7 +127,7 @@ pub fn main() !void {
 
         gu.guFinish();
         gu.guSync(.Finish, .Wait);
-        psp.display.displayWaitVblankStart();
+        _ = psp.display.sceDisplayWaitVblankStart();
         gu.guSwapBuffers();
     }
 }
