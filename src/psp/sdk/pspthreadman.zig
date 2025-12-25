@@ -1,14 +1,10 @@
-const psptypes = @import("psp");
-const SceUID = psptypes.SceUID;
-const SceSize = psptypes.SceSize;
-const SceVoid = psptypes.SceVoid;
-const SceUInt = psptypes.SceUInt;
-const SceInt32 = psptypes.SceInt32;
-const SceInt64 = psptypes.SceInt64;
-const SceUInt32 = psptypes.SceUInt32;
-const SceShort16 = psptypes.SceShort16;
-const SceUChar = psptypes.SceUChar;
-const SceUChar8 = psptypes.SceUChar8;
+const libzpsp = @import("psp");
+const SceUID = libzpsp.SceUID;
+const SceSize = libzpsp.SceSize;
+const SceUInt = libzpsp.SceUInt;
+const SceInt64 = libzpsp.SceInt64;
+const SceUInt32 = libzpsp.SceUInt32;
+const SceUChar = libzpsp.SceUChar;
 
 pub const struct_SceKernelSysClock = extern struct {
     low: SceUInt32,
@@ -374,11 +370,8 @@ pub const enum_ThreadEvents = enum(c_int) {
 pub extern fn sceKernelRegisterThreadEventHandler(name: [*c]const u8, threadID: SceUID, mask: c_int, handler: SceKernelThreadEventHandler, common: ?*anyopaque) SceUID;
 pub extern fn sceKernelReleaseThreadEventHandler(uid: SceUID) c_int;
 pub extern fn sceKernelReferThreadEventHandlerStatus(uid: SceUID, info: [*c]struct_SceKernelThreadEventHandlerInfo) c_int;
-pub extern fn sceKernelReferThreadProfiler() [*c]psptypes.PspDebugProfilerRegs;
-pub extern fn sceKernelReferGlobalProfiler() [*c]psptypes.PspDebugProfilerRegs;
 pub extern fn sceKernelCreateThread(name: [*c]const u8, entry: SceKernelThreadEntry, initPriority: c_int, stackSize: c_int, attr: SceUInt, option: [*c]SceKernelThreadOptParam) SceUID;
 
-pub const PspModuleInfoAttr = psptypes.enum_PspModuleInfoAttr;
 pub const PspThreadAttributes = enum_PspThreadAttributes;
 pub const PspThreadStatus = enum_PspThreadStatus;
 pub const PspEventFlagAttributes = enum_PspEventFlagAttributes;

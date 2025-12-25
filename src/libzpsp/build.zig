@@ -5,7 +5,7 @@ pub fn build(b: *std.Build) void {
     const optimize = b.standardOptimizeOption(.{});
 
     const lib_mod = b.createModule(.{
-        .root_source_file = b.path("src/root.zig"),
+        .root_source_file = b.path("src/libzpsp.zig"),
         .target = target,
         .optimize = optimize,
     });
@@ -16,8 +16,5 @@ pub fn build(b: *std.Build) void {
         .root_module = lib_mod,
     });
 
-    _ = b.addModule("libzpsp_options", .{
-        .root_source_file = b.path("src/options.zig"),
-    });
     b.installArtifact(lib);
 }
