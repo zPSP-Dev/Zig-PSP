@@ -13,7 +13,7 @@ pub usingnamespace @import("sdk/pspctrl.zig");
 pub usingnamespace @import("sdk/pspdisplay.zig");
 pub usingnamespace @import("sdk/pspdmac.zig");
 pub usingnamespace @import("sdk/pspge.zig");
-pub usingnamespace @import("sdk/pspgu.zig");
+pub const gu = @import("sdk/pspgu.zig");
 pub usingnamespace @import("sdk/pspgum.zig");
 pub usingnamespace @import("sdk/psphprm.zig");
 pub usingnamespace @import("sdk/psphttp.zig");

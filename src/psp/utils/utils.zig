@@ -1,12 +1,10 @@
 const libzpsp = @import("psp");
-const psp = @import("psp");
-const psptypes = @import("psp");
 const pspthreadman = @import("../sdk/pspthreadman.zig");
 
 var requestedExit: bool = false;
 
 //Check if exit is requested
-pub fn isRunning() bool {
+pub fn isExitRequested() bool {
     return requestedExit;
 }
 
@@ -21,7 +19,7 @@ export fn exitCB(arg1: c_int, arg2: c_int, common: ?*anyopaque) c_int {
 }
 
 //Thread for home button exit thread.
-export fn cbThread(args: psptypes.SceSize, argp: ?*anyopaque) c_int {
+export fn cbThread(args: libzpsp.types.SceSize, argp: ?*anyopaque) c_int {
     _ = args;
     _ = argp;
     var cbID: i32 = -1;

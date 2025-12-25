@@ -1,5 +1,7 @@
 //A quick graphics example
 const psp = @import("psp/pspsdk.zig");
+const gu = psp.gu;
+
 pub const panic = psp.debug.panic;
 
 comptime {
@@ -60,74 +62,72 @@ pub fn main() !void {
     psp.utils.enableHBCB();
     psp.debug.screenInit();
 
-    const fbp0 = psp.vram.allocVramRelative(psp.SCR_BUF_WIDTH, psp.SCREEN_HEIGHT, psp.GuPixelMode.Psm8888);
-    const fbp1 = psp.vram.allocVramRelative(psp.SCR_BUF_WIDTH, psp.SCREEN_HEIGHT, psp.GuPixelMode.Psm8888);
-    const zbp = psp.vram.allocVramRelative(psp.SCR_BUF_WIDTH, psp.SCREEN_HEIGHT, psp.GuPixelMode.Psm4444);
+    const fbp0 = psp.vram.allocVramRelative(psp.SCR_BUF_WIDTH, psp.SCREEN_HEIGHT, .Psm8888);
+    const fbp1 = psp.vram.allocVramRelative(psp.SCR_BUF_WIDTH, psp.SCREEN_HEIGHT, .Psm8888);
+    const zbp = psp.vram.allocVramRelative(psp.SCR_BUF_WIDTH, psp.SCREEN_HEIGHT, .Psm4444);
 
-    psp.sceGuInit();
-    psp.sceGuStart(psp.GuContextType.Direct, @as(*anyopaque, @ptrCast(&display_list)));
-    psp.sceGuDrawBuffer(psp.GuPixelMode.Psm8888, fbp0, psp.SCR_BUF_WIDTH);
-    psp.sceGuDispBuffer(psp.SCREEN_WIDTH, psp.SCREEN_HEIGHT, fbp1, psp.SCR_BUF_WIDTH);
-    psp.sceGuDepthBuffer(zbp, psp.SCR_BUF_WIDTH);
-    psp.sceGuOffset(2048 - (psp.SCREEN_WIDTH / 2), 2048 - (psp.SCREEN_HEIGHT / 2));
-    psp.sceGuViewport(2048, 2048, psp.SCREEN_WIDTH, psp.SCREEN_HEIGHT);
-    psp.sceGuDepthRange(65535, 0);
-    psp.sceGuScissor(0, 0, psp.SCREEN_WIDTH, psp.SCREEN_HEIGHT);
-    psp.sceGuEnable(psp.GuState.ScissorTest);
-    psp.sceGuDepthFunc(psp.DepthFunc.GreaterOrEqual);
-    psp.sceGuEnable(psp.GuState.DepthTest);
-    psp.sceGuShadeModel(psp.ShadeModel.Smooth);
-    psp.sceGuFrontFace(psp.FrontFaceDirection.Clockwise);
-    psp.sceGuEnable(psp.GuState.CullFace);
-    psp.sceGuDisable(psp.GuState.ClipPlanes);
-    psp.sceGuEnable(psp.GuState.Texture2D);
+    gu.sceGuInit();
+    gu.sceGuStart(.Direct, @as(*anyopaque, @ptrCast(&display_list)));
+    gu.sceGuDrawBuffer(.Psm8888, fbp0, psp.SCR_BUF_WIDTH);
+    gu.sceGuDispBuffer(psp.SCREEN_WIDTH, psp.SCREEN_HEIGHT, fbp1, psp.SCR_BUF_WIDTH);
+    gu.sceGuDepthBuffer(zbp, psp.SCR_BUF_WIDTH);
+    gu.sceGuOffset(2048 - (psp.SCREEN_WIDTH / 2), 2048 - (psp.SCREEN_HEIGHT / 2));
+    gu.sceGuViewport(2048, 2048, psp.SCREEN_WIDTH, psp.SCREEN_HEIGHT);
+    gu.sceGuDepthRange(65535, 0);
+    gu.sceGuScissor(0, 0, psp.SCREEN_WIDTH, psp.SCREEN_HEIGHT);
+    gu.sceGuEnable(.ScissorTest);
+    gu.sceGuDepthFunc(.GreaterOrEqual);
+    gu.sceGuEnable(.DepthTest);
+    gu.sceGuShadeModel(.Smooth);
+    gu.sceGuFrontFace(.Clockwise);
+    gu.sceGuEnable(.CullFace);
+    gu.sceGuDisable(.ClipPlanes);
+    gu.sceGuEnable(.Texture2D);
 
-    psp.guFinish();
-    psp.guSync(psp.GuSyncMode.Finish, psp.GuSyncBehavior.Wait);
+    gu.guFinish();
+    gu.guSync(.Finish, .Wait);
     psp.displayWaitVblankStart();
-    psp.sceGuDisplay(true);
+    gu.sceGuDisplay(true);
 
     var i: u32 = 0;
     while (true) : (i += 1) {
-        psp.sceGuStart(psp.GuContextType.Direct, @as(*anyopaque, @ptrCast(&display_list)));
+        gu.sceGuStart(.Direct, @as(*anyopaque, @ptrCast(&display_list)));
 
-        psp.sceGuClearColor(psp.rgba(32, 32, 32, 0xFF));
-        psp.sceGuClearDepth(0);
-        psp.sceGuClear(@intFromEnum(psp.ClearBitFlags.ColorBuffer) |
-            @intFromEnum(psp.ClearBitFlags.DepthBuffer));
+        gu.sceGuClearColor(gu.rgba(32, 32, 32, 0xFF));
+        gu.sceGuClearDepth(0);
+        gu.sceGuClear(@intFromEnum(gu.types.ClearBitFlags.ColorBuffer) |
+            @intFromEnum(gu.types.ClearBitFlags.DepthBuffer));
 
-        psp.sceGumMatrixMode(psp.MatrixMode.Projection);
+        psp.sceGumMatrixMode(.Projection);
         psp.sceGumLoadIdentity();
         psp.sceGumPerspective(90.0, 16.0 / 9.0, 0.2, 10.0);
 
-        psp.sceGumMatrixMode(psp.MatrixMode.View);
+        psp.sceGumMatrixMode(.View);
         psp.sceGumLoadIdentity();
 
-        psp.sceGumMatrixMode(psp.MatrixMode.Model);
+        psp.sceGumMatrixMode(.Model);
         psp.sceGumLoadIdentity();
 
         //Rotate
-        var pos: psp.ScePspFVector3 = psp.ScePspFVector3{ .x = 0, .y = 0, .z = -2.5 };
-        var rot: psp.ScePspFVector3 = psp.ScePspFVector3{ .x = @as(f32, @floatFromInt(i)) * 0.79 * (3.14159 / 180.0), .y = @as(f32, @floatFromInt(i)) * 0.98 * (3.14159 / 180.0), .z = @as(f32, @floatFromInt(i)) * 1.32 * (3.14159 / 180.0) };
-        psp.sceGumTranslate(&pos);
-        psp.sceGumRotateXYZ(&rot);
+        psp.sceGumTranslate(&.{ .x = 0, .y = 0, .z = -2.5 });
+        psp.sceGumRotateXYZ(&.{ .x = @as(f32, @floatFromInt(i)) * 0.79 * (3.14159 / 180.0), .y = @as(f32, @floatFromInt(i)) * 0.98 * (3.14159 / 180.0), .z = @as(f32, @floatFromInt(i)) * 1.32 * (3.14159 / 180.0) });
 
-        psp.sceGuTexMode(psp.GuPixelMode.Psm8888, 0, 0, 0);
-        psp.sceGuTexImage(0, 128, 128, 128, &logo_start);
-        psp.sceGuTexFunc(psp.TextureEffect.Replace, psp.TextureColorComponent.Rgba);
-        psp.sceGuTexFilter(psp.TextureFilter.Linear, psp.TextureFilter.Linear);
-        psp.sceGuTexScale(1.0, 1.0);
-        psp.sceGuTexOffset(0.0, 0.0);
-        psp.sceGuAmbientColor(0xffffffff);
+        gu.sceGuTexMode(.Psm8888, 0, 0, 0);
+        gu.sceGuTexImage(0, 128, 128, 128, &logo_start);
+        gu.sceGuTexFunc(.Replace, .Rgba);
+        gu.sceGuTexFilter(.Linear, .Linear);
+        gu.sceGuTexScale(1.0, 1.0);
+        gu.sceGuTexOffset(0.0, 0.0);
+        gu.sceGuAmbientColor(0xffffffff);
 
         // draw cube
 
-        psp.sceGumDrawArray(psp.GuPrimitive.Triangles, @intFromEnum(psp.VertexTypeFlags.Texture32Bitf) | @intFromEnum(psp.VertexTypeFlags.Color8888) | @intFromEnum(psp.VertexTypeFlags.Vertex32Bitf) | @intFromEnum(psp.VertexTypeFlags.Transform3D), 12 * 3, null, @as(*anyopaque, @ptrCast(&vertices)));
+        psp.sceGumDrawArray(.Triangles, @intFromEnum(gu.types.VertexTypeFlags.Texture32Bitf) | @intFromEnum(gu.types.VertexTypeFlags.Color8888) | @intFromEnum(gu.types.VertexTypeFlags.Vertex32Bitf) | @intFromEnum(gu.types.VertexTypeFlags.Transform3D), 12 * 3, null, @as(*anyopaque, @ptrCast(&vertices)));
 
-        psp.guFinish();
-        psp.guSync(psp.GuSyncMode.Finish, psp.GuSyncBehavior.Wait);
+        gu.guFinish();
+        gu.guSync(.Finish, .Wait);
         psp.displayWaitVblankStart();
-        psp.guSwapBuffers();
+        gu.guSwapBuffers();
     }
 }
 
