@@ -1,4 +1,6 @@
 const libzpsp = @import("psp");
+const libzpsp_threadman = libzpsp.ThreadManForUser;
+const libzpsp_loadexec = libzpsp.LoadExecForUser;
 
 const debug = @import("debug.zig");
 
@@ -7,10 +9,10 @@ const root = @import("root");
 //If there's an issue this is the internal exit (wait 10 seconds and exit).
 pub fn exitErr() void {
     //Hang for 10 seconds for error reporting
-    const stat = libzpsp.threadman.sceKernelDelayThread(10 * 1000 * 1000);
+    const stat = libzpsp_threadman.sceKernelDelayThread(10 * 1000 * 1000);
     _ = stat;
     //Exit out.
-    libzpsp.loadexec.sceKernelExitGame();
+    libzpsp_loadexec.sceKernelExitGame();
 }
 
 // const has_std_os = if (@hasDecl(root, "os")) true else false;
@@ -61,7 +63,7 @@ pub fn _module_main_thread(argc: libzpsp.types.SceSize, _: ?*anyopaque) callconv
     }
 
     if (debug.exitOnEnd) {
-        libzpsp.loadexec.sceKernelExitGame();
+        libzpsp_loadexec.sceKernelExitGame();
     }
     return 0;
 }
@@ -191,6 +193,6 @@ pub fn module_info(comptime name: []const u8, comptime attrib: u16, comptime maj
 // const pspos = @import("../pspos.zig");
 //Entry point - launches main through the thread above.
 pub export fn module_start(argc: c_uint, argv: ?*anyopaque) c_int {
-    const thid = libzpsp.threadman.sceKernelCreateThread(@ptrCast("zig_user_main"), @bitCast(@intFromPtr(&_module_main_thread)), 0x20, 256 * 1024, 0b10000000000000000100000000000000, 0);
-    return libzpsp.threadman.sceKernelStartThread(thid, argc, argv);
+    const thid = libzpsp_threadman.sceKernelCreateThread(@ptrCast("zig_user_main"), @bitCast(@intFromPtr(&_module_main_thread)), 0x20, 256 * 1024, 0b10000000000000000100000000000000, 0);
+    return libzpsp_threadman.sceKernelStartThread(thid, argc, argv);
 }

@@ -46,14 +46,14 @@ pub extern fn sceNetGetLocalEtherAddr(mac: [*c]u8) callconv(.C) c_int;
 pub extern fn sceNetGetMallocStat(stat: [*c]c_int) callconv(.C) c_int;
 
 comptime {
-    asm(macro.import_module_start("sceNet", "0x00090000", "8"));
-    asm(macro.import_function("sceNet", "0x39AF39A6", "sceNetInit_stub"));
-    asm(macro.generic_abi_wrapper("sceNetInit", 5));
-    asm(macro.import_function("sceNet", "0x281928A9", "sceNetTerm"));
-    asm(macro.import_function("sceNet", "0x50647530", "sceNetFreeThreadinfo"));
-    asm(macro.import_function("sceNet", "0xAD6844C6", "sceNetThreadAbort"));
-    asm(macro.import_function("sceNet", "0x89360950", "sceNetEtherNtostr"));
-    asm(macro.import_function("sceNet", "0xD27961C9", "sceNetEtherStrton"));
-    asm(macro.import_function("sceNet", "0x0BF0A3AE", "sceNetGetLocalEtherAddr"));
-    asm(macro.import_function("sceNet", "0xCC393E48", "sceNetGetMallocStat"));
+    asm (macro.import_module_start("sceNet", "0x00090000", "8"));
+    asm (macro.import_function("sceNet", "0x39AF39A6", "sceNetInit_stub"));
+    asm (macro.generic_abi_wrapper("sceNetInit", 5));
+    asm (macro.import_function("sceNet", "0x281928A9", "sceNetTerm"));
+    asm (macro.import_function("sceNet", "0x50647530", "sceNetFreeThreadinfo"));
+    asm (macro.import_function("sceNet", "0xAD6844C6", "sceNetThreadAbort"));
+    asm (macro.import_function("sceNet", "0x89360950", "sceNetEtherNtostr"));
+    asm (macro.import_function("sceNet", "0xD27961C9", "sceNetEtherStrton"));
+    asm (macro.import_function("sceNet", "0x0BF0A3AE", "sceNetGetLocalEtherAddr"));
+    asm (macro.import_function("sceNet", "0xCC393E48", "sceNetGetMallocStat"));
 }

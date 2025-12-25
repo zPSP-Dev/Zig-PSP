@@ -112,23 +112,23 @@ pub extern fn sceNetAdhocMatchingSendData(matchingid: c_int, mac: [*c]u8, datale
 pub extern fn sceNetAdhocMatchingAbortSendData(matchingid: c_int, mac: [*c]u8) callconv(.C) c_int;
 
 comptime {
-    asm(macro.import_module_start("sceNetAdhocMatching", "0x00090000", "16"));
-    asm(macro.import_function("sceNetAdhocMatching", "0x2A2A1E07", "sceNetAdhocMatchingInit"));
-    asm(macro.import_function("sceNetAdhocMatching", "0x7945ECDA", "sceNetAdhocMatchingTerm"));
-    asm(macro.import_function("sceNetAdhocMatching", "0xCA5EDA6F", "sceNetAdhocMatchingCreate_stub"));
-    asm(macro.generic_abi_wrapper("sceNetAdhocMatchingCreate", 9));
-    asm(macro.import_function("sceNetAdhocMatching", "0x93EF3843", "sceNetAdhocMatchingStart_stub"));
-    asm(macro.generic_abi_wrapper("sceNetAdhocMatchingStart", 7));
-    asm(macro.import_function("sceNetAdhocMatching", "0x32B156B3", "sceNetAdhocMatchingStop"));
-    asm(macro.import_function("sceNetAdhocMatching", "0xF16EAF4F", "sceNetAdhocMatchingDelete"));
-    asm(macro.import_function("sceNetAdhocMatching", "0x5E3D4B79", "sceNetAdhocMatchingSelectTarget"));
-    asm(macro.import_function("sceNetAdhocMatching", "0xEA3C6108", "sceNetAdhocMatchingCancelTarget"));
-    asm(macro.import_function("sceNetAdhocMatching", "0xB58E61B7", "sceNetAdhocMatchingSetHelloOpt"));
-    asm(macro.import_function("sceNetAdhocMatching", "0xB5D96C2A", "sceNetAdhocMatchingGetHelloOpt"));
-    asm(macro.import_function("sceNetAdhocMatching", "0xC58BCD9E", "sceNetAdhocMatchingGetMembers"));
-    asm(macro.import_function("sceNetAdhocMatching", "0x40F8F435", "sceNetAdhocMatchingGetPoolMaxAlloc"));
-    asm(macro.import_function("sceNetAdhocMatching", "0x8F58BEDF", "sceNetAdhocMatchingCancelTargetWithOpt"));
-    asm(macro.import_function("sceNetAdhocMatching", "0x9C5CFB7D", "sceNetAdhocMatchingGetPoolStat"));
-    asm(macro.import_function("sceNetAdhocMatching", "0xF79472D7", "sceNetAdhocMatchingSendData"));
-    asm(macro.import_function("sceNetAdhocMatching", "0xEC19337D", "sceNetAdhocMatchingAbortSendData"));
+    asm (macro.import_module_start("sceNetAdhocMatching", "0x00090000", "16"));
+    asm (macro.import_function("sceNetAdhocMatching", "0x2A2A1E07", "sceNetAdhocMatchingInit"));
+    asm (macro.import_function("sceNetAdhocMatching", "0x7945ECDA", "sceNetAdhocMatchingTerm"));
+    asm (macro.import_function("sceNetAdhocMatching", "0xCA5EDA6F", "sceNetAdhocMatchingCreate_stub"));
+    asm (macro.generic_abi_wrapper("sceNetAdhocMatchingCreate", 9));
+    asm (macro.import_function("sceNetAdhocMatching", "0x93EF3843", "sceNetAdhocMatchingStart_stub"));
+    asm (macro.generic_abi_wrapper("sceNetAdhocMatchingStart", 7));
+    asm (macro.import_function("sceNetAdhocMatching", "0x32B156B3", "sceNetAdhocMatchingStop"));
+    asm (macro.import_function("sceNetAdhocMatching", "0xF16EAF4F", "sceNetAdhocMatchingDelete"));
+    asm (macro.import_function("sceNetAdhocMatching", "0x5E3D4B79", "sceNetAdhocMatchingSelectTarget"));
+    asm (macro.import_function("sceNetAdhocMatching", "0xEA3C6108", "sceNetAdhocMatchingCancelTarget"));
+    asm (macro.import_function("sceNetAdhocMatching", "0xB58E61B7", "sceNetAdhocMatchingSetHelloOpt"));
+    asm (macro.import_function("sceNetAdhocMatching", "0xB5D96C2A", "sceNetAdhocMatchingGetHelloOpt"));
+    asm (macro.import_function("sceNetAdhocMatching", "0xC58BCD9E", "sceNetAdhocMatchingGetMembers"));
+    asm (macro.import_function("sceNetAdhocMatching", "0x40F8F435", "sceNetAdhocMatchingGetPoolMaxAlloc"));
+    asm (macro.import_function("sceNetAdhocMatching", "0x8F58BEDF", "sceNetAdhocMatchingCancelTargetWithOpt"));
+    asm (macro.import_function("sceNetAdhocMatching", "0x9C5CFB7D", "sceNetAdhocMatchingGetPoolStat"));
+    asm (macro.import_function("sceNetAdhocMatching", "0xF79472D7", "sceNetAdhocMatchingSendData"));
+    asm (macro.import_function("sceNetAdhocMatching", "0xEC19337D", "sceNetAdhocMatchingAbortSendData"));
 }

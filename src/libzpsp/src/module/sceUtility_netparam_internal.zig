@@ -27,9 +27,9 @@ pub extern fn sceUtilityCopyNetParam(src: c_int, dest: c_int) callconv(.C) c_int
 pub extern fn sceUtilitySetNetParam(param: c_int, val: ?*const anyopaque) callconv(.C) c_int;
 
 comptime {
-    asm(macro.import_module_start("sceUtility_netparam_internal", "0x40010000", "4"));
-    asm(macro.import_function("sceUtility_netparam_internal", "0x072DEBF2", "sceUtilityCreateNetParam"));
-    asm(macro.import_function("sceUtility_netparam_internal", "0x9CE50172", "sceUtilityDeleteNetParam"));
-    asm(macro.import_function("sceUtility_netparam_internal", "0xFB0C4840", "sceUtilityCopyNetParam"));
-    asm(macro.import_function("sceUtility_netparam_internal", "0xFC4516F3", "sceUtilitySetNetParam"));
+    asm (macro.import_module_start("sceUtility_netparam_internal", "0x40010000", "4"));
+    asm (macro.import_function("sceUtility_netparam_internal", "0x072DEBF2", "sceUtilityCreateNetParam"));
+    asm (macro.import_function("sceUtility_netparam_internal", "0x9CE50172", "sceUtilityDeleteNetParam"));
+    asm (macro.import_function("sceUtility_netparam_internal", "0xFB0C4840", "sceUtilityCopyNetParam"));
+    asm (macro.import_function("sceUtility_netparam_internal", "0xFC4516F3", "sceUtilitySetNetParam"));
 }

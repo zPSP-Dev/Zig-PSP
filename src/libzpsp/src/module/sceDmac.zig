@@ -12,7 +12,7 @@ pub extern fn sceDmacMemcpy(dst: ?*anyopaque, src: ?*const anyopaque, n: types.S
 pub extern fn sceDmacTryMemcpy(dst: ?*anyopaque, src: ?*const anyopaque, n: types.SceSize) callconv(.C) c_int;
 
 comptime {
-    asm(macro.import_module_start("sceDmac", "0x40010011", "2"));
-    asm(macro.import_function("sceDmac", "0x617F3FE6", "sceDmacMemcpy"));
-    asm(macro.import_function("sceDmac", "0xD97F94D8", "sceDmacTryMemcpy"));
+    asm (macro.import_module_start("sceDmac", "0x40010011", "2"));
+    asm (macro.import_function("sceDmac", "0x617F3FE6", "sceDmacMemcpy"));
+    asm (macro.import_function("sceDmac", "0xD97F94D8", "sceDmacTryMemcpy"));
 }

@@ -29,11 +29,11 @@ pub extern fn sceKernelVolatileMemTryLock(unk: c_int, ptr: ?*anyopaque, size: [*
 pub extern fn sceKernelVolatileMemUnlock(unk: c_int) callconv(.C) c_int;
 
 comptime {
-    asm(macro.import_module_start("sceSuspendForUser", "0x40000000", "6"));
-    asm(macro.import_function("sceSuspendForUser", "0xEADB1BD7", "sceKernelPowerLock"));
-    asm(macro.import_function("sceSuspendForUser", "0x3AEE7261", "sceKernelPowerUnlock"));
-    asm(macro.import_function("sceSuspendForUser", "0x090CCB3F", "sceKernelPowerTick"));
-    asm(macro.import_function("sceSuspendForUser", "0x3E0271D3", "sceKernelVolatileMemLock"));
-    asm(macro.import_function("sceSuspendForUser", "0xA14F40B2", "sceKernelVolatileMemTryLock"));
-    asm(macro.import_function("sceSuspendForUser", "0xA569E425", "sceKernelVolatileMemUnlock"));
+    asm (macro.import_module_start("sceSuspendForUser", "0x40000000", "6"));
+    asm (macro.import_function("sceSuspendForUser", "0xEADB1BD7", "sceKernelPowerLock"));
+    asm (macro.import_function("sceSuspendForUser", "0x3AEE7261", "sceKernelPowerUnlock"));
+    asm (macro.import_function("sceSuspendForUser", "0x090CCB3F", "sceKernelPowerTick"));
+    asm (macro.import_function("sceSuspendForUser", "0x3E0271D3", "sceKernelVolatileMemLock"));
+    asm (macro.import_function("sceSuspendForUser", "0xA14F40B2", "sceKernelVolatileMemTryLock"));
+    asm (macro.import_function("sceSuspendForUser", "0xA569E425", "sceKernelVolatileMemUnlock"));
 }

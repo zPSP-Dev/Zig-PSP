@@ -1,5 +1,7 @@
 //A quick graphics example
-const psp = @import("psp/pspsdk.zig").sdk;
+const psp = @import("psp/pspsdk.zig");
+const gu = psp.gu;
+const gum = psp.gum;
 
 comptime {
     asm (psp.extra.module.module_info("Zig PSP App", 0, 1, 0));
@@ -59,9 +61,6 @@ pub fn main() !void {
     const SCREEN_WIDTH = psp.extra.constants.SCREEN_WIDTH;
     const SCREEN_HEIGHT = psp.extra.constants.SCREEN_HEIGHT;
     const SCR_BUF_WIDTH = psp.extra.constants.SCR_BUF_WIDTH;
-
-    const gu = psp.gu;
-    const gum = psp.gum;
 
     psp.extra.utils.enableHBCB();
     psp.extra.debug.screenInit();

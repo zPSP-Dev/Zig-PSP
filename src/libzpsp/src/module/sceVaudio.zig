@@ -39,13 +39,13 @@ pub extern fn sceVaudioChReserveBuffering() callconv(.C) void;
 pub extern fn sceVaudio_E8E78DC8() callconv(.C) void;
 
 comptime {
-    asm(macro.import_module_start("sceVaudio", "0x40090000", "8"));
-    asm(macro.import_function("sceVaudio", "0x8986295E", "sceVaudioOutputBlocking"));
-    asm(macro.import_function("sceVaudio", "0x03B6807D", "sceVaudioChReserve"));
-    asm(macro.import_function("sceVaudio", "0x67585DFD", "sceVaudioChRelease"));
-    asm(macro.import_function("sceVaudio", "0x346fbe94", "sceVaudioSetEffectType"));
-    asm(macro.import_function("sceVaudio", "0xcbd4ac51", "sceVaudioSetAlcMode"));
-    asm(macro.import_function("sceVaudio", "0x504E4745", "sceVaudio_504E4745"));
-    asm(macro.import_function("sceVaudio", "0x27ACC20B", "sceVaudioChReserveBuffering"));
-    asm(macro.import_function("sceVaudio", "0xE8E78DC8", "sceVaudio_E8E78DC8"));
+    asm (macro.import_module_start("sceVaudio", "0x40090000", "8"));
+    asm (macro.import_function("sceVaudio", "0x8986295E", "sceVaudioOutputBlocking"));
+    asm (macro.import_function("sceVaudio", "0x03B6807D", "sceVaudioChReserve"));
+    asm (macro.import_function("sceVaudio", "0x67585DFD", "sceVaudioChRelease"));
+    asm (macro.import_function("sceVaudio", "0x346fbe94", "sceVaudioSetEffectType"));
+    asm (macro.import_function("sceVaudio", "0xcbd4ac51", "sceVaudioSetAlcMode"));
+    asm (macro.import_function("sceVaudio", "0x504E4745", "sceVaudio_504E4745"));
+    asm (macro.import_function("sceVaudio", "0x27ACC20B", "sceVaudioChReserveBuffering"));
+    asm (macro.import_function("sceVaudio", "0xE8E78DC8", "sceVaudio_E8E78DC8"));
 }

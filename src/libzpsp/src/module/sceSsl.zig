@@ -36,16 +36,16 @@ pub extern fn sceSslGetSerialNumber() callconv(.C) void;
 pub extern fn sceSslGetNameEntryInfo() callconv(.C) void;
 
 comptime {
-    asm(macro.import_module_start("sceSsl", "0x00090011", "11"));
-    asm(macro.import_function("sceSsl", "0x058D21C0", "sceSslGetNameEntryCount"));
-    asm(macro.import_function("sceSsl", "0x0EB43B06", "sceSslGetUsedMemoryCurrent"));
-    asm(macro.import_function("sceSsl", "0x17A10DCC", "sceSslGetNotBefore"));
-    asm(macro.import_function("sceSsl", "0x191CDEFF", "sceSslEnd"));
-    asm(macro.import_function("sceSsl", "0x1B7C8191", "sceSslGetIssuerName"));
-    asm(macro.import_function("sceSsl", "0x3DD5E023", "sceSslGetSubjectName"));
-    asm(macro.import_function("sceSsl", "0x5BFB6B61", "sceSslGetNotAfter"));
-    asm(macro.import_function("sceSsl", "0x957ECBE2", "sceSslInit"));
-    asm(macro.import_function("sceSsl", "0xB99EDE6A", "sceSslGetUsedMemoryMax"));
-    asm(macro.import_function("sceSsl", "0xCC0919B0", "sceSslGetSerialNumber"));
-    asm(macro.import_function("sceSsl", "0xD6D097B4", "sceSslGetNameEntryInfo"));
+    asm (macro.import_module_start("sceSsl", "0x00090011", "11"));
+    asm (macro.import_function("sceSsl", "0x058D21C0", "sceSslGetNameEntryCount"));
+    asm (macro.import_function("sceSsl", "0x0EB43B06", "sceSslGetUsedMemoryCurrent"));
+    asm (macro.import_function("sceSsl", "0x17A10DCC", "sceSslGetNotBefore"));
+    asm (macro.import_function("sceSsl", "0x191CDEFF", "sceSslEnd"));
+    asm (macro.import_function("sceSsl", "0x1B7C8191", "sceSslGetIssuerName"));
+    asm (macro.import_function("sceSsl", "0x3DD5E023", "sceSslGetSubjectName"));
+    asm (macro.import_function("sceSsl", "0x5BFB6B61", "sceSslGetNotAfter"));
+    asm (macro.import_function("sceSsl", "0x957ECBE2", "sceSslInit"));
+    asm (macro.import_function("sceSsl", "0xB99EDE6A", "sceSslGetUsedMemoryMax"));
+    asm (macro.import_function("sceSsl", "0xCC0919B0", "sceSslGetSerialNumber"));
+    asm (macro.import_function("sceSsl", "0xD6D097B4", "sceSslGetNameEntryInfo"));
 }

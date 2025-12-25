@@ -43,13 +43,13 @@ pub extern fn sceKernelUnlockLwMutex(workarea: [*c]c_int, lockCount: c_int) call
 pub extern fn sceKernelTryLockLwMutex(workarea: [*c]c_int, lockCount: c_int) callconv(.C) c_int;
 
 comptime {
-    asm(macro.import_module_start("Kernel_Library", "0x00010000", "8"));
-    asm(macro.import_function("Kernel_Library", "0x092968F4", "sceKernelCpuSuspendIntr"));
-    asm(macro.import_function("Kernel_Library", "0x5F10D406", "sceKernelCpuResumeIntr"));
-    asm(macro.import_function("Kernel_Library", "0x3B84732D", "sceKernelCpuResumeIntrWithSync"));
-    asm(macro.import_function("Kernel_Library", "0x47A0B729", "sceKernelIsCpuIntrSuspended"));
-    asm(macro.import_function("Kernel_Library", "0xB55249D2", "sceKernelIsCpuIntrEnable"));
-    asm(macro.import_function("Kernel_Library", "0xBEA46419", "sceKernelLockLwMutex"));
-    asm(macro.import_function("Kernel_Library", "0x15B6446B", "sceKernelUnlockLwMutex"));
-    asm(macro.import_function("Kernel_Library", "0xDC692EE3", "sceKernelTryLockLwMutex"));
+    asm (macro.import_module_start("Kernel_Library", "0x00010000", "8"));
+    asm (macro.import_function("Kernel_Library", "0x092968F4", "sceKernelCpuSuspendIntr"));
+    asm (macro.import_function("Kernel_Library", "0x5F10D406", "sceKernelCpuResumeIntr"));
+    asm (macro.import_function("Kernel_Library", "0x3B84732D", "sceKernelCpuResumeIntrWithSync"));
+    asm (macro.import_function("Kernel_Library", "0x47A0B729", "sceKernelIsCpuIntrSuspended"));
+    asm (macro.import_function("Kernel_Library", "0xB55249D2", "sceKernelIsCpuIntrEnable"));
+    asm (macro.import_function("Kernel_Library", "0xBEA46419", "sceKernelLockLwMutex"));
+    asm (macro.import_function("Kernel_Library", "0x15B6446B", "sceKernelUnlockLwMutex"));
+    asm (macro.import_function("Kernel_Library", "0xDC692EE3", "sceKernelTryLockLwMutex"));
 }

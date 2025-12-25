@@ -47,14 +47,14 @@ pub extern fn sceNetResolverStartAtoN(rid: c_int, addr: [*c]const c_int, hostnam
 pub extern fn sceNetResolverStop(rid: c_int) callconv(.C) c_int;
 
 comptime {
-    asm(macro.import_module_start("sceNetResolver", "0x00090000", "7"));
-    asm(macro.import_function("sceNetResolver", "0xF3370E61", "sceNetResolverInit"));
-    asm(macro.import_function("sceNetResolver", "0x6138194A", "sceNetResolverTerm"));
-    asm(macro.import_function("sceNetResolver", "0x244172AF", "sceNetResolverCreate"));
-    asm(macro.import_function("sceNetResolver", "0x94523E09", "sceNetResolverDelete"));
-    asm(macro.import_function("sceNetResolver", "0x224C5F44", "sceNetResolverStartNtoA_stub"));
-    asm(macro.generic_abi_wrapper("sceNetResolverStartNtoA", 5));
-    asm(macro.import_function("sceNetResolver", "0x629E2FB7", "sceNetResolverStartAtoN_stub"));
-    asm(macro.generic_abi_wrapper("sceNetResolverStartAtoN", 6));
-    asm(macro.import_function("sceNetResolver", "0x808F6063", "sceNetResolverStop"));
+    asm (macro.import_module_start("sceNetResolver", "0x00090000", "7"));
+    asm (macro.import_function("sceNetResolver", "0xF3370E61", "sceNetResolverInit"));
+    asm (macro.import_function("sceNetResolver", "0x6138194A", "sceNetResolverTerm"));
+    asm (macro.import_function("sceNetResolver", "0x244172AF", "sceNetResolverCreate"));
+    asm (macro.import_function("sceNetResolver", "0x94523E09", "sceNetResolverDelete"));
+    asm (macro.import_function("sceNetResolver", "0x224C5F44", "sceNetResolverStartNtoA_stub"));
+    asm (macro.generic_abi_wrapper("sceNetResolverStartNtoA", 5));
+    asm (macro.import_function("sceNetResolver", "0x629E2FB7", "sceNetResolverStartAtoN_stub"));
+    asm (macro.generic_abi_wrapper("sceNetResolverStartAtoN", 6));
+    asm (macro.import_function("sceNetResolver", "0x808F6063", "sceNetResolverStop"));
 }

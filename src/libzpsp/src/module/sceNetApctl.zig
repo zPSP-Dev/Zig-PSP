@@ -44,13 +44,13 @@ pub extern fn sceNetApctlDisconnect() callconv(.C) c_int;
 pub extern fn sceNetApctlGetState(pState: [*c]c_int) callconv(.C) c_int;
 
 comptime {
-    asm(macro.import_module_start("sceNetApctl", "0x00090000", "8"));
-    asm(macro.import_function("sceNetApctl", "0xE2F91F9B", "sceNetApctlInit"));
-    asm(macro.import_function("sceNetApctl", "0xB3EDD0EC", "sceNetApctlTerm"));
-    asm(macro.import_function("sceNetApctl", "0x2BEFDF23", "sceNetApctlGetInfo"));
-    asm(macro.import_function("sceNetApctl", "0x8ABADD51", "sceNetApctlAddHandler"));
-    asm(macro.import_function("sceNetApctl", "0x5963991B", "sceNetApctlDelHandler"));
-    asm(macro.import_function("sceNetApctl", "0xCFB957C6", "sceNetApctlConnect"));
-    asm(macro.import_function("sceNetApctl", "0x24FE91A1", "sceNetApctlDisconnect"));
-    asm(macro.import_function("sceNetApctl", "0x5DEAC81B", "sceNetApctlGetState"));
+    asm (macro.import_module_start("sceNetApctl", "0x00090000", "8"));
+    asm (macro.import_function("sceNetApctl", "0xE2F91F9B", "sceNetApctlInit"));
+    asm (macro.import_function("sceNetApctl", "0xB3EDD0EC", "sceNetApctlTerm"));
+    asm (macro.import_function("sceNetApctl", "0x2BEFDF23", "sceNetApctlGetInfo"));
+    asm (macro.import_function("sceNetApctl", "0x8ABADD51", "sceNetApctlAddHandler"));
+    asm (macro.import_function("sceNetApctl", "0x5963991B", "sceNetApctlDelHandler"));
+    asm (macro.import_function("sceNetApctl", "0xCFB957C6", "sceNetApctlConnect"));
+    asm (macro.import_function("sceNetApctl", "0x24FE91A1", "sceNetApctlDisconnect"));
+    asm (macro.import_function("sceNetApctl", "0x5DEAC81B", "sceNetApctlGetState"));
 }

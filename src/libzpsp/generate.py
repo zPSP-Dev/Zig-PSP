@@ -358,10 +358,7 @@ def parse_doc_comment(lines: List[str]) -> Optional[str]:
         processed_lines.append(line)
 
     # Join with /// prefix
-    return "\n".join(
-        f"/// {line}"
-        for _, line in enumerate(processed_lines)
-    )
+    return "\n".join(f"/// {line}" for _, line in enumerate(processed_lines))
 
 
 def find_function_signature(
@@ -545,7 +542,7 @@ def process_s_files(base_dir: str, verbose: bool = False) -> Dict[str, Module]:
 
 
 def generate_module_files(modules: Dict[str, Module], output_dir: str):
-    """Generate the Zig source file containing extern function declarations."""
+    """Generate the Zig source files containing extern function declarations and NIDs."""
 
     # Write module declarations
     for module in modules.values():
@@ -553,12 +550,11 @@ def generate_module_files(modules: Dict[str, Module], output_dir: str):
         os.makedirs(os.path.dirname(module_output_path), exist_ok=True)
 
         with open(module_output_path, "w") as f:
-
             # Write header
             f.write("// THIS FILE IS AUTO-GENERATED\n")
             f.write('const types = @import("../types.zig");\n')
             f.write('const macro = @import("../macro.zig");\n')
-            f.write('\n')
+            f.write("\n")
 
             # Write module externs struct
             for func in module.functions:
@@ -575,7 +571,7 @@ def generate_module_files(modules: Dict[str, Module], output_dir: str):
 
             f.write("comptime {\n")
             f.write(
-                f'    asm(macro.import_module_start("{module.name}", "{module.data_tag}", "{len(module.functions)}"));\n'
+                f'    asm (macro.import_module_start("{module.name}", "{module.data_tag}", "{len(module.functions)}"));\n'
             )
             # Add function declarations
             for func in module.functions:
@@ -588,22 +584,39 @@ def generate_module_files(modules: Dict[str, Module], output_dir: str):
                     if arg_count > 4:
                         # For functions with more than 4 arguments, create _stub and wrapper
                         f.write(
-                            f'    asm(macro.import_function("{module.name}", "{func.nid}", "{func.name}_stub"));\n'
+                            f'    asm (macro.import_function("{module.name}", "{func.nid}", "{func.name}_stub"));\n'
                         )
                         f.write(
-                            f'    asm(macro.generic_abi_wrapper("{func.name}", {arg_count}));\n'
+                            f'    asm (macro.generic_abi_wrapper("{func.name}", {arg_count}));\n'
                         )
                     else:
                         # For functions with 4 or fewer arguments, just import normally
                         f.write(
-                            f'    asm(macro.import_function("{module.name}", "{func.nid}", "{func.name}"));\n'
+                            f'    asm (macro.import_function("{module.name}", "{func.nid}", "{func.name}"));\n'
                         )
                 else:
                     # If no signature, assume no arguments and import normally
                     f.write(
-                        f'    asm(macro.import_function("{module.name}", "{func.nid}", "{func.name}"));\n'
+                        f'    asm (macro.import_function("{module.name}", "{func.nid}", "{func.name}"));\n'
                     )
             f.write("}\n")
+
+
+def generate_root_module(modules: Dict[str, Module], output_dir: str):
+    """Generate the Zig root module."""
+
+    root_module_output_path = output_dir + "/libzpsp.zig"
+    os.makedirs(os.path.dirname(root_module_output_path), exist_ok=True)
+
+    with open(root_module_output_path, "w") as f:
+        # Write header
+        f.write("// THIS FILE IS AUTO-GENERATED\n")
+        f.write('pub const types = @import("types.zig");\n')
+        f.write("\n")
+
+        # Write module declarations
+        for module in modules.values():
+            f.write(f'pub const {module.name} = @import("module/{module.name}.zig");\n')
 
 
 def main():
@@ -664,6 +677,7 @@ def main():
         # Generate Zig files
         print(f"\nGenerating Zig files in {args.output_dir}...")
         generate_module_files(modules, args.output_dir)
+        generate_root_module(modules, args.output_dir)
         print("Done!")
 
 

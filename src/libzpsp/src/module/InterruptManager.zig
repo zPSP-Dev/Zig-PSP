@@ -39,14 +39,14 @@ pub extern fn QueryIntrHandlerInfo(intr_code: types.SceUID, sub_intr_code: types
 pub extern fn sceKernelRegisterUserSpaceIntrStack() callconv(.C) void;
 
 comptime {
-    asm(macro.import_module_start("InterruptManager", "0x40000000", "9"));
-    asm(macro.import_function("InterruptManager", "0xCA04A2B9", "sceKernelRegisterSubIntrHandler"));
-    asm(macro.import_function("InterruptManager", "0xD61E6961", "sceKernelReleaseSubIntrHandler"));
-    asm(macro.import_function("InterruptManager", "0xFB8E22EC", "sceKernelEnableSubIntr"));
-    asm(macro.import_function("InterruptManager", "0x8A389411", "sceKernelDisableSubIntr"));
-    asm(macro.import_function("InterruptManager", "0x5CB5A78B", "sceKernelSuspendSubIntr"));
-    asm(macro.import_function("InterruptManager", "0x7860E0DC", "sceKernelResumeSubIntr"));
-    asm(macro.import_function("InterruptManager", "0xFC4374B8", "sceKernelIsSubInterruptOccurred"));
-    asm(macro.import_function("InterruptManager", "0xD2E8363F", "QueryIntrHandlerInfo"));
-    asm(macro.import_function("InterruptManager", "0xEEE43F47", "sceKernelRegisterUserSpaceIntrStack"));
+    asm (macro.import_module_start("InterruptManager", "0x40000000", "9"));
+    asm (macro.import_function("InterruptManager", "0xCA04A2B9", "sceKernelRegisterSubIntrHandler"));
+    asm (macro.import_function("InterruptManager", "0xD61E6961", "sceKernelReleaseSubIntrHandler"));
+    asm (macro.import_function("InterruptManager", "0xFB8E22EC", "sceKernelEnableSubIntr"));
+    asm (macro.import_function("InterruptManager", "0x8A389411", "sceKernelDisableSubIntr"));
+    asm (macro.import_function("InterruptManager", "0x5CB5A78B", "sceKernelSuspendSubIntr"));
+    asm (macro.import_function("InterruptManager", "0x7860E0DC", "sceKernelResumeSubIntr"));
+    asm (macro.import_function("InterruptManager", "0xFC4374B8", "sceKernelIsSubInterruptOccurred"));
+    asm (macro.import_function("InterruptManager", "0xD2E8363F", "QueryIntrHandlerInfo"));
+    asm (macro.import_function("InterruptManager", "0xEEE43F47", "sceKernelRegisterUserSpaceIntrStack"));
 }
