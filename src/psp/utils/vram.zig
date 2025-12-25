@@ -1,7 +1,8 @@
 //This is probably broken
 const gu = @import("../sdk/pspgutypes.zig");
-const psp = @import("psp");
 const display = @import("../sdk/pspdisplay.zig");
+
+const libzpsp = @import("psp");
 
 //This isn't an actual "allocator" per se
 //It allocates static chunks of VRAM
@@ -41,5 +42,5 @@ pub fn allocVramRelative(width: u32, height: u32, format: gu.GuPixelMode) ?*anyo
 
 //Allocate a buffer of VRAM in VRAM-Absolute pointers (0x04000000 start)
 pub fn allocVramAbsolute(width: u32, height: u32, format: gu.GuPixelMode) ?*anyopaque {
-    return @as(?*anyopaque, @ptrFromInt(@intFromPtr(display.allocVramDirect(width, height, format)) + @intFromPtr(psp.sceGeEdramGetAddr())));
+    return @as(?*anyopaque, @ptrFromInt(@intFromPtr(display.allocVramDirect(width, height, format)) + @intFromPtr(libzpsp.ge.sceGeEdramGetAddr())));
 }

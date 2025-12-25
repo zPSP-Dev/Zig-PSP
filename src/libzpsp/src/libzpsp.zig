@@ -39,7 +39,7 @@ pub usingnamespace @import("module/sceMp3.zig");
 pub usingnamespace @import("module/sceUtility.zig");
 pub usingnamespace @import("module/sceUtility_netparam_internal.zig");
 pub usingnamespace @import("module/sceKermitPeripheral.zig");
-pub usingnamespace @import("module/sceGe_user.zig");
+pub const ge = @import("module/sceGe_user.zig");
 pub usingnamespace @import("module/sceJpeg.zig");
 pub usingnamespace @import("module/sceMpegbase.zig");
 pub usingnamespace @import("module/sceMpeg.zig");
