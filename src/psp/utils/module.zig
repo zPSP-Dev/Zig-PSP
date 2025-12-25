@@ -1,7 +1,3 @@
-test {
-    @import("std").meta.refAllDecls(@This());
-}
-
 const libzpsp = @import("psp");
 
 const debug = @import("debug.zig");

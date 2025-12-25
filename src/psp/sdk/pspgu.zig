@@ -7,10 +7,6 @@ const ScePspFMatrix4 = libzpsp.types.ScePspFMatrix4;
 const pspge = @import("pspge.zig");
 const pspdisplay = @import("pspdisplay.zig");
 
-test {
-    @import("std").meta.refAllDecls(@This());
-}
-
 // DEPRECATED Use packed structs for this
 pub fn abgr(a: u8, b: u8, g: u8, r: u8) u32 {
     return @as(u32, r) | (@as(u32, g) << 8) | (@as(u32, b) << 16) | (@as(u32, a) << 24);

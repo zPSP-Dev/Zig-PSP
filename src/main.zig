@@ -1,11 +1,8 @@
 //A quick graphics example
-const psp = @import("psp/pspsdk.zig");
-const gu = psp.gu;
-
-pub const panic = psp.debug.panic;
+const psp = @import("psp/pspsdk.zig").sdk;
 
 comptime {
-    asm (psp.module_info("Zig PSP App", 0, 1, 0));
+    asm (psp.extra.module.module_info("Zig PSP App", 0, 1, 0));
 }
 
 var display_list: [0x40000]u32 align(16) = [_]u32{0} ** 0x40000;
@@ -59,22 +56,29 @@ var vertices: [36]Vertex = [_]Vertex{
 };
 
 pub fn main() !void {
-    psp.utils.enableHBCB();
-    psp.debug.screenInit();
+    const SCREEN_WIDTH = psp.extra.constants.SCREEN_WIDTH;
+    const SCREEN_HEIGHT = psp.extra.constants.SCREEN_HEIGHT;
+    const SCR_BUF_WIDTH = psp.extra.constants.SCR_BUF_WIDTH;
 
-    const fbp0 = psp.vram.allocVramRelative(psp.SCR_BUF_WIDTH, psp.SCREEN_HEIGHT, .Psm8888);
-    const fbp1 = psp.vram.allocVramRelative(psp.SCR_BUF_WIDTH, psp.SCREEN_HEIGHT, .Psm8888);
-    const zbp = psp.vram.allocVramRelative(psp.SCR_BUF_WIDTH, psp.SCREEN_HEIGHT, .Psm4444);
+    const gu = psp.gu;
+    const gum = psp.gum;
+
+    psp.extra.utils.enableHBCB();
+    psp.extra.debug.screenInit();
+
+    const fbp0 = psp.extra.vram.allocVramRelative(SCR_BUF_WIDTH, SCREEN_HEIGHT, .Psm8888);
+    const fbp1 = psp.extra.vram.allocVramRelative(SCR_BUF_WIDTH, SCREEN_HEIGHT, .Psm8888);
+    const zbp = psp.extra.vram.allocVramRelative(SCR_BUF_WIDTH, SCREEN_HEIGHT, .Psm4444);
 
     gu.sceGuInit();
     gu.sceGuStart(.Direct, @as(*anyopaque, @ptrCast(&display_list)));
-    gu.sceGuDrawBuffer(.Psm8888, fbp0, psp.SCR_BUF_WIDTH);
-    gu.sceGuDispBuffer(psp.SCREEN_WIDTH, psp.SCREEN_HEIGHT, fbp1, psp.SCR_BUF_WIDTH);
-    gu.sceGuDepthBuffer(zbp, psp.SCR_BUF_WIDTH);
-    gu.sceGuOffset(2048 - (psp.SCREEN_WIDTH / 2), 2048 - (psp.SCREEN_HEIGHT / 2));
-    gu.sceGuViewport(2048, 2048, psp.SCREEN_WIDTH, psp.SCREEN_HEIGHT);
+    gu.sceGuDrawBuffer(.Psm8888, fbp0, SCR_BUF_WIDTH);
+    gu.sceGuDispBuffer(SCREEN_WIDTH, SCREEN_HEIGHT, fbp1, SCR_BUF_WIDTH);
+    gu.sceGuDepthBuffer(zbp, SCR_BUF_WIDTH);
+    gu.sceGuOffset(2048 - (SCREEN_WIDTH / 2), 2048 - (SCREEN_HEIGHT / 2));
+    gu.sceGuViewport(2048, 2048, SCREEN_WIDTH, SCREEN_HEIGHT);
     gu.sceGuDepthRange(65535, 0);
-    gu.sceGuScissor(0, 0, psp.SCREEN_WIDTH, psp.SCREEN_HEIGHT);
+    gu.sceGuScissor(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
     gu.sceGuEnable(.ScissorTest);
     gu.sceGuDepthFunc(.GreaterOrEqual);
     gu.sceGuEnable(.DepthTest);
@@ -86,7 +90,7 @@ pub fn main() !void {
 
     gu.guFinish();
     gu.guSync(.Finish, .Wait);
-    psp.displayWaitVblankStart();
+    psp.display.displayWaitVblankStart();
     gu.sceGuDisplay(true);
 
     var i: u32 = 0;
@@ -98,19 +102,18 @@ pub fn main() !void {
         gu.sceGuClear(@intFromEnum(gu.types.ClearBitFlags.ColorBuffer) |
             @intFromEnum(gu.types.ClearBitFlags.DepthBuffer));
 
-        psp.sceGumMatrixMode(.Projection);
-        psp.sceGumLoadIdentity();
-        psp.sceGumPerspective(90.0, 16.0 / 9.0, 0.2, 10.0);
+        gum.sceGumMatrixMode(.Projection);
+        gum.sceGumLoadIdentity();
+        gum.sceGumPerspective(90.0, 16.0 / 9.0, 0.2, 10.0);
 
-        psp.sceGumMatrixMode(.View);
-        psp.sceGumLoadIdentity();
+        gum.sceGumMatrixMode(.View);
+        gum.sceGumLoadIdentity();
 
-        psp.sceGumMatrixMode(.Model);
-        psp.sceGumLoadIdentity();
+        gum.sceGumMatrixMode(.Model);
+        gum.sceGumLoadIdentity();
 
-        //Rotate
-        psp.sceGumTranslate(&.{ .x = 0, .y = 0, .z = -2.5 });
-        psp.sceGumRotateXYZ(&.{ .x = @as(f32, @floatFromInt(i)) * 0.79 * (3.14159 / 180.0), .y = @as(f32, @floatFromInt(i)) * 0.98 * (3.14159 / 180.0), .z = @as(f32, @floatFromInt(i)) * 1.32 * (3.14159 / 180.0) });
+        gum.sceGumTranslate(&.{ .x = 0, .y = 0, .z = -2.5 });
+        gum.sceGumRotateXYZ(&.{ .x = @as(f32, @floatFromInt(i)) * 0.79 * (3.14159 / 180.0), .y = @as(f32, @floatFromInt(i)) * 0.98 * (3.14159 / 180.0), .z = @as(f32, @floatFromInt(i)) * 1.32 * (3.14159 / 180.0) });
 
         gu.sceGuTexMode(.Psm8888, 0, 0, 0);
         gu.sceGuTexImage(0, 128, 128, 128, &logo_start);
@@ -121,12 +124,11 @@ pub fn main() !void {
         gu.sceGuAmbientColor(0xffffffff);
 
         // draw cube
-
-        psp.sceGumDrawArray(.Triangles, @intFromEnum(gu.types.VertexTypeFlags.Texture32Bitf) | @intFromEnum(gu.types.VertexTypeFlags.Color8888) | @intFromEnum(gu.types.VertexTypeFlags.Vertex32Bitf) | @intFromEnum(gu.types.VertexTypeFlags.Transform3D), 12 * 3, null, @as(*anyopaque, @ptrCast(&vertices)));
+        gum.sceGumDrawArray(.Triangles, @intFromEnum(gu.types.VertexTypeFlags.Texture32Bitf) | @intFromEnum(gu.types.VertexTypeFlags.Color8888) | @intFromEnum(gu.types.VertexTypeFlags.Vertex32Bitf) | @intFromEnum(gu.types.VertexTypeFlags.Transform3D), 12 * 3, null, @as(*anyopaque, @ptrCast(&vertices)));
 
         gu.guFinish();
         gu.guSync(.Finish, .Wait);
-        psp.displayWaitVblankStart();
+        psp.display.displayWaitVblankStart();
         gu.guSwapBuffers();
     }
 }
