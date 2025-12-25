@@ -1,7 +1,4 @@
-// THIS FILE IS AUTO-GENERATED
 pub const types = @import("types.zig");
-
-pub usingnamespace types; // DEPRECATED
 
 // DEPRECATED, use namespaces instead
 pub usingnamespace @import("module/sceCtrl.zig");
@@ -51,48 +48,3 @@ pub usingnamespace @import("module/sceUsb.zig");
 pub usingnamespace @import("module/sceUsbCam.zig");
 pub usingnamespace @import("module/sceDmac.zig");
 pub usingnamespace @import("module/sceDisplay.zig");
-
-// DEPRECATED, use types directly instead
-const ScePspSRect = types.ScePspSRect;
-const ScePspIRect = types.ScePspIRect;
-const ScePspL64Rect = types.ScePspL64Rect;
-const ScePspFRect = types.ScePspFRect;
-const ScePspSVector2 = types.ScePspSVector2;
-const ScePspIVector2 = types.ScePspIVector2;
-const ScePspL64Vector2 = types.ScePspL64Vector2;
-const ScePspFVector2 = types.ScePspFVector2;
-const ScePspVector2 = types.ScePspVector2;
-const ScePspSVector3 = types.ScePspSVector3;
-const ScePspIVector3 = types.ScePspIVector3;
-const ScePspL64Vector3 = types.ScePspL64Vector3;
-const ScePspFVector3 = types.ScePspFVector3;
-const ScePspVector3 = types.ScePspVector3;
-const ScePspSVector4 = types.ScePspSVector4;
-const ScePspIVector4 = types.ScePspIVector4;
-const ScePspL64Vector4 = types.ScePspL64Vector4;
-const ScePspFVector4 = types.ScePspFVector4;
-const ScePspFVector4Unaligned = types.ScePspFVector4Unaligned;
-const ScePspVector4 = types.ScePspVector4;
-const ScePspIMatrix2 = types.ScePspIMatrix2;
-const ScePspFMatrix2 = types.ScePspFMatrix2;
-const ScePspMatrix2 = types.ScePspMatrix2;
-const ScePspIMatrix3 = types.ScePspIMatrix3;
-const ScePspFMatrix3 = types.ScePspFMatrix3;
-const ScePspMatrix3 = types.ScePspMatrix3;
-const ScePspIMatrix4 = types.ScePspIMatrix4;
-const ScePspIMatrix4Unaligned = types.ScePspIMatrix4Unaligned;
-const ScePspFMatrix4 = types.ScePspFMatrix4;
-const ScePspFMatrix4Unaligned = types.ScePspFMatrix4Unaligned;
-const ScePspMatrix4 = types.ScePspMatrix4;
-const ScePspFQuaternion = types.ScePspFQuaternion;
-const ScePspFQuaternionUnaligned = types.ScePspFQuaternionUnaligned;
-const ScePspFColor = types.ScePspFColor;
-const ScePspFColorUnaligned = types.ScePspFColorUnaligned;
-const ScePspRGBA8888 = types.ScePspRGBA8888;
-const ScePspRGBA4444 = types.ScePspRGBA4444;
-const ScePspRGBA5551 = types.ScePspRGBA5551;
-const ScePspRGB565 = types.ScePspRGB565;
-const ScePspUnion32 = types.ScePspUnion32;
-const ScePspUnion64 = types.ScePspUnion64;
-const ScePspUnion128 = types.ScePspUnion128;
-const ScePspDateTime = types.ScePspDateTime;

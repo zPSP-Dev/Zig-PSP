@@ -1,10 +1,10 @@
 const libzpsp = @import("psp");
-const SceUID = libzpsp.SceUID;
-const SceSize = libzpsp.SceSize;
-const SceUInt = libzpsp.SceUInt;
-const SceInt64 = libzpsp.SceInt64;
-const SceUInt32 = libzpsp.SceUInt32;
-const SceUChar = libzpsp.SceUChar;
+const SceUID = libzpsp.types.SceUID;
+const SceSize = libzpsp.types.SceSize;
+const SceUInt = libzpsp.types.SceUInt;
+const SceInt64 = libzpsp.types.SceInt64;
+const SceUInt32 = libzpsp.types.SceUInt32;
+const SceUChar = libzpsp.types.SceUChar;
 
 pub const struct_SceKernelSysClock = extern struct {
     low: SceUInt32,
