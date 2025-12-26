@@ -21,7 +21,7 @@ jobs:
       - uses: mlugg/setup-zig@v2
         with:
           version: ${{ env.zig_version }}
-      - run: zig build
+      - run: zig build examples
 
   lint:
     runs-on: ubuntu-latest
