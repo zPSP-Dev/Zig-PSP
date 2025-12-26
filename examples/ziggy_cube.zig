@@ -1,10 +1,10 @@
 //A quick graphics example
-const psp = @import("psp/pspsdk.zig");
-const gu = psp.gu;
-const gum = psp.gum;
+const sdk = @import("pspsdk");
+const gu = sdk.gu;
+const gum = sdk.gum;
 
 comptime {
-    asm (psp.extra.module.module_info("Zig PSP App", 0, 1, 0));
+    asm (sdk.extra.module.module_info("SDK Ziggy Cube", 0, 1, 0));
 }
 
 var display_list: [0x40000]u32 align(16) = [_]u32{0} ** 0x40000;
@@ -65,16 +65,16 @@ var vertices: [36]Vertex = [_]Vertex{
 };
 
 pub fn main() !void {
-    const SCREEN_WIDTH = psp.extra.constants.SCREEN_WIDTH;
-    const SCREEN_HEIGHT = psp.extra.constants.SCREEN_HEIGHT;
-    const SCR_BUF_WIDTH = psp.extra.constants.SCR_BUF_WIDTH;
+    const SCREEN_WIDTH = sdk.extra.constants.SCREEN_WIDTH;
+    const SCREEN_HEIGHT = sdk.extra.constants.SCREEN_HEIGHT;
+    const SCR_BUF_WIDTH = sdk.extra.constants.SCR_BUF_WIDTH;
 
-    psp.extra.utils.enableHBCB();
-    psp.extra.debug.screenInit();
+    sdk.extra.utils.enableHBCB();
+    sdk.extra.debug.screenInit();
 
-    const fbp0 = psp.extra.vram.allocVramRelative(SCR_BUF_WIDTH, SCREEN_HEIGHT, .Psm8888);
-    const fbp1 = psp.extra.vram.allocVramRelative(SCR_BUF_WIDTH, SCREEN_HEIGHT, .Psm8888);
-    const zbp = psp.extra.vram.allocVramRelative(SCR_BUF_WIDTH, SCREEN_HEIGHT, .Psm4444);
+    const fbp0 = sdk.extra.vram.allocVramRelative(SCR_BUF_WIDTH, SCREEN_HEIGHT, .Psm8888);
+    const fbp1 = sdk.extra.vram.allocVramRelative(SCR_BUF_WIDTH, SCREEN_HEIGHT, .Psm8888);
+    const zbp = sdk.extra.vram.allocVramRelative(SCR_BUF_WIDTH, SCREEN_HEIGHT, .Psm4444);
 
     gu.sceGuInit();
     gu.sceGuStart(.Direct, @as(*anyopaque, @ptrCast(&display_list)));
@@ -96,11 +96,11 @@ pub fn main() !void {
 
     gu.guFinish();
     gu.guSync(.Finish, .Wait);
-    _ = psp.display.sceDisplayWaitVblankStart();
+    _ = sdk.display.sceDisplayWaitVblankStart();
     gu.sceGuDisplay(true);
 
     var i: u32 = 0;
-    while (true) : (i += 1) {
+    while (!sdk.extra.utils.isExitRequested()) : (i += 1) {
         gu.sceGuStart(.Direct, @as(*anyopaque, @ptrCast(&display_list)));
 
         gu.sceGuClearColor(gu.rgba(32, 32, 32, 0xFF));
@@ -134,7 +134,7 @@ pub fn main() !void {
 
         gu.guFinish();
         gu.guSync(.Finish, .Wait);
-        _ = psp.display.sceDisplayWaitVblankStart();
+        _ = sdk.display.sceDisplayWaitVblankStart();
         gu.guSwapBuffers();
     }
 }
