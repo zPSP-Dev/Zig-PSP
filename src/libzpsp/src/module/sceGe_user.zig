@@ -30,17 +30,17 @@ pub extern fn sceGeGetMtx(type: c_int, matrix: ?*anyopaque) callconv(.C) c_int;
 /// `stackId` - The ID of the stack to retrieve.
 /// `stack` - Pointer to a structure to store the stack, or NULL to not store it.
 /// Returns The number of stacks of the current display list, < 0 on error.
-pub extern fn sceGeGetStack(stackId: c_int, stack: [*c]c_int) callconv(.C) c_int;
+pub extern fn sceGeGetStack(stackId: c_int, stack: [*c]types.PspGeStack) callconv(.C) c_int;
 
 /// Save the GE's current state.
 /// `context` - Pointer to a ::PspGeContext.
 /// Returns < 0 on error.
-pub extern fn sceGeSaveContext(context: [*c]c_int) callconv(.C) c_int;
+pub extern fn sceGeSaveContext(context: [*c]types.PspGeContext) callconv(.C) c_int;
 
 /// Restore a previously saved GE context.
 /// `context` - Pointer to a ::PspGeContext.
 /// Returns < 0 on error.
-pub extern fn sceGeRestoreContext(context: [*c]const c_int) callconv(.C) c_int;
+pub extern fn sceGeRestoreContext(context: [*c]const types.PspGeContext) callconv(.C) c_int;
 
 /// Enqueue a display list at the tail of the GE display list queue.
 /// `list` - The head of the list to queue.
@@ -49,7 +49,7 @@ pub extern fn sceGeRestoreContext(context: [*c]const c_int) callconv(.C) c_int;
 /// `cbid` - ID of the callback set by calling sceGeSetCallback
 /// `arg` - Structure containing GE context buffer address
 /// Returns The ID of the queue, < 0 on error.
-pub extern fn sceGeListEnQueue(list: ?*const anyopaque, stall: ?*anyopaque, cbid: c_int, arg: [*c]c_int) callconv(.C) c_int;
+pub extern fn sceGeListEnQueue(list: ?*const anyopaque, stall: ?*anyopaque, cbid: c_int, arg: [*c]types.PspGeListArgs) callconv(.C) c_int;
 
 /// Enqueue a display list at the head of the GE display list queue.
 /// `list` - The head of the list to queue.
@@ -58,7 +58,7 @@ pub extern fn sceGeListEnQueue(list: ?*const anyopaque, stall: ?*anyopaque, cbid
 /// `cbid` - ID of the callback set by calling sceGeSetCallback
 /// `arg` - Structure containing GE context buffer address
 /// Returns The ID of the queue, < 0 on error.
-pub extern fn sceGeListEnQueueHead(list: ?*const anyopaque, stall: ?*anyopaque, cbid: c_int, arg: [*c]c_int) callconv(.C) c_int;
+pub extern fn sceGeListEnQueueHead(list: ?*const anyopaque, stall: ?*anyopaque, cbid: c_int, arg: [*c]types.PspGeListArgs) callconv(.C) c_int;
 
 /// Cancel a queued or running list.
 /// `qid` - The ID of the queue.
@@ -86,7 +86,7 @@ pub extern fn sceGeDrawSync(syncType: c_int) callconv(.C) c_int;
 /// `mode` - If set to 1, reset all the queues.
 /// `pParam` - Unused (just K1-checked).
 /// Returns The stopped queue ID if mode isn't set to 0, otherwise 0, and < 0 on error.
-pub extern fn sceGeBreak(mode: c_int, pParam: [*c]c_int) callconv(.C) c_int;
+pub extern fn sceGeBreak(mode: c_int, pParam: [*c]types.PspGeBreakParam) callconv(.C) c_int;
 
 /// Restart drawing queue.
 /// Returns < 0 on error.
@@ -95,7 +95,7 @@ pub extern fn sceGeContinue() callconv(.C) c_int;
 /// Register callback handlers for the the GE.
 /// `cb` - Configured callback data structure.
 /// Returns The callback ID, < 0 on error.
-pub extern fn sceGeSetCallback(cb: [*c]c_int) callconv(.C) c_int;
+pub extern fn sceGeSetCallback(cb: [*c]types.PspGeCallbackData) callconv(.C) c_int;
 
 /// Unregister the callback handlers.
 /// `cbid` - The ID of the callbacks, returned by sceGeSetCallback().

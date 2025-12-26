@@ -159,6 +159,11 @@ def parse_c_type_to_zig(c_type: str) -> str:
         "ScePVoid": "types.ScePVoid",
         "SceCtrlData": "types.SceCtrlData",
         "SceCtrlLatch": "types.SceCtrlLatch",
+        "PspGeBreakParam": "types.PspGeBreakParam",
+        "PspGeCallbackData": "types.PspGeCallbackData",
+        "PspGeContext": "types.PspGeContext",
+        "PspGeListArgs": "types.PspGeListArgs",
+        "PspGeStack": "types.PspGeStack",
     }
 
     # Handle const first

@@ -1,7 +1,7 @@
 pub const types = @import("pspgutypes.zig");
 
 const libzpsp = @import("libzpsp");
-const libzpsp_ge = libzpsp.sceGe_user; // DEPRECATED call the wrapper instead
+const libzpsp_threadman = libzpsp.ThreadManForUser;
 
 const ScePspFVector3 = libzpsp.types.ScePspFVector3;
 const ScePspIMatrix4 = libzpsp.types.ScePspIMatrix4;
@@ -267,7 +267,7 @@ pub fn sendCommandiStall(cmd: c_int, argument: c_int) void {
     @setRuntimeSafety(false);
     sendCommandi(cmd, argument);
     if (gu_object_stack_depth == 0 and gu_curr_context == 0) {
-        _ = libzpsp_ge.sceGeListUpdateStallAddr(ge_list_executed[0], @as(*anyopaque, @ptrCast(gu_list.?.current)));
+        _ = pspge.sceGeListUpdateStallAddr(ge_list_executed[0], @as(*anyopaque, @ptrCast(gu_list.?.current)));
     }
 }
 
@@ -1034,10 +1034,10 @@ pub fn sceGuSendList(mode: c_int, list: ?*const anyopaque, context: [*c]types.ps
 
     switch (@as(types.GuQueueMode, @enumFromInt(mode))) {
         .Head => {
-            list_id = libzpsp_ge.sceGeListEnQueueHead(list, null, callback, &args);
+            list_id = pspge.sceGeListEnQueueHead(list, null, callback, &args);
         },
         .Tail => {
-            list_id = libzpsp_ge.sceGeListEnQueue(list, null, callback, &args);
+            list_id = pspge.sceGeListEnQueue(list, null, callback, &args);
         },
     }
 
@@ -1215,30 +1215,31 @@ pub fn guSwapBuffersCallback(callback: types.GuSwapBuffersCallback) void {
     gu_settings.swapBuffersCallback = callback;
 }
 
-pub fn sceGuSync(mode: types.GuSyncMode, what: types.GuSyncBehavior) c_int {
+pub fn sceGuSync(mode: types.GuSyncMode, sync_type: pspge.PspGeSyncBehavior) pspge.PspGeListState {
     switch (mode) {
         .Finish => {
-            return libzpsp_ge.sceGeDrawSync(@intFromEnum(what));
+            return pspge.sceGeDrawSync(sync_type);
+        },
+        .Signal, .Done => {
+            return .Done;
         },
         .List => {
-            return libzpsp_ge.sceGeListSync(ge_list_executed[0], @intFromEnum(what));
+            return pspge.sceGeListSync(ge_list_executed[0], sync_type);
         },
         .Send => {
-            return libzpsp_ge.sceGeListSync(ge_list_executed[1], @intFromEnum(what));
-        },
-        else => {
-            return 0;
+            return pspge.sceGeListSync(ge_list_executed[1], sync_type);
         },
     }
 }
-pub fn guSync(mode: types.GuSyncMode, what: types.GuSyncBehavior) void {
-    _ = sceGuSync(mode, what);
+
+pub fn guSync(mode: types.GuSyncMode, sync_type: pspge.PspGeSyncBehavior) void {
+    _ = sceGuSync(mode, sync_type);
 }
 
 pub fn sceGuTerm() void {
     @setRuntimeSafety(false);
-    _ = libzpsp.sceKernelDeleteEventFlag(gu_settings.kernel_event_flag);
-    _ = libzpsp_ge.sceGeUnsetCallback(gu_settings.ge_callback_id);
+    _ = libzpsp_threadman.sceKernelDeleteEventFlag(gu_settings.kernel_event_flag);
+    _ = pspge.sceGeUnsetCallback(gu_settings.ge_callback_id);
 }
 
 pub fn sceGuTexEnvColor(color: c_int) void {
@@ -1399,18 +1400,18 @@ pub fn sceGuInit() void {
     callback.finish_func = callbackFin;
     callback.finish_arg = &gu_settings;
 
-    gu_settings.ge_callback_id = libzpsp_ge.sceGeSetCallback(@ptrCast(&callback));
+    gu_settings.ge_callback_id = pspge.sceGeSetCallback(@ptrCast(&callback));
     gu_settings.swapBuffersCallback = null;
     gu_settings.swapBuffersBehaviour = .Nextframe;
 
-    ge_edram_address = libzpsp_ge.sceGeEdramGetAddr();
+    ge_edram_address = pspge.sceGeEdramGetAddr();
 
-    ge_list_executed[0] = libzpsp_ge.sceGeListEnQueue((@as(*anyopaque, @ptrFromInt(@intFromPtr(&ge_init_list) & 0x1fffffff))), null, gu_settings.ge_callback_id, 0);
+    ge_list_executed[0] = pspge.sceGeListEnQueue((@as(*anyopaque, @ptrFromInt(@intFromPtr(&ge_init_list) & 0x1fffffff))), null, gu_settings.ge_callback_id, 0);
 
     resetValues();
     gu_settings.kernel_event_flag = pspthreadman.sceKernelCreateEventFlag("SceGuSignal", 512, 3, 0);
 
-    _ = libzpsp_ge.sceGeListSync(ge_list_executed[0], 0);
+    _ = pspge.sceGeListSync(ge_list_executed[0], .Wait);
 }
 
 pub fn sceGuStart(cont: types.GuContextType, list: ?*anyopaque) void {
@@ -1427,7 +1428,7 @@ pub fn sceGuStart(cont: types.GuContextType, list: ?*anyopaque) void {
     gu_curr_context = cid;
 
     if (cid == 0) {
-        ge_list_executed[0] = libzpsp_ge.sceGeListEnQueue(local_list, local_list, gu_settings.ge_callback_id, 0);
+        ge_list_executed[0] = pspge.sceGeListEnQueue(local_list, local_list, gu_settings.ge_callback_id, 0);
         gu_settings.signal_offset = 0;
     }
 
@@ -1528,7 +1529,7 @@ pub fn sceGuGetMemory(size: c_uint) *anyopaque {
     gu_list.?.current = new_ptr;
 
     if (gu_curr_context == 0) {
-        _ = libzpsp_ge.sceGeListUpdateStallAddr(ge_list_executed[0], new_ptr);
+        _ = pspge.sceGeListUpdateStallAddr(ge_list_executed[0], new_ptr);
     }
     return @as(*anyopaque, @ptrFromInt(@intFromPtr(orig_ptr + 2)));
 }

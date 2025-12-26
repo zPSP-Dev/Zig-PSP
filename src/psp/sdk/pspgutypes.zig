@@ -257,11 +257,6 @@ pub const GuSyncMode = enum(c_int) {
     Send = 4,
 };
 
-pub const GuSyncBehavior = enum(c_int) {
-    Wait = 0,
-    NoWait = 1,
-};
-
 pub const GuCallbackId = enum(c_int) {
     Signal = 1,
     Finish = 4,

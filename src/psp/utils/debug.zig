@@ -1,8 +1,8 @@
 const libzpsp = @import("libzpsp");
 const libzpsp_display = libzpsp.sceDisplay;
-const libzpsp_ge = libzpsp.sceGe_user;
 
 const pspdisplay = @import("../sdk/pspdisplay.zig");
+const pspge = @import("../sdk/pspge.zig");
 const constants = @import("constants.zig");
 
 const builtin = @import("builtin");
@@ -73,7 +73,7 @@ pub fn screenInit() void {
     x = 0;
     y = 0;
 
-    vram_base = @as(?[*]u32, @ptrFromInt(0x40000000 | @intFromPtr(libzpsp_ge.sceGeEdramGetAddr())));
+    vram_base = @as(?[*]u32, @ptrFromInt(0x40000000 | @intFromPtr(pspge.sceGeEdramGetAddr())));
 
     _ = libzpsp_display.sceDisplaySetMode(0, constants.SCREEN_WIDTH, constants.SCREEN_HEIGHT);
     _ = libzpsp_display.sceDisplaySetFrameBuf(vram_base, constants.SCR_BUF_WIDTH, @intFromEnum(pspdisplay.PspDisplayPixelFormats.Format8888), 1);

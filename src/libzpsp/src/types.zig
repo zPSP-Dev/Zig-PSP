@@ -354,3 +354,34 @@ pub const SceCtrlLatch = extern struct {
     uiPress: PspCtrlButtons,
     uiRelease: PspCtrlButtons,
 };
+
+pub const PspGeContext = extern struct {
+    context: [512]c_uint,
+};
+
+pub const SceGeStack = extern struct {
+    stack: [8]c_uint,
+};
+
+pub const PspGeCallback = ?*const fn (c_int, ?*anyopaque) callconv(.C) void;
+pub const PspGeCallbackData = extern struct {
+    signal_func: PspGeCallback,
+    signal_arg: ?*anyopaque,
+    finish_func: PspGeCallback,
+    finish_arg: ?*anyopaque,
+};
+
+pub const PspGeListArgs = extern struct {
+    size: c_uint,
+    context: [*c]PspGeContext,
+    numStacks: u32,
+    stacks: [*c]SceGeStack,
+};
+
+pub const PspGeBreakParam = extern struct {
+    buf: [4]c_uint,
+};
+
+pub const PspGeStack = extern struct {
+    stack: [8]c_uint,
+};
