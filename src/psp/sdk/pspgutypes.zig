@@ -10,6 +10,10 @@ pub const GuPixelMode = enum(c_int) {
     PsmDXT1 = 8,
     PsmDXT3 = 9,
     PsmDXT5 = 10,
+    // High-order bit extension
+    PsmDXT1EXT = 8 + 256,
+    PsmDXT3EXT = 9 + 256,
+    PsmDXT5EXT = 10 + 256,
 };
 
 pub const GuPrimitive = enum(c_int) {
@@ -228,7 +232,7 @@ pub const LightMode = enum(c_int) {
     SeparateSpecularColor = 1,
 };
 
-pub const GuLightType = enum(c_int) {
+pub const GuLightType = enum(u2) {
     Directional = 0,
     Pointlight = 1,
     Spotlight = 2,
@@ -280,30 +284,67 @@ pub const GuLightBitFlags = enum(c_int) {
     AmbientDiffuse = 3,
     Specular = 4,
     DiffuseSpecular = 6,
-    Unknown = 8,
 };
 
-pub const VertexTypeFlags = enum(c_int) {
-    Texture8Bit = 1,
-    Texture16Bit = 2,
-    Texture32Bitf = 3,
-    Color5650 = 4 << 2,
-    Color5551 = 5 << 2,
-    Color4444 = 6 << 2,
-    Color8888 = 7 << 2,
-    Normal8Bit = 1 << 5,
-    Normal16Bit = 2 << 5,
-    Normal32Bitf = 3 << 5,
-    Vertex8Bit = 1 << 7,
-    Vertex16Bit = 2 << 7,
-    Vertex32Bitf = 3 << 7,
-    Weight8Bit = 1 << 9,
-    Weight16Bit = 2 << 9,
-    Weight32Bitf = 3 << 9,
-    Index8Bit = 1 << 11,
-    Index16Bit = 2 << 11,
-    Transform2D = 1 << 23,
-    Transform3D = 0,
+pub const VertexType = packed struct(u24) {
+    uv: enum(u2) {
+        None = 0,
+        Texture8Bit = 1,
+        Texture16Bit = 2,
+        Texture32Bitf = 3,
+    } = .None,
+    color: enum(u3) {
+        None = 0,
+        Color5650 = 4,
+        Color5551 = 5,
+        Color4444 = 6,
+        Color8888 = 7,
+    } = .None,
+    normal: enum(u2) {
+        None = 0,
+        Normal8Bit = 1,
+        Normal16Bit = 2,
+        Normal32Bitf = 3,
+    } = .None,
+    vertex: enum(u2) {
+        None = 0,
+        Vertex8Bit = 1,
+        Vertex16Bit = 2,
+        Vertex32Bitf = 3,
+    },
+    weight: enum(u2) {
+        None = 0,
+        Weight8Bit = 1,
+        Weight16Bit = 2,
+        Weight32Bitf = 3,
+    } = .None,
+    index: enum(u3) {
+        None = 0,
+        Index8Bit = 1,
+        Index16Bit = 2,
+    } = .None,
+    weight_count: enum(u4) {
+        Weight_1 = 0,
+        Weight_4 = 3,
+        Weight_5 = 4,
+        Weight_6 = 5,
+        Weight_7 = 6,
+        Weight_8 = 7,
+    } = .Weight_1,
+    vertex_count: enum(u5) {
+        Vertex_1 = 0,
+        Vertex_2 = 1,
+        Vertex_3 = 2,
+        Vertex_4 = 3,
+        Vertex_5 = 4,
+        Vertex_6 = 5,
+        Vertex_7 = 6,
+        Vertex_8 = 7,
+    } = .Vertex_1,
+    transform: enum(u1) {
+        Transform3D = 0,
+        Transform2D = 1, // Skips transforming vertex
+    },
 };
 
 pub const GuSwapBuffersCallback = ?*const fn ([*c]?*anyopaque, [*c]?*anyopaque) callconv(.C) void;

@@ -1,10 +1,11 @@
 pub const types = @import("pspgutypes.zig");
 
 const libzpsp = @import("psp");
+const libzpsp_ge = libzpsp.sceGe_user; // DEPRECATED call the wrapper instead
+
+const ScePspFVector3 = libzpsp.types.ScePspFVector3;
 const ScePspIMatrix4 = libzpsp.types.ScePspIMatrix4;
 const ScePspFMatrix4 = libzpsp.types.ScePspFMatrix4;
-const libzpsp_ge = libzpsp.sceGe_user;
-const libzpsp_display = libzpsp.sceDisplay;
 
 const pspge = @import("pspge.zig");
 const pspdisplay = @import("pspdisplay.zig");
@@ -34,7 +35,7 @@ const GuSettings = struct {
     ge_callback_id: i32,
 
     swapBuffersCallback: types.GuSwapBuffersCallback,
-    swapBuffersBehaviour: i32,
+    swapBuffersBehaviour: pspdisplay.PspDisplaySetBufSync,
 };
 
 const GupspList = struct {
@@ -63,7 +64,7 @@ const GuContext = struct {
 };
 
 const GuDrawBuffer = struct {
-    pixel_size: i32,
+    pixel_format: pspdisplay.PspDisplayPixelFormats,
     frame_width: i32,
     frame_buffer: ?*anyopaque,
     disp_buffer: ?*anyopaque,
@@ -220,7 +221,7 @@ pub fn resetValues() void {
     gu_psp_on = 0;
     gu_call_mode = 0;
 
-    gu_draw_buffer.pixel_size = 1;
+    gu_draw_buffer.pixel_format = .Format5551;
     gu_draw_buffer.frame_width = 0;
     gu_draw_buffer.frame_buffer = null;
     gu_draw_buffer.disp_buffer = null;
@@ -560,26 +561,27 @@ pub fn sceGuDispBuffer(width: c_int, height: c_int, dispbp: ?*anyopaque, dispbw:
         gu_draw_buffer.frame_width = dispbw;
 
     drawRegion(0, 0, gu_draw_buffer.width, gu_draw_buffer.height);
-    _ = libzpsp_display.sceDisplaySetMode(0, gu_draw_buffer.width, gu_draw_buffer.height);
+    _ = pspdisplay.sceDisplaySetMode(0, gu_draw_buffer.width, gu_draw_buffer.height);
 
     if (gu_psp_on != 0)
-        _ = libzpsp_display.sceDisplaySetFrameBuf(@as(*anyopaque, @ptrFromInt(@intFromPtr(ge_edram_address) + @intFromPtr(gu_draw_buffer.disp_buffer))), dispbw, gu_draw_buffer.pixel_size, @intFromEnum(pspdisplay.PspDisplaySetBufSync.Nextframe));
+        _ = pspdisplay.sceDisplaySetFrameBuf(@as(*anyopaque, @ptrFromInt(@intFromPtr(ge_edram_address) + @intFromPtr(gu_draw_buffer.disp_buffer))), dispbw, gu_draw_buffer.pixel_format, .Nextframe);
 }
 
 pub fn sceGuDisplay(state: bool) void {
     if (state) {
-        _ = libzpsp_display.sceDisplaySetFrameBuf(@as(*anyopaque, @ptrFromInt(@intFromPtr(ge_edram_address) + @intFromPtr(gu_draw_buffer.disp_buffer))), gu_draw_buffer.frame_width, gu_draw_buffer.pixel_size, @intFromEnum(pspdisplay.PspDisplaySetBufSync.Nextframe));
+        _ = pspdisplay.sceDisplaySetFrameBuf(@as(*anyopaque, @ptrFromInt(@intFromPtr(ge_edram_address) + @intFromPtr(gu_draw_buffer.disp_buffer))), gu_draw_buffer.frame_width, gu_draw_buffer.pixel_format, .Nextframe);
     } else {
-        _ = libzpsp_display.sceDisplaySetFrameBuf(null, 0, 0, @intFromEnum(pspdisplay.PspDisplaySetBufSync.Nextframe));
+        _ = pspdisplay.sceDisplaySetFrameBuf(null, 0, .Format565, .Nextframe);
     }
 
     gu_psp_on = @intFromBool(state);
 }
 
-pub fn sceGuDrawArray(prim: types.GuPrimitive, vtype: c_int, count: c_int, indices: ?*const anyopaque, vertices: ?*const anyopaque) void {
-    @setRuntimeSafety(false);
-    if (vtype != 0)
-        sendCommandi(18, vtype);
+pub fn sceGuDrawArray(prim: types.GuPrimitive, vtype: types.VertexType, count: c_int, indices: ?*const anyopaque, vertices: ?*const anyopaque) void {
+    const vtype_u24: u24 = @bitCast(vtype);
+
+    if (vtype_u24 != 0)
+        sendCommandi(18, vtype_u24);
 
     if (indices != null) {
         sendCommandi(16, @as(c_int, @intCast((@intFromPtr(indices) >> 8))) & 0xf0000);
@@ -635,11 +637,8 @@ pub fn sceGuDrawBezier(vtype: c_int, ucount: c_int, vcount: c_int, indices: ?*co
     sendCommandi(5, (vcount << 8) | ucount);
 }
 
-pub fn sceGuDrawBuffer(pix: types.GuPixelMode, fbp: ?*anyopaque, fbw: c_int) void {
-    @setRuntimeSafety(false);
-    const psm = @intFromEnum(pix);
-
-    gu_draw_buffer.pixel_size = psm;
+pub fn sceGuDrawBuffer(pixel_format: pspdisplay.PspDisplayPixelFormats, fbp: ?*anyopaque, fbw: c_int) void {
+    gu_draw_buffer.pixel_format = pixel_format;
     gu_draw_buffer.frame_width = fbw;
     gu_draw_buffer.frame_buffer = fbp;
 
@@ -649,16 +648,15 @@ pub fn sceGuDrawBuffer(pix: types.GuPixelMode, fbp: ?*anyopaque, fbw: c_int) voi
     if (gu_draw_buffer.depth_width != 0)
         gu_draw_buffer.depth_width = fbw;
 
-    sendCommandi(210, psm);
+    sendCommandi(210, @intFromEnum(pixel_format));
     sendCommandi(156, @as(c_int, @intCast(@as(c_uint, @intCast(@intFromPtr(gu_draw_buffer.frame_buffer))) & 0xffffff)));
     sendCommandi(157, @as(c_int, @intCast(((@as(c_uint, @intCast(@intFromPtr(gu_draw_buffer.frame_buffer))) & 0xff000000) >> 8))) | gu_draw_buffer.frame_width);
     sendCommandi(158, @as(c_int, @intCast(@as(c_uint, @intCast(@intFromPtr(gu_draw_buffer.depth_buffer))) & 0xffffff)));
     sendCommandi(159, @as(c_int, @intCast(((@as(c_uint, @intCast(@intFromPtr(gu_draw_buffer.depth_buffer))) & 0xff000000) >> 8))) | gu_draw_buffer.depth_width);
 }
 
-pub fn sceGuDrawBufferList(psm: types.GuPixelMode, fbp: ?*anyopaque, fbw: c_int) void {
-    @setRuntimeSafety(false);
-    sendCommandi(210, @intFromEnum(psm));
+pub fn sceGuDrawBufferList(pixel_format: pspdisplay.PspDisplayPixelFormats, fbp: ?*anyopaque, fbw: c_int) void {
+    sendCommandi(210, @intFromEnum(pixel_format));
     sendCommandi(156, @as(c_int, @intCast(@intFromPtr(fbp))) & 0xffffff);
     sendCommandi(157, @as(c_int, @intCast((@as(c_uint, @intCast(@intFromPtr(fbp))) & 0xff000000) >> 8)) | fbw);
 }
@@ -882,14 +880,14 @@ pub fn sceGuGetStatus(state: types.GuState) c_int {
     return 0;
 }
 
-pub fn sceGuLight(light: c_int, typec: types.GuLightType, components: types.GuLightBitFlags, position: [*c]const types.ScePspFVector3) void {
+pub fn sceGuLight(light: u32, light_type: types.GuLightType, components: types.GuLightBitFlags, position: [*c]const ScePspFVector3) void {
     @setRuntimeSafety(false);
 
     sendCommandf(light_settings[light].xpos, position.*.x);
     sendCommandf(light_settings[light].ypos, position.*.y);
     sendCommandf(light_settings[light].zpos, position.*.z);
 
-    var kind: c_int = 2;
+    var kind: u24 = 2;
     if (@intFromEnum(components) != 8) {
         if ((@intFromEnum(components) ^ 6) < 1) {
             kind = 1;
@@ -898,7 +896,7 @@ pub fn sceGuLight(light: c_int, typec: types.GuLightType, components: types.GuLi
         }
     }
 
-    sendCommandi(light_settings[light].typec, ((typec & 0x03) << 8) | kind);
+    sendCommandi(light_settings[light].typec, (@as(u24, @intFromEnum(light_type)) << 8) | kind);
 }
 
 pub fn sceGuLightAtt(light: usize, atten0: f32, atten1: f32, atten2: f32) void {
@@ -910,7 +908,7 @@ pub fn sceGuLightAtt(light: usize, atten0: f32, atten1: f32, atten2: f32) void {
 
 pub fn sceGuLightColor(light: usize, component: types.GuLightBitFlags, col: c_int) void {
     @setRuntimeSafety(false);
-    switch (@as(types.GuLightBitFlags, @enumFromInt(component))) {
+    switch (component) {
         .Ambient => {
             sendCommandi(light_settings[light].ambient, col & 0xffffff);
         },
@@ -928,7 +926,6 @@ pub fn sceGuLightColor(light: usize, component: types.GuLightBitFlags, col: c_in
             sendCommandi(light_settings[light].diffuse, col & 0xffffff);
             sendCommandi(light_settings[light].specular, col & 0xffffff);
         },
-        else => {},
     }
 }
 
@@ -937,7 +934,7 @@ pub fn sceGuLightMode(mode: c_int) void {
     sendCommandi(94, mode);
 }
 
-pub fn sceGuLightSpot(light: usize, direction: [*c]const types.ScePspFVector3, exponent: f32, cutoff: f32) void {
+pub fn sceGuLightSpot(light: usize, direction: [*c]const ScePspFVector3, exponent: f32, cutoff: f32) void {
     @setRuntimeSafety(false);
     sendCommandf(light_settings[light].exponent, exponent);
     sendCommandf(light_settings[light].cutoff, cutoff);
@@ -1199,7 +1196,7 @@ pub fn sceGuSwapBuffers() ?*anyopaque {
     }
 
     if (gu_psp_on != 0) {
-        _ = libzpsp_display.sceDisplaySetFrameBuf(@as(*anyopaque, @ptrFromInt(@intFromPtr(ge_edram_address) + @intFromPtr(gu_draw_buffer.disp_buffer))), gu_draw_buffer.frame_width, gu_draw_buffer.pixel_size, gu_settings.swapBuffersBehaviour);
+        _ = pspdisplay.sceDisplaySetFrameBuf(@as(*anyopaque, @ptrFromInt(@intFromPtr(ge_edram_address) + @intFromPtr(gu_draw_buffer.disp_buffer))), gu_draw_buffer.frame_width, gu_draw_buffer.pixel_format, gu_settings.swapBuffersBehaviour);
     }
 
     gu_current_frame ^= 1;
@@ -1210,13 +1207,11 @@ pub fn guSwapBuffers() void {
     _ = sceGuSwapBuffers();
 }
 
-pub fn guSwapBuffersBehaviour(behaviour: c_int) void {
-    @setRuntimeSafety(false);
+pub fn guSwapBuffersBehaviour(behaviour: pspdisplay.PspDisplaySetBufSync) void {
     gu_settings.swapBuffersBehaviour = behaviour;
 }
 
 pub fn guSwapBuffersCallback(callback: types.GuSwapBuffersCallback) void {
-    @setRuntimeSafety(false);
     gu_settings.swapBuffersCallback = callback;
 }
 
@@ -1406,7 +1401,7 @@ pub fn sceGuInit() void {
 
     gu_settings.ge_callback_id = libzpsp_ge.sceGeSetCallback(@ptrCast(&callback));
     gu_settings.swapBuffersCallback = null;
-    gu_settings.swapBuffersBehaviour = 1;
+    gu_settings.swapBuffersBehaviour = .Nextframe;
 
     ge_edram_address = libzpsp_ge.sceGeEdramGetAddr();
 
@@ -1461,28 +1456,30 @@ pub fn sceGuStart(cont: types.GuContextType, list: ?*anyopaque) void {
     }
 }
 
-const Vertex = extern struct { color: u32, x: u16, y: u16, z: u16, pad: u16 };
-
 pub fn sceGuClear(flags: c_int) void {
-    @setRuntimeSafety(false);
+    const Vertex = extern struct { color: u32, x: u16, y: u16, z: u16, pad: u16 };
+
+    const vertex_type = types.VertexType{
+        .color = .Color8888,
+        .vertex = .Vertex16Bit,
+        .transform = .Transform2D,
+    };
+
     const context: *GuContext = &gu_contexts[@as(usize, @intCast(gu_curr_context))];
 
     var filter: u32 = 0;
-    switch (gu_draw_buffer.pixel_size) {
-        0 => {
+    switch (gu_draw_buffer.pixel_format) {
+        .Format565 => {
             filter = context.clear_color & 0xffffff;
         },
-        1 => {
+        .Format5551 => {
             filter = (context.clear_color & 0xffffff) | (context.clear_stencil << 31);
         },
-        2 => {
+        .Format4444 => {
             filter = (context.clear_color & 0xffffff) | (context.clear_stencil << 28);
         },
-        3 => {
+        .Format8888 => {
             filter = (context.clear_color & 0xffffff) | (context.clear_stencil << 24);
-        },
-        else => {
-            filter = 0;
         },
     }
 
@@ -1505,12 +1502,9 @@ pub fn sceGuClear(flags: c_int) void {
         curr[i].z = @as(u16, @intCast(context.clear_depth));
     }
 
-    const ClearBitFlags = types.ClearBitFlags;
-    const VertexTypeFlags = types.VertexTypeFlags;
-    const GuPrimitive = types.GuPrimitive;
+    sendCommandi(211, ((flags & (@intFromEnum(types.ClearBitFlags.ColorBuffer) | @intFromEnum(types.ClearBitFlags.StencilBuffer) | @intFromEnum(types.ClearBitFlags.DepthBuffer))) << 8) | 0x01);
 
-    sendCommandi(211, ((flags & (@intFromEnum(ClearBitFlags.ColorBuffer) | @intFromEnum(ClearBitFlags.StencilBuffer) | @intFromEnum(ClearBitFlags.DepthBuffer))) << 8) | 0x01);
-    sceGuDrawArray(GuPrimitive.Sprites, @intFromEnum(VertexTypeFlags.Color8888) | @intFromEnum(VertexTypeFlags.Vertex16Bit) | @intFromEnum(VertexTypeFlags.Transform2D), @as(c_int, @intCast(count)), null, vertices);
+    sceGuDrawArray(.Sprites, vertex_type, @as(c_int, @intCast(count)), null, vertices);
     sendCommandi(211, 0);
 }
 

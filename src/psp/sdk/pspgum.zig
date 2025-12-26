@@ -14,7 +14,7 @@ var gum_stack_depth: [4][*]ScePspFMatrix4 = [_][*]ScePspFMatrix4{ @as([*]ScePspF
 
 var gum_matrix_stack: [4][32]ScePspFMatrix4 = undefined;
 
-pub fn sceGumDrawArray(prim: pspgu.types.GuPrimitive, vtype: c_int, count: c_int, indices: ?*const anyopaque, vertices: ?*const anyopaque) void {
+pub fn sceGumDrawArray(prim: pspgu.types.GuPrimitive, vtype: pspgu.types.VertexType, count: c_int, indices: ?*const anyopaque, vertices: ?*const anyopaque) void {
     sceGumUpdateMatrix();
     pspgu.sceGuDrawArray(prim, vtype, count, indices, vertices);
 }

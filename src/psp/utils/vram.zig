@@ -1,8 +1,10 @@
 //This is probably broken
-const gu = @import("../sdk/pspgutypes.zig");
+const gu = @import("../sdk/pspgu.zig");
+const ge = @import("../sdk/pspge.zig");
 const display = @import("../sdk/pspdisplay.zig");
 
 const libzpsp = @import("psp");
+const libzpsp_ge = libzpsp.sceGe_user;
 
 //This isn't an actual "allocator" per se
 //It allocates static chunks of VRAM
@@ -11,7 +13,7 @@ const libzpsp = @import("psp");
 var vramOff: usize = 0;
 
 //Get the amount of memory needed
-fn getMemSize(width: u32, height: u32, format: gu.GuPixelMode) c_uint {
+fn getMemSize(width: u32, height: u32, format: gu.types.GuPixelMode) c_uint {
     switch (format) {
         .PsmT4 => {
             return width * height / 2;
@@ -34,13 +36,13 @@ fn getMemSize(width: u32, height: u32, format: gu.GuPixelMode) c_uint {
 }
 
 //Allocate a buffer of VRAM in VRAM-Relative pointers (0 is 0x04000000)
-pub fn allocVramRelative(width: u32, height: u32, format: gu.GuPixelMode) ?*anyopaque {
+pub fn allocVramRelative(width: u32, height: u32, format: gu.types.GuPixelMode) ?*anyopaque {
     const res = vramOff;
     vramOff += getMemSize(width, height, format);
     return @as(?*anyopaque, @ptrFromInt(res));
 }
 
-//Allocate a buffer of VRAM in VRAM-Absolute pointers (0x04000000 start)
-pub fn allocVramAbsolute(width: u32, height: u32, format: gu.GuPixelMode) ?*anyopaque {
-    return @as(?*anyopaque, @ptrFromInt(@intFromPtr(display.allocVramDirect(width, height, format)) + @intFromPtr(libzpsp.ge.sceGeEdramGetAddr())));
+pub fn allocVramAbsolute(width: u32, height: u32, format: gu.types.GuPixelMode) *align(16) anyopaque {
+    const relative_offset = allocVramRelative(width, height, format);
+    return @ptrFromInt(@intFromPtr(relative_offset) + @intFromPtr(libzpsp_ge.sceGeEdramGetAddr()));
 }

@@ -18,6 +18,13 @@ const Vertex = packed struct {
     z: f32,
 };
 
+const vertex_type = gu.types.VertexType{
+    .uv = .Texture32Bitf,
+    .color = .Color8888,
+    .vertex = .Vertex32Bitf,
+    .transform = .Transform3D,
+};
+
 var vertices: [36]Vertex = [_]Vertex{
     Vertex{ .u = 0, .v = 0, .c = 0xff7f0000, .x = -1, .y = -1, .z = 1 }, // 0
     Vertex{ .u = 1, .v = 0, .c = 0xff7f0000, .x = -1, .y = 1, .z = 1 }, // 4
@@ -71,7 +78,7 @@ pub fn main() !void {
 
     gu.sceGuInit();
     gu.sceGuStart(.Direct, @as(*anyopaque, @ptrCast(&display_list)));
-    gu.sceGuDrawBuffer(.Psm8888, fbp0, SCR_BUF_WIDTH);
+    gu.sceGuDrawBuffer(.Format8888, fbp0, SCR_BUF_WIDTH);
     gu.sceGuDispBuffer(SCREEN_WIDTH, SCREEN_HEIGHT, fbp1, SCR_BUF_WIDTH);
     gu.sceGuDepthBuffer(zbp, SCR_BUF_WIDTH);
     gu.sceGuOffset(2048 - (SCREEN_WIDTH / 2), 2048 - (SCREEN_HEIGHT / 2));
@@ -123,7 +130,7 @@ pub fn main() !void {
         gu.sceGuAmbientColor(0xffffffff);
 
         // draw cube
-        gum.sceGumDrawArray(.Triangles, @intFromEnum(gu.types.VertexTypeFlags.Texture32Bitf) | @intFromEnum(gu.types.VertexTypeFlags.Color8888) | @intFromEnum(gu.types.VertexTypeFlags.Vertex32Bitf) | @intFromEnum(gu.types.VertexTypeFlags.Transform3D), 12 * 3, null, @as(*anyopaque, @ptrCast(&vertices)));
+        gum.sceGumDrawArray(.Triangles, vertex_type, 12 * 3, null, @as(*anyopaque, @ptrCast(&vertices)));
 
         gu.guFinish();
         gu.guSync(.Finish, .Wait);
