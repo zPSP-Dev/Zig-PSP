@@ -1,4 +1,4 @@
-const psptypes = @import("psp");
+const psptypes = @import("libzpsp");
 const SceSize = psptypes.SceSize;
 
 pub const SceKernelLoadExecParam = extern struct {

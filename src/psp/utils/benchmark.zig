@@ -1,4 +1,4 @@
-const psp = @import("psp");
+const psp = @import("libzpsp");
 const debug = @import("debug.zig");
 var current_time: u64 = 0;
 var tickRate: u32 = 0;

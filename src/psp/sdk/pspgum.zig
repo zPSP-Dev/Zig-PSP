@@ -1,6 +1,6 @@
 const pspgu = @import("pspgu.zig");
 
-const libzpsp = @import("psp");
+const libzpsp = @import("libzpsp");
 const ScePspFMatrix4 = libzpsp.types.ScePspFMatrix4;
 const ScePspFVector3 = libzpsp.types.ScePspFVector3;
 

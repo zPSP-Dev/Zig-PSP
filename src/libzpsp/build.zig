@@ -4,17 +4,11 @@ pub fn build(b: *std.Build) void {
     const target = b.standardTargetOptions(.{});
     const optimize = b.standardOptimizeOption(.{});
 
-    const lib_mod = b.createModule(.{
+    const lib_mod = b.addModule("libzpsp", .{
         .root_source_file = b.path("src/libzpsp.zig"),
         .target = target,
         .optimize = optimize,
     });
 
-    const lib = b.addLibrary(.{
-        .linkage = .static,
-        .name = "libzpsp",
-        .root_module = lib_mod,
-    });
-
-    b.installArtifact(lib);
+    _ = lib_mod;
 }

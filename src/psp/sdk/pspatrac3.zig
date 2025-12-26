@@ -1,4 +1,4 @@
-const psptypes = @import("psp");
+const psptypes = @import("libzpsp");
 
 pub const AtracError = enum(u32) {
     ParamFail = (0x80630001),

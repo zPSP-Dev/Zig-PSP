@@ -1,6 +1,6 @@
 pub const types = @import("pspgutypes.zig");
 
-const libzpsp = @import("psp");
+const libzpsp = @import("libzpsp");
 const libzpsp_ge = libzpsp.sceGe_user; // DEPRECATED call the wrapper instead
 
 const ScePspFVector3 = libzpsp.types.ScePspFVector3;

@@ -1,4 +1,4 @@
-const libzpsp = @import("psp");
+const libzpsp = @import("libzpsp");
 const SceUID = libzpsp.types.SceUID;
 const SceSize = libzpsp.types.SceSize;
 const SceUInt = libzpsp.types.SceUInt;

@@ -3,7 +3,7 @@ const gu = @import("../sdk/pspgu.zig");
 const ge = @import("../sdk/pspge.zig");
 const display = @import("../sdk/pspdisplay.zig");
 
-const libzpsp = @import("psp");
+const libzpsp = @import("libzpsp");
 const libzpsp_ge = libzpsp.sceGe_user;
 
 //This isn't an actual "allocator" per se

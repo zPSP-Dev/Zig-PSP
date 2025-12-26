@@ -1,4 +1,4 @@
-const libzpsp = @import("psp");
+const libzpsp = @import("libzpsp");
 const libzpsp_display = libzpsp.sceDisplay;
 const libzpsp_ge = libzpsp.sceGe_user;
 

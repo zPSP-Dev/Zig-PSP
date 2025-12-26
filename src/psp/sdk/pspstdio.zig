@@ -1,4 +1,4 @@
-const psptypes = @import("psp");
+const psptypes = @import("libzpsp");
 const SceUID = psptypes.SceUID;
 
 // Function to get the current standard in file no

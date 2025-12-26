@@ -1,4 +1,4 @@
-const libzpsp = @import("psp");
+const libzpsp = @import("libzpsp");
 const libzpsp_threadman = libzpsp.ThreadManForUser;
 const libzpsp_loadexec = libzpsp.LoadExecForUser;
 

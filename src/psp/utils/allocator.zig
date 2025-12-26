@@ -4,7 +4,7 @@ const debug = std.debug;
 const assert = debug.assert;
 
 const psploadexec = @import("../sdk/psploadexec.zig");
-const psp = @import("psp");
+const psp = @import("libzpsp");
 
 const SceSize = psp.SceSize;
 const SceUID = psp.SceUID;

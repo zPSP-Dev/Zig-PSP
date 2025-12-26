@@ -1,4 +1,4 @@
-const libzpsp = @import("psp");
+const libzpsp = @import("libzpsp");
 
 const module = libzpsp.sceCtrl;
 

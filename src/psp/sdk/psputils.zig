@@ -1,5 +1,5 @@
-const psptypes = @import("psp");
-const psprtc = @import("psp");
+const psptypes = @import("libzpsp");
+const psprtc = @import("libzpsp");
 const SceUShort16 = psptypes.SceUShort16;
 const SceULong64 = psptypes.SceULong64;
 const time_t = psprtc.time_t;

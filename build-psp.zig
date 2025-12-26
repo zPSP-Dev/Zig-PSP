@@ -40,7 +40,7 @@ pub fn build_psp(b: *std.Build, comptime build_info: PSPBuildInfo) !void {
     const libzpsp = b.dependency("libzpsp", .{
         .target = target,
         .optimize = optimize,
-    });
+    }).module("libzpsp");
 
     //Build from your main file!
     const exe = b.addExecutable(.{
@@ -52,7 +52,7 @@ pub fn build_psp(b: *std.Build, comptime build_info: PSPBuildInfo) !void {
             .strip = false, // disable as cannot be used with "link_emit_relocs = true"
         }),
     });
-    exe.root_module.addImport("psp", libzpsp.artifact("libzpsp").root_module);
+    exe.root_module.addImport("libzpsp", libzpsp);
 
     exe.setLinkerScript(b.path(build_info.path_to_sdk ++ "tools/linkfile.ld"));
 

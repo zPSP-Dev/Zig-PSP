@@ -1,4 +1,4 @@
-const psptypes = @import("psp");
+const psptypes = @import("libzpsp");
 const SceUID = psptypes.SceUID;
 const SceSize = psptypes.SceSize;
 const SceVoid = psptypes.SceVoid;
