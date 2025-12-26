@@ -7,8 +7,6 @@ on:
   pull_request:
     branches:
       - master
-env:
-  zig_version: 0.14.0
 
 jobs:
   build:
@@ -19,8 +17,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: mlugg/setup-zig@v2
-        with:
-          version: ${{ env.zig_version }}
       - run: zig build examples
 
   lint:
@@ -28,6 +24,4 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: mlugg/setup-zig@v2
-        with:
-          version: ${{ env.zig_version }}
       - run: zig fmt --check *.zig
