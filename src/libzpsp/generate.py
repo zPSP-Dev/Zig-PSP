@@ -157,6 +157,8 @@ def parse_c_type_to_zig(c_type: str) -> str:
         "SceBool": "types.SceBool",
         "SceVoid": "types.SceVoid",
         "ScePVoid": "types.ScePVoid",
+        "SceCtrlData": "types.SceCtrlData",
+        "SceCtrlLatch": "types.SceCtrlLatch",
     }
 
     # Handle const first

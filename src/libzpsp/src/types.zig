@@ -299,3 +299,58 @@ pub const SceUInt = c_uint;
 pub const SceMode = c_int;
 pub const SceOff = SceInt64;
 pub const SceIores = SceInt64;
+
+// See also: https://github.com/hrydgard/ppsspp/issues/17464
+pub const PspCtrlButtons = packed struct(u32) {
+    select: u1,
+    l3: u1, // Available on devkits when connecting a dualshock controller
+    r3: u1,
+    start: u1,
+
+    up: u1,
+    right: u1,
+    down: u1,
+    left: u1,
+
+    l_trigger: u1,
+    r_trigger: u1,
+    l2: u1, // Available on devkits when connecting a dualshock controller
+    r2: u1,
+
+    triangle: u1,
+    circle: u1,
+    cross: u1,
+    square: u1,
+
+    home: u1,
+    hold: u1,
+    wlan_up: u1,
+    remote: u1,
+
+    vol_up: u1,
+    vol_down: u1,
+    screen: u1,
+    note: u1,
+
+    disc: u1,
+    memory_stick: u1,
+    unknown_b26: u1,
+    unknown_b27: u1,
+
+    unknown_b28_31: u4,
+};
+
+pub const SceCtrlData = extern struct {
+    timeStamp: c_uint,
+    buttons: PspCtrlButtons,
+    Lx: u8,
+    Ly: u8,
+    Rsrv: [6]u8,
+};
+
+pub const SceCtrlLatch = extern struct {
+    uiMake: PspCtrlButtons,
+    uiBreak: PspCtrlButtons,
+    uiPress: PspCtrlButtons,
+    uiRelease: PspCtrlButtons,
+};

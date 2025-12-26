@@ -31,9 +31,9 @@ pub extern fn sceCtrlGetSamplingMode(pmode: [*c]c_int) callconv(.C) c_int;
 /// @see ::SceCtrlData
 /// @see ::sceCtrlPeekBufferNegative()
 /// @see ::sceCtrlReadBufferPositive()
-pub extern fn sceCtrlPeekBufferPositive(pad_data: [*c]c_int, count: c_int) callconv(.C) c_int;
+pub extern fn sceCtrlPeekBufferPositive(pad_data: [*c]types.SceCtrlData, count: c_int) callconv(.C) c_int;
 
-pub extern fn sceCtrlPeekBufferNegative(pad_data: [*c]c_int, count: c_int) callconv(.C) c_int;
+pub extern fn sceCtrlPeekBufferNegative(pad_data: [*c]types.SceCtrlData, count: c_int) callconv(.C) c_int;
 
 /// @brief Read new controller data from the controller service.
 /// Controller data contains current button and axis state.
@@ -54,9 +54,9 @@ pub extern fn sceCtrlPeekBufferNegative(pad_data: [*c]c_int, count: c_int) callc
 /// @see ::SceCtrlData
 /// @see ::sceCtrlReadBufferNegative()
 /// @see ::sceCtrlPeekBufferPositive()
-pub extern fn sceCtrlReadBufferPositive(pad_data: [*c]c_int, count: c_int) callconv(.C) c_int;
+pub extern fn sceCtrlReadBufferPositive(pad_data: [*c]types.SceCtrlData, count: c_int) callconv(.C) c_int;
 
-pub extern fn sceCtrlReadBufferNegative(pad_data: [*c]c_int, count: c_int) callconv(.C) c_int;
+pub extern fn sceCtrlReadBufferNegative(pad_data: [*c]types.SceCtrlData, count: c_int) callconv(.C) c_int;
 
 /// @brief Read latest latch data from the controller service.
 /// Latch data contains information about button state changes between two controller service sampling cycles.
@@ -66,7 +66,7 @@ pub extern fn sceCtrlReadBufferNegative(pad_data: [*c]c_int, count: c_int) callc
 /// Returns < 0 on error.
 /// @see ::SceCtrlLatch
 /// @see ::sceCtrlReadLatch()
-pub extern fn sceCtrlPeekLatch(latch_data: [*c]c_int) callconv(.C) c_int;
+pub extern fn sceCtrlPeekLatch(latch_data: [*c]types.SceCtrlLatch) callconv(.C) c_int;
 
 /// @brief Read new latch data from the controller service.
 /// Latch data contains information about button state changes between two controller service sampling cycles.
@@ -108,7 +108,7 @@ pub extern fn sceCtrlPeekLatch(latch_data: [*c]c_int) callconv(.C) c_int;
 /// Returns < 0 on error.
 /// @see ::SceCtrlLatch
 /// @see ::sceCtrlPeekLatch()
-pub extern fn sceCtrlReadLatch(latch_data: [*c]c_int) callconv(.C) c_int;
+pub extern fn sceCtrlReadLatch(latch_data: [*c]types.SceCtrlLatch) callconv(.C) c_int;
 
 pub extern fn sceCtrl_348D99D4() callconv(.C) void;
 
