@@ -1414,7 +1414,7 @@ pub fn sceGuInit() void {
     _ = pspge.sceGeListSync(ge_list_executed[0], .Wait);
 }
 
-pub fn sceGuStart(cont: types.GuContextType, list: ?*anyopaque) void {
+pub fn sceGuStart(cont: types.GuContextType, list: [*]align(16) u32) void {
     @setRuntimeSafety(false);
     const local_list: [*]u32 = @as([*]u32, @ptrFromInt((@as(usize, @intCast(@intFromPtr(list))) | 0x40000000)));
 

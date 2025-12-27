@@ -21,7 +21,7 @@ pub fn main() !void {
     const zbp = sdk.extra.vram.allocVramRelative(SCR_BUF_WIDTH, SCREEN_HEIGHT, .Psm4444);
 
     gu.sceGuInit();
-    gu.sceGuStart(.Direct, @as(*anyopaque, @ptrCast(&display_list)));
+    gu.sceGuStart(.Direct, &display_list);
     gu.sceGuDrawBuffer(.Format8888, fbp0, SCR_BUF_WIDTH);
     gu.sceGuDispBuffer(SCREEN_WIDTH, SCREEN_HEIGHT, fbp1, SCR_BUF_WIDTH);
     gu.sceGuDepthBuffer(zbp, SCR_BUF_WIDTH);
@@ -37,7 +37,7 @@ pub fn main() !void {
     gu.sceGuDisplay(true);
 
     while (!sdk.extra.utils.isExitRequested()) {
-        gu.sceGuStart(.Direct, @as(*anyopaque, @ptrCast(&display_list)));
+        gu.sceGuStart(.Direct, &display_list);
 
         gu.sceGuClearColor(gu.rgba(0xff, 0xff, 0, 0xff));
         gu.sceGuClearDepth(0);
