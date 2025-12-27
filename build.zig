@@ -11,7 +11,7 @@ pub fn build(b: *std.Build) void {
             .root_source_file = b.path("tools/prxgen/stub.zig"),
             .link_libc = true,
             .target = hostTarget,
-            .optimize = .ReleaseFast,
+            .optimize = hostOptimize,
         }),
     });
     prxgen.addCSourceFile(.{
@@ -44,9 +44,7 @@ pub fn build(b: *std.Build) void {
         .cpu_features_add = feature_set,
     });
 
-    //All of the release modes work
-    //Debug Mode can cause issues with trap instructions - use ReleaseSafe for "Debug" builds
-    const psp_optimize = builtin.Mode.ReleaseSmall;
+    const psp_optimize = hostOptimize;
 
     const pspsdk_module = b.addModule("pspsdk", .{
         .root_source_file = b.path("src/pspsdk.zig"),

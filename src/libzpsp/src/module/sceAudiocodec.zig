@@ -2,21 +2,21 @@
 const types = @import("../types.zig");
 const macro = @import("../macro.zig");
 
-pub extern fn sceAudiocodecCheckNeedMem(Buffer: [*c]c_ulong, Type: c_int) callconv(.C) c_int;
+pub extern fn sceAudiocodecCheckNeedMem(Buffer: [*c]c_ulong, Type: c_int) callconv(.c) c_int;
 
-pub extern fn sceAudiocodecInit(Buffer: [*c]c_ulong, Type: c_int) callconv(.C) c_int;
+pub extern fn sceAudiocodecInit(Buffer: [*c]c_ulong, Type: c_int) callconv(.c) c_int;
 
-pub extern fn sceAudiocodecDecode(Buffer: [*c]c_ulong, Type: c_int) callconv(.C) c_int;
+pub extern fn sceAudiocodecDecode(Buffer: [*c]c_ulong, Type: c_int) callconv(.c) c_int;
 
-pub extern fn sceAudiocodecGetInfo() callconv(.C) void;
+pub extern fn sceAudiocodecGetInfo() callconv(.c) void;
 
-pub extern fn sceAudiocodec_6CD2A861() callconv(.C) void;
+pub extern fn sceAudiocodec_6CD2A861() callconv(.c) void;
 
-pub extern fn sceAudiocodec_59176A0F() callconv(.C) void;
+pub extern fn sceAudiocodec_59176A0F() callconv(.c) void;
 
-pub extern fn sceAudiocodecGetEDRAM(Buffer: [*c]c_ulong, Type: c_int) callconv(.C) c_int;
+pub extern fn sceAudiocodecGetEDRAM(Buffer: [*c]c_ulong, Type: c_int) callconv(.c) c_int;
 
-pub extern fn sceAudiocodecReleaseEDRAM(Buffer: [*c]c_ulong) callconv(.C) c_int;
+pub extern fn sceAudiocodecReleaseEDRAM(Buffer: [*c]c_ulong) callconv(.c) c_int;
 
 comptime {
     asm (macro.import_module_start("sceAudiocodec", "0x40090000", "8"));

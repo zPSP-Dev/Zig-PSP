@@ -2,65 +2,65 @@
 const types = @import("../types.zig");
 const macro = @import("../macro.zig");
 
-pub extern fn sceNetInetInit() callconv(.C) c_int;
+pub extern fn sceNetInetInit() callconv(.c) c_int;
 
-pub extern fn sceNetInetTerm() callconv(.C) c_int;
+pub extern fn sceNetInetTerm() callconv(.c) c_int;
 
-pub extern fn sceNetInetAccept() callconv(.C) void;
+pub extern fn sceNetInetAccept() callconv(.c) void;
 
-pub extern fn sceNetInetBind() callconv(.C) void;
+pub extern fn sceNetInetBind() callconv(.c) void;
 
-pub extern fn sceNetInetClose(s: c_int) callconv(.C) c_int;
+pub extern fn sceNetInetClose(s: c_int) callconv(.c) c_int;
 
-pub extern fn sceNetInetCloseWithRST() callconv(.C) void;
+pub extern fn sceNetInetCloseWithRST() callconv(.c) void;
 
-pub extern fn sceNetInetConnect() callconv(.C) void;
+pub extern fn sceNetInetConnect() callconv(.c) void;
 
-pub extern fn sceNetInetGetpeername() callconv(.C) void;
+pub extern fn sceNetInetGetpeername() callconv(.c) void;
 
-pub extern fn sceNetInetGetsockname() callconv(.C) void;
+pub extern fn sceNetInetGetsockname() callconv(.c) void;
 
-pub extern fn sceNetInetGetsockopt() callconv(.C) void;
+pub extern fn sceNetInetGetsockopt() callconv(.c) void;
 
-pub extern fn sceNetInetListen() callconv(.C) void;
+pub extern fn sceNetInetListen() callconv(.c) void;
 
-pub extern fn sceNetInetPoll() callconv(.C) void;
+pub extern fn sceNetInetPoll() callconv(.c) void;
 
-pub extern fn sceNetInetRecv() callconv(.C) void;
+pub extern fn sceNetInetRecv() callconv(.c) void;
 
-pub extern fn sceNetInetRecvfrom() callconv(.C) void;
+pub extern fn sceNetInetRecvfrom() callconv(.c) void;
 
-pub extern fn sceNetInetRecvmsg(s: c_int, msg: [*c]c_int, flags: c_int) callconv(.C) isize;
+pub extern fn sceNetInetRecvmsg(s: c_int, msg: [*c]c_int, flags: c_int) callconv(.c) isize;
 
-pub extern fn sceNetInetSelect(n: c_int, readfds: [*c]c_int, writefds: [*c]c_int, exceptfds: [*c]c_int, timeout: [*c]c_int) callconv(.C) c_int;
+pub extern fn sceNetInetSelect(n: c_int, readfds: [*c]c_int, writefds: [*c]c_int, exceptfds: [*c]c_int, timeout: [*c]c_int) callconv(.c) c_int;
 
-pub extern fn sceNetInetSend() callconv(.C) void;
+pub extern fn sceNetInetSend() callconv(.c) void;
 
-pub extern fn sceNetInetSendto() callconv(.C) void;
+pub extern fn sceNetInetSendto() callconv(.c) void;
 
-pub extern fn sceNetInetSendmsg(s: c_int, msg: [*c]const c_int, flags: c_int) callconv(.C) isize;
+pub extern fn sceNetInetSendmsg(s: c_int, msg: [*c]const c_int, flags: c_int) callconv(.c) isize;
 
-pub extern fn sceNetInetSetsockopt() callconv(.C) void;
+pub extern fn sceNetInetSetsockopt() callconv(.c) void;
 
-pub extern fn sceNetInetShutdown() callconv(.C) void;
+pub extern fn sceNetInetShutdown() callconv(.c) void;
 
-pub extern fn sceNetInetSocket() callconv(.C) void;
+pub extern fn sceNetInetSocket() callconv(.c) void;
 
-pub extern fn sceNetInetSocketAbort() callconv(.C) void;
+pub extern fn sceNetInetSocketAbort() callconv(.c) void;
 
-pub extern fn sceNetInetGetErrno() callconv(.C) c_int;
+pub extern fn sceNetInetGetErrno() callconv(.c) c_int;
 
-pub extern fn sceNetInetGetTcpcbstat() callconv(.C) void;
+pub extern fn sceNetInetGetTcpcbstat() callconv(.c) void;
 
-pub extern fn sceNetInetGetUdpcbstat() callconv(.C) void;
+pub extern fn sceNetInetGetUdpcbstat() callconv(.c) void;
 
-pub extern fn sceNetInetInetAddr() callconv(.C) void;
+pub extern fn sceNetInetInetAddr() callconv(.c) void;
 
-pub extern fn sceNetInetInetAton() callconv(.C) void;
+pub extern fn sceNetInetInetAton() callconv(.c) void;
 
-pub extern fn sceNetInetInetNtop() callconv(.C) void;
+pub extern fn sceNetInetInetNtop() callconv(.c) void;
 
-pub extern fn sceNetInetInetPton() callconv(.C) void;
+pub extern fn sceNetInetInetPton() callconv(.c) void;
 
 comptime {
     asm (macro.import_module_start("sceNetInet", "0x00090000", "30"));

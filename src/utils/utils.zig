@@ -9,7 +9,7 @@ pub fn isExitRequested() bool {
 }
 
 //Exit
-export fn exit_callback(arg1: c_int, arg2: c_int, common: ?*anyopaque) callconv(.C) c_int {
+export fn exit_callback(arg1: c_int, arg2: c_int, common: ?*anyopaque) callconv(.c) c_int {
     _ = arg1;
     _ = arg2;
     _ = common;
@@ -19,7 +19,7 @@ export fn exit_callback(arg1: c_int, arg2: c_int, common: ?*anyopaque) callconv(
 }
 
 //Thread for home button exit thread.
-export fn exit_callback_thread(args: threadman.SceSize, argp: ?*anyopaque) callconv(.C) c_int {
+export fn exit_callback_thread(args: threadman.SceSize, argp: ?*anyopaque) callconv(.c) c_int {
     _ = args;
     _ = argp;
 

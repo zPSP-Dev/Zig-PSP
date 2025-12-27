@@ -4,43 +4,43 @@ const macro = @import("../macro.zig");
 
 /// Attach to the wlan device
 /// Returns 0 on success, < 0 on error.
-pub extern fn sceWlanDevAttach() callconv(.C) c_int;
+pub extern fn sceWlanDevAttach() callconv(.c) c_int;
 
 /// Detach from the wlan device
 /// Returns 0 on success, < 0 on error/
-pub extern fn sceWlanDevDetach() callconv(.C) c_int;
+pub extern fn sceWlanDevDetach() callconv(.c) c_int;
 
-pub extern fn sceWlanDrv_lib_19E51F54() callconv(.C) void;
+pub extern fn sceWlanDrv_lib_19E51F54() callconv(.c) void;
 
-pub extern fn sceWlanDevIsGameMode() callconv(.C) void;
+pub extern fn sceWlanDevIsGameMode() callconv(.c) void;
 
-pub extern fn sceWlanGPPrevEstablishActive() callconv(.C) void;
+pub extern fn sceWlanGPPrevEstablishActive() callconv(.c) void;
 
-pub extern fn sceWlanGPSend() callconv(.C) void;
+pub extern fn sceWlanGPSend() callconv(.c) void;
 
-pub extern fn sceWlanGPRecv() callconv(.C) void;
+pub extern fn sceWlanGPRecv() callconv(.c) void;
 
-pub extern fn sceWlanGPRegisterCallback() callconv(.C) void;
+pub extern fn sceWlanGPRegisterCallback() callconv(.c) void;
 
-pub extern fn sceWlanGPUnRegisterCallback() callconv(.C) void;
+pub extern fn sceWlanGPUnRegisterCallback() callconv(.c) void;
 
-pub extern fn sceWlanDrv_lib_81579D36() callconv(.C) void;
+pub extern fn sceWlanDrv_lib_81579D36() callconv(.c) void;
 
-pub extern fn sceWlanDrv_lib_5BAA1FE5() callconv(.C) void;
+pub extern fn sceWlanDrv_lib_5BAA1FE5() callconv(.c) void;
 
-pub extern fn sceWlanDrv_lib_4C14BACA() callconv(.C) void;
+pub extern fn sceWlanDrv_lib_4C14BACA() callconv(.c) void;
 
-pub extern fn sceWlanDrv_lib_2D0FAE4E() callconv(.C) void;
+pub extern fn sceWlanDrv_lib_2D0FAE4E() callconv(.c) void;
 
-pub extern fn sceWlanDrv_lib_56F467CA() callconv(.C) void;
+pub extern fn sceWlanDrv_lib_56F467CA() callconv(.c) void;
 
-pub extern fn sceWlanDrv_lib_FE8A0B46() callconv(.C) void;
+pub extern fn sceWlanDrv_lib_FE8A0B46() callconv(.c) void;
 
-pub extern fn sceWlanDrv_lib_40B0AA4A() callconv(.C) void;
+pub extern fn sceWlanDrv_lib_40B0AA4A() callconv(.c) void;
 
-pub extern fn sceWlanDevSetGPIO() callconv(.C) void;
+pub extern fn sceWlanDevSetGPIO() callconv(.c) void;
 
-pub extern fn sceWlanDevGetStateGPIO() callconv(.C) void;
+pub extern fn sceWlanDevGetStateGPIO() callconv(.c) void;
 
 comptime {
     asm (macro.import_module_start("sceWlanDrv_lib", "0x40010000", "18"));

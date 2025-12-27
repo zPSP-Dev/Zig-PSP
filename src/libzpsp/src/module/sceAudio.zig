@@ -7,14 +7,14 @@ const macro = @import("../macro.zig");
 /// `vol` - The volume.
 /// `buf` - Pointer to the PCM data to output.
 /// Returns 0 on success, an error if less than 0.
-pub extern fn sceAudioOutput(channel: c_int, vol: c_int, buf: ?*anyopaque) callconv(.C) c_int;
+pub extern fn sceAudioOutput(channel: c_int, vol: c_int, buf: ?*anyopaque) callconv(.c) c_int;
 
 /// Output audio of the specified channel (blocking)
 /// `channel` - The channel number.
 /// `vol` - The volume.
 /// `buf` - Pointer to the PCM data to output.
 /// Returns 0 on success, an error if less than 0.
-pub extern fn sceAudioOutputBlocking(channel: c_int, vol: c_int, buf: ?*anyopaque) callconv(.C) c_int;
+pub extern fn sceAudioOutputBlocking(channel: c_int, vol: c_int, buf: ?*anyopaque) callconv(.c) c_int;
 
 /// Output panned audio of the specified channel
 /// `channel` - The channel number.
@@ -22,7 +22,7 @@ pub extern fn sceAudioOutputBlocking(channel: c_int, vol: c_int, buf: ?*anyopaqu
 /// `rightvol` - The right volume.
 /// `buf` - Pointer to the PCM data to output.
 /// Returns 0 on success, an error if less than 0.
-pub extern fn sceAudioOutputPanned(channel: c_int, leftvol: c_int, rightvol: c_int, buf: ?*anyopaque) callconv(.C) c_int;
+pub extern fn sceAudioOutputPanned(channel: c_int, leftvol: c_int, rightvol: c_int, buf: ?*anyopaque) callconv(.c) c_int;
 
 /// Output panned audio of the specified channel (blocking)
 /// `channel` - The channel number.
@@ -30,7 +30,7 @@ pub extern fn sceAudioOutputPanned(channel: c_int, leftvol: c_int, rightvol: c_i
 /// `rightvol` - The right volume.
 /// `buf` - Pointer to the PCM data to output.
 /// Returns 0 on success, an error if less than 0.
-pub extern fn sceAudioOutputPannedBlocking(channel: c_int, leftvol: c_int, rightvol: c_int, buf: ?*anyopaque) callconv(.C) c_int;
+pub extern fn sceAudioOutputPannedBlocking(channel: c_int, leftvol: c_int, rightvol: c_int, buf: ?*anyopaque) callconv(.c) c_int;
 
 /// Allocate and initialize a hardware output channel.
 /// `channel` - Use a value between 0 - 7 to reserve a specific channel.
@@ -41,62 +41,62 @@ pub extern fn sceAudioOutputPannedBlocking(channel: c_int, leftvol: c_int, right
 /// (use the ::PSP_AUDIO_SAMPLE_ALIGN macro to align it).
 /// `format` - The output format to use for the channel.  One of ::PspAudioFormats.
 /// Returns The channel number on success, an error code if less than 0.
-pub extern fn sceAudioChReserve(channel: c_int, samplecount: c_int, format: c_int) callconv(.C) c_int;
+pub extern fn sceAudioChReserve(channel: c_int, samplecount: c_int, format: c_int) callconv(.c) c_int;
 
-pub extern fn sceAudioOneshotOutput() callconv(.C) void;
+pub extern fn sceAudioOneshotOutput() callconv(.c) void;
 
 /// Release a hardware output channel.
 /// `channel` - The channel to release.
 /// Returns 0 on success, an error if less than 0.
-pub extern fn sceAudioChRelease(channel: c_int) callconv(.C) c_int;
+pub extern fn sceAudioChRelease(channel: c_int) callconv(.c) c_int;
 
 /// Get count of unplayed samples remaining
 /// `channel` - The channel number.
 /// Returns Number of samples to be played, an error if less than 0.
-pub extern fn sceAudioGetChannelRestLen(channel: c_int) callconv(.C) c_int;
+pub extern fn sceAudioGetChannelRestLen(channel: c_int) callconv(.c) c_int;
 
 /// Change the output sample count, after it's already been reserved
 /// `channel` - The channel number.
 /// `samplecount` - The number of samples to output in one output call.
 /// Returns 0 on success, an error if less than 0.
-pub extern fn sceAudioSetChannelDataLen(channel: c_int, samplecount: c_int) callconv(.C) c_int;
+pub extern fn sceAudioSetChannelDataLen(channel: c_int, samplecount: c_int) callconv(.c) c_int;
 
 /// Change the format of a channel
 /// `channel` - The channel number.
 /// `format` - One of ::PspAudioFormats
 /// Returns 0 on success, an error if less than 0.
-pub extern fn sceAudioChangeChannelConfig(channel: c_int, format: c_int) callconv(.C) c_int;
+pub extern fn sceAudioChangeChannelConfig(channel: c_int, format: c_int) callconv(.c) c_int;
 
 /// Change the volume of a channel
 /// `channel` - The channel number.
 /// `leftvol` - The left volume.
 /// `rightvol` - The right volume.
 /// Returns 0 on success, an error if less than 0.
-pub extern fn sceAudioChangeChannelVolume(channel: c_int, leftvol: c_int, rightvol: c_int) callconv(.C) c_int;
+pub extern fn sceAudioChangeChannelVolume(channel: c_int, leftvol: c_int, rightvol: c_int) callconv(.c) c_int;
 
 /// Reserve the audio output
 /// `samplecount` - The number of samples to output in one output call (min 17, max 4111).
 /// `freq` - The frequency. One of 48000, 44100, 32000, 24000, 22050, 16000, 12000, 11050, 8000.
 /// `channels` - Number of channels. Pass 2 (stereo).
 /// Returns 0 on success, an error if less than 0.
-pub extern fn sceAudioSRCChReserve(samplecount: c_int, freq: c_int, channels: c_int) callconv(.C) c_int;
+pub extern fn sceAudioSRCChReserve(samplecount: c_int, freq: c_int, channels: c_int) callconv(.c) c_int;
 
 /// Release the audio output
 /// Returns 0 on success, an error if less than 0.
-pub extern fn sceAudioSRCChRelease() callconv(.C) c_int;
+pub extern fn sceAudioSRCChRelease() callconv(.c) c_int;
 
 /// Output audio
 /// `vol` - The volume.
 /// `buf` - Pointer to the PCM data to output.
 /// Returns 0 on success, an error if less than 0.
-pub extern fn sceAudioSRCOutputBlocking(vol: c_int, buf: ?*anyopaque) callconv(.C) c_int;
+pub extern fn sceAudioSRCOutputBlocking(vol: c_int, buf: ?*anyopaque) callconv(.c) c_int;
 
 /// Perform audio input (blocking)
 /// `samplecount` - Number of samples.
 /// `freq` - Either 44100, 22050 or 11025.
 /// `buf` - Pointer to where the audio data will be stored.
 /// Returns 0 on success, an error if less than 0.
-pub extern fn sceAudioInputBlocking(samplecount: c_int, freq: c_int, buf: ?*anyopaque) callconv(.C) c_int;
+pub extern fn sceAudioInputBlocking(samplecount: c_int, freq: c_int, buf: ?*anyopaque) callconv(.c) c_int;
 
 /// Perform audio input
 /// `samplecount` - Number of samples.
@@ -116,60 +116,60 @@ pub extern fn sceAudioInputBlocking(samplecount: c_int, freq: c_int, buf: ?*anyo
 /// `gain` - Gain.
 /// `unknown2` - Unknown. Pass 0.
 /// Returns 0 on success, an error if less than 0.
-pub extern fn sceAudioInput(samplecount: c_int, freq: c_int, buf: ?*anyopaque) callconv(.C) c_int;
+pub extern fn sceAudioInput(samplecount: c_int, freq: c_int, buf: ?*anyopaque) callconv(.c) c_int;
 
 /// Get the number of samples that were acquired
 /// Returns Number of samples acquired, an error if less than 0.
-pub extern fn sceAudioGetInputLength() callconv(.C) c_int;
+pub extern fn sceAudioGetInputLength() callconv(.c) c_int;
 
 /// Wait for non-blocking audio input to complete
 /// Returns 0 on success, an error if less than 0.
-pub extern fn sceAudioWaitInputEnd() callconv(.C) c_int;
+pub extern fn sceAudioWaitInputEnd() callconv(.c) c_int;
 
 /// Init audio input
 /// `unknown1` - Unknown. Pass 0.
 /// `gain` - Gain.
 /// `unknown2` - Unknown. Pass 0.
 /// Returns 0 on success, an error if less than 0.
-pub extern fn sceAudioInputInit(unknown1: c_int, gain: c_int, unknown2: c_int) callconv(.C) c_int;
+pub extern fn sceAudioInputInit(unknown1: c_int, gain: c_int, unknown2: c_int) callconv(.c) c_int;
 
 /// Poll for non-blocking audio input status
 /// Returns 0 if input has completed, 1 if not completed or an error if less than 0.
-pub extern fn sceAudioPollInputEnd() callconv(.C) c_int;
+pub extern fn sceAudioPollInputEnd() callconv(.c) c_int;
 
 /// Get count of unplayed samples remaining
 /// `channel` - The channel number.
 /// Returns Number of samples to be played, an error if less than 0.
-pub extern fn sceAudioGetChannelRestLength(channel: c_int) callconv(.C) c_int;
+pub extern fn sceAudioGetChannelRestLength(channel: c_int) callconv(.c) c_int;
 
 /// Init audio input (with extra arguments)
 /// `params` - A pointer to a ::pspAudioInputParams struct.
 /// Returns 0 on success, an error if less than 0.
-pub extern fn sceAudioInputInitEx(params: [*c]c_int) callconv(.C) c_int;
+pub extern fn sceAudioInputInitEx(params: [*c]c_int) callconv(.c) c_int;
 
 /// Reserve the audio output and set the output sample count
 /// `samplecount` - The number of samples to output in one output call (min 17, max 4111).
 /// Returns 0 on success, an error if less than 0.
-pub extern fn sceAudioOutput2Reserve(samplecount: c_int) callconv(.C) c_int;
+pub extern fn sceAudioOutput2Reserve(samplecount: c_int) callconv(.c) c_int;
 
 /// Output audio (blocking)
 /// `vol` - The volume.
 /// `buf` - Pointer to the PCM data.
 /// Returns 0 on success, an error if less than 0.
-pub extern fn sceAudioOutput2OutputBlocking(vol: c_int, buf: ?*anyopaque) callconv(.C) c_int;
+pub extern fn sceAudioOutput2OutputBlocking(vol: c_int, buf: ?*anyopaque) callconv(.c) c_int;
 
 /// Release the audio output
 /// Returns 0 on success, an error if less than 0.
-pub extern fn sceAudioOutput2Release() callconv(.C) c_int;
+pub extern fn sceAudioOutput2Release() callconv(.c) c_int;
 
 /// Change the output sample count, after it's already been reserved
 /// `samplecount` - The number of samples to output in one output call (min 17, max 4111).
 /// Returns 0 on success, an error if less than 0.
-pub extern fn sceAudioOutput2ChangeLength(samplecount: c_int) callconv(.C) c_int;
+pub extern fn sceAudioOutput2ChangeLength(samplecount: c_int) callconv(.c) c_int;
 
 /// Get count of unplayed samples remaining
 /// Returns Number of samples to be played, an error if less than 0.
-pub extern fn sceAudioOutput2GetRestSample() callconv(.C) c_int;
+pub extern fn sceAudioOutput2GetRestSample() callconv(.c) c_int;
 
 comptime {
     asm (macro.import_module_start("sceAudio", "0x40010000", "27"));

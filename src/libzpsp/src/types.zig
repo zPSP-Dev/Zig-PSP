@@ -363,7 +363,7 @@ pub const SceGeStack = extern struct {
     stack: [8]c_uint,
 };
 
-pub const PspGeCallback = ?*const fn (c_int, ?*anyopaque) callconv(.C) void;
+pub const PspGeCallback = ?*const fn (c_int, ?*anyopaque) callconv(.c) void;
 pub const PspGeCallbackData = extern struct {
     signal_func: PspGeCallback,
     signal_arg: ?*anyopaque,
@@ -412,7 +412,7 @@ pub const SceKernelIdListType = enum(c_int) {
     _,
 };
 
-pub const SceKernelCallbackFunction = ?*const fn (c_int, c_int, ?*anyopaque) callconv(.C) c_int;
+pub const SceKernelCallbackFunction = ?*const fn (c_int, c_int, ?*anyopaque) callconv(.c) c_int;
 pub const SceKernelCallbackInfo = extern struct {
     size: SceSize,
     name: [32]u8,
@@ -442,7 +442,7 @@ pub const PspEventFlagWaitTypes = enum(c_int) {
     _,
 };
 
-pub const SceKernelThreadEventHandler = ?*const fn (c_int, SceUID, ?*anyopaque) callconv(.C) c_int;
+pub const SceKernelThreadEventHandler = ?*const fn (c_int, SceUID, ?*anyopaque) callconv(.c) c_int;
 pub const SceKernelThreadEventHandlerInfo = extern struct {
     size: SceSize,
     name: [32]u8,
@@ -478,7 +478,7 @@ pub const SceKernelSysClock = extern struct {
     hi: SceUInt32,
 };
 
-pub const SceKernelThreadEntry = ?*const fn (SceSize, ?*anyopaque) callconv(.C) c_int;
+pub const SceKernelThreadEntry = ?*const fn (SceSize, ?*anyopaque) callconv(.c) c_int;
 pub const SceKernelThreadOptParam = extern struct {
     size: SceSize,
     stackMpid: SceUID,
@@ -539,8 +539,8 @@ pub const SceKernelEventFlagInfo = extern struct {
 pub const SceKernelEventFlagOptParam = extern struct {
     size: SceSize,
 };
-pub const SceKernelVTimerHandler = ?*const fn (SceUID, [*c]SceKernelSysClock, [*c]SceKernelSysClock, ?*anyopaque) callconv(.C) SceUInt;
-pub const SceKernelVTimerHandlerWide = ?*const fn (SceUID, SceInt64, SceInt64, ?*anyopaque) callconv(.C) SceUInt;
+pub const SceKernelVTimerHandler = ?*const fn (SceUID, [*c]SceKernelSysClock, [*c]SceKernelSysClock, ?*anyopaque) callconv(.c) SceUInt;
+pub const SceKernelVTimerHandlerWide = ?*const fn (SceUID, SceInt64, SceInt64, ?*anyopaque) callconv(.c) SceUInt;
 
 pub const SceKernelMbxOptParam = extern struct {
     size: SceSize,
@@ -553,7 +553,7 @@ pub const SceKernelMbxInfo = extern struct {
     numMessages: c_int,
     firstMessage: ?*anyopaque,
 };
-pub const SceKernelAlarmHandler = ?*const fn (?*anyopaque) callconv(.C) SceUInt;
+pub const SceKernelAlarmHandler = ?*const fn (?*anyopaque) callconv(.c) SceUInt;
 pub const SceKernelAlarmInfo = extern struct {
     size: SceSize,
     schedule: SceKernelSysClock,

@@ -2,197 +2,197 @@
 const types = @import("../types.zig");
 const macro = @import("../macro.zig");
 
-pub extern fn sceNet_lib_3B617AA0() callconv(.C) void;
+pub extern fn sceNet_lib_3B617AA0() callconv(.c) void;
 
-pub extern fn sceNet_lib_DB88F458() callconv(.C) void;
+pub extern fn sceNet_lib_DB88F458() callconv(.c) void;
 
-pub extern fn sceNet_lib_B6FC0A5B() callconv(.C) void;
+pub extern fn sceNet_lib_B6FC0A5B() callconv(.c) void;
 
-pub extern fn sceNet_lib_C431A214() callconv(.C) void;
+pub extern fn sceNet_lib_C431A214() callconv(.c) void;
 
-pub extern fn sceNet_lib_BFCFEFF6() callconv(.C) void;
+pub extern fn sceNet_lib_BFCFEFF6() callconv(.c) void;
 
-pub extern fn sceNet_lib_E1F4696F() callconv(.C) void;
+pub extern fn sceNet_lib_E1F4696F() callconv(.c) void;
 
-pub extern fn sceNet_lib_5216CBF5() callconv(.C) void;
+pub extern fn sceNet_lib_5216CBF5() callconv(.c) void;
 
-pub extern fn sceNet_lib_D2422E4D() callconv(.C) void;
+pub extern fn sceNet_lib_D2422E4D() callconv(.c) void;
 
-pub extern fn sceNet_lib_D1BE2CE9() callconv(.C) void;
+pub extern fn sceNet_lib_D1BE2CE9() callconv(.c) void;
 
-pub extern fn sceNet_lib_AB7DD9A5() callconv(.C) void;
+pub extern fn sceNet_lib_AB7DD9A5() callconv(.c) void;
 
-pub extern fn sceNet_lib_80E1933E() callconv(.C) void;
+pub extern fn sceNet_lib_80E1933E() callconv(.c) void;
 
-pub extern fn sceNet_lib_7BA3ED91() callconv(.C) void;
+pub extern fn sceNet_lib_7BA3ED91() callconv(.c) void;
 
-pub extern fn sceNet_lib_03164B12() callconv(.C) void;
+pub extern fn sceNet_lib_03164B12() callconv(.c) void;
 
-pub extern fn sceNet_lib_389728AB() callconv(.C) void;
+pub extern fn sceNet_lib_389728AB() callconv(.c) void;
 
-pub extern fn sceNet_lib_4BF9E1DE() callconv(.C) void;
+pub extern fn sceNet_lib_4BF9E1DE() callconv(.c) void;
 
-pub extern fn sceNet_lib_D5B64E37() callconv(.C) void;
+pub extern fn sceNet_lib_D5B64E37() callconv(.c) void;
 
-pub extern fn sceNet_lib_DA02F383() callconv(.C) void;
+pub extern fn sceNet_lib_DA02F383() callconv(.c) void;
 
-pub extern fn sceNet_lib_AFA11338() callconv(.C) void;
+pub extern fn sceNet_lib_AFA11338() callconv(.c) void;
 
-pub extern fn sceNet_lib_B20F84F8() callconv(.C) void;
+pub extern fn sceNet_lib_B20F84F8() callconv(.c) void;
 
-pub extern fn sceNet_lib_83FE280A() callconv(.C) void;
+pub extern fn sceNet_lib_83FE280A() callconv(.c) void;
 
-pub extern fn sceNet_lib_4F8F3808() callconv(.C) void;
+pub extern fn sceNet_lib_4F8F3808() callconv(.c) void;
 
-pub extern fn sceNet_lib_891723D5() callconv(.C) void;
+pub extern fn sceNet_lib_891723D5() callconv(.c) void;
 
-pub extern fn sceNet_lib_0DFF67F9() callconv(.C) void;
+pub extern fn sceNet_lib_0DFF67F9() callconv(.c) void;
 
-pub extern fn sceNet_lib_F355C73B() callconv(.C) void;
+pub extern fn sceNet_lib_F355C73B() callconv(.c) void;
 
-pub extern fn sceNet_lib_A55C914F() callconv(.C) void;
+pub extern fn sceNet_lib_A55C914F() callconv(.c) void;
 
-pub extern fn sceNet_lib_0D633F53() callconv(.C) void;
+pub extern fn sceNet_lib_0D633F53() callconv(.c) void;
 
-pub extern fn sceNetConfigGetEtherAddr() callconv(.C) void;
+pub extern fn sceNetConfigGetEtherAddr() callconv(.c) void;
 
-pub extern fn sceNet_lib_522A971B() callconv(.C) void;
+pub extern fn sceNet_lib_522A971B() callconv(.c) void;
 
-pub extern fn sceNetRand() callconv(.C) void;
+pub extern fn sceNetRand() callconv(.c) void;
 
-pub extern fn sceNet_lib_75D9985C() callconv(.C) void;
+pub extern fn sceNet_lib_75D9985C() callconv(.c) void;
 
-pub extern fn sceNet_lib_25CC373A() callconv(.C) void;
+pub extern fn sceNet_lib_25CC373A() callconv(.c) void;
 
-pub extern fn sceNet_lib_DCBC596E() callconv(.C) void;
+pub extern fn sceNet_lib_DCBC596E() callconv(.c) void;
 
-pub extern fn sceNet_lib_7C86FBA4() callconv(.C) void;
+pub extern fn sceNet_lib_7C86FBA4() callconv(.c) void;
 
-pub extern fn sceNet_lib_A8B6205A() callconv(.C) void;
+pub extern fn sceNet_lib_A8B6205A() callconv(.c) void;
 
-pub extern fn sceNet_lib_A93A93E9() callconv(.C) void;
+pub extern fn sceNet_lib_A93A93E9() callconv(.c) void;
 
-pub extern fn sceNet_lib_6B294EE4() callconv(.C) void;
+pub extern fn sceNet_lib_6B294EE4() callconv(.c) void;
 
-pub extern fn sceNet_lib_51C209B2() callconv(.C) void;
+pub extern fn sceNet_lib_51C209B2() callconv(.c) void;
 
-pub extern fn sceNet_lib_C9C97945() callconv(.C) void;
+pub extern fn sceNet_lib_C9C97945() callconv(.c) void;
 
-pub extern fn sceNet_lib_B8C4A858() callconv(.C) void;
+pub extern fn sceNet_lib_B8C4A858() callconv(.c) void;
 
-pub extern fn sceNet_lib_205E8D17() callconv(.C) void;
+pub extern fn sceNet_lib_205E8D17() callconv(.c) void;
 
-pub extern fn sceNet_lib_F6DB0A0B() callconv(.C) void;
+pub extern fn sceNet_lib_F6DB0A0B() callconv(.c) void;
 
-pub extern fn sceNet_lib_7574FDA1() callconv(.C) void;
+pub extern fn sceNet_lib_7574FDA1() callconv(.c) void;
 
-pub extern fn sceNet_lib_CA3CF5EB() callconv(.C) void;
+pub extern fn sceNet_lib_CA3CF5EB() callconv(.c) void;
 
-pub extern fn sceNet_lib_757085B0() callconv(.C) void;
+pub extern fn sceNet_lib_757085B0() callconv(.c) void;
 
-pub extern fn sceNet_lib_435843CB() callconv(.C) void;
+pub extern fn sceNet_lib_435843CB() callconv(.c) void;
 
-pub extern fn sceNet_lib_D861EF33() callconv(.C) void;
+pub extern fn sceNet_lib_D861EF33() callconv(.c) void;
 
-pub extern fn sceNet_lib_BB2B3DDB() callconv(.C) void;
+pub extern fn sceNet_lib_BB2B3DDB() callconv(.c) void;
 
-pub extern fn sceNet_lib_6D5D42D7() callconv(.C) void;
+pub extern fn sceNet_lib_6D5D42D7() callconv(.c) void;
 
-pub extern fn sceNet_lib_C21E18B2() callconv(.C) void;
+pub extern fn sceNet_lib_C21E18B2() callconv(.c) void;
 
-pub extern fn sceNet_lib_45452B7B() callconv(.C) void;
+pub extern fn sceNet_lib_45452B7B() callconv(.c) void;
 
-pub extern fn sceNet_lib_94B44F26() callconv(.C) void;
+pub extern fn sceNet_lib_94B44F26() callconv(.c) void;
 
-pub extern fn sceNet_lib_515B2F33() callconv(.C) void;
+pub extern fn sceNet_lib_515B2F33() callconv(.c) void;
 
-pub extern fn sceNet_lib_6DC71518() callconv(.C) void;
+pub extern fn sceNet_lib_6DC71518() callconv(.c) void;
 
-pub extern fn sceNet_lib_7C3B86C5() callconv(.C) void;
+pub extern fn sceNet_lib_7C3B86C5() callconv(.c) void;
 
-pub extern fn sceNet_lib_05D525E4() callconv(.C) void;
+pub extern fn sceNet_lib_05D525E4() callconv(.c) void;
 
-pub extern fn sceNet_lib_1D10419C() callconv(.C) void;
+pub extern fn sceNet_lib_1D10419C() callconv(.c) void;
 
-pub extern fn sceNet_lib_C2EC2EEA() callconv(.C) void;
+pub extern fn sceNet_lib_C2EC2EEA() callconv(.c) void;
 
-pub extern fn sceNet_lib_710BD467() callconv(.C) void;
+pub extern fn sceNet_lib_710BD467() callconv(.c) void;
 
-pub extern fn sceNet_lib_701DDDC3() callconv(.C) void;
+pub extern fn sceNet_lib_701DDDC3() callconv(.c) void;
 
-pub extern fn sceNet_lib_D5A03BC0() callconv(.C) void;
+pub extern fn sceNet_lib_D5A03BC0() callconv(.c) void;
 
-pub extern fn sceNet_lib_FA6DE6A6() callconv(.C) void;
+pub extern fn sceNet_lib_FA6DE6A6() callconv(.c) void;
 
-pub extern fn sceNet_lib_EDB11CB4() callconv(.C) void;
+pub extern fn sceNet_lib_EDB11CB4() callconv(.c) void;
 
-pub extern fn sceNet_lib_8C55B410() callconv(.C) void;
+pub extern fn sceNet_lib_8C55B410() callconv(.c) void;
 
-pub extern fn sceNet_lib_13A8B98A() callconv(.C) void;
+pub extern fn sceNet_lib_13A8B98A() callconv(.c) void;
 
-pub extern fn sceNet_lib_EA42B353() callconv(.C) void;
+pub extern fn sceNet_lib_EA42B353() callconv(.c) void;
 
-pub extern fn sceNet_lib_45945E8D() callconv(.C) void;
+pub extern fn sceNet_lib_45945E8D() callconv(.c) void;
 
-pub extern fn sceNet_lib_D60225A3() callconv(.C) void;
+pub extern fn sceNet_lib_D60225A3() callconv(.c) void;
 
-pub extern fn sceNet_lib_EB6DE71A() callconv(.C) void;
+pub extern fn sceNet_lib_EB6DE71A() callconv(.c) void;
 
-pub extern fn sceNet_lib_EDCC871E() callconv(.C) void;
+pub extern fn sceNet_lib_EDCC871E() callconv(.c) void;
 
-pub extern fn sceNet_lib_4B2B3416() callconv(.C) void;
+pub extern fn sceNet_lib_4B2B3416() callconv(.c) void;
 
-pub extern fn sceNet_lib_2B42872F() callconv(.C) void;
+pub extern fn sceNet_lib_2B42872F() callconv(.c) void;
 
-pub extern fn sceNet_lib_C4261339() callconv(.C) void;
+pub extern fn sceNet_lib_C4261339() callconv(.c) void;
 
-pub extern fn sceNet_lib_41FD8B5C() callconv(.C) void;
+pub extern fn sceNet_lib_41FD8B5C() callconv(.c) void;
 
-pub extern fn sceNet_lib_92633D8D() callconv(.C) void;
+pub extern fn sceNet_lib_92633D8D() callconv(.c) void;
 
-pub extern fn sceNet_lib_B9C780C7() callconv(.C) void;
+pub extern fn sceNet_lib_B9C780C7() callconv(.c) void;
 
-pub extern fn sceNet_lib_B68E1EEA() callconv(.C) void;
+pub extern fn sceNet_lib_B68E1EEA() callconv(.c) void;
 
-pub extern fn sceNet_lib_E155112D() callconv(.C) void;
+pub extern fn sceNet_lib_E155112D() callconv(.c) void;
 
-pub extern fn sceNet_lib_41621EB0() callconv(.C) void;
+pub extern fn sceNet_lib_41621EB0() callconv(.c) void;
 
-pub extern fn sceNet_lib_2E005032() callconv(.C) void;
+pub extern fn sceNet_lib_2E005032() callconv(.c) void;
 
-pub extern fn sceNet_lib_33B230BD() callconv(.C) void;
+pub extern fn sceNet_lib_33B230BD() callconv(.c) void;
 
-pub extern fn sceNet_lib_976AB1E9() callconv(.C) void;
+pub extern fn sceNet_lib_976AB1E9() callconv(.c) void;
 
-pub extern fn sceNet_lib_4C8FD452() callconv(.C) void;
+pub extern fn sceNet_lib_4C8FD452() callconv(.c) void;
 
-pub extern fn sceNet_lib_5ED457BE() callconv(.C) void;
+pub extern fn sceNet_lib_5ED457BE() callconv(.c) void;
 
-pub extern fn sceNet_lib_31F3CDA1() callconv(.C) void;
+pub extern fn sceNet_lib_31F3CDA1() callconv(.c) void;
 
-pub extern fn sceNet_lib_1F94AFD9() callconv(.C) void;
+pub extern fn sceNet_lib_1F94AFD9() callconv(.c) void;
 
-pub extern fn sceNet_lib_0A5A8751() callconv(.C) void;
+pub extern fn sceNet_lib_0A5A8751() callconv(.c) void;
 
-pub extern fn sceNet_lib_B3A48B7F() callconv(.C) void;
+pub extern fn sceNet_lib_B3A48B7F() callconv(.c) void;
 
-pub extern fn sceNet_lib_949F1FBB() callconv(.C) void;
+pub extern fn sceNet_lib_949F1FBB() callconv(.c) void;
 
-pub extern fn sceNet_lib_13672F83() callconv(.C) void;
+pub extern fn sceNet_lib_13672F83() callconv(.c) void;
 
-pub extern fn sceNet_lib_5C7C7381() callconv(.C) void;
+pub extern fn sceNet_lib_5C7C7381() callconv(.c) void;
 
-pub extern fn sceNet_lib_86B6DCD9() callconv(.C) void;
+pub extern fn sceNet_lib_86B6DCD9() callconv(.c) void;
 
-pub extern fn sceNet_lib_7AE91FB4() callconv(.C) void;
+pub extern fn sceNet_lib_7AE91FB4() callconv(.c) void;
 
-pub extern fn sceNet_lib_572AD6ED() callconv(.C) void;
+pub extern fn sceNet_lib_572AD6ED() callconv(.c) void;
 
-pub extern fn sceNet_lib_87DC7A7E() callconv(.C) void;
+pub extern fn sceNet_lib_87DC7A7E() callconv(.c) void;
 
-pub extern fn sceNet_lib_991FF86D() callconv(.C) void;
+pub extern fn sceNet_lib_991FF86D() callconv(.c) void;
 
-pub extern fn sceNet_lib_5505D820() callconv(.C) void;
+pub extern fn sceNet_lib_5505D820() callconv(.c) void;
 
 comptime {
     asm (macro.import_module_start("sceNet_lib", "0x00090000", "96"));

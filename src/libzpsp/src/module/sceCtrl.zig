@@ -5,23 +5,23 @@ const macro = @import("../macro.zig");
 /// Set the controller cycle setting.
 /// `cycle` - Cycle.  Normally set to 0.
 /// Returns The previous cycle setting.
-pub extern fn sceCtrlSetSamplingCycle(cycle: c_int) callconv(.C) c_int;
+pub extern fn sceCtrlSetSamplingCycle(cycle: c_int) callconv(.c) c_int;
 
 /// Get the controller current cycle setting.
 /// `pcycle` - Return value.
 /// Returns 0.
-pub extern fn sceCtrlGetSamplingCycle(pcycle: [*c]c_int) callconv(.C) c_int;
+pub extern fn sceCtrlGetSamplingCycle(pcycle: [*c]c_int) callconv(.c) c_int;
 
 /// Set the controller mode.
 /// `mode` - One of ::PspCtrlMode. If this is ::PSP_CTRL_MODE_DIGITAL, no data about the analog stick
 /// will be present in the SceCtrlData struct read by SceCtrlReadBuffer.
 /// Returns The previous mode.
-pub extern fn sceCtrlSetSamplingMode(mode: c_int) callconv(.C) c_int;
+pub extern fn sceCtrlSetSamplingMode(mode: c_int) callconv(.c) c_int;
 
 /// Get the current controller mode.
 /// `pmode` - Return value.
 /// Returns 0.
-pub extern fn sceCtrlGetSamplingMode(pmode: [*c]c_int) callconv(.C) c_int;
+pub extern fn sceCtrlGetSamplingMode(pmode: [*c]c_int) callconv(.c) c_int;
 
 /// @brief Read latest controller data from the controller service.
 /// Controller data contains current button and axis state.
@@ -31,9 +31,9 @@ pub extern fn sceCtrlGetSamplingMode(pmode: [*c]c_int) callconv(.C) c_int;
 /// @see ::SceCtrlData
 /// @see ::sceCtrlPeekBufferNegative()
 /// @see ::sceCtrlReadBufferPositive()
-pub extern fn sceCtrlPeekBufferPositive(pad_data: [*c]types.SceCtrlData, count: c_int) callconv(.C) c_int;
+pub extern fn sceCtrlPeekBufferPositive(pad_data: [*c]types.SceCtrlData, count: c_int) callconv(.c) c_int;
 
-pub extern fn sceCtrlPeekBufferNegative(pad_data: [*c]types.SceCtrlData, count: c_int) callconv(.C) c_int;
+pub extern fn sceCtrlPeekBufferNegative(pad_data: [*c]types.SceCtrlData, count: c_int) callconv(.c) c_int;
 
 /// @brief Read new controller data from the controller service.
 /// Controller data contains current button and axis state.
@@ -54,9 +54,9 @@ pub extern fn sceCtrlPeekBufferNegative(pad_data: [*c]types.SceCtrlData, count: 
 /// @see ::SceCtrlData
 /// @see ::sceCtrlReadBufferNegative()
 /// @see ::sceCtrlPeekBufferPositive()
-pub extern fn sceCtrlReadBufferPositive(pad_data: [*c]types.SceCtrlData, count: c_int) callconv(.C) c_int;
+pub extern fn sceCtrlReadBufferPositive(pad_data: [*c]types.SceCtrlData, count: c_int) callconv(.c) c_int;
 
-pub extern fn sceCtrlReadBufferNegative(pad_data: [*c]types.SceCtrlData, count: c_int) callconv(.C) c_int;
+pub extern fn sceCtrlReadBufferNegative(pad_data: [*c]types.SceCtrlData, count: c_int) callconv(.c) c_int;
 
 /// @brief Read latest latch data from the controller service.
 /// Latch data contains information about button state changes between two controller service sampling cycles.
@@ -66,7 +66,7 @@ pub extern fn sceCtrlReadBufferNegative(pad_data: [*c]types.SceCtrlData, count: 
 /// Returns < 0 on error.
 /// @see ::SceCtrlLatch
 /// @see ::sceCtrlReadLatch()
-pub extern fn sceCtrlPeekLatch(latch_data: [*c]types.SceCtrlLatch) callconv(.C) c_int;
+pub extern fn sceCtrlPeekLatch(latch_data: [*c]types.SceCtrlLatch) callconv(.c) c_int;
 
 /// @brief Read new latch data from the controller service.
 /// Latch data contains information about button state changes between two controller service sampling cycles.
@@ -108,15 +108,15 @@ pub extern fn sceCtrlPeekLatch(latch_data: [*c]types.SceCtrlLatch) callconv(.C) 
 /// Returns < 0 on error.
 /// @see ::SceCtrlLatch
 /// @see ::sceCtrlPeekLatch()
-pub extern fn sceCtrlReadLatch(latch_data: [*c]types.SceCtrlLatch) callconv(.C) c_int;
+pub extern fn sceCtrlReadLatch(latch_data: [*c]types.SceCtrlLatch) callconv(.c) c_int;
 
-pub extern fn sceCtrl_348D99D4() callconv(.C) void;
+pub extern fn sceCtrl_348D99D4() callconv(.c) void;
 
-pub extern fn sceCtrl_AF5960F3() callconv(.C) void;
+pub extern fn sceCtrl_AF5960F3() callconv(.c) void;
 
-pub extern fn sceCtrlClearRapidFire() callconv(.C) void;
+pub extern fn sceCtrlClearRapidFire() callconv(.c) void;
 
-pub extern fn sceCtrlSetRapidFire() callconv(.C) void;
+pub extern fn sceCtrlSetRapidFire() callconv(.c) void;
 
 /// Set analog threshold relating to the idle timer.
 /// `idlereset` - Movement needed by the analog to reset the idle timer.
@@ -125,13 +125,13 @@ pub extern fn sceCtrlSetRapidFire() callconv(.C) void;
 /// Set to 0 for idle timer to be cancelled even if the analog is not moved.
 /// Set between 1 - 128 to specify the movement on either axis needed by the analog to fire the event.
 /// Returns < 0 on error.
-pub extern fn sceCtrlSetIdleCancelThreshold(idlereset: c_int, idleback: c_int) callconv(.C) c_int;
+pub extern fn sceCtrlSetIdleCancelThreshold(idlereset: c_int, idleback: c_int) callconv(.c) c_int;
 
 /// Get the idle threshold values.
 /// `idlerest` - Movement needed by the analog to reset the idle timer.
 /// `idleback` - Movement needed by the analog to bring the PSP back from an idle state.
 /// Returns < 0 on error.
-pub extern fn sceCtrlGetIdleCancelThreshold(idlerest: [*c]c_int, idleback: [*c]c_int) callconv(.C) c_int;
+pub extern fn sceCtrlGetIdleCancelThreshold(idlerest: [*c]c_int, idleback: [*c]c_int) callconv(.c) c_int;
 
 comptime {
     asm (macro.import_module_start("sceCtrl", "0x40010000", "16"));

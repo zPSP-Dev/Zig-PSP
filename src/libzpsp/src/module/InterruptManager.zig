@@ -8,35 +8,35 @@ const macro = @import("../macro.zig");
 /// `handler` - The interrupt handler
 /// `arg` - An argument passed to the interrupt handler
 /// Returns < 0 on error.
-pub extern fn sceKernelRegisterSubIntrHandler(intno: c_int, no: c_int, handler: ?*anyopaque, arg: ?*anyopaque) callconv(.C) c_int;
+pub extern fn sceKernelRegisterSubIntrHandler(intno: c_int, no: c_int, handler: ?*anyopaque, arg: ?*anyopaque) callconv(.c) c_int;
 
 /// Release a sub interrupt handler.
 /// `intno` - The interrupt number to register.
 /// `no` - The sub interrupt handler number
 /// Returns < 0 on error.
-pub extern fn sceKernelReleaseSubIntrHandler(intno: c_int, no: c_int) callconv(.C) c_int;
+pub extern fn sceKernelReleaseSubIntrHandler(intno: c_int, no: c_int) callconv(.c) c_int;
 
 /// Enable a sub interrupt.
 /// `intno` - The sub interrupt to enable.
 /// `no` - The sub interrupt handler number
 /// Returns < 0 on error.
-pub extern fn sceKernelEnableSubIntr(intno: c_int, no: c_int) callconv(.C) c_int;
+pub extern fn sceKernelEnableSubIntr(intno: c_int, no: c_int) callconv(.c) c_int;
 
 /// Disable a sub interrupt handler.
 /// `intno` - The sub interrupt to disable.
 /// `no` - The sub interrupt handler number
 /// Returns < 0 on error.
-pub extern fn sceKernelDisableSubIntr(intno: c_int, no: c_int) callconv(.C) c_int;
+pub extern fn sceKernelDisableSubIntr(intno: c_int, no: c_int) callconv(.c) c_int;
 
-pub extern fn sceKernelSuspendSubIntr() callconv(.C) void;
+pub extern fn sceKernelSuspendSubIntr() callconv(.c) void;
 
-pub extern fn sceKernelResumeSubIntr() callconv(.C) void;
+pub extern fn sceKernelResumeSubIntr() callconv(.c) void;
 
-pub extern fn sceKernelIsSubInterruptOccurred() callconv(.C) void;
+pub extern fn sceKernelIsSubInterruptOccurred() callconv(.c) void;
 
-pub extern fn QueryIntrHandlerInfo(intr_code: types.SceUID, sub_intr_code: types.SceUID, data: [*c]c_int) callconv(.C) c_int;
+pub extern fn QueryIntrHandlerInfo(intr_code: types.SceUID, sub_intr_code: types.SceUID, data: [*c]c_int) callconv(.c) c_int;
 
-pub extern fn sceKernelRegisterUserSpaceIntrStack() callconv(.C) void;
+pub extern fn sceKernelRegisterUserSpaceIntrStack() callconv(.c) void;
 
 comptime {
     asm (macro.import_module_start("InterruptManager", "0x40000000", "9"));

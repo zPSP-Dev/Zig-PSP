@@ -4,43 +4,43 @@ const macro = @import("../macro.zig");
 
 /// Suspend all interrupts.
 /// Returns The current state of the interrupt controller, to be used with ::sceKernelCpuResumeIntr().
-pub extern fn sceKernelCpuSuspendIntr() callconv(.C) c_uint;
+pub extern fn sceKernelCpuSuspendIntr() callconv(.c) c_uint;
 
 /// Resume all interrupts.
 /// `flags` - The value returned from ::sceKernelCpuSuspendIntr().
-pub extern fn sceKernelCpuResumeIntr(flags: c_uint) callconv(.C) void;
+pub extern fn sceKernelCpuResumeIntr(flags: c_uint) callconv(.c) void;
 
 /// Resume all interrupts (using sync instructions).
 /// `flags` - The value returned from ::sceKernelCpuSuspendIntr()
-pub extern fn sceKernelCpuResumeIntrWithSync(flags: c_uint) callconv(.C) void;
+pub extern fn sceKernelCpuResumeIntrWithSync(flags: c_uint) callconv(.c) void;
 
 /// Determine if interrupts are suspended or active, based on the given flags.
 /// `flags` - The value returned from ::sceKernelCpuSuspendIntr().
 /// Returns 1 if flags indicate that interrupts were not suspended, 0 otherwise.
-pub extern fn sceKernelIsCpuIntrSuspended(flags: c_uint) callconv(.C) c_int;
+pub extern fn sceKernelIsCpuIntrSuspended(flags: c_uint) callconv(.c) c_int;
 
 /// Determine if interrupts are enabled or disabled.
 /// Returns 1 if interrupts are currently enabled.
-pub extern fn sceKernelIsCpuIntrEnable() callconv(.C) c_int;
+pub extern fn sceKernelIsCpuIntrEnable() callconv(.c) c_int;
 
 /// Lock a lightweight mutex
 /// `workarea` - The pointer to the workarea
 /// `lockCount` - value of increase the lock counter
 /// `pTimeout` - The pointer for timeout waiting
 /// Returns 0 on success, otherwise one of ::PspKernelErrorCodes
-pub extern fn sceKernelLockLwMutex(workarea: [*c]c_int, lockCount: c_int, pTimeout: [*c]c_uint) callconv(.C) c_int;
+pub extern fn sceKernelLockLwMutex(workarea: [*c]c_int, lockCount: c_int, pTimeout: [*c]c_uint) callconv(.c) c_int;
 
 /// Lock a lightweight mutex
 /// `workarea` - The pointer to the workarea
 /// `lockCount` - value of decrease the lock counter
 /// Returns 0 on success, otherwise one of ::PspKernelErrorCodes
-pub extern fn sceKernelUnlockLwMutex(workarea: [*c]c_int, lockCount: c_int) callconv(.C) c_int;
+pub extern fn sceKernelUnlockLwMutex(workarea: [*c]c_int, lockCount: c_int) callconv(.c) c_int;
 
 /// Try to lock a lightweight mutex
 /// `workarea` - The pointer to the workarea
 /// `lockCount` - value of increase the lock counter
 /// Returns 0 on success, otherwise one of ::PspKernelErrorCodes
-pub extern fn sceKernelTryLockLwMutex(workarea: [*c]c_int, lockCount: c_int) callconv(.C) c_int;
+pub extern fn sceKernelTryLockLwMutex(workarea: [*c]c_int, lockCount: c_int) callconv(.c) c_int;
 
 comptime {
     asm (macro.import_module_start("Kernel_Library", "0x00010000", "8"));

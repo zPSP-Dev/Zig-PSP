@@ -4,17 +4,17 @@ const macro = @import("../macro.zig");
 
 /// Determine if the wlan device is currently powered on
 /// Returns 0 if off, 1 if on
-pub extern fn sceWlanDevIsPowerOn() callconv(.C) c_int;
+pub extern fn sceWlanDevIsPowerOn() callconv(.c) c_int;
 
 /// Determine the state of the Wlan power switch
 /// Returns 0 if off, 1 if on
-pub extern fn sceWlanGetSwitchState() callconv(.C) c_int;
+pub extern fn sceWlanGetSwitchState() callconv(.c) c_int;
 
 /// Get the Ethernet Address of the wlan controller
 /// `etherAddr` - pointer to a buffer of uint8_t (NOTE: it only writes to 6 bytes, but
 /// requests 8 so pass it 8 bytes just in case)
 /// Returns 0 on success, < 0 on error
-pub extern fn sceWlanGetEtherAddr(etherAddr: [*c]u8) callconv(.C) c_int;
+pub extern fn sceWlanGetEtherAddr(etherAddr: [*c]u8) callconv(.c) c_int;
 
 comptime {
     asm (macro.import_module_start("sceWlanDrv", "0x40010000", "3"));

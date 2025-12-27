@@ -7,39 +7,39 @@ const macro = @import("../macro.zig");
 /// `size` - Size of arguments to pass to USB driver start
 /// `args` - Arguments to pass to USB driver start
 /// Returns 0 on success
-pub extern fn sceUsbStart(driverName: [*c]const c_char, size: c_int, args: ?*anyopaque) callconv(.C) c_int;
+pub extern fn sceUsbStart(driverName: [*c]const c_char, size: c_int, args: ?*anyopaque) callconv(.c) c_int;
 
 /// Stop a USB driver.
 /// `driverName` - name of the USB driver to stop
 /// `size` - Size of arguments to pass to USB driver stop
 /// `args` - Arguments to pass to USB driver stop
 /// Returns 0 on success
-pub extern fn sceUsbStop(driverName: [*c]const c_char, size: c_int, args: ?*anyopaque) callconv(.C) c_int;
+pub extern fn sceUsbStop(driverName: [*c]const c_char, size: c_int, args: ?*anyopaque) callconv(.c) c_int;
 
 /// Get USB state
 /// Returns OR'd PSP_USB_* constants
-pub extern fn sceUsbGetState() callconv(.C) c_int;
+pub extern fn sceUsbGetState() callconv(.c) c_int;
 
-pub extern fn sceUsbGetDrvList(r4one: u32, r5ret: [*c]u32, r6one: u32) callconv(.C) c_int;
+pub extern fn sceUsbGetDrvList(r4one: u32, r5ret: [*c]u32, r6one: u32) callconv(.c) c_int;
 
 /// Get state of a specific USB driver
 /// `driverName` - name of USB driver to get status from
 /// Returns 1 if the driver has been started, 2 if it is stopped
-pub extern fn sceUsbGetDrvState(driverName: [*c]const c_char) callconv(.C) c_int;
+pub extern fn sceUsbGetDrvState(driverName: [*c]const c_char) callconv(.c) c_int;
 
 /// Activate a USB driver.
 /// `pid` - Product ID for the default USB Driver
 /// Returns 0 on success
-pub extern fn sceUsbActivate(pid: u32) callconv(.C) c_int;
+pub extern fn sceUsbActivate(pid: u32) callconv(.c) c_int;
 
 /// Deactivate USB driver.
 /// `pid` - Product ID for the default USB driver
 /// Returns 0 on success
-pub extern fn sceUsbDeactivate(pid: u32) callconv(.C) c_int;
+pub extern fn sceUsbDeactivate(pid: u32) callconv(.c) c_int;
 
-pub extern fn sceUsbWaitState(state: u32, waitmode: c_int, timeout: [*c]u32) callconv(.C) c_int;
+pub extern fn sceUsbWaitState(state: u32, waitmode: c_int, timeout: [*c]u32) callconv(.c) c_int;
 
-pub extern fn sceUsbWaitCancel() callconv(.C) c_int;
+pub extern fn sceUsbWaitCancel() callconv(.c) c_int;
 
 comptime {
     asm (macro.import_module_start("sceUsb", "0x40010000", "9"));

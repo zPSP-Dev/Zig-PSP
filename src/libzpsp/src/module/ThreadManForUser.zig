@@ -4,7 +4,7 @@ const macro = @import("../macro.zig");
 
 /// Return from a callback (used as a syscall for the return
 /// of the callback function)
-pub extern fn _sceKernelReturnFromCallback() callconv(.C) void;
+pub extern fn _sceKernelReturnFromCallback() callconv(.c) void;
 
 /// Register a thread event handler
 /// `name` - Name for the thread event handler
@@ -13,18 +13,18 @@ pub extern fn _sceKernelReturnFromCallback() callconv(.C) void;
 /// `handler` - Pointer to a ::SceKernelThreadEventHandler function
 /// `common` - Common pointer
 /// Returns The UID of the create event handler, < 0 on error
-pub extern fn sceKernelRegisterThreadEventHandler(name: [*c]const c_char, threadID: types.SceUID, mask: c_int, handler: types.SceKernelThreadEventHandler, common: ?*anyopaque) callconv(.C) types.SceUID;
+pub extern fn sceKernelRegisterThreadEventHandler(name: [*c]const c_char, threadID: types.SceUID, mask: c_int, handler: types.SceKernelThreadEventHandler, common: ?*anyopaque) callconv(.c) types.SceUID;
 
 /// Release a thread event handler.
 /// `uid` - The UID of the event handler
 /// Returns 0 on success, < 0 on error
-pub extern fn sceKernelReleaseThreadEventHandler(uid: types.SceUID) callconv(.C) c_int;
+pub extern fn sceKernelReleaseThreadEventHandler(uid: types.SceUID) callconv(.c) c_int;
 
 /// Refer the status of an thread event handler
 /// `uid` - The UID of the event handler
 /// `info` - Pointer to a ::SceKernelThreadEventHandlerInfo structure
 /// Returns 0 on success, < 0 on error
-pub extern fn sceKernelReferThreadEventHandlerStatus(uid: types.SceUID, info: [*c]types.SceKernelThreadEventHandlerInfo) callconv(.C) c_int;
+pub extern fn sceKernelReferThreadEventHandlerStatus(uid: types.SceUID, info: [*c]types.SceKernelThreadEventHandlerInfo) callconv(.c) c_int;
 
 /// Create callback
 /// @par Example:
@@ -36,43 +36,43 @@ pub extern fn sceKernelReferThreadEventHandlerStatus(uid: types.SceUID, info: [*
 /// `func` - A pointer to a function that will be called as the callback
 /// `arg` - Argument for the callback ?
 /// Returns >= 0 A callback id which can be used in subsequent functions, < 0 an error.
-pub extern fn sceKernelCreateCallback(name: [*c]const c_char, func: types.SceKernelCallbackFunction, arg: ?*anyopaque) callconv(.C) c_int;
+pub extern fn sceKernelCreateCallback(name: [*c]const c_char, func: types.SceKernelCallbackFunction, arg: ?*anyopaque) callconv(.c) c_int;
 
 /// Delete a callback
 /// `cb` - The UID of the specified callback
 /// Returns 0 on success, < 0 on error
-pub extern fn sceKernelDeleteCallback(cb: types.SceUID) callconv(.C) c_int;
+pub extern fn sceKernelDeleteCallback(cb: types.SceUID) callconv(.c) c_int;
 
 /// Notify a callback
 /// `cb` - The UID of the specified callback
 /// `arg2` - Passed as arg2 into the callback function
 /// Returns 0 on success, < 0 on error
-pub extern fn sceKernelNotifyCallback(cb: types.SceUID, arg2: c_int) callconv(.C) c_int;
+pub extern fn sceKernelNotifyCallback(cb: types.SceUID, arg2: c_int) callconv(.c) c_int;
 
 /// Cancel a callback ?
 /// `cb` - The UID of the specified callback
 /// Returns 0 on succes, < 0 on error
-pub extern fn sceKernelCancelCallback(cb: types.SceUID) callconv(.C) c_int;
+pub extern fn sceKernelCancelCallback(cb: types.SceUID) callconv(.c) c_int;
 
 /// Get the callback count
 /// `cb` - The UID of the specified callback
 /// Returns The callback count, < 0 on error
-pub extern fn sceKernelGetCallbackCount(cb: types.SceUID) callconv(.C) c_int;
+pub extern fn sceKernelGetCallbackCount(cb: types.SceUID) callconv(.c) c_int;
 
 /// Check callback ?
 /// Returns Something or another
-pub extern fn sceKernelCheckCallback() callconv(.C) c_int;
+pub extern fn sceKernelCheckCallback() callconv(.c) c_int;
 
 /// Gets the status of a specified callback.
 /// `cb` - The UID of the callback to refer.
 /// `status` - Pointer to a status structure. The size parameter should be
 /// initialised before calling.
 /// Returns < 0 on error.
-pub extern fn sceKernelReferCallbackStatus(cb: types.SceUID, status: [*c]types.SceKernelCallbackInfo) callconv(.C) c_int;
+pub extern fn sceKernelReferCallbackStatus(cb: types.SceUID, status: [*c]types.SceKernelCallbackInfo) callconv(.c) c_int;
 
 /// Sleep thread
 /// Returns < 0 on error.
-pub extern fn sceKernelSleepThread() callconv(.C) c_int;
+pub extern fn sceKernelSleepThread() callconv(.c) c_int;
 
 /// Sleep thread but service any callbacks as necessary
 /// @par Example:
@@ -80,39 +80,39 @@ pub extern fn sceKernelSleepThread() callconv(.C) c_int;
 /// // Once all callbacks have been setup call this function
 /// sceKernelSleepThreadCB();
 /// `
-pub extern fn sceKernelSleepThreadCB() callconv(.C) c_int;
+pub extern fn sceKernelSleepThreadCB() callconv(.c) c_int;
 
 /// Wake a thread previously put into the sleep state.
 /// `thid` - UID of the thread to wake.
 /// Returns Success if >= 0, an error if < 0.
-pub extern fn sceKernelWakeupThread(thid: types.SceUID) callconv(.C) c_int;
+pub extern fn sceKernelWakeupThread(thid: types.SceUID) callconv(.c) c_int;
 
 /// Cancel a thread that was to be woken with ::sceKernelWakeupThread.
 /// `thid` - UID of the thread to cancel.
 /// Returns Success if >= 0, an error if < 0.
-pub extern fn sceKernelCancelWakeupThread(thid: types.SceUID) callconv(.C) c_int;
+pub extern fn sceKernelCancelWakeupThread(thid: types.SceUID) callconv(.c) c_int;
 
 /// Suspend a thread.
 /// `thid` - UID of the thread to suspend.
 /// Returns Success if >= 0, an error if < 0.
-pub extern fn sceKernelSuspendThread(thid: types.SceUID) callconv(.C) c_int;
+pub extern fn sceKernelSuspendThread(thid: types.SceUID) callconv(.c) c_int;
 
 /// Resume a thread previously put into a suspended state with ::sceKernelSuspendThread.
 /// `thid` - UID of the thread to resume.
 /// Returns Success if >= 0, an error if < 0.
-pub extern fn sceKernelResumeThread(thid: types.SceUID) callconv(.C) c_int;
+pub extern fn sceKernelResumeThread(thid: types.SceUID) callconv(.c) c_int;
 
 /// Wait until a thread has ended.
 /// `thid` - Id of the thread to wait for.
 /// `timeout` - Timeout in microseconds (assumed).
 /// Returns < 0 on error.
-pub extern fn sceKernelWaitThreadEnd(thid: types.SceUID, timeout: [*c]types.SceUInt) callconv(.C) c_int;
+pub extern fn sceKernelWaitThreadEnd(thid: types.SceUID, timeout: [*c]types.SceUInt) callconv(.c) c_int;
 
 /// Wait until a thread has ended and handle callbacks if necessary.
 /// `thid` - Id of the thread to wait for.
 /// `timeout` - Timeout in microseconds (assumed).
 /// Returns < 0 on error.
-pub extern fn sceKernelWaitThreadEndCB(thid: types.SceUID, timeout: [*c]types.SceUInt) callconv(.C) c_int;
+pub extern fn sceKernelWaitThreadEndCB(thid: types.SceUID, timeout: [*c]types.SceUInt) callconv(.c) c_int;
 
 /// Delay the current thread by a specified number of microseconds
 /// `delay` - Delay in microseconds.
@@ -120,7 +120,7 @@ pub extern fn sceKernelWaitThreadEndCB(thid: types.SceUID, timeout: [*c]types.Sc
 /// `
 /// sceKernelDelayThread(1000000); // Delay for a second
 /// `
-pub extern fn sceKernelDelayThread(delay: types.SceUInt) callconv(.C) c_int;
+pub extern fn sceKernelDelayThread(delay: types.SceUInt) callconv(.c) c_int;
 
 /// Delay the current thread by a specified number of microseconds and handle any callbacks.
 /// `delay` - Delay in microseconds.
@@ -128,17 +128,17 @@ pub extern fn sceKernelDelayThread(delay: types.SceUInt) callconv(.C) c_int;
 /// `
 /// sceKernelDelayThread(1000000); // Delay for a second
 /// `
-pub extern fn sceKernelDelayThreadCB(delay: types.SceUInt) callconv(.C) c_int;
+pub extern fn sceKernelDelayThreadCB(delay: types.SceUInt) callconv(.c) c_int;
 
 /// Delay the current thread by a specified number of sysclocks
 /// `delay` - Delay in sysclocks
 /// Returns 0 on success, < 0 on error
-pub extern fn sceKernelDelaySysClockThread(delay: [*c]types.SceKernelSysClock) callconv(.C) c_int;
+pub extern fn sceKernelDelaySysClockThread(delay: [*c]types.SceKernelSysClock) callconv(.c) c_int;
 
 /// Delay the current thread by a specified number of sysclocks handling callbacks
 /// `delay` - Delay in sysclocks
 /// Returns 0 on success, < 0 on error
-pub extern fn sceKernelDelaySysClockThreadCB(delay: [*c]types.SceKernelSysClock) callconv(.C) c_int;
+pub extern fn sceKernelDelaySysClockThreadCB(delay: [*c]types.SceKernelSysClock) callconv(.c) c_int;
 
 /// Creates a new semaphore
 /// @par Example:
@@ -152,12 +152,12 @@ pub extern fn sceKernelDelaySysClockThreadCB(delay: [*c]types.SceKernelSysClock)
 /// `maxVal` - Sema maximum value
 /// `option` - Sema options (normally set to 0)
 /// Returns A semaphore id
-pub extern fn sceKernelCreateSema(name: [*c]const c_char, attr: types.SceUInt, initVal: c_int, maxVal: c_int, option: [*c]types.SceKernelSemaOptParam) callconv(.C) types.SceUID;
+pub extern fn sceKernelCreateSema(name: [*c]const c_char, attr: types.SceUInt, initVal: c_int, maxVal: c_int, option: [*c]types.SceKernelSemaOptParam) callconv(.c) types.SceUID;
 
 /// Destroy a semaphore
 /// `semaid` - The semaid returned from a previous create call.
 /// Returns Returns the value 0 if its succesful otherwise -1
-pub extern fn sceKernelDeleteSema(semaid: types.SceUID) callconv(.C) c_int;
+pub extern fn sceKernelDeleteSema(semaid: types.SceUID) callconv(.c) c_int;
 
 /// Send a signal to a semaphore
 /// @par Example:
@@ -168,7 +168,7 @@ pub extern fn sceKernelDeleteSema(semaid: types.SceUID) callconv(.C) c_int;
 /// `semaid` - The sema id returned from sceKernelCreateSema
 /// `signal` - The amount to signal the sema (i.e. if 2 then increment the sema by 2)
 /// Returns < 0 On error.
-pub extern fn sceKernelSignalSema(semaid: types.SceUID, signal: c_int) callconv(.C) c_int;
+pub extern fn sceKernelSignalSema(semaid: types.SceUID, signal: c_int) callconv(.c) c_int;
 
 /// Lock a semaphore
 /// @par Example:
@@ -179,7 +179,7 @@ pub extern fn sceKernelSignalSema(semaid: types.SceUID, signal: c_int) callconv(
 /// `signal` - The value to wait for (i.e. if 1 then wait till reaches a signal state of 1)
 /// `timeout` - Timeout in microseconds (assumed).
 /// Returns < 0 on error.
-pub extern fn sceKernelWaitSema(semaid: types.SceUID, signal: c_int, timeout: [*c]types.SceUInt) callconv(.C) c_int;
+pub extern fn sceKernelWaitSema(semaid: types.SceUID, signal: c_int, timeout: [*c]types.SceUInt) callconv(.c) c_int;
 
 /// Lock a semaphore a handle callbacks if necessary.
 /// @par Example:
@@ -190,21 +190,21 @@ pub extern fn sceKernelWaitSema(semaid: types.SceUID, signal: c_int, timeout: [*
 /// `signal` - The value to wait for (i.e. if 1 then wait till reaches a signal state of 1)
 /// `timeout` - Timeout in microseconds (assumed).
 /// Returns < 0 on error.
-pub extern fn sceKernelWaitSemaCB(semaid: types.SceUID, signal: c_int, timeout: [*c]types.SceUInt) callconv(.C) c_int;
+pub extern fn sceKernelWaitSemaCB(semaid: types.SceUID, signal: c_int, timeout: [*c]types.SceUInt) callconv(.c) c_int;
 
 /// Poll a sempahore.
 /// `semaid` - UID of the semaphore to poll.
 /// `signal` - The value to test for.
 /// Returns < 0 on error.
-pub extern fn sceKernelPollSema(semaid: types.SceUID, signal: c_int) callconv(.C) c_int;
+pub extern fn sceKernelPollSema(semaid: types.SceUID, signal: c_int) callconv(.c) c_int;
 
-pub extern fn sceKernelCancelSema() callconv(.C) void;
+pub extern fn sceKernelCancelSema() callconv(.c) void;
 
 /// Retrieve information about a semaphore.
 /// `semaid` - UID of the semaphore to retrieve info for.
 /// `info` - Pointer to a ::SceKernelSemaInfo struct to receive the info.
 /// Returns < 0 on error.
-pub extern fn sceKernelReferSemaStatus(semaid: types.SceUID, info: [*c]types.SceKernelSemaInfo) callconv(.C) c_int;
+pub extern fn sceKernelReferSemaStatus(semaid: types.SceUID, info: [*c]types.SceKernelSemaInfo) callconv(.c) c_int;
 
 /// Create an event flag.
 /// `name` - The name of the event flag.
@@ -217,24 +217,24 @@ pub extern fn sceKernelReferSemaStatus(semaid: types.SceUID, info: [*c]types.Sce
 /// int evid;
 /// evid = sceKernelCreateEventFlag("wait_event", 0, 0, 0);
 /// `
-pub extern fn sceKernelCreateEventFlag(name: [*c]const c_char, attr: c_int, bits: c_int, opt: [*c]types.SceKernelEventFlagOptParam) callconv(.C) types.SceUID;
+pub extern fn sceKernelCreateEventFlag(name: [*c]const c_char, attr: c_int, bits: c_int, opt: [*c]types.SceKernelEventFlagOptParam) callconv(.c) types.SceUID;
 
 /// Delete an event flag
 /// `evid` - The event id returned by sceKernelCreateEventFlag.
 /// Returns < 0 On error
-pub extern fn sceKernelDeleteEventFlag(evid: c_int) callconv(.C) c_int;
+pub extern fn sceKernelDeleteEventFlag(evid: c_int) callconv(.c) c_int;
 
 /// Set an event flag bit pattern.
 /// `evid` - The event id returned by sceKernelCreateEventFlag.
 /// `bits` - The bit pattern to set.
 /// Returns < 0 On error
-pub extern fn sceKernelSetEventFlag(evid: types.SceUID, bits: u32) callconv(.C) c_int;
+pub extern fn sceKernelSetEventFlag(evid: types.SceUID, bits: u32) callconv(.c) c_int;
 
 /// Clear a event flag bit pattern
 /// `evid` - The event id returned by ::sceKernelCreateEventFlag
 /// `bits` - The bits to clean
 /// Returns < 0 on Error
-pub extern fn sceKernelClearEventFlag(evid: types.SceUID, bits: u32) callconv(.C) c_int;
+pub extern fn sceKernelClearEventFlag(evid: types.SceUID, bits: u32) callconv(.c) c_int;
 
 /// Wait for an event flag for a given bit pattern.
 /// `evid` - The event id returned by sceKernelCreateEventFlag.
@@ -243,7 +243,7 @@ pub extern fn sceKernelClearEventFlag(evid: types.SceUID, bits: u32) callconv(.C
 /// `outBits` - The bit pattern that was matched.
 /// `timeout` - Timeout in microseconds
 /// Returns < 0 On error
-pub extern fn sceKernelWaitEventFlag(evid: c_int, bits: u32, wait: u32, outBits: [*c]u32, timeout: [*c]types.SceUInt) callconv(.C) c_int;
+pub extern fn sceKernelWaitEventFlag(evid: c_int, bits: u32, wait: u32, outBits: [*c]u32, timeout: [*c]types.SceUInt) callconv(.c) c_int;
 
 /// Wait for an event flag for a given bit pattern with callback.
 /// `evid` - The event id returned by sceKernelCreateEventFlag.
@@ -252,7 +252,7 @@ pub extern fn sceKernelWaitEventFlag(evid: c_int, bits: u32, wait: u32, outBits:
 /// `outBits` - The bit pattern that was matched.
 /// `timeout` - Timeout in microseconds
 /// Returns < 0 On error
-pub extern fn sceKernelWaitEventFlagCB(evid: c_int, bits: u32, wait: u32, outBits: [*c]u32, timeout: [*c]types.SceUInt) callconv(.C) c_int;
+pub extern fn sceKernelWaitEventFlagCB(evid: c_int, bits: u32, wait: u32, outBits: [*c]u32, timeout: [*c]types.SceUInt) callconv(.c) c_int;
 
 /// Poll an event flag for a given bit pattern.
 /// `evid` - The event id returned by sceKernelCreateEventFlag.
@@ -260,15 +260,15 @@ pub extern fn sceKernelWaitEventFlagCB(evid: c_int, bits: u32, wait: u32, outBit
 /// `wait` - Wait type, one or more of ::PspEventFlagWaitTypes or'ed together
 /// `outBits` - The bit pattern that was matched.
 /// Returns < 0 On error
-pub extern fn sceKernelPollEventFlag(evid: c_int, bits: u32, wait: u32, outBits: [*c]u32) callconv(.C) c_int;
+pub extern fn sceKernelPollEventFlag(evid: c_int, bits: u32, wait: u32, outBits: [*c]u32) callconv(.c) c_int;
 
-pub extern fn sceKernelCancelEventFlag() callconv(.C) void;
+pub extern fn sceKernelCancelEventFlag() callconv(.c) void;
 
 /// Get the status of an event flag.
 /// `event` - The UID of the event.
 /// `status` - A pointer to a ::SceKernelEventFlagInfo structure.
 /// Returns < 0 on error.
-pub extern fn sceKernelReferEventFlagStatus(event: types.SceUID, status: [*c]types.SceKernelEventFlagInfo) callconv(.C) c_int;
+pub extern fn sceKernelReferEventFlagStatus(event: types.SceUID, status: [*c]types.SceKernelEventFlagInfo) callconv(.c) c_int;
 
 /// Creates a new messagebox
 /// @par Example:
@@ -280,12 +280,12 @@ pub extern fn sceKernelReferEventFlagStatus(event: types.SceUID, status: [*c]typ
 /// `attr` - Mbx attribute flags (normally set to 0)
 /// `option` - Mbx options (normally set to NULL)
 /// Returns A messagebox id
-pub extern fn sceKernelCreateMbx(name: [*c]const c_char, attr: types.SceUInt, option: [*c]types.SceKernelMbxOptParam) callconv(.C) types.SceUID;
+pub extern fn sceKernelCreateMbx(name: [*c]const c_char, attr: types.SceUInt, option: [*c]types.SceKernelMbxOptParam) callconv(.c) types.SceUID;
 
 /// Destroy a messagebox
 /// `mbxid` - The mbxid returned from a previous create call.
 /// Returns Returns the value 0 if its succesful otherwise an error code
-pub extern fn sceKernelDeleteMbx(mbxid: types.SceUID) callconv(.C) c_int;
+pub extern fn sceKernelDeleteMbx(mbxid: types.SceUID) callconv(.c) c_int;
 
 /// Send a message to a messagebox
 /// @par Example:
@@ -303,7 +303,7 @@ pub extern fn sceKernelDeleteMbx(mbxid: types.SceUID) callconv(.C) c_int;
 /// The start of the message should be the
 /// ::SceKernelMsgPacket structure, the rest
 /// Returns < 0 On error.
-pub extern fn sceKernelSendMbx(mbxid: types.SceUID, message: ?*anyopaque) callconv(.C) c_int;
+pub extern fn sceKernelSendMbx(mbxid: types.SceUID, message: ?*anyopaque) callconv(.c) c_int;
 
 /// Wait for a message to arrive in a messagebox
 /// @par Example:
@@ -316,7 +316,7 @@ pub extern fn sceKernelSendMbx(mbxid: types.SceUID, message: ?*anyopaque) callco
 /// received message should be stored
 /// `timeout` - Timeout in microseconds
 /// Returns < 0 on error.
-pub extern fn sceKernelReceiveMbx(mbxid: types.SceUID, pmessage: ?*anyopaque, timeout: [*c]types.SceUInt) callconv(.C) c_int;
+pub extern fn sceKernelReceiveMbx(mbxid: types.SceUID, pmessage: ?*anyopaque, timeout: [*c]types.SceUInt) callconv(.c) c_int;
 
 /// Wait for a message to arrive in a messagebox and handle callbacks if necessary.
 /// @par Example:
@@ -329,7 +329,7 @@ pub extern fn sceKernelReceiveMbx(mbxid: types.SceUID, pmessage: ?*anyopaque, ti
 /// received message should be stored
 /// `timeout` - Timeout in microseconds
 /// Returns < 0 on error.
-pub extern fn sceKernelReceiveMbxCB(mbxid: types.SceUID, pmessage: ?*anyopaque, timeout: [*c]types.SceUInt) callconv(.C) c_int;
+pub extern fn sceKernelReceiveMbxCB(mbxid: types.SceUID, pmessage: ?*anyopaque, timeout: [*c]types.SceUInt) callconv(.c) c_int;
 
 /// Check if a message has arrived in a messagebox
 /// @par Example:
@@ -341,7 +341,7 @@ pub extern fn sceKernelReceiveMbxCB(mbxid: types.SceUID, pmessage: ?*anyopaque, 
 /// `pmessage` - A pointer to where a pointer to the
 /// received message should be stored
 /// Returns < 0 on error (SCE_KERNEL_ERROR_MBOX_NOMSG if the mbx is empty).
-pub extern fn sceKernelPollMbx(mbxid: types.SceUID, pmessage: ?*anyopaque) callconv(.C) c_int;
+pub extern fn sceKernelPollMbx(mbxid: types.SceUID, pmessage: ?*anyopaque) callconv(.c) c_int;
 
 /// Abort all wait operations on a messagebox
 /// @par Example:
@@ -353,13 +353,13 @@ pub extern fn sceKernelPollMbx(mbxid: types.SceUID, pmessage: ?*anyopaque) callc
 /// were waiting on the mbx should be stored (NULL
 /// if you don't care)
 /// Returns < 0 on error
-pub extern fn sceKernelCancelReceiveMbx(mbxid: types.SceUID, pnum: [*c]c_int) callconv(.C) c_int;
+pub extern fn sceKernelCancelReceiveMbx(mbxid: types.SceUID, pnum: [*c]c_int) callconv(.c) c_int;
 
 /// Retrieve information about a messagebox.
 /// `mbxid` - UID of the messagebox to retrieve info for.
 /// `info` - Pointer to a ::SceKernelMbxInfo struct to receive the info.
 /// Returns < 0 on error.
-pub extern fn sceKernelReferMbxStatus(mbxid: types.SceUID, info: [*c]types.SceKernelMbxInfo) callconv(.C) c_int;
+pub extern fn sceKernelReferMbxStatus(mbxid: types.SceUID, info: [*c]types.SceKernelMbxInfo) callconv(.c) c_int;
 
 /// Create a message pipe
 /// `name` - Name of the pipe
@@ -368,12 +368,12 @@ pub extern fn sceKernelReferMbxStatus(mbxid: types.SceUID, info: [*c]types.SceKe
 /// `unk1` - Unknown
 /// `opt` - Message pipe options (set to NULL)
 /// Returns The UID of the created pipe, < 0 on error
-pub extern fn sceKernelCreateMsgPipe(name: [*c]const c_char, part: c_int, attr: c_int, unk1: ?*anyopaque, opt: ?*anyopaque) callconv(.C) types.SceUID;
+pub extern fn sceKernelCreateMsgPipe(name: [*c]const c_char, part: c_int, attr: c_int, unk1: ?*anyopaque, opt: ?*anyopaque) callconv(.c) types.SceUID;
 
 /// Delete a message pipe
 /// `uid` - The UID of the pipe
 /// Returns 0 on success, < 0 on error
-pub extern fn sceKernelDeleteMsgPipe(uid: types.SceUID) callconv(.C) c_int;
+pub extern fn sceKernelDeleteMsgPipe(uid: types.SceUID) callconv(.c) c_int;
 
 /// Send a message to a pipe
 /// `uid` - The UID of the pipe
@@ -383,7 +383,7 @@ pub extern fn sceKernelDeleteMsgPipe(uid: types.SceUID) callconv(.C) c_int;
 /// `unk2` - Unknown
 /// `timeout` - Timeout for send
 /// Returns 0 on success, < 0 on error
-pub extern fn sceKernelSendMsgPipe(uid: types.SceUID, message: ?*anyopaque, size: c_uint, unk1: c_int, unk2: ?*anyopaque, timeout: [*c]c_uint) callconv(.C) c_int;
+pub extern fn sceKernelSendMsgPipe(uid: types.SceUID, message: ?*anyopaque, size: c_uint, unk1: c_int, unk2: ?*anyopaque, timeout: [*c]c_uint) callconv(.c) c_int;
 
 /// Send a message to a pipe (with callback)
 /// `uid` - The UID of the pipe
@@ -393,7 +393,7 @@ pub extern fn sceKernelSendMsgPipe(uid: types.SceUID, message: ?*anyopaque, size
 /// `unk2` - Unknown
 /// `timeout` - Timeout for send
 /// Returns 0 on success, < 0 on error
-pub extern fn sceKernelSendMsgPipeCB(uid: types.SceUID, message: ?*anyopaque, size: c_uint, unk1: c_int, unk2: ?*anyopaque, timeout: [*c]c_uint) callconv(.C) c_int;
+pub extern fn sceKernelSendMsgPipeCB(uid: types.SceUID, message: ?*anyopaque, size: c_uint, unk1: c_int, unk2: ?*anyopaque, timeout: [*c]c_uint) callconv(.c) c_int;
 
 /// Try to send a message to a pipe
 /// `uid` - The UID of the pipe
@@ -402,7 +402,7 @@ pub extern fn sceKernelSendMsgPipeCB(uid: types.SceUID, message: ?*anyopaque, si
 /// `unk1` - Unknown
 /// `unk2` - Unknown
 /// Returns 0 on success, < 0 on error
-pub extern fn sceKernelTrySendMsgPipe(uid: types.SceUID, message: ?*anyopaque, size: c_uint, unk1: c_int, unk2: ?*anyopaque) callconv(.C) c_int;
+pub extern fn sceKernelTrySendMsgPipe(uid: types.SceUID, message: ?*anyopaque, size: c_uint, unk1: c_int, unk2: ?*anyopaque) callconv(.c) c_int;
 
 /// Receive a message from a pipe
 /// `uid` - The UID of the pipe
@@ -412,7 +412,7 @@ pub extern fn sceKernelTrySendMsgPipe(uid: types.SceUID, message: ?*anyopaque, s
 /// `unk2` - Unknown
 /// `timeout` - Timeout for receive
 /// Returns 0 on success, < 0 on error
-pub extern fn sceKernelReceiveMsgPipe(uid: types.SceUID, message: ?*anyopaque, size: c_uint, unk1: c_int, unk2: ?*anyopaque, timeout: [*c]c_uint) callconv(.C) c_int;
+pub extern fn sceKernelReceiveMsgPipe(uid: types.SceUID, message: ?*anyopaque, size: c_uint, unk1: c_int, unk2: ?*anyopaque, timeout: [*c]c_uint) callconv(.c) c_int;
 
 /// Receive a message from a pipe (with callback)
 /// `uid` - The UID of the pipe
@@ -422,7 +422,7 @@ pub extern fn sceKernelReceiveMsgPipe(uid: types.SceUID, message: ?*anyopaque, s
 /// `unk2` - Unknown
 /// `timeout` - Timeout for receive
 /// Returns 0 on success, < 0 on error
-pub extern fn sceKernelReceiveMsgPipeCB(uid: types.SceUID, message: ?*anyopaque, size: c_uint, unk1: c_int, unk2: ?*anyopaque, timeout: [*c]c_uint) callconv(.C) c_int;
+pub extern fn sceKernelReceiveMsgPipeCB(uid: types.SceUID, message: ?*anyopaque, size: c_uint, unk1: c_int, unk2: ?*anyopaque, timeout: [*c]c_uint) callconv(.c) c_int;
 
 /// Receive a message from a pipe
 /// `uid` - The UID of the pipe
@@ -431,20 +431,20 @@ pub extern fn sceKernelReceiveMsgPipeCB(uid: types.SceUID, message: ?*anyopaque,
 /// `unk1` - Unknown
 /// `unk2` - Unknown
 /// Returns 0 on success, < 0 on error
-pub extern fn sceKernelTryReceiveMsgPipe(uid: types.SceUID, message: ?*anyopaque, size: c_uint, unk1: c_int, unk2: ?*anyopaque) callconv(.C) c_int;
+pub extern fn sceKernelTryReceiveMsgPipe(uid: types.SceUID, message: ?*anyopaque, size: c_uint, unk1: c_int, unk2: ?*anyopaque) callconv(.c) c_int;
 
 /// Cancel a message pipe
 /// `uid` - UID of the pipe to cancel
 /// `psend` - Receive number of sending threads?
 /// `precv` - Receive number of receiving threads?
 /// Returns 0 on success, < 0 on error
-pub extern fn sceKernelCancelMsgPipe(uid: types.SceUID, psend: [*c]c_int, precv: [*c]c_int) callconv(.C) c_int;
+pub extern fn sceKernelCancelMsgPipe(uid: types.SceUID, psend: [*c]c_int, precv: [*c]c_int) callconv(.c) c_int;
 
 /// Get the status of a Message Pipe
 /// `uid` - The uid of the Message Pipe
 /// `info` - Pointer to a ::SceKernelMppInfo structure
 /// Returns 0 on success, < 0 on error
-pub extern fn sceKernelReferMsgPipeStatus(uid: types.SceUID, info: [*c]types.SceKernelMppInfo) callconv(.C) c_int;
+pub extern fn sceKernelReferMsgPipeStatus(uid: types.SceUID, info: [*c]types.SceKernelMppInfo) callconv(.c) c_int;
 
 /// Create a variable pool
 /// `name` - Name of the pool
@@ -453,12 +453,12 @@ pub extern fn sceKernelReferMsgPipeStatus(uid: types.SceUID, info: [*c]types.Sce
 /// `size` - Size of pool
 /// `opt` - Options (set to NULL)
 /// Returns The UID of the created pool, < 0 on error.
-pub extern fn sceKernelCreateVpl(name: [*c]const c_char, part: c_int, attr: c_int, size: c_uint, opt: [*c]types.SceKernelVplOptParam) callconv(.C) types.SceUID;
+pub extern fn sceKernelCreateVpl(name: [*c]const c_char, part: c_int, attr: c_int, size: c_uint, opt: [*c]types.SceKernelVplOptParam) callconv(.c) types.SceUID;
 
 /// Delete a variable pool
 /// `uid` - The UID of the pool
 /// Returns 0 on success, < 0 on error
-pub extern fn sceKernelDeleteVpl(uid: types.SceUID) callconv(.C) c_int;
+pub extern fn sceKernelDeleteVpl(uid: types.SceUID) callconv(.c) c_int;
 
 /// Allocate from the pool
 /// `uid` - The UID of the pool
@@ -466,7 +466,7 @@ pub extern fn sceKernelDeleteVpl(uid: types.SceUID) callconv(.C) c_int;
 /// `data` - Receives the address of the allocated data
 /// `timeout` - Amount of time to wait for allocation?
 /// Returns 0 on success, < 0 on error
-pub extern fn sceKernelAllocateVpl(uid: types.SceUID, size: c_uint, data: ?*anyopaque, timeout: [*c]c_uint) callconv(.C) c_int;
+pub extern fn sceKernelAllocateVpl(uid: types.SceUID, size: c_uint, data: ?*anyopaque, timeout: [*c]c_uint) callconv(.c) c_int;
 
 /// Allocate from the pool (with callback)
 /// `uid` - The UID of the pool
@@ -474,32 +474,32 @@ pub extern fn sceKernelAllocateVpl(uid: types.SceUID, size: c_uint, data: ?*anyo
 /// `data` - Receives the address of the allocated data
 /// `timeout` - Amount of time to wait for allocation?
 /// Returns 0 on success, < 0 on error
-pub extern fn sceKernelAllocateVplCB(uid: types.SceUID, size: c_uint, data: ?*anyopaque, timeout: [*c]c_uint) callconv(.C) c_int;
+pub extern fn sceKernelAllocateVplCB(uid: types.SceUID, size: c_uint, data: ?*anyopaque, timeout: [*c]c_uint) callconv(.c) c_int;
 
 /// Try to allocate from the pool
 /// `uid` - The UID of the pool
 /// `size` - The size to allocate
 /// `data` - Receives the address of the allocated data
 /// Returns 0 on success, < 0 on error
-pub extern fn sceKernelTryAllocateVpl(uid: types.SceUID, size: c_uint, data: ?*anyopaque) callconv(.C) c_int;
+pub extern fn sceKernelTryAllocateVpl(uid: types.SceUID, size: c_uint, data: ?*anyopaque) callconv(.c) c_int;
 
 /// Free a block
 /// `uid` - The UID of the pool
 /// `data` - The data block to deallocate
 /// Returns 0 on success, < 0 on error
-pub extern fn sceKernelFreeVpl(uid: types.SceUID, data: ?*anyopaque) callconv(.C) c_int;
+pub extern fn sceKernelFreeVpl(uid: types.SceUID, data: ?*anyopaque) callconv(.c) c_int;
 
 /// Cancel a pool
 /// `uid` - The UID of the pool
 /// `pnum` - Receives the number of waiting threads
 /// Returns 0 on success, < 0 on error
-pub extern fn sceKernelCancelVpl(uid: types.SceUID, pnum: [*c]c_int) callconv(.C) c_int;
+pub extern fn sceKernelCancelVpl(uid: types.SceUID, pnum: [*c]c_int) callconv(.c) c_int;
 
 /// Get the status of an VPL
 /// `uid` - The uid of the VPL
 /// `info` - Pointer to a ::SceKernelVplInfo structure
 /// Returns 0 on success, < 0 on error
-pub extern fn sceKernelReferVplStatus(uid: types.SceUID, info: [*c]types.SceKernelVplInfo) callconv(.C) c_int;
+pub extern fn sceKernelReferVplStatus(uid: types.SceUID, info: [*c]types.SceKernelVplInfo) callconv(.c) c_int;
 
 /// Create a fixed pool
 /// `name` - Name of the pool
@@ -509,171 +509,171 @@ pub extern fn sceKernelReferVplStatus(uid: types.SceUID, info: [*c]types.SceKern
 /// `blocks` - Number of blocks to allocate
 /// `opt` - Options (set to NULL)
 /// Returns The UID of the created pool, < 0 on error.
-pub extern fn sceKernelCreateFpl(name: [*c]const c_char, part: c_int, attr: c_int, size: c_uint, blocks: c_uint, opt: [*c]types.SceKernelFplOptParam) callconv(.C) c_int;
+pub extern fn sceKernelCreateFpl(name: [*c]const c_char, part: c_int, attr: c_int, size: c_uint, blocks: c_uint, opt: [*c]types.SceKernelFplOptParam) callconv(.c) c_int;
 
 /// Delete a fixed pool
 /// `uid` - The UID of the pool
 /// Returns 0 on success, < 0 on error
-pub extern fn sceKernelDeleteFpl(uid: types.SceUID) callconv(.C) c_int;
+pub extern fn sceKernelDeleteFpl(uid: types.SceUID) callconv(.c) c_int;
 
 /// Allocate from the pool
 /// `uid` - The UID of the pool
 /// `data` - Receives the address of the allocated data
 /// `timeout` - Amount of time to wait for allocation?
 /// Returns 0 on success, < 0 on error
-pub extern fn sceKernelAllocateFpl(uid: types.SceUID, data: ?*anyopaque, timeout: [*c]c_uint) callconv(.C) c_int;
+pub extern fn sceKernelAllocateFpl(uid: types.SceUID, data: ?*anyopaque, timeout: [*c]c_uint) callconv(.c) c_int;
 
 /// Allocate from the pool (with callback)
 /// `uid` - The UID of the pool
 /// `data` - Receives the address of the allocated data
 /// `timeout` - Amount of time to wait for allocation?
 /// Returns 0 on success, < 0 on error
-pub extern fn sceKernelAllocateFplCB(uid: types.SceUID, data: ?*anyopaque, timeout: [*c]c_uint) callconv(.C) c_int;
+pub extern fn sceKernelAllocateFplCB(uid: types.SceUID, data: ?*anyopaque, timeout: [*c]c_uint) callconv(.c) c_int;
 
 /// Try to allocate from the pool
 /// `uid` - The UID of the pool
 /// `data` - Receives the address of the allocated data
 /// Returns 0 on success, < 0 on error
-pub extern fn sceKernelTryAllocateFpl(uid: types.SceUID, data: ?*anyopaque) callconv(.C) c_int;
+pub extern fn sceKernelTryAllocateFpl(uid: types.SceUID, data: ?*anyopaque) callconv(.c) c_int;
 
 /// Free a block
 /// `uid` - The UID of the pool
 /// `data` - The data block to deallocate
 /// Returns 0 on success, < 0 on error
-pub extern fn sceKernelFreeFpl(uid: types.SceUID, data: ?*anyopaque) callconv(.C) c_int;
+pub extern fn sceKernelFreeFpl(uid: types.SceUID, data: ?*anyopaque) callconv(.c) c_int;
 
 /// Cancel a pool
 /// `uid` - The UID of the pool
 /// `pnum` - Receives the number of waiting threads
 /// Returns 0 on success, < 0 on error
-pub extern fn sceKernelCancelFpl(uid: types.SceUID, pnum: [*c]c_int) callconv(.C) c_int;
+pub extern fn sceKernelCancelFpl(uid: types.SceUID, pnum: [*c]c_int) callconv(.c) c_int;
 
 /// Get the status of an FPL
 /// `uid` - The uid of the FPL
 /// `info` - Pointer to a ::SceKernelFplInfo structure
 /// Returns 0 on success, < 0 on error
-pub extern fn sceKernelReferFplStatus(uid: types.SceUID, info: [*c]types.SceKernelFplInfo) callconv(.C) c_int;
+pub extern fn sceKernelReferFplStatus(uid: types.SceUID, info: [*c]types.SceKernelFplInfo) callconv(.c) c_int;
 
 /// Return from a timer handler (doesn't seem to do alot)
-pub extern fn _sceKernelReturnFromTimerHandler() callconv(.C) void;
+pub extern fn _sceKernelReturnFromTimerHandler() callconv(.c) void;
 
 /// Convert a number of microseconds to a ::SceKernelSysClock structure
 /// `usec` - Number of microseconds
 /// `clock` - Pointer to a ::SceKernelSysClock structure
 /// Returns 0 on success, < 0 on error
-pub extern fn sceKernelUSec2SysClock(usec: c_uint, clock: [*c]types.SceKernelSysClock) callconv(.C) c_int;
+pub extern fn sceKernelUSec2SysClock(usec: c_uint, clock: [*c]types.SceKernelSysClock) callconv(.c) c_int;
 
 /// Convert a number of microseconds to a wide time
 /// `usec` - Number of microseconds.
 /// Returns The time
-pub extern fn sceKernelUSec2SysClockWide(usec: c_uint) callconv(.C) types.SceInt64;
+pub extern fn sceKernelUSec2SysClockWide(usec: c_uint) callconv(.c) types.SceInt64;
 
 /// Convert a ::SceKernelSysClock structure to microseconds
 /// `clock` - Pointer to a ::SceKernelSysClock structure
 /// `low` - Pointer to the low part of the time
 /// `high` - Pointer to the high part of the time
 /// Returns 0 on success, < 0 on error
-pub extern fn sceKernelSysClock2USec(clock: [*c]types.SceKernelSysClock, low: [*c]c_uint, high: [*c]c_uint) callconv(.C) c_int;
+pub extern fn sceKernelSysClock2USec(clock: [*c]types.SceKernelSysClock, low: [*c]c_uint, high: [*c]c_uint) callconv(.c) c_int;
 
 /// Convert a wide time to microseconds
 /// `clock` - Wide time
 /// `low` - Pointer to the low part of the time
 /// `high` - Pointer to the high part of the time
 /// Returns 0 on success, < 0 on error
-pub extern fn sceKernelSysClock2USecWide(clock: types.SceInt64, low: [*c]c_int, high: [*c]c_uint) callconv(.C) c_int;
+pub extern fn sceKernelSysClock2USecWide(clock: types.SceInt64, low: [*c]c_int, high: [*c]c_uint) callconv(.c) c_int;
 
 /// Get the system time
 /// `time` - Pointer to a ::SceKernelSysClock structure
 /// Returns 0 on success, < 0 on error
-pub extern fn sceKernelGetSystemTime(time: [*c]types.SceKernelSysClock) callconv(.C) c_int;
+pub extern fn sceKernelGetSystemTime(time: [*c]types.SceKernelSysClock) callconv(.c) c_int;
 
 /// Get the system time (wide version)
 /// Returns The system time
-pub extern fn sceKernelGetSystemTimeWide() callconv(.C) types.SceInt64;
+pub extern fn sceKernelGetSystemTimeWide() callconv(.c) types.SceInt64;
 
 /// Get the low 32bits of the current system time
 /// Returns The low 32bits of the system time
-pub extern fn sceKernelGetSystemTimeLow() callconv(.C) c_uint;
+pub extern fn sceKernelGetSystemTimeLow() callconv(.c) c_uint;
 
 /// Set an alarm.
 /// `clock` - The number of micro seconds till the alarm occurrs.
 /// `handler` - Pointer to a ::SceKernelAlarmHandler
 /// `common` - Common pointer for the alarm handler
 /// Returns A UID representing the created alarm, < 0 on error.
-pub extern fn sceKernelSetAlarm(clock: types.SceUInt, handler: types.SceKernelAlarmHandler, common: ?*anyopaque) callconv(.C) types.SceUID;
+pub extern fn sceKernelSetAlarm(clock: types.SceUInt, handler: types.SceKernelAlarmHandler, common: ?*anyopaque) callconv(.c) types.SceUID;
 
 /// Set an alarm using a ::SceKernelSysClock structure for the time
 /// `clock` - Pointer to a ::SceKernelSysClock structure
 /// `handler` - Pointer to a ::SceKernelAlarmHandler
 /// `common` - Common pointer for the alarm handler.
 /// Returns A UID representing the created alarm, < 0 on error.
-pub extern fn sceKernelSetSysClockAlarm(clock: [*c]types.SceKernelSysClock, handler: types.SceKernelAlarmHandler, common: ?*anyopaque) callconv(.C) types.SceUID;
+pub extern fn sceKernelSetSysClockAlarm(clock: [*c]types.SceKernelSysClock, handler: types.SceKernelAlarmHandler, common: ?*anyopaque) callconv(.c) types.SceUID;
 
 /// Cancel a pending alarm.
 /// `alarmid` - UID of the alarm to cancel.
 /// Returns 0 on success, < 0 on error.
-pub extern fn sceKernelCancelAlarm(alarmid: types.SceUID) callconv(.C) c_int;
+pub extern fn sceKernelCancelAlarm(alarmid: types.SceUID) callconv(.c) c_int;
 
 /// Refer the status of a created alarm.
 /// `alarmid` - UID of the alarm to get the info of
 /// `info` - Pointer to a ::SceKernelAlarmInfo structure
 /// Returns 0 on success, < 0 on error.
-pub extern fn sceKernelReferAlarmStatus(alarmid: types.SceUID, info: [*c]types.SceKernelAlarmInfo) callconv(.C) c_int;
+pub extern fn sceKernelReferAlarmStatus(alarmid: types.SceUID, info: [*c]types.SceKernelAlarmInfo) callconv(.c) c_int;
 
 /// Create a virtual timer
 /// `name` - Name for the timer.
 /// `opt` - Pointer to an ::SceKernelVTimerOptParam (pass NULL)
 /// Returns The VTimer's UID or < 0 on error.
-pub extern fn sceKernelCreateVTimer(name: [*c]const c_char, opt: [*c]types.SceKernelVTimerOptParam) callconv(.C) types.SceUID;
+pub extern fn sceKernelCreateVTimer(name: [*c]const c_char, opt: [*c]types.SceKernelVTimerOptParam) callconv(.c) types.SceUID;
 
 /// Delete a virtual timer
 /// `uid` - The UID of the timer
 /// Returns < 0 on error.
-pub extern fn sceKernelDeleteVTimer(uid: types.SceUID) callconv(.C) c_int;
+pub extern fn sceKernelDeleteVTimer(uid: types.SceUID) callconv(.c) c_int;
 
 /// Get the timer base
 /// `uid` - UID of the vtimer
 /// `base` - Pointer to a ::SceKernelSysClock structure
 /// Returns 0 on success, < 0 on error
-pub extern fn sceKernelGetVTimerBase(uid: types.SceUID, base: [*c]types.SceKernelSysClock) callconv(.C) c_int;
+pub extern fn sceKernelGetVTimerBase(uid: types.SceUID, base: [*c]types.SceKernelSysClock) callconv(.c) c_int;
 
 /// Get the timer base (wide format)
 /// `uid` - UID of the vtimer
 /// Returns The 64bit timer base
-pub extern fn sceKernelGetVTimerBaseWide(uid: types.SceUID) callconv(.C) types.SceInt64;
+pub extern fn sceKernelGetVTimerBaseWide(uid: types.SceUID) callconv(.c) types.SceInt64;
 
 /// Get the timer time
 /// `uid` - UID of the vtimer
 /// `time` - Pointer to a ::SceKernelSysClock structure
 /// Returns 0 on success, < 0 on error
-pub extern fn sceKernelGetVTimerTime(uid: types.SceUID, time: [*c]types.SceKernelSysClock) callconv(.C) c_int;
+pub extern fn sceKernelGetVTimerTime(uid: types.SceUID, time: [*c]types.SceKernelSysClock) callconv(.c) c_int;
 
 /// Get the timer time (wide format)
 /// `uid` - UID of the vtimer
 /// Returns The 64bit timer time
-pub extern fn sceKernelGetVTimerTimeWide(uid: types.SceUID) callconv(.C) types.SceInt64;
+pub extern fn sceKernelGetVTimerTimeWide(uid: types.SceUID) callconv(.c) types.SceInt64;
 
 /// Set the timer time
 /// `uid` - UID of the vtimer
 /// `time` - Pointer to a ::SceKernelSysClock structure
 /// Returns 0 on success, < 0 on error
-pub extern fn sceKernelSetVTimerTime(uid: types.SceUID, time: [*c]types.SceKernelSysClock) callconv(.C) c_int;
+pub extern fn sceKernelSetVTimerTime(uid: types.SceUID, time: [*c]types.SceKernelSysClock) callconv(.c) c_int;
 
 /// Set the timer time (wide format)
 /// `uid` - UID of the vtimer
 /// `time` - Pointer to a ::SceKernelSysClock structure
 /// Returns Possibly the last time
-pub extern fn sceKernelSetVTimerTimeWide(uid: types.SceUID, time: types.SceInt64) callconv(.C) types.SceInt64;
+pub extern fn sceKernelSetVTimerTimeWide(uid: types.SceUID, time: types.SceInt64) callconv(.c) types.SceInt64;
 
 /// Start a virtual timer
 /// `uid` - The UID of the timer
 /// Returns < 0 on error
-pub extern fn sceKernelStartVTimer(uid: types.SceUID) callconv(.C) c_int;
+pub extern fn sceKernelStartVTimer(uid: types.SceUID) callconv(.c) c_int;
 
 /// Stop a virtual timer
 /// `uid` - The UID of the timer
 /// Returns < 0 on error
-pub extern fn sceKernelStopVTimer(uid: types.SceUID) callconv(.C) c_int;
+pub extern fn sceKernelStopVTimer(uid: types.SceUID) callconv(.c) c_int;
 
 /// Set the timer handler
 /// `uid` - UID of the vtimer
@@ -681,7 +681,7 @@ pub extern fn sceKernelStopVTimer(uid: types.SceUID) callconv(.C) c_int;
 /// `handler` - The timer handler
 /// `common` - Common pointer
 /// Returns 0 on success, < 0 on error
-pub extern fn sceKernelSetVTimerHandler(uid: types.SceUID, time: [*c]types.SceKernelSysClock, handler: types.SceKernelVTimerHandler, common: ?*anyopaque) callconv(.C) c_int;
+pub extern fn sceKernelSetVTimerHandler(uid: types.SceUID, time: [*c]types.SceKernelSysClock, handler: types.SceKernelVTimerHandler, common: ?*anyopaque) callconv(.c) c_int;
 
 /// Set the timer handler (wide mode)
 /// `uid` - UID of the vtimer
@@ -689,69 +689,69 @@ pub extern fn sceKernelSetVTimerHandler(uid: types.SceUID, time: [*c]types.SceKe
 /// `handler` - The timer handler
 /// `common` - Common pointer
 /// Returns 0 on success, < 0 on error
-pub extern fn sceKernelSetVTimerHandlerWide(uid: types.SceUID, time: types.SceInt64, handler: types.SceKernelVTimerHandlerWide, common: ?*anyopaque) callconv(.C) c_int;
+pub extern fn sceKernelSetVTimerHandlerWide(uid: types.SceUID, time: types.SceInt64, handler: types.SceKernelVTimerHandlerWide, common: ?*anyopaque) callconv(.c) c_int;
 
 /// Cancel the timer handler
 /// `uid` - The UID of the vtimer
 /// Returns 0 on success, < 0 on error
-pub extern fn sceKernelCancelVTimerHandler(uid: types.SceUID) callconv(.C) c_int;
+pub extern fn sceKernelCancelVTimerHandler(uid: types.SceUID) callconv(.c) c_int;
 
 /// Get the status of a VTimer
 /// `uid` - The uid of the VTimer
 /// `info` - Pointer to a ::SceKernelVTimerInfo structure
 /// Returns 0 on success, < 0 on error
-pub extern fn sceKernelReferVTimerStatus(uid: types.SceUID, info: [*c]types.SceKernelVTimerInfo) callconv(.C) c_int;
+pub extern fn sceKernelReferVTimerStatus(uid: types.SceUID, info: [*c]types.SceKernelVTimerInfo) callconv(.c) c_int;
 
-pub extern fn sceKernelCreateThread(name: [*c]const c_char, entry: types.SceKernelThreadEntry, initPriority: c_int, stackSize: c_int, attr: types.SceUInt, option: [*c]types.SceKernelThreadOptParam) callconv(.C) types.SceUID;
+pub extern fn sceKernelCreateThread(name: [*c]const c_char, entry: types.SceKernelThreadEntry, initPriority: c_int, stackSize: c_int, attr: types.SceUInt, option: [*c]types.SceKernelThreadOptParam) callconv(.c) types.SceUID;
 
 /// Delate a thread
 /// `thid` - UID of the thread to be deleted.
 /// Returns < 0 on error.
-pub extern fn sceKernelDeleteThread(thid: types.SceUID) callconv(.C) c_int;
+pub extern fn sceKernelDeleteThread(thid: types.SceUID) callconv(.c) c_int;
 
 /// Start a created thread
 /// `thid` - Thread id from sceKernelCreateThread
 /// `arglen` - Length of the data pointed to by argp, in bytes
 /// `argp` - Pointer to the arguments.
-pub extern fn sceKernelStartThread(thid: types.SceUID, arglen: types.SceSize, argp: ?*anyopaque) callconv(.C) c_int;
+pub extern fn sceKernelStartThread(thid: types.SceUID, arglen: types.SceSize, argp: ?*anyopaque) callconv(.c) c_int;
 
 /// Exit the thread (probably used as the syscall when the main thread
 /// returns
-pub extern fn _sceKernelExitThread() callconv(.C) void;
+pub extern fn _sceKernelExitThread() callconv(.c) void;
 
 /// Exit a thread
 /// `status` - Exit status.
-pub extern fn sceKernelExitThread(status: c_int) callconv(.C) c_int;
+pub extern fn sceKernelExitThread(status: c_int) callconv(.c) c_int;
 
 /// Exit a thread and delete itself.
 /// `status` - Exit status
-pub extern fn sceKernelExitDeleteThread(status: c_int) callconv(.C) c_int;
+pub extern fn sceKernelExitDeleteThread(status: c_int) callconv(.c) c_int;
 
 /// Terminate a thread.
 /// `thid` - UID of the thread to terminate.
 /// Returns Success if >= 0, an error if < 0.
-pub extern fn sceKernelTerminateThread(thid: types.SceUID) callconv(.C) c_int;
+pub extern fn sceKernelTerminateThread(thid: types.SceUID) callconv(.c) c_int;
 
 /// Terminate and delete a thread.
 /// `thid` - UID of the thread to terminate and delete.
 /// Returns Success if >= 0, an error if < 0.
-pub extern fn sceKernelTerminateDeleteThread(thid: types.SceUID) callconv(.C) c_int;
+pub extern fn sceKernelTerminateDeleteThread(thid: types.SceUID) callconv(.c) c_int;
 
 /// Suspend the dispatch thread
 /// Returns The current state of the dispatch thread, < 0 on error
-pub extern fn sceKernelSuspendDispatchThread() callconv(.C) c_int;
+pub extern fn sceKernelSuspendDispatchThread() callconv(.c) c_int;
 
 /// Resume the dispatch thread
 /// `state` - The state of the dispatch thread
 /// (from ::sceKernelSuspendDispatchThread)
 /// Returns 0 on success, < 0 on error
-pub extern fn sceKernelResumeDispatchThread(state: c_int) callconv(.C) c_int;
+pub extern fn sceKernelResumeDispatchThread(state: c_int) callconv(.c) c_int;
 
 /// Modify the attributes of the current thread.
 /// `unknown` - Set to 0.
 /// `attr` - The thread attributes to modify.  One of ::PspThreadAttributes.
 /// Returns < 0 on error.
-pub extern fn sceKernelChangeCurrentThreadAttr(unknown: c_int, attr: types.SceUInt) callconv(.C) c_int;
+pub extern fn sceKernelChangeCurrentThreadAttr(unknown: c_int, attr: types.SceUInt) callconv(.c) c_int;
 
 /// Change the threads current priority.
 /// `thid` - The ID of the thread (from sceKernelCreateThread or sceKernelGetThreadId)
@@ -763,40 +763,40 @@ pub extern fn sceKernelChangeCurrentThreadAttr(unknown: c_int, attr: types.SceUI
 /// sceKernelChangeThreadPriority(thid, 16);
 /// `
 /// Returns 0 if successful, otherwise the error code.
-pub extern fn sceKernelChangeThreadPriority(thid: types.SceUID, priority: c_int) callconv(.C) c_int;
+pub extern fn sceKernelChangeThreadPriority(thid: types.SceUID, priority: c_int) callconv(.c) c_int;
 
 /// Rotate thread ready queue at a set priority
 /// `priority` - The priority of the queue
 /// Returns 0 on success, < 0 on error.
-pub extern fn sceKernelRotateThreadReadyQueue(priority: c_int) callconv(.C) c_int;
+pub extern fn sceKernelRotateThreadReadyQueue(priority: c_int) callconv(.c) c_int;
 
 /// Release a thread in the wait state.
 /// `thid` - The UID of the thread.
 /// Returns 0 on success, < 0 on error
-pub extern fn sceKernelReleaseWaitThread(thid: types.SceUID) callconv(.C) c_int;
+pub extern fn sceKernelReleaseWaitThread(thid: types.SceUID) callconv(.c) c_int;
 
 /// Get the current thread Id
 /// Returns The thread id of the calling thread.
-pub extern fn sceKernelGetThreadId() callconv(.C) c_int;
+pub extern fn sceKernelGetThreadId() callconv(.c) c_int;
 
 /// Get the current priority of the thread you are in.
 /// Returns The current thread priority
-pub extern fn sceKernelGetThreadCurrentPriority() callconv(.C) c_int;
+pub extern fn sceKernelGetThreadCurrentPriority() callconv(.c) c_int;
 
 /// Get the exit status of a thread.
 /// `thid` - The UID of the thread to check.
 /// Returns The exit status
-pub extern fn sceKernelGetThreadExitStatus(thid: types.SceUID) callconv(.C) c_int;
+pub extern fn sceKernelGetThreadExitStatus(thid: types.SceUID) callconv(.c) c_int;
 
 /// Check the thread stack?
 /// Returns Unknown.
-pub extern fn sceKernelCheckThreadStack() callconv(.C) c_int;
+pub extern fn sceKernelCheckThreadStack() callconv(.c) c_int;
 
 /// Get the free stack size for a thread.
 /// `thid` - The thread ID. Seem to take current thread
 /// if set to 0.
 /// Returns The free size.
-pub extern fn sceKernelGetThreadStackFreeSize(thid: types.SceUID) callconv(.C) c_int;
+pub extern fn sceKernelGetThreadStackFreeSize(thid: types.SceUID) callconv(.c) c_int;
 
 /// Get the status information for the specified thread.
 /// `thid` - Id of the thread to get status
@@ -811,18 +811,18 @@ pub extern fn sceKernelGetThreadStackFreeSize(thid: types.SceUID) callconv(.C) c
 /// { Do something... }
 /// `
 /// Returns 0 if successful, otherwise the error code.
-pub extern fn sceKernelReferThreadStatus(thid: types.SceUID, info: [*c]types.SceKernelThreadInfo) callconv(.C) c_int;
+pub extern fn sceKernelReferThreadStatus(thid: types.SceUID, info: [*c]types.SceKernelThreadInfo) callconv(.c) c_int;
 
 /// Retrive the runtime status of a thread.
 /// `thid` - UID of the thread to retrive status.
 /// `status` - Pointer to a ::SceKernelThreadRunStatus struct to receive the runtime status.
 /// Returns 0 if successful, otherwise the error code.
-pub extern fn sceKernelReferThreadRunStatus(thid: types.SceUID, status: [*c]types.SceKernelThreadRunStatus) callconv(.C) c_int;
+pub extern fn sceKernelReferThreadRunStatus(thid: types.SceUID, status: [*c]types.SceKernelThreadRunStatus) callconv(.c) c_int;
 
 /// Get the current system status.
 /// `status` - Pointer to a ::SceKernelSystemStatus structure.
 /// Returns < 0 on error.
-pub extern fn sceKernelReferSystemStatus(status: [*c]types.SceKernelSystemStatus) callconv(.C) c_int;
+pub extern fn sceKernelReferSystemStatus(status: [*c]types.SceKernelSystemStatus) callconv(.c) c_int;
 
 /// Get a list of UIDs from threadman. Allows you to enumerate
 /// resources such as threads or semaphores.
@@ -831,25 +831,25 @@ pub extern fn sceKernelReferSystemStatus(status: [*c]types.SceKernelSystemStatus
 /// `readbufsize` - The size of the buffer in SceUID units.
 /// `idcount` - Pointer to an integer in which to return the number of ids in the list.
 /// Returns < 0 on error. Either 0 or the same as idcount on success.
-pub extern fn sceKernelGetThreadmanIdList(type: types.SceKernelIdListType, readbuf: [*c]types.SceUID, readbufsize: c_int, idcount: [*c]c_int) callconv(.C) c_int;
+pub extern fn sceKernelGetThreadmanIdList(type: types.SceKernelIdListType, readbuf: [*c]types.SceUID, readbufsize: c_int, idcount: [*c]c_int) callconv(.c) c_int;
 
 /// Get the type of a threadman uid
 /// `uid` - The uid to get the type from
 /// Returns The type, < 0 on error
-pub extern fn sceKernelGetThreadmanIdType(uid: types.SceUID) callconv(.C) types.SceKernelIdListType;
+pub extern fn sceKernelGetThreadmanIdType(uid: types.SceUID) callconv(.c) types.SceKernelIdListType;
 
 /// Get the thread profiler registers.
 /// Returns Pointer to the registers, NULL on error
-pub extern fn sceKernelReferThreadProfiler() callconv(.C) [*c]c_int;
+pub extern fn sceKernelReferThreadProfiler() callconv(.c) [*c]c_int;
 
 /// Get the globile profiler registers.
 /// Returns Pointer to the registers, NULL on error
-pub extern fn sceKernelReferGlobalProfiler() callconv(.C) [*c]c_int;
+pub extern fn sceKernelReferGlobalProfiler() callconv(.c) [*c]c_int;
 
 /// Delete a lightweight mutex
 /// `workarea` - The pointer to the workarea
 /// Returns 0 on success, otherwise one of ::PspKernelErrorCodes
-pub extern fn sceKernelDeleteLwMutex(workarea: [*c]c_int) callconv(.C) c_int;
+pub extern fn sceKernelDeleteLwMutex(workarea: [*c]c_int) callconv(.c) c_int;
 
 /// Create a lightweight mutex
 /// `workarea` - The pointer to the workarea
@@ -858,7 +858,7 @@ pub extern fn sceKernelDeleteLwMutex(workarea: [*c]c_int) callconv(.C) c_int;
 /// `initialCount` - THe inital value of the mutex
 /// `optionsPtr` - Other options for mutex
 /// Returns 0 on success, otherwise one of ::PspKernelErrorCodes
-pub extern fn sceKernelCreateLwMutex(workarea: [*c]c_int, name: [*c]const c_char, attr: types.SceUInt32, initialCount: c_int, optionsPtr: [*c]u32) callconv(.C) c_int;
+pub extern fn sceKernelCreateLwMutex(workarea: [*c]c_int, name: [*c]const c_char, attr: types.SceUInt32, initialCount: c_int, optionsPtr: [*c]u32) callconv(.c) c_int;
 
 comptime {
     asm (macro.import_module_start("ThreadManForUser", "0x40010000", "128"));

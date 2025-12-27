@@ -6,61 +6,61 @@ const macro = @import("../macro.zig");
 /// `requestid` - ID of the request created by sceHttpCreateRequest or sceHttpCreateRequestWithURL
 /// `contentlength` - The size of the content
 /// Returns 0 on success, < 0 on error.
-pub extern fn sceHttpGetContentLength(requestid: c_int, contentlength: [*c]types.SceULong64) callconv(.C) c_int;
+pub extern fn sceHttpGetContentLength(requestid: c_int, contentlength: [*c]types.SceULong64) callconv(.c) c_int;
 
 /// Set resolver retry
 /// `id` - ID of the template or connection
 /// `count` - Number of retries
 /// Returns 0 on success, < 0 on error.
-pub extern fn sceHttpSetResolveRetry(id: c_int, count: c_int) callconv(.C) c_int;
+pub extern fn sceHttpSetResolveRetry(id: c_int, count: c_int) callconv(.c) c_int;
 
-pub extern fn sceHttpSetCookieSendCallback() callconv(.C) void;
+pub extern fn sceHttpSetCookieSendCallback() callconv(.c) void;
 
 /// Enable redirect
 /// `id` - ID of the template or connection
 /// Returns 0 on success, < 0 on error.
-pub extern fn sceHttpEnableRedirect(id: c_int) callconv(.C) c_int;
+pub extern fn sceHttpEnableRedirect(id: c_int) callconv(.c) c_int;
 
 /// Disable cookie
 /// `id` - ID of the template or connection
 /// Returns 0 on success, < 0 on error.
-pub extern fn sceHttpDisableCookie(id: c_int) callconv(.C) c_int;
+pub extern fn sceHttpDisableCookie(id: c_int) callconv(.c) c_int;
 
 /// Enable cookie
 /// `id` - ID of the template or connection
 /// Returns 0 on success, < 0 on error.
-pub extern fn sceHttpEnableCookie(id: c_int) callconv(.C) c_int;
+pub extern fn sceHttpEnableCookie(id: c_int) callconv(.c) c_int;
 
 /// Delete content header
 /// `id` - ID of the template, connection or request
 /// `name` - Name of the content
 /// Returns 0 on success, < 0 on error.
-pub extern fn sceHttpDeleteHeader(id: c_int, name: [*c]const c_char) callconv(.C) c_int;
+pub extern fn sceHttpDeleteHeader(id: c_int, name: [*c]const c_char) callconv(.c) c_int;
 
 /// Disable redirect
 /// `id` - ID of the template or connection
 /// Returns 0 on success, < 0 on error.
-pub extern fn sceHttpDisableRedirect(id: c_int) callconv(.C) c_int;
+pub extern fn sceHttpDisableRedirect(id: c_int) callconv(.c) c_int;
 
-pub extern fn sceHttpFlushCache() callconv(.C) void;
+pub extern fn sceHttpFlushCache() callconv(.c) void;
 
 /// Set receive timeout
 /// `id` - ID of the template or connection
 /// `timeout` - Timeout value in microseconds
 /// Returns 0 on success, < 0 on error.
-pub extern fn sceHttpSetRecvTimeOut(id: c_int, timeout: c_uint) callconv(.C) c_int;
+pub extern fn sceHttpSetRecvTimeOut(id: c_int, timeout: c_uint) callconv(.c) c_int;
 
-pub extern fn sceHttpGetNetworkPspError() callconv(.C) void;
+pub extern fn sceHttpGetNetworkPspError() callconv(.c) void;
 
-pub extern fn sceHttpSetAuthInfoCallback() callconv(.C) void;
+pub extern fn sceHttpSetAuthInfoCallback() callconv(.c) void;
 
-pub extern fn sceHttpSetAuthInfoCB(id: c_int, cbfunc: c_int) callconv(.C) c_int;
+pub extern fn sceHttpSetAuthInfoCB(id: c_int, cbfunc: c_int) callconv(.c) c_int;
 
-pub extern fn sceHttpFlushAuthList() callconv(.C) void;
+pub extern fn sceHttpFlushAuthList() callconv(.c) void;
 
-pub extern fn sceHttpSetCookieRecvCallback() callconv(.C) void;
+pub extern fn sceHttpSetCookieRecvCallback() callconv(.c) void;
 
-pub extern fn sceHttp_3C478044() callconv(.C) void;
+pub extern fn sceHttp_3C478044() callconv(.c) void;
 
 /// Add content header
 /// `id` - ID of the template, connection or request
@@ -68,9 +68,9 @@ pub extern fn sceHttp_3C478044() callconv(.C) void;
 /// `value` - Value of the content
 /// `unknown1` - Pass 0
 /// Returns 0 on success, < 0 on error.
-pub extern fn sceHttpAddExtraHeader(id: c_int, name: [*c]c_char, value: [*c]c_char, unknown1: c_int) callconv(.C) c_int;
+pub extern fn sceHttpAddExtraHeader(id: c_int, name: [*c]c_char, value: [*c]c_char, unknown1: c_int) callconv(.c) c_int;
 
-pub extern fn sceHttp_457D221D() callconv(.C) void;
+pub extern fn sceHttp_457D221D() callconv(.c) void;
 
 /// Create a http request.
 /// `connectionid` - ID of the connection created by sceHttpCreateConnection or sceHttpCreateConnectionWithURL
@@ -78,67 +78,67 @@ pub extern fn sceHttp_457D221D() callconv(.C) void;
 /// `path` - Path to access
 /// `contentlength` - Length of the content (POST method only)
 /// Returns A request ID on success, < 0 on error.
-pub extern fn sceHttpCreateRequest(connectionid: c_int, method: c_int, path: [*c]c_char, contentlength: types.SceULong64) callconv(.C) c_int;
+pub extern fn sceHttpCreateRequest(connectionid: c_int, method: c_int, path: [*c]c_char, contentlength: types.SceULong64) callconv(.c) c_int;
 
 /// Set resolver timeout
 /// `id` - ID of the template or connection
 /// `timeout` - Timeout value in microseconds
 /// Returns 0 on success, < 0 on error.
-pub extern fn sceHttpSetResolveTimeOut(id: c_int, timeout: c_uint) callconv(.C) c_int;
+pub extern fn sceHttpSetResolveTimeOut(id: c_int, timeout: c_uint) callconv(.c) c_int;
 
 /// Get http request status code.
 /// `requestid` - ID of the request created by sceHttpCreateRequest or sceHttpCreateRequestWithURL
 /// `statuscode` - The status code from the host (200 is ok, 404 is not found etc)
 /// Returns 0 on success, < 0 on error.
-pub extern fn sceHttpGetStatusCode(requestid: c_int, statuscode: [*c]c_int) callconv(.C) c_int;
+pub extern fn sceHttpGetStatusCode(requestid: c_int, statuscode: [*c]c_int) callconv(.c) c_int;
 
-pub extern fn sceHttp_4E4A284A() callconv(.C) void;
+pub extern fn sceHttp_4E4A284A() callconv(.c) void;
 
 /// Delete a http connection.
 /// `connectionid` - ID of the connection created by sceHttpCreateConnection or sceHttpCreateConnectionWithURL
 /// Returns 0 on success, < 0 on error.
-pub extern fn sceHttpDeleteConnection(connectionid: c_int) callconv(.C) c_int;
+pub extern fn sceHttpDeleteConnection(connectionid: c_int) callconv(.c) c_int;
 
-pub extern fn sceHttpIsRequestInCache() callconv(.C) void;
+pub extern fn sceHttpIsRequestInCache() callconv(.c) void;
 
-pub extern fn sceHttpsSetSslCallback() callconv(.C) void;
+pub extern fn sceHttpsSetSslCallback() callconv(.c) void;
 
-pub extern fn sceHttpEnableCache(id: c_int) callconv(.C) c_int;
+pub extern fn sceHttpEnableCache(id: c_int) callconv(.c) c_int;
 
-pub extern fn sceHttpsInitWithPath() callconv(.C) void;
+pub extern fn sceHttpsInitWithPath() callconv(.c) void;
 
-pub extern fn sceHttp_739C2D79() callconv(.C) void;
+pub extern fn sceHttp_739C2D79() callconv(.c) void;
 
 /// Save cookie
 /// Returns 0 on success, < 0 on error.
-pub extern fn sceHttpSaveSystemCookie() callconv(.C) c_int;
+pub extern fn sceHttpSaveSystemCookie() callconv(.c) c_int;
 
-pub extern fn sceHttpAddCookie() callconv(.C) void;
+pub extern fn sceHttpAddCookie() callconv(.c) void;
 
-pub extern fn sceHttp_77EE5319() callconv(.C) void;
+pub extern fn sceHttp_77EE5319() callconv(.c) void;
 
 /// Enable keep alive
 /// `id` - ID of the template or connection
 /// Returns 0 on success, < 0 on error.
-pub extern fn sceHttpEnableKeepAlive(id: c_int) callconv(.C) c_int;
+pub extern fn sceHttpEnableKeepAlive(id: c_int) callconv(.c) c_int;
 
-pub extern fn sceHttpEndCache() callconv(.C) c_int;
+pub extern fn sceHttpEndCache() callconv(.c) c_int;
 
-pub extern fn sceHttp_8046E250() callconv(.C) void;
+pub extern fn sceHttp_8046E250() callconv(.c) void;
 
 /// Load default certificate
 /// `unknown1` - Pass 0
 /// `unknown2` - Pass 0
 /// Returns 0 on success, < 0 on error.
-pub extern fn sceHttpsLoadDefaultCert(unknown1: c_int, unknown2: c_int) callconv(.C) c_int;
+pub extern fn sceHttpsLoadDefaultCert(unknown1: c_int, unknown2: c_int) callconv(.c) c_int;
 
-pub extern fn sceHttp_87F1E666() callconv(.C) void;
+pub extern fn sceHttp_87F1E666() callconv(.c) void;
 
 /// Set connect timeout
 /// `id` - ID of the template, connection or request
 /// `timeout` - Timeout value in microseconds
 /// Returns 0 on success, < 0 on error.
-pub extern fn sceHttpSetConnectTimeOut(id: c_int, timeout: c_uint) callconv(.C) c_int;
+pub extern fn sceHttpSetConnectTimeOut(id: c_int, timeout: c_uint) callconv(.c) c_int;
 
 /// Create a http connection.
 /// `templateid` - ID of the template created by sceHttpCreateTemplate
@@ -147,58 +147,58 @@ pub extern fn sceHttpSetConnectTimeOut(id: c_int, timeout: c_uint) callconv(.C) 
 /// `port` - Port to connect on
 /// `unknown2` - Pass 0
 /// Returns A connection ID on success, < 0 on error.
-pub extern fn sceHttpCreateConnection(templateid: c_int, host: [*c]c_char, unknown1: [*c]c_char, port: c_ushort, unknown2: c_int) callconv(.C) c_int;
+pub extern fn sceHttpCreateConnection(templateid: c_int, host: [*c]c_char, unknown1: [*c]c_char, port: c_ushort, unknown2: c_int) callconv(.c) c_int;
 
-pub extern fn sceHttp_951D310E() callconv(.C) void;
+pub extern fn sceHttp_951D310E() callconv(.c) void;
 
-pub extern fn sceHttpSetRecvBlockSize() callconv(.C) void;
+pub extern fn sceHttpSetRecvBlockSize() callconv(.c) void;
 
-pub extern fn sceHttpGetCookie() callconv(.C) void;
+pub extern fn sceHttpGetCookie() callconv(.c) void;
 
 /// Set send timeout
 /// `id` - ID of the template, connection or request
 /// `timeout` - Timeout value in microseconds
 /// Returns 0 on success, < 0 on error.
-pub extern fn sceHttpSetSendTimeOut(id: c_int, timeout: c_uint) callconv(.C) c_int;
+pub extern fn sceHttpSetSendTimeOut(id: c_int, timeout: c_uint) callconv(.c) c_int;
 
-pub extern fn sceHttpSendRequestInCacheFirstMode() callconv(.C) void;
+pub extern fn sceHttpSendRequestInCacheFirstMode() callconv(.c) void;
 
 /// Create a http template.
 /// `agent` - User agent
 /// `unknown1` - Pass 1
 /// `unknown2` - Pass 0
 /// Returns A template ID on success, < 0 on error.
-pub extern fn sceHttpCreateTemplate(agent: [*c]c_char, unknown1: c_int, unknown2: c_int) callconv(.C) c_int;
+pub extern fn sceHttpCreateTemplate(agent: [*c]c_char, unknown1: c_int, unknown2: c_int) callconv(.c) c_int;
 
-pub extern fn sceHttpEnableAuth(id: c_int) callconv(.C) c_int;
+pub extern fn sceHttpEnableAuth(id: c_int) callconv(.c) c_int;
 
-pub extern fn sceHttpSetRedirectCallback() callconv(.C) void;
+pub extern fn sceHttpSetRedirectCallback() callconv(.c) void;
 
-pub extern fn sceHttp_A461A167() callconv(.C) void;
+pub extern fn sceHttp_A461A167() callconv(.c) void;
 
 /// Delete a http request.
 /// `requestid` - ID of the request created by sceHttpCreateRequest or sceHttpCreateRequestWithURL
 /// Returns 0 on success, < 0 on error.
-pub extern fn sceHttpDeleteRequest(requestid: c_int) callconv(.C) c_int;
+pub extern fn sceHttpDeleteRequest(requestid: c_int) callconv(.c) c_int;
 
-pub extern fn sceHttpInitCache(max_size: types.SceSize) callconv(.C) c_int;
+pub extern fn sceHttpInitCache(max_size: types.SceSize) callconv(.c) c_int;
 
-pub extern fn sceHttp_A909F2AE() callconv(.C) void;
+pub extern fn sceHttp_A909F2AE() callconv(.c) void;
 
-pub extern fn sceHttpsGetSslError() callconv(.C) void;
+pub extern fn sceHttpsGetSslError() callconv(.c) void;
 
 /// Init the http library.
 /// `unknown1` - Memory pool size? Pass 20000
 /// Returns 0 on success, < 0 on error.
-pub extern fn sceHttpInit(unknown1: c_uint) callconv(.C) c_int;
+pub extern fn sceHttpInit(unknown1: c_uint) callconv(.c) c_int;
 
-pub extern fn sceHttpDisableAuth(id: c_int) callconv(.C) c_int;
+pub extern fn sceHttpDisableAuth(id: c_int) callconv(.c) c_int;
 
-pub extern fn sceHttp_B0257723() callconv(.C) void;
+pub extern fn sceHttp_B0257723() callconv(.c) void;
 
-pub extern fn sceHttpSetCacheContentLengthMaxSize() callconv(.C) void;
+pub extern fn sceHttpSetCacheContentLengthMaxSize() callconv(.c) void;
 
-pub extern fn sceHttpsDisableOption() callconv(.C) void;
+pub extern fn sceHttpsDisableOption() callconv(.c) void;
 
 /// Create a http request with url.
 /// `connectionid` - ID of the connection created by sceHttpCreateConnection or sceHttpCreateConnectionWithURL
@@ -206,63 +206,63 @@ pub extern fn sceHttpsDisableOption() callconv(.C) void;
 /// `url` - url to access
 /// `contentlength` - Length of the content (POST method only)
 /// Returns A request ID on success, < 0 on error.
-pub extern fn sceHttpCreateRequestWithURL(connectionid: c_int, method: c_int, url: [*c]c_char, contentlength: types.SceULong64) callconv(.C) c_int;
+pub extern fn sceHttpCreateRequestWithURL(connectionid: c_int, method: c_int, url: [*c]c_char, contentlength: types.SceULong64) callconv(.c) c_int;
 
-pub extern fn sceHttpsEnableOption() callconv(.C) void;
+pub extern fn sceHttpsEnableOption() callconv(.c) void;
 
 /// Send a http request.
 /// `requestid` - ID of the request created by sceHttpCreateRequest or sceHttpCreateRequestWithURL
 /// `data` - For POST methods specify a pointer to the post data, otherwise pass NULL
 /// `datasize` - For POST methods specify the size of the post data, otherwise pass 0
 /// Returns 0 on success, < 0 on error.
-pub extern fn sceHttpSendRequest(requestid: c_int, data: ?*anyopaque, datasize: c_uint) callconv(.C) c_int;
+pub extern fn sceHttpSendRequest(requestid: c_int, data: ?*anyopaque, datasize: c_uint) callconv(.c) c_int;
 
-pub extern fn sceHttp_C0E69162() callconv(.C) void;
+pub extern fn sceHttp_C0E69162() callconv(.c) void;
 
 /// Abort a http request.
 /// `requestid` - ID of the request created by sceHttpCreateRequest or sceHttpCreateRequestWithURL
 /// Returns 0 on success, < 0 on error.
-pub extern fn sceHttpAbortRequest(requestid: c_int) callconv(.C) c_int;
+pub extern fn sceHttpAbortRequest(requestid: c_int) callconv(.c) c_int;
 
-pub extern fn sceHttp_C6330B0D() callconv(.C) void;
+pub extern fn sceHttp_C6330B0D() callconv(.c) void;
 
 /// Disable keep alive
 /// `id` - ID of the template or connection
 /// Returns 0 on success, < 0 on error.
-pub extern fn sceHttpDisableKeepAlive(id: c_int) callconv(.C) c_int;
+pub extern fn sceHttpDisableKeepAlive(id: c_int) callconv(.c) c_int;
 
-pub extern fn sceHttpSetResHeaderMaxSize(id: c_int, header_size: c_uint) callconv(.C) c_int;
+pub extern fn sceHttpSetResHeaderMaxSize(id: c_int, header_size: c_uint) callconv(.c) c_int;
 
-pub extern fn sceHttp_CC920C12() callconv(.C) void;
+pub extern fn sceHttp_CC920C12() callconv(.c) void;
 
-pub extern fn sceHttpDisableCache(id: c_int) callconv(.C) c_int;
+pub extern fn sceHttpDisableCache(id: c_int) callconv(.c) c_int;
 
-pub extern fn sceHttp_CDB0DC58() callconv(.C) void;
+pub extern fn sceHttp_CDB0DC58() callconv(.c) void;
 
 /// Create a http connection to a url.
 /// `templateid` - ID of the template created by sceHttpCreateTemplate
 /// `url` - url to connect to
 /// `unknown1` - Pass 0
 /// Returns A connection ID on success, < 0 on error.
-pub extern fn sceHttpCreateConnectionWithURL(templateid: c_int, url: [*c]const c_char, unknown1: c_int) callconv(.C) c_int;
+pub extern fn sceHttpCreateConnectionWithURL(templateid: c_int, url: [*c]const c_char, unknown1: c_int) callconv(.c) c_int;
 
-pub extern fn sceHttpGetNetworkErrno(request: c_int, err_num: [*c]c_int) callconv(.C) c_int;
+pub extern fn sceHttpGetNetworkErrno(request: c_int, err_num: [*c]c_int) callconv(.c) c_int;
 
-pub extern fn sceHttpsGetCaList() callconv(.C) void;
+pub extern fn sceHttpsGetCaList() callconv(.c) void;
 
 /// Terminate the http library.
 /// Returns 0 on success, < 0 on error.
-pub extern fn sceHttpEnd() callconv(.C) c_int;
+pub extern fn sceHttpEnd() callconv(.c) c_int;
 
-pub extern fn sceHttp_D29163DA() callconv(.C) void;
+pub extern fn sceHttp_D29163DA() callconv(.c) void;
 
-pub extern fn sceHttpGetProxy(id: c_int, activate_flag: [*c]c_int, mode: [*c]c_int, proxy_host: [*c]u8, len: types.SceSize, proxy_port: [*c]c_ushort) callconv(.C) c_int;
+pub extern fn sceHttpGetProxy(id: c_int, activate_flag: [*c]c_int, mode: [*c]c_int, proxy_host: [*c]u8, len: types.SceSize, proxy_port: [*c]c_ushort) callconv(.c) c_int;
 
-pub extern fn sceHttp_D80BE761() callconv(.C) void;
+pub extern fn sceHttp_D80BE761() callconv(.c) void;
 
-pub extern fn sceHttpGetAllHeader(request: c_int, header: [*c]u8, header_size: [*c]c_uint) callconv(.C) c_int;
+pub extern fn sceHttpGetAllHeader(request: c_int, header: [*c]u8, header_size: [*c]c_uint) callconv(.c) c_int;
 
-pub extern fn sceHttp_DD6E7857() callconv(.C) void;
+pub extern fn sceHttp_DD6E7857() callconv(.c) void;
 
 /// Init the https library.
 /// `unknown1` - Pass 0
@@ -270,31 +270,31 @@ pub extern fn sceHttp_DD6E7857() callconv(.C) void;
 /// `unknown3` - Pass 0
 /// `unknown4` - Pass 0
 /// Returns 0 on success, < 0 on error.
-pub extern fn sceHttpsInit(unknown1: c_int, unknown2: c_int, unknown3: c_int, unknown4: c_int) callconv(.C) c_int;
+pub extern fn sceHttpsInit(unknown1: c_int, unknown2: c_int, unknown3: c_int, unknown4: c_int) callconv(.c) c_int;
 
 /// Read a http request response.
 /// `requestid` - ID of the request created by sceHttpCreateRequest or sceHttpCreateRequestWithURL
 /// `data` - Buffer for the response data to be stored
 /// `datasize` - Size of the buffer
 /// Returns The size read into the data buffer, 0 if there is no more data, < 0 on error.
-pub extern fn sceHttpReadData(requestid: c_int, data: ?*anyopaque, datasize: c_uint) callconv(.C) c_int;
+pub extern fn sceHttpReadData(requestid: c_int, data: ?*anyopaque, datasize: c_uint) callconv(.c) c_int;
 
-pub extern fn sceHttpSetProxy(id: c_int, activate_flag: c_int, mode: c_int, new_proxy_host: [*c]const u8, new_proxy_port: c_ushort) callconv(.C) c_int;
+pub extern fn sceHttpSetProxy(id: c_int, activate_flag: c_int, mode: c_int, new_proxy_host: [*c]const u8, new_proxy_port: c_ushort) callconv(.c) c_int;
 
 /// Load cookie
 /// Returns 0 on success, < 0 on error.
-pub extern fn sceHttpLoadSystemCookie() callconv(.C) c_int;
+pub extern fn sceHttpLoadSystemCookie() callconv(.c) c_int;
 
-pub extern fn sceHttpSetMallocFunction(malloc_func: c_int, free_func: c_int, realloc_func: c_int) callconv(.C) c_int;
+pub extern fn sceHttpSetMallocFunction(malloc_func: c_int, free_func: c_int, realloc_func: c_int) callconv(.c) c_int;
 
 /// Terminate the https library
 /// Returns 0 on success, < 0 on error.
-pub extern fn sceHttpsEnd() callconv(.C) c_int;
+pub extern fn sceHttpsEnd() callconv(.c) c_int;
 
 /// Delete a http template.
 /// `templateid` - ID of the template created by sceHttpCreateTemplate
 /// Returns 0 on success, < 0 on error.
-pub extern fn sceHttpDeleteTemplate(templateid: c_int) callconv(.C) c_int;
+pub extern fn sceHttpDeleteTemplate(templateid: c_int) callconv(.c) c_int;
 
 comptime {
     asm (macro.import_module_start("sceHttp", "0x00090011", "83"));
