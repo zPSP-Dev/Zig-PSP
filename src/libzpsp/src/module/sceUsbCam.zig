@@ -2,141 +2,141 @@
 const types = @import("../types.zig");
 const macro = @import("../macro.zig");
 
-pub extern fn sceUsbCamSetupMic() callconv(.C) void;
+pub extern fn sceUsbCamSetupMic() callconv(.c) void;
 
-pub extern fn sceUsbCamSetMicGain() callconv(.C) void;
+pub extern fn sceUsbCamSetMicGain() callconv(.c) void;
 
 /// Sets the contrast
 /// `contrast` - The contrast (0-255)
 /// Returns 0 on success, < 0 on error
-pub extern fn sceUsbCamSetContrast(contrast: c_int) callconv(.C) c_int;
+pub extern fn sceUsbCamSetContrast(contrast: c_int) callconv(.c) c_int;
 
 /// Setups the parameters to take a still image (with more options)
 /// `param` - pointer to a ::PspUsbCamSetupStillExParam
 /// Returns 0 on success, < 0 on error
-pub extern fn sceUsbCamSetupStillEx(param: [*c]c_int) callconv(.C) c_int;
+pub extern fn sceUsbCamSetupStillEx(param: [*c]c_int) callconv(.c) c_int;
 
 /// Gets the state of the autoreversal of the image.
 /// Returns 1 if it is set to automatic, 0 otherwise
-pub extern fn sceUsbCamGetAutoImageReverseState() callconv(.C) c_int;
+pub extern fn sceUsbCamGetAutoImageReverseState() callconv(.c) c_int;
 
 /// Set ups the parameters for video capture.
 /// `param` - Pointer to a ::PspUsbCamSetupVideoParam structure.
 /// `workarea` - Pointer to a buffer used as work area by the driver.
 /// `wasize` - Size of the work area.
 /// Returns 0 on success, < 0 on error
-pub extern fn sceUsbCamSetupVideo(param: [*c]c_int, workarea: ?*anyopaque, wasize: c_int) callconv(.C) c_int;
+pub extern fn sceUsbCamSetupVideo(param: [*c]c_int, workarea: ?*anyopaque, wasize: c_int) callconv(.c) c_int;
 
 /// Polls the status of still input completion.
 /// Returns the size of the acquired image if still input has ended,
 /// 0 if the input has not ended, < 0 on error.
-pub extern fn sceUsbCamStillPollInputEnd() callconv(.C) c_int;
+pub extern fn sceUsbCamStillPollInputEnd() callconv(.c) c_int;
 
 /// Sets the exposure level
 /// `ev` - The exposure level, one of ::PspUsbCamEVLevel
 /// Returns 0 on success, < 0 on error
-pub extern fn sceUsbCamSetEvLevel(ev: c_int) callconv(.C) c_int;
+pub extern fn sceUsbCamSetEvLevel(ev: c_int) callconv(.c) c_int;
 
-pub extern fn sceUsbCam_1E958148() callconv(.C) void;
+pub extern fn sceUsbCam_1E958148() callconv(.c) void;
 
 /// Gets the current exposure level.
 /// `ev` - pointer to a variable that receives the current exposure level
 /// Returns 0 on success, < 0 on error
-pub extern fn sceUsbCamGetEvLevel(ev: [*c]c_int) callconv(.C) c_int;
+pub extern fn sceUsbCamGetEvLevel(ev: [*c]c_int) callconv(.c) c_int;
 
-pub extern fn sceUsbCamSetupMicEx() callconv(.C) void;
+pub extern fn sceUsbCamSetupMicEx() callconv(.c) void;
 
-pub extern fn sceUsbCamReadMicBlocking() callconv(.C) void;
+pub extern fn sceUsbCamReadMicBlocking() callconv(.c) void;
 
 /// Gets the current saturation
 /// `saturation` - pointer to a variable that receives the current saturation
 /// Returns 0 on success, < 0 on error
-pub extern fn sceUsbCamGetSaturation(saturation: [*c]c_int) callconv(.C) c_int;
+pub extern fn sceUsbCamGetSaturation(saturation: [*c]c_int) callconv(.c) c_int;
 
-pub extern fn sceUsbCamReadMic() callconv(.C) void;
+pub extern fn sceUsbCamReadMic() callconv(.c) void;
 
 /// Setups the parameters to take a still image.
 /// `param` - pointer to a ::PspUsbCamSetupStillParam
 /// Returns 0 on success, < 0 on error
-pub extern fn sceUsbCamSetupStill(param: [*c]c_int) callconv(.C) c_int;
+pub extern fn sceUsbCamSetupStill(param: [*c]c_int) callconv(.c) c_int;
 
 /// Polls the status of video frame read completion.
 /// Returns the size of the acquired frame if it has been read,
 /// 0 if the frame has not yet been read, < 0 on error.
-pub extern fn sceUsbCamPollReadVideoFrameEnd() callconv(.C) c_int;
+pub extern fn sceUsbCamPollReadVideoFrameEnd() callconv(.c) c_int;
 
-pub extern fn sceUsbCamUnregisterLensRotationCallback() callconv(.C) void;
+pub extern fn sceUsbCamUnregisterLensRotationCallback() callconv(.c) void;
 
 /// Gets the direction of the camera lens
 /// Returns 1 if the camera is "looking to you", 0 if the camera
 /// is "looking to the other side".
-pub extern fn sceUsbCamGetLensDirection() callconv(.C) c_int;
+pub extern fn sceUsbCamGetLensDirection() callconv(.c) c_int;
 
 /// Sets the brightness
 /// `brightness` - The brightness (0-255)
 /// Returns 0 on success, < 0 on error
-pub extern fn sceUsbCamSetBrightness(brightness: c_int) callconv(.C) c_int;
+pub extern fn sceUsbCamSetBrightness(brightness: c_int) callconv(.c) c_int;
 
-pub extern fn sceUsbCamStopMic() callconv(.C) void;
+pub extern fn sceUsbCamStopMic() callconv(.c) void;
 
 /// Starts video input from the camera.
 /// Returns 0 on success, < 0 on error
-pub extern fn sceUsbCamStartVideo() callconv(.C) c_int;
+pub extern fn sceUsbCamStartVideo() callconv(.c) c_int;
 
-pub extern fn sceUsbCamGetMicDataLength() callconv(.C) void;
+pub extern fn sceUsbCamGetMicDataLength() callconv(.c) void;
 
 /// Gets a still image. The function doesn't return until the image
 /// has been acquired.
 /// `buf` - The buffer that receives the image jpeg data
 /// `size` - The size of the buffer.
 /// Returns size of acquired image on success, < 0 on error
-pub extern fn sceUsbCamStillInputBlocking(buf: [*c]u8, size: types.SceSize) callconv(.C) c_int;
+pub extern fn sceUsbCamStillInputBlocking(buf: [*c]u8, size: types.SceSize) callconv(.c) c_int;
 
 /// Sets the sharpness
 /// `sharpness` - The sharpness (0-255)
 /// Returns 0 on success, < 0 on error
-pub extern fn sceUsbCamSetSharpness(sharpness: c_int) callconv(.C) c_int;
+pub extern fn sceUsbCamSetSharpness(sharpness: c_int) callconv(.c) c_int;
 
-pub extern fn sceUsbCamSetAntiFlicker() callconv(.C) void;
+pub extern fn sceUsbCamSetAntiFlicker() callconv(.c) void;
 
 /// Stops video input from the camera.
 /// Returns 0 on success, < 0 on error
-pub extern fn sceUsbCamStopVideo() callconv(.C) c_int;
+pub extern fn sceUsbCamStopVideo() callconv(.c) c_int;
 
 /// Sets the saturation
 /// `saturation` - The saturation (0-255)
 /// Returns 0 on success, < 0 on error
-pub extern fn sceUsbCamSetSaturation(saturation: c_int) callconv(.C) c_int;
+pub extern fn sceUsbCamSetSaturation(saturation: c_int) callconv(.c) c_int;
 
 /// Gets the current brightness
 /// `brightness` - pointer to a variable that receives the current brightness
 /// Returns 0 on success, < 0 on error
-pub extern fn sceUsbCamGetBrightness(brightness: [*c]c_int) callconv(.C) c_int;
+pub extern fn sceUsbCamGetBrightness(brightness: [*c]c_int) callconv(.c) c_int;
 
 /// Waits untils still input has been finished.
 /// Returns the size of the acquired image on sucess, < 0 on error
-pub extern fn sceUsbCamStillWaitInputEnd() callconv(.C) c_int;
+pub extern fn sceUsbCamStillWaitInputEnd() callconv(.c) c_int;
 
 /// Reads a video frame. The function doesn't return until the frame
 /// has been acquired.
 /// `buf` - The buffer that receives the frame jpeg data
 /// `size` - The size of the buffer.
 /// Returns size of acquired frame on success, < 0 on error
-pub extern fn sceUsbCamReadVideoFrameBlocking(buf: [*c]u8, size: types.SceSize) callconv(.C) c_int;
+pub extern fn sceUsbCamReadVideoFrameBlocking(buf: [*c]u8, size: types.SceSize) callconv(.c) c_int;
 
-pub extern fn sceUsbCamStartMic() callconv(.C) void;
+pub extern fn sceUsbCamStartMic() callconv(.c) void;
 
 /// Sets the reverse mode
 /// `reverseflags` - The reverse flags, zero or more of ::PspUsbCamReverseFlags
 /// Returns 0 on success, < 0 on error
-pub extern fn sceUsbCamSetReverseMode(reverseflags: c_int) callconv(.C) c_int;
+pub extern fn sceUsbCamSetReverseMode(reverseflags: c_int) callconv(.c) c_int;
 
-pub extern fn sceUsbCam_95F8901E() callconv(.C) void;
+pub extern fn sceUsbCam_95F8901E() callconv(.c) void;
 
 /// Gets the current image efect mode
 /// `effectmode` - pointer to a variable that receives the current effect mode
 /// Returns 0 on success, < 0 on error
-pub extern fn sceUsbCamGetImageEffectMode(effectmode: [*c]c_int) callconv(.C) c_int;
+pub extern fn sceUsbCamGetImageEffectMode(effectmode: [*c]c_int) callconv(.c) c_int;
 
 /// Reads a video frame. The function returns inmediately, and
 /// the completion has to be handled by calling ::sceUsbCamWaitReadVideoFrameEnd
@@ -149,73 +149,73 @@ pub extern fn sceUsbCamGetImageEffectMode(effectmode: [*c]c_int) callconv(.C) c_
 /// `buf` - The buffer that receives the frame jpeg data
 /// `size` - The size of the buffer.
 /// Returns size of acquired frame on success, < 0 on error
-pub extern fn sceUsbCamReadVideoFrame(buf: [*c]u8, size: types.SceSize) callconv(.C) c_int;
+pub extern fn sceUsbCamReadVideoFrame(buf: [*c]u8, size: types.SceSize) callconv(.c) c_int;
 
 /// Gets the current zoom.
 /// `zoom` - pointer to a variable that receives the current zoom
 /// Returns 0 on success, < 0 on error
-pub extern fn sceUsbCamGetZoom(zoom: [*c]c_int) callconv(.C) c_int;
+pub extern fn sceUsbCamGetZoom(zoom: [*c]c_int) callconv(.c) c_int;
 
 /// Gets the current contrast
 /// `contrast` - pointer to a variable that receives the current contrast
 /// Returns 0 on success, < 0 on error
-pub extern fn sceUsbCamGetContrast(contrast: [*c]c_int) callconv(.C) c_int;
+pub extern fn sceUsbCamGetContrast(contrast: [*c]c_int) callconv(.c) c_int;
 
 /// Cancels the still input.
 /// Returns 0 on success, < 0 on error
-pub extern fn sceUsbCamStillCancelInput() callconv(.C) c_int;
+pub extern fn sceUsbCamStillCancelInput() callconv(.c) c_int;
 
-pub extern fn sceUsbCamGetAntiFlicker() callconv(.C) void;
+pub extern fn sceUsbCamGetAntiFlicker() callconv(.c) void;
 
-pub extern fn sceUsbCamWaitReadMicEnd() callconv(.C) void;
+pub extern fn sceUsbCamWaitReadMicEnd() callconv(.c) void;
 
 /// Sets the zoom.
 /// `zoom` - The zoom level starting by 10. (10 = 1X, 11 = 1.1X, etc)
 /// Returns s 0 on success, < 0 on error
-pub extern fn sceUsbCamSetZoom(zoom: c_int) callconv(.C) c_int;
+pub extern fn sceUsbCamSetZoom(zoom: c_int) callconv(.c) c_int;
 
-pub extern fn sceUsbCam_C72ED6D3() callconv(.C) void;
+pub extern fn sceUsbCam_C72ED6D3() callconv(.c) void;
 
 /// Set ups the parameters for video capture (with more options)
 /// `param` - Pointer to a ::PspUsbCamSetupVideoExParam structure.
 /// `workarea` - Pointer to a buffer used as work area by the driver.
 /// `wasize` - Size of the work area.
 /// Returns 0 on success, < 0 on error
-pub extern fn sceUsbCamSetupVideoEx(param: [*c]c_int, workarea: ?*anyopaque, wasize: c_int) callconv(.C) c_int;
+pub extern fn sceUsbCamSetupVideoEx(param: [*c]c_int, workarea: ?*anyopaque, wasize: c_int) callconv(.c) c_int;
 
-pub extern fn sceUsbCamRegisterLensRotationCallback() callconv(.C) void;
+pub extern fn sceUsbCamRegisterLensRotationCallback() callconv(.c) void;
 
 /// Sets the image effect mode
 /// `effectmode` - The effect mode, one of ::PspUsbCamEffectMode
 /// Returns 0 on success, < 0 on error
-pub extern fn sceUsbCamSetImageEffectMode(effectmode: c_int) callconv(.C) c_int;
+pub extern fn sceUsbCamSetImageEffectMode(effectmode: c_int) callconv(.c) c_int;
 
 /// Gets the current reverse mode.
 /// `reverseflags` - pointer to a variable that receives the current reverse mode flags
 /// Returns 0 on success, < 0 on error
-pub extern fn sceUsbCamGetReverseMode(reverseflags: [*c]c_int) callconv(.C) c_int;
+pub extern fn sceUsbCamGetReverseMode(reverseflags: [*c]c_int) callconv(.c) c_int;
 
-pub extern fn sceUsbCam_D865997B() callconv(.C) void;
+pub extern fn sceUsbCam_D865997B() callconv(.c) void;
 
 /// Gets the size of the acquired frame.
 /// Returns the size of the acquired frame on success, < 0 on error
-pub extern fn sceUsbCamGetReadVideoFrameSize() callconv(.C) c_int;
+pub extern fn sceUsbCamGetReadVideoFrameSize() callconv(.c) c_int;
 
 /// Gets the size of the acquired still image.
 /// Returns the size of the acquired image on success, < 0 on error
-pub extern fn sceUsbCamStillGetInputLength() callconv(.C) c_int;
+pub extern fn sceUsbCamStillGetInputLength() callconv(.c) c_int;
 
-pub extern fn sceUsbCamPollReadMicEnd() callconv(.C) void;
+pub extern fn sceUsbCamPollReadMicEnd() callconv(.c) void;
 
 /// Waits untils the current frame has been read.
 /// Returns the size of the acquired frame on sucess, < 0 on error
-pub extern fn sceUsbCamWaitReadVideoFrameEnd() callconv(.C) c_int;
+pub extern fn sceUsbCamWaitReadVideoFrameEnd() callconv(.c) c_int;
 
 /// Sets if the image should be automatically reversed, depending of the position
 /// of the camera.
 /// `on` - 1 to set the automatical reversal of the image, 0 to set it off
 /// Returns 0 on success, < 0 on error
-pub extern fn sceUsbCamAutoImageReverseSW(on: c_int) callconv(.C) c_int;
+pub extern fn sceUsbCamAutoImageReverseSW(on: c_int) callconv(.c) c_int;
 
 /// Gets a still image. The function returns inmediately, and
 /// the completion has to be handled by calling ::sceUsbCamStillWaitInputEnd
@@ -228,12 +228,12 @@ pub extern fn sceUsbCamAutoImageReverseSW(on: c_int) callconv(.C) c_int;
 /// `buf` - The buffer that receives the image jpeg data
 /// `size` - The size of the buffer.
 /// Returns size of acquired image on success, < 0 on error
-pub extern fn sceUsbCamStillInput(buf: [*c]u8, size: types.SceSize) callconv(.C) c_int;
+pub extern fn sceUsbCamStillInput(buf: [*c]u8, size: types.SceSize) callconv(.c) c_int;
 
 /// Gets the current sharpness
 /// `sharpness` - pointer to a variable that receives the current sharpness
 /// Returns 0 on success, < 0 on error
-pub extern fn sceUsbCamGetSharpness(sharpness: [*c]c_int) callconv(.C) c_int;
+pub extern fn sceUsbCamGetSharpness(sharpness: [*c]c_int) callconv(.c) c_int;
 
 comptime {
     asm (macro.import_module_start("sceUsbCam", "0x40090000", "54"));

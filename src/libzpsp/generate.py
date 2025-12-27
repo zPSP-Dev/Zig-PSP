@@ -601,10 +601,10 @@ def generate_module_files(modules: Dict[str, Module], output_dir: str):
                     # Split the signature into parameters and return type
                     params, ret_type = func.signature.split(") ")
                     f.write(
-                        f"pub extern fn {func.name}{params}) callconv(.C) {ret_type};\n\n"
+                        f"pub extern fn {func.name}{params}) callconv(.c) {ret_type};\n\n"
                     )
                 else:
-                    f.write(f"pub extern fn {func.name}() callconv(.C) void;\n\n")
+                    f.write(f"pub extern fn {func.name}() callconv(.c) void;\n\n")
 
             f.write("comptime {\n")
             f.write(

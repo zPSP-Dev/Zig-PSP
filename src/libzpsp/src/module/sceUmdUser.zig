@@ -4,45 +4,45 @@ const macro = @import("../macro.zig");
 
 /// Get the error code associated with a failed event
 /// Returns < 0 on error, the error code on success
-pub extern fn sceUmdGetErrorStat() callconv(.C) c_int;
+pub extern fn sceUmdGetErrorStat() callconv(.c) c_int;
 
 /// Get the disc info
 /// `info` - A pointer to a ::pspUmdInfo struct
 /// Returns < 0 on error
-pub extern fn sceUmdGetDiscInfo(info: [*c]c_int) callconv(.C) c_int;
+pub extern fn sceUmdGetDiscInfo(info: [*c]c_int) callconv(.c) c_int;
 
 /// Check whether there is a disc in the UMD drive
 /// Returns 0 if no disc present, anything else indicates a disc is inserted.
-pub extern fn sceUmdCheckMedium() callconv(.C) c_int;
+pub extern fn sceUmdCheckMedium() callconv(.c) c_int;
 
 /// Wait for the UMD drive to reach a certain state (plus callback)
 /// `stat` - One or more of ::pspUmdState
 /// `timeout` - Timeout value in microseconds
 /// Returns < 0 on error
-pub extern fn sceUmdWaitDriveStatCB(stat: c_int, timeout: c_uint) callconv(.C) c_int;
+pub extern fn sceUmdWaitDriveStatCB(stat: c_int, timeout: c_uint) callconv(.c) c_int;
 
 /// Wait for the UMD drive to reach a certain state
 /// `stat` - One or more of ::pspUmdState
 /// `timeout` - Timeout value in microseconds
 /// Returns < 0 on error
-pub extern fn sceUmdWaitDriveStatWithTimer(stat: c_int, timeout: c_uint) callconv(.C) c_int;
+pub extern fn sceUmdWaitDriveStatWithTimer(stat: c_int, timeout: c_uint) callconv(.c) c_int;
 
 /// Cancel a sceUmdWait* call
 /// Returns < 0 on error
-pub extern fn sceUmdCancelWaitDriveStat() callconv(.C) c_int;
+pub extern fn sceUmdCancelWaitDriveStat() callconv(.c) c_int;
 
 /// Get (poll) the current state of the UMD drive
 /// Returns < 0 on error, one or more of ::pspUmdState on success
-pub extern fn sceUmdGetDriveStat() callconv(.C) c_int;
+pub extern fn sceUmdGetDriveStat() callconv(.c) c_int;
 
 /// Prohibit UMD disc being replaced
 /// Returns < 0 on error
-pub extern fn sceUmdReplaceProhibit() callconv(.C) c_int;
+pub extern fn sceUmdReplaceProhibit() callconv(.c) c_int;
 
 /// Wait for the UMD drive to reach a certain state
 /// `stat` - One or more of ::pspUmdState
 /// Returns < 0 on error
-pub extern fn sceUmdWaitDriveStat(stat: c_int) callconv(.C) c_int;
+pub extern fn sceUmdWaitDriveStat(stat: c_int) callconv(.c) c_int;
 
 /// Register a callback for the UMD drive
 /// @note Callback is of type UmdCallback
@@ -57,12 +57,12 @@ pub extern fn sceUmdWaitDriveStat(stat: c_int) callconv(.C) c_int;
 /// int cbid = sceKernelCreateCallback("UMD Callback", umd_callback, NULL);
 /// sceUmdRegisterUMDCallBack(cbid);
 /// `
-pub extern fn sceUmdRegisterUMDCallBack(cbid: c_int) callconv(.C) c_int;
+pub extern fn sceUmdRegisterUMDCallBack(cbid: c_int) callconv(.c) c_int;
 
 /// Un-register a callback for the UMD drive
 /// `cbid` - A callback ID created from sceKernelCreateCallback
 /// Returns < 0 on error
-pub extern fn sceUmdUnRegisterUMDCallBack(cbid: c_int) callconv(.C) c_int;
+pub extern fn sceUmdUnRegisterUMDCallBack(cbid: c_int) callconv(.c) c_int;
 
 /// Activates the UMD drive
 /// `unit` - The unit to initialise (probably). Should be set to 1.
@@ -81,17 +81,17 @@ pub extern fn sceUmdUnRegisterUMDCallBack(cbid: c_int) callconv(.C) c_int;
 /// sceUmdWaitDriveStat(PSP_UMD_READY);
 /// // Now you can access the UMD using standard sceIo functions
 /// `
-pub extern fn sceUmdActivate(unit: c_int, drive: [*c]const c_char) callconv(.C) c_int;
+pub extern fn sceUmdActivate(unit: c_int, drive: [*c]const c_char) callconv(.c) c_int;
 
 /// Permit UMD disc being replaced
 /// Returns < 0 on error
-pub extern fn sceUmdReplacePermit() callconv(.C) c_int;
+pub extern fn sceUmdReplacePermit() callconv(.c) c_int;
 
 /// Deativates the UMD drive
 /// `unit` - The unit to initialise (probably). Should be set to 1.
 /// `drive` - A prefix string for the fs device to mount the UMD on (e.g. "disc0:")
 /// Returns < 0 on error
-pub extern fn sceUmdDeactivate(unit: c_int, drive: [*c]const c_char) callconv(.C) c_int;
+pub extern fn sceUmdDeactivate(unit: c_int, drive: [*c]const c_char) callconv(.c) c_int;
 
 comptime {
     asm (macro.import_module_start("sceUmdUser", "0x40010011", "14"));

@@ -6,39 +6,39 @@ const macro = @import("../macro.zig");
 /// `fd` - The file descriptor which is current performing an asynchronous action.
 /// `res` - The result of the async action.
 /// Returns < 0 on error.
-pub extern fn sceIoPollAsync(fd: types.SceUID, res: [*c]types.SceInt64) callconv(.C) c_int;
+pub extern fn sceIoPollAsync(fd: types.SceUID, res: [*c]types.SceInt64) callconv(.c) c_int;
 
 /// Wait for asyncronous completion.
 /// `fd` - The file descriptor which is current performing an asynchronous action.
 /// `res` - The result of the async action.
 /// Returns < 0 on error.
-pub extern fn sceIoWaitAsync(fd: types.SceUID, res: [*c]types.SceInt64) callconv(.C) c_int;
+pub extern fn sceIoWaitAsync(fd: types.SceUID, res: [*c]types.SceInt64) callconv(.c) c_int;
 
 /// Wait for asyncronous completion (with callbacks).
 /// `fd` - The file descriptor which is current performing an asynchronous action.
 /// `res` - The result of the async action.
 /// Returns < 0 on error.
-pub extern fn sceIoWaitAsyncCB(fd: types.SceUID, res: [*c]types.SceInt64) callconv(.C) c_int;
+pub extern fn sceIoWaitAsyncCB(fd: types.SceUID, res: [*c]types.SceInt64) callconv(.c) c_int;
 
 /// Get the asyncronous completion status.
 /// `fd` - The file descriptor which is current performing an asynchronous action.
 /// `poll` - If 0 then waits for the status, otherwise it polls the fd.
 /// `res` - The result of the async action.
 /// Returns < 0 on error.
-pub extern fn sceIoGetAsyncStat(fd: types.SceUID, poll: c_int, res: [*c]types.SceInt64) callconv(.C) c_int;
+pub extern fn sceIoGetAsyncStat(fd: types.SceUID, poll: c_int, res: [*c]types.SceInt64) callconv(.c) c_int;
 
 /// Change the priority of the asynchronous thread.
 /// `fd` - The opened fd on which the priority should be changed.
 /// `pri` - The priority of the thread.
 /// Returns < 0 on error.
-pub extern fn sceIoChangeAsyncPriority(fd: types.SceUID, pri: c_int) callconv(.C) c_int;
+pub extern fn sceIoChangeAsyncPriority(fd: types.SceUID, pri: c_int) callconv(.c) c_int;
 
 /// Sets a callback for the asynchronous action.
 /// `fd` - The filedescriptor currently performing an asynchronous action.
 /// `cb` - The UID of the callback created with ::sceKernelCreateCallback
 /// `argp` - Pointer to an argument to pass to the callback.
 /// Returns < 0 on error.
-pub extern fn sceIoSetAsyncCallback(fd: types.SceUID, cb: types.SceUID, argp: ?*anyopaque) callconv(.C) c_int;
+pub extern fn sceIoSetAsyncCallback(fd: types.SceUID, cb: types.SceUID, argp: ?*anyopaque) callconv(.c) c_int;
 
 /// Delete a descriptor
 /// `
@@ -46,12 +46,12 @@ pub extern fn sceIoSetAsyncCallback(fd: types.SceUID, cb: types.SceUID, argp: ?*
 /// `
 /// `fd` - File descriptor to close
 /// Returns < 0 on error
-pub extern fn sceIoClose(fd: types.SceUID) callconv(.C) c_int;
+pub extern fn sceIoClose(fd: types.SceUID) callconv(.c) c_int;
 
 /// Delete a descriptor (asynchronous)
 /// `fd` - File descriptor to close
 /// Returns < 0 on error
-pub extern fn sceIoCloseAsync(fd: types.SceUID) callconv(.C) c_int;
+pub extern fn sceIoCloseAsync(fd: types.SceUID) callconv(.c) c_int;
 
 /// Open or create a file for reading or writing
 /// @par Example1: Open a file for reading
@@ -70,14 +70,14 @@ pub extern fn sceIoCloseAsync(fd: types.SceUID) callconv(.C) c_int;
 /// `flags` - Libc styled flags that are or'ed together
 /// `mode` - File access mode.
 /// Returns A non-negative integer is a valid fd, anything else an error
-pub extern fn sceIoOpen(file: [*c]const c_char, flags: c_int, mode: types.SceMode) callconv(.C) types.SceUID;
+pub extern fn sceIoOpen(file: [*c]const c_char, flags: c_int, mode: types.SceMode) callconv(.c) types.SceUID;
 
 /// Open or create a file for reading or writing (asynchronous)
 /// `file` - Pointer to a string holding the name of the file to open
 /// `flags` - Libc styled flags that are or'ed together
 /// `mode` - File access mode.
 /// Returns A non-negative integer is a valid fd, anything else an error
-pub extern fn sceIoOpenAsync(file: [*c]const c_char, flags: c_int, mode: types.SceMode) callconv(.C) types.SceUID;
+pub extern fn sceIoOpenAsync(file: [*c]const c_char, flags: c_int, mode: types.SceMode) callconv(.c) types.SceUID;
 
 /// Read input
 /// @par Example:
@@ -88,7 +88,7 @@ pub extern fn sceIoOpenAsync(file: [*c]const c_char, flags: c_int, mode: types.S
 /// `data` - Pointer to the buffer where the read data will be placed
 /// `size` - Size of the read in bytes
 /// Returns The number of bytes read
-pub extern fn sceIoRead(fd: types.SceUID, data: ?*anyopaque, size: types.SceSize) callconv(.C) c_int;
+pub extern fn sceIoRead(fd: types.SceUID, data: ?*anyopaque, size: types.SceSize) callconv(.c) c_int;
 
 /// Read input (asynchronous)
 /// @par Example:
@@ -99,7 +99,7 @@ pub extern fn sceIoRead(fd: types.SceUID, data: ?*anyopaque, size: types.SceSize
 /// `data` - Pointer to the buffer where the read data will be placed
 /// `size` - Size of the read in bytes
 /// Returns < 0 on error.
-pub extern fn sceIoReadAsync(fd: types.SceUID, data: ?*anyopaque, size: types.SceSize) callconv(.C) c_int;
+pub extern fn sceIoReadAsync(fd: types.SceUID, data: ?*anyopaque, size: types.SceSize) callconv(.c) c_int;
 
 /// Write output
 /// @par Example:
@@ -110,14 +110,14 @@ pub extern fn sceIoReadAsync(fd: types.SceUID, data: ?*anyopaque, size: types.Sc
 /// `data` - Pointer to the data to write
 /// `size` - Size of data to write
 /// Returns The number of bytes written
-pub extern fn sceIoWrite(fd: types.SceUID, data: ?*const anyopaque, size: types.SceSize) callconv(.C) c_int;
+pub extern fn sceIoWrite(fd: types.SceUID, data: ?*const anyopaque, size: types.SceSize) callconv(.c) c_int;
 
 /// Write output (asynchronous)
 /// `fd` - Opened file descriptor to write to
 /// `data` - Pointer to the data to write
 /// `size` - Size of data to write
 /// Returns < 0 on error.
-pub extern fn sceIoWriteAsync(fd: types.SceUID, data: ?*const anyopaque, size: types.SceSize) callconv(.C) c_int;
+pub extern fn sceIoWriteAsync(fd: types.SceUID, data: ?*const anyopaque, size: types.SceSize) callconv(.c) c_int;
 
 /// Reposition read/write file descriptor offset
 /// @par Example:
@@ -129,7 +129,7 @@ pub extern fn sceIoWriteAsync(fd: types.SceUID, data: ?*const anyopaque, size: t
 /// `whence` - Set to SEEK_SET to seek from the start of the file, SEEK_CUR
 /// seek from the current position and SEEK_END to seek from the end.
 /// Returns The position in the file after the seek.
-pub extern fn sceIoLseek(fd: types.SceUID, offset: types.SceOff, whence: c_int) callconv(.C) types.SceOff;
+pub extern fn sceIoLseek(fd: types.SceUID, offset: types.SceOff, whence: c_int) callconv(.c) types.SceOff;
 
 /// Reposition read/write file descriptor offset (asynchronous)
 /// `fd` - Opened file descriptor with which to seek
@@ -137,7 +137,7 @@ pub extern fn sceIoLseek(fd: types.SceUID, offset: types.SceOff, whence: c_int) 
 /// `whence` - Set to SEEK_SET to seek from the start of the file, SEEK_CUR
 /// seek from the current position and SEEK_END to seek from the end.
 /// Returns < 0 on error. Actual value should be passed returned by the ::sceIoWaitAsync call.
-pub extern fn sceIoLseekAsync(fd: types.SceUID, offset: types.SceOff, whence: c_int) callconv(.C) c_int;
+pub extern fn sceIoLseekAsync(fd: types.SceUID, offset: types.SceOff, whence: c_int) callconv(.c) c_int;
 
 /// Reposition read/write file descriptor offset (32bit mode)
 /// @par Example:
@@ -149,7 +149,7 @@ pub extern fn sceIoLseekAsync(fd: types.SceUID, offset: types.SceOff, whence: c_
 /// `whence` - Set to SEEK_SET to seek from the start of the file, SEEK_CUR
 /// seek from the current position and SEEK_END to seek from the end.
 /// Returns The position in the file after the seek.
-pub extern fn sceIoLseek32(fd: types.SceUID, offset: c_int, whence: c_int) callconv(.C) c_int;
+pub extern fn sceIoLseek32(fd: types.SceUID, offset: c_int, whence: c_int) callconv(.c) c_int;
 
 /// Reposition read/write file descriptor offset (32bit mode, asynchronous)
 /// `fd` - Opened file descriptor with which to seek
@@ -157,7 +157,7 @@ pub extern fn sceIoLseek32(fd: types.SceUID, offset: c_int, whence: c_int) callc
 /// `whence` - Set to SEEK_SET to seek from the start of the file, SEEK_CUR
 /// seek from the current position and SEEK_END to seek from the end.
 /// Returns < 0 on error.
-pub extern fn sceIoLseek32Async(fd: types.SceUID, offset: c_int, whence: c_int) callconv(.C) c_int;
+pub extern fn sceIoLseek32Async(fd: types.SceUID, offset: c_int, whence: c_int) callconv(.c) c_int;
 
 /// Perform an ioctl on a device.
 /// `fd` - Opened file descriptor to ioctl to
@@ -167,7 +167,7 @@ pub extern fn sceIoLseek32Async(fd: types.SceUID, offset: c_int, whence: c_int) 
 /// `outdata` - A data block to receive the result of a command, if NULL receives no data
 /// `outlen` - Length of outdata, if 0 receives no data
 /// Returns 0 on success, < 0 on error
-pub extern fn sceIoIoctl(fd: types.SceUID, cmd: c_uint, indata: ?*anyopaque, inlen: c_int, outdata: ?*anyopaque, outlen: c_int) callconv(.C) c_int;
+pub extern fn sceIoIoctl(fd: types.SceUID, cmd: c_uint, indata: ?*anyopaque, inlen: c_int, outdata: ?*anyopaque, outlen: c_int) callconv(.c) c_int;
 
 /// Perform an ioctl on a device. (asynchronous)
 /// `fd` - Opened file descriptor to ioctl to
@@ -177,7 +177,7 @@ pub extern fn sceIoIoctl(fd: types.SceUID, cmd: c_uint, indata: ?*anyopaque, inl
 /// `outdata` - A data block to receive the result of a command, if NULL receives no data
 /// `outlen` - Length of outdata, if 0 receives no data
 /// Returns 0 on success, < 0 on error
-pub extern fn sceIoIoctlAsync(fd: types.SceUID, cmd: c_uint, indata: ?*anyopaque, inlen: c_int, outdata: ?*anyopaque, outlen: c_int) callconv(.C) c_int;
+pub extern fn sceIoIoctlAsync(fd: types.SceUID, cmd: c_uint, indata: ?*anyopaque, inlen: c_int, outdata: ?*anyopaque, outlen: c_int) callconv(.c) c_int;
 
 /// Open a directory
 /// @par Example:
@@ -189,7 +189,7 @@ pub extern fn sceIoIoctlAsync(fd: types.SceUID, cmd: c_uint, indata: ?*anyopaque
 /// `
 /// `dirname` - The directory to open for reading.
 /// Returns If >= 0 then a valid file descriptor, otherwise a Sony error code.
-pub extern fn sceIoDopen(dirname: [*c]const c_char) callconv(.C) types.SceUID;
+pub extern fn sceIoDopen(dirname: [*c]const c_char) callconv(.c) types.SceUID;
 
 /// Reads an entry from an opened file descriptor.
 /// `fd` - Already opened file descriptor (using sceIoDopen)
@@ -198,62 +198,62 @@ pub extern fn sceIoDopen(dirname: [*c]const c_char) callconv(.C) types.SceUID;
 /// -   0 - No more directory entries left
 /// - > 0 - More directory entired to go
 /// - < 0 - Error
-pub extern fn sceIoDread(fd: types.SceUID, dir: [*c]c_int) callconv(.C) c_int;
+pub extern fn sceIoDread(fd: types.SceUID, dir: [*c]c_int) callconv(.c) c_int;
 
 /// Close an opened directory file descriptor
 /// `fd` - Already opened file descriptor (using sceIoDopen)
 /// Returns < 0 on error
-pub extern fn sceIoDclose(fd: types.SceUID) callconv(.C) c_int;
+pub extern fn sceIoDclose(fd: types.SceUID) callconv(.c) c_int;
 
 /// Remove directory entry
 /// `file` - Path to the file to remove
 /// Returns < 0 on error
-pub extern fn sceIoRemove(file: [*c]const c_char) callconv(.C) c_int;
+pub extern fn sceIoRemove(file: [*c]const c_char) callconv(.c) c_int;
 
 /// Make a directory file
 /// `dir`
 /// `mode` - Access mode.
 /// Returns Returns the value 0 if its succesful otherwise -1
-pub extern fn sceIoMkdir(dir: [*c]const c_char, mode: types.SceMode) callconv(.C) c_int;
+pub extern fn sceIoMkdir(dir: [*c]const c_char, mode: types.SceMode) callconv(.c) c_int;
 
 /// Remove a directory file
 /// `path` - Removes a directory file pointed by the string path
 /// Returns Returns the value 0 if its succesful otherwise -1
-pub extern fn sceIoRmdir(path: [*c]const c_char) callconv(.C) c_int;
+pub extern fn sceIoRmdir(path: [*c]const c_char) callconv(.c) c_int;
 
 /// Change the current directory.
 /// `path` - The path to change to.
 /// Returns < 0 on error.
-pub extern fn sceIoChdir(path: [*c]const c_char) callconv(.C) c_int;
+pub extern fn sceIoChdir(path: [*c]const c_char) callconv(.c) c_int;
 
 /// Synchronise the file data on the device.
 /// `device` - The device to synchronise (e.g. msfat0:)
 /// `unk` - Unknown
-pub extern fn sceIoSync(device: [*c]const c_char, unk: c_uint) callconv(.C) c_int;
+pub extern fn sceIoSync(device: [*c]const c_char, unk: c_uint) callconv(.c) c_int;
 
 /// Get the status of a file.
 /// `file` - The path to the file.
 /// `stat` - A pointer to an io_stat_t structure.
 /// Returns < 0 on error.
-pub extern fn sceIoGetstat(file: [*c]const c_char, stat: [*c]c_int) callconv(.C) c_int;
+pub extern fn sceIoGetstat(file: [*c]const c_char, stat: [*c]c_int) callconv(.c) c_int;
 
 /// Change the status of a file.
 /// `file` - The path to the file.
 /// `stat` - A pointer to an io_stat_t structure.
 /// `bits` - Bitmask defining which bits to change.
 /// Returns < 0 on error.
-pub extern fn sceIoChstat(file: [*c]const c_char, stat: [*c]c_int, bits: c_int) callconv(.C) c_int;
+pub extern fn sceIoChstat(file: [*c]const c_char, stat: [*c]c_int, bits: c_int) callconv(.c) c_int;
 
 /// Change the name of a file
 /// `oldname` - The old filename
 /// `newname` - The new filename
 /// Returns < 0 on error.
-pub extern fn sceIoRename(oldname: [*c]const c_char, newname: [*c]const c_char) callconv(.C) c_int;
+pub extern fn sceIoRename(oldname: [*c]const c_char, newname: [*c]const c_char) callconv(.c) c_int;
 
 /// Get the device type of the currently opened file descriptor.
 /// `fd` - The opened file descriptor.
 /// Returns < 0 on error. Otherwise the device type?
-pub extern fn sceIoGetDevType(fd: types.SceUID) callconv(.C) c_int;
+pub extern fn sceIoGetDevType(fd: types.SceUID) callconv(.c) c_int;
 
 /// Assigns one IO device to another (I guess)
 /// `dev1` - The device name to assign.
@@ -268,18 +268,18 @@ pub extern fn sceIoGetDevType(fd: types.SceUID) callconv(.C) c_int;
 /// sceIoUnassign("flash0");
 /// sceIoAssign("flash0", "lflash0:0,0", "flashfat0:", IOASSIGN_RDWR, NULL, 0);
 /// `
-pub extern fn sceIoAssign(dev1: [*c]const c_char, dev2: [*c]const c_char, dev3: [*c]const c_char, mode: c_int, unk1: ?*anyopaque, unk2: c_long) callconv(.C) c_int;
+pub extern fn sceIoAssign(dev1: [*c]const c_char, dev2: [*c]const c_char, dev3: [*c]const c_char, mode: c_int, unk1: ?*anyopaque, unk2: c_long) callconv(.c) c_int;
 
 /// Unassign an IO device.
 /// `dev` - The device to unassign.
 /// Returns < 0 on error
 /// @par Example: See ::sceIoAssign
-pub extern fn sceIoUnassign(dev: [*c]const c_char) callconv(.C) c_int;
+pub extern fn sceIoUnassign(dev: [*c]const c_char) callconv(.c) c_int;
 
 /// Cancel an asynchronous operation on a file descriptor.
 /// `fd` - The file descriptor to perform cancel on.
 /// Returns < 0 on error.
-pub extern fn sceIoCancel(fd: types.SceUID) callconv(.C) c_int;
+pub extern fn sceIoCancel(fd: types.SceUID) callconv(.c) c_int;
 
 comptime {
     asm (macro.import_module_start("IoFileMgrForUser", "0x40010000", "36"));

@@ -4,17 +4,17 @@ const macro = @import("../macro.zig");
 
 /// Initialise the adhoc library.
 /// Returns 0 on success, < 0 on error
-pub extern fn sceNetAdhocInit() callconv(.C) c_int;
+pub extern fn sceNetAdhocInit() callconv(.c) c_int;
 
 /// Terminate the adhoc library
 /// Returns 0 on success, < 0 on error
-pub extern fn sceNetAdhocTerm() callconv(.C) c_int;
+pub extern fn sceNetAdhocTerm() callconv(.c) c_int;
 
-pub extern fn sceNetAdhocPollSocket() callconv(.C) void;
+pub extern fn sceNetAdhocPollSocket() callconv(.c) void;
 
-pub extern fn sceNetAdhocSetSocketAlert() callconv(.C) void;
+pub extern fn sceNetAdhocSetSocketAlert() callconv(.c) void;
 
-pub extern fn sceNetAdhocGetSocketAlert() callconv(.C) void;
+pub extern fn sceNetAdhocGetSocketAlert() callconv(.c) void;
 
 /// Create a PDP object.
 /// `mac` - Your MAC address (from sceWlanGetEtherAddr)
@@ -22,7 +22,7 @@ pub extern fn sceNetAdhocGetSocketAlert() callconv(.C) void;
 /// `bufsize` - Socket buffer size, lumines sets to 0x400
 /// `unk1` - Unknown, lumines sets to 0
 /// Returns The ID of the PDP object (< 0 on error)
-pub extern fn sceNetAdhocPdpCreate(mac: [*c]u8, port: c_ushort, bufsize: c_uint, unk1: c_int) callconv(.C) c_int;
+pub extern fn sceNetAdhocPdpCreate(mac: [*c]u8, port: c_ushort, bufsize: c_uint, unk1: c_int) callconv(.c) c_int;
 
 /// Set a PDP packet to a destination
 /// `id` - The ID as returned by ::sceNetAdhocPdpCreate
@@ -33,7 +33,7 @@ pub extern fn sceNetAdhocPdpCreate(mac: [*c]u8, port: c_ushort, bufsize: c_uint,
 /// `timeout` - Timeout in microseconds.
 /// `nonblock` - Set to 0 to block, 1 for non-blocking.
 /// Returns Bytes sent, < 0 on error
-pub extern fn sceNetAdhocPdpSend(id: c_int, destMacAddr: [*c]u8, port: c_ushort, data: ?*anyopaque, len: c_uint, timeout: c_uint, nonblock: c_int) callconv(.C) c_int;
+pub extern fn sceNetAdhocPdpSend(id: c_int, destMacAddr: [*c]u8, port: c_ushort, data: ?*anyopaque, len: c_uint, timeout: c_uint, nonblock: c_int) callconv(.c) c_int;
 
 /// Receive a PDP packet
 /// `id` - The ID of the PDP object, as returned by ::sceNetAdhocPdpCreate
@@ -44,19 +44,19 @@ pub extern fn sceNetAdhocPdpSend(id: c_int, destMacAddr: [*c]u8, port: c_ushort,
 /// `timeout` - Timeout in microseconds.
 /// `nonblock` - Set to 0 to block, 1 for non-blocking.
 /// Returns Number of bytes received, < 0 on error.
-pub extern fn sceNetAdhocPdpRecv(id: c_int, srcMacAddr: [*c]u8, port: [*c]c_ushort, data: ?*anyopaque, dataLength: ?*anyopaque, timeout: c_uint, nonblock: c_int) callconv(.C) c_int;
+pub extern fn sceNetAdhocPdpRecv(id: c_int, srcMacAddr: [*c]u8, port: [*c]c_ushort, data: ?*anyopaque, dataLength: ?*anyopaque, timeout: c_uint, nonblock: c_int) callconv(.c) c_int;
 
 /// Delete a PDP object.
 /// `id` - The ID returned from ::sceNetAdhocPdpCreate
 /// `unk1` - Unknown, set to 0
 /// Returns 0 on success, < 0 on error
-pub extern fn sceNetAdhocPdpDelete(id: c_int, unk1: c_int) callconv(.C) c_int;
+pub extern fn sceNetAdhocPdpDelete(id: c_int, unk1: c_int) callconv(.c) c_int;
 
 /// Get the status of all PDP objects
 /// `size` - Pointer to the size of the stat array (e.g 20 for one structure)
 /// `stat` - Pointer to a list of ::pdpStatStruct structures.
 /// Returns 0 on success, < 0 on error
-pub extern fn sceNetAdhocGetPdpStat(size: [*c]c_int, stat: [*c]c_int) callconv(.C) c_int;
+pub extern fn sceNetAdhocGetPdpStat(size: [*c]c_int, stat: [*c]c_int) callconv(.c) c_int;
 
 /// Open a PTP connection
 /// `srcmac` - Local mac address.
@@ -68,14 +68,14 @@ pub extern fn sceNetAdhocGetPdpStat(size: [*c]c_int, stat: [*c]c_int) callconv(.
 /// `count` - Number of retries.
 /// `unk1` - Pass 0.
 /// Returns A socket ID on success, < 0 on error.
-pub extern fn sceNetAdhocPtpOpen(srcmac: [*c]u8, srcport: c_ushort, destmac: [*c]u8, destport: c_ushort, bufsize: c_uint, delay: c_uint, count: c_int, unk1: c_int) callconv(.C) c_int;
+pub extern fn sceNetAdhocPtpOpen(srcmac: [*c]u8, srcport: c_ushort, destmac: [*c]u8, destport: c_ushort, bufsize: c_uint, delay: c_uint, count: c_int, unk1: c_int) callconv(.c) c_int;
 
 /// Wait for connection created by sceNetAdhocPtpOpen()
 /// `id` - A socket ID.
 /// `timeout` - Timeout in microseconds.
 /// `nonblock` - Set to 0 to block, 1 for non-blocking.
 /// Returns 0 on success, < 0 on error.
-pub extern fn sceNetAdhocPtpConnect(id: c_int, timeout: c_uint, nonblock: c_int) callconv(.C) c_int;
+pub extern fn sceNetAdhocPtpConnect(id: c_int, timeout: c_uint, nonblock: c_int) callconv(.c) c_int;
 
 /// Wait for an incoming PTP connection
 /// `srcmac` - Local mac address.
@@ -86,7 +86,7 @@ pub extern fn sceNetAdhocPtpConnect(id: c_int, timeout: c_uint, nonblock: c_int)
 /// `queue` - Connection queue length.
 /// `unk1` - Pass 0.
 /// Returns A socket ID on success, < 0 on error.
-pub extern fn sceNetAdhocPtpListen(srcmac: [*c]u8, srcport: c_ushort, bufsize: c_uint, delay: c_uint, count: c_int, queue: c_int, unk1: c_int) callconv(.C) c_int;
+pub extern fn sceNetAdhocPtpListen(srcmac: [*c]u8, srcport: c_ushort, bufsize: c_uint, delay: c_uint, count: c_int, queue: c_int, unk1: c_int) callconv(.c) c_int;
 
 /// Accept an incoming PTP connection
 /// `id` - A socket ID.
@@ -95,7 +95,7 @@ pub extern fn sceNetAdhocPtpListen(srcmac: [*c]u8, srcport: c_ushort, bufsize: c
 /// `timeout` - Timeout in microseconds.
 /// `nonblock` - Set to 0 to block, 1 for non-blocking.
 /// Returns 0 on success, < 0 on error.
-pub extern fn sceNetAdhocPtpAccept(id: c_int, mac: [*c]u8, port: [*c]c_ushort, timeout: c_uint, nonblock: c_int) callconv(.C) c_int;
+pub extern fn sceNetAdhocPtpAccept(id: c_int, mac: [*c]u8, port: [*c]c_ushort, timeout: c_uint, nonblock: c_int) callconv(.c) c_int;
 
 /// Send data
 /// `id` - A socket ID.
@@ -104,7 +104,7 @@ pub extern fn sceNetAdhocPtpAccept(id: c_int, mac: [*c]u8, port: [*c]c_ushort, t
 /// `timeout` - Timeout in microseconds.
 /// `nonblock` - Set to 0 to block, 1 for non-blocking.
 /// Returns 0 success, < 0 on error.
-pub extern fn sceNetAdhocPtpSend(id: c_int, data: ?*anyopaque, datasize: [*c]c_int, timeout: c_uint, nonblock: c_int) callconv(.C) c_int;
+pub extern fn sceNetAdhocPtpSend(id: c_int, data: ?*anyopaque, datasize: [*c]c_int, timeout: c_uint, nonblock: c_int) callconv(.c) c_int;
 
 /// Receive data
 /// `id` - A socket ID.
@@ -113,58 +113,58 @@ pub extern fn sceNetAdhocPtpSend(id: c_int, data: ?*anyopaque, datasize: [*c]c_i
 /// `timeout` - Timeout in microseconds.
 /// `nonblock` - Set to 0 to block, 1 for non-blocking.
 /// Returns 0 on success, < 0 on error.
-pub extern fn sceNetAdhocPtpRecv(id: c_int, data: ?*anyopaque, datasize: [*c]c_int, timeout: c_uint, nonblock: c_int) callconv(.C) c_int;
+pub extern fn sceNetAdhocPtpRecv(id: c_int, data: ?*anyopaque, datasize: [*c]c_int, timeout: c_uint, nonblock: c_int) callconv(.c) c_int;
 
 /// Wait for data in the buffer to be sent
 /// `id` - A socket ID.
 /// `timeout` - Timeout in microseconds.
 /// `nonblock` - Set to 0 to block, 1 for non-blocking.
 /// Returns A socket ID on success, < 0 on error.
-pub extern fn sceNetAdhocPtpFlush(id: c_int, timeout: c_uint, nonblock: c_int) callconv(.C) c_int;
+pub extern fn sceNetAdhocPtpFlush(id: c_int, timeout: c_uint, nonblock: c_int) callconv(.c) c_int;
 
 /// Close a socket
 /// `id` - A socket ID.
 /// `unk1` - Pass 0.
 /// Returns A socket ID on success, < 0 on error.
-pub extern fn sceNetAdhocPtpClose(id: c_int, unk1: c_int) callconv(.C) c_int;
+pub extern fn sceNetAdhocPtpClose(id: c_int, unk1: c_int) callconv(.c) c_int;
 
 /// Get the status of all PTP objects
 /// `size` - Pointer to the size of the stat array (e.g 20 for one structure)
 /// `stat` - Pointer to a list of ::ptpStatStruct structures.
 /// Returns 0 on success, < 0 on error
-pub extern fn sceNetAdhocGetPtpStat(size: [*c]c_int, stat: [*c]c_int) callconv(.C) c_int;
+pub extern fn sceNetAdhocGetPtpStat(size: [*c]c_int, stat: [*c]c_int) callconv(.c) c_int;
 
 /// Create own game object type data.
 /// `data` - A pointer to the game object data.
 /// `size` - Size of the game data.
 /// Returns 0 on success, < 0 on error.
-pub extern fn sceNetAdhocGameModeCreateMaster(data: ?*anyopaque, size: c_int) callconv(.C) c_int;
+pub extern fn sceNetAdhocGameModeCreateMaster(data: ?*anyopaque, size: c_int) callconv(.c) c_int;
 
 /// Create peer game object type data.
 /// `mac` - The mac address of the peer.
 /// `data` - A pointer to the game object data.
 /// `size` - Size of the game data.
 /// Returns The id of the replica on success, < 0 on error.
-pub extern fn sceNetAdhocGameModeCreateReplica(mac: [*c]u8, data: ?*anyopaque, size: c_int) callconv(.C) c_int;
+pub extern fn sceNetAdhocGameModeCreateReplica(mac: [*c]u8, data: ?*anyopaque, size: c_int) callconv(.c) c_int;
 
 /// Update own game object type data.
 /// Returns 0 on success, < 0 on error.
-pub extern fn sceNetAdhocGameModeUpdateMaster() callconv(.C) c_int;
+pub extern fn sceNetAdhocGameModeUpdateMaster() callconv(.c) c_int;
 
 /// Update peer game object type data.
 /// `id` - The id of the replica returned by sceNetAdhocGameModeCreateReplica.
 /// `unk1` - Pass 0.
 /// Returns 0 on success, < 0 on error.
-pub extern fn sceNetAdhocGameModeUpdateReplica(id: c_int, unk1: c_int) callconv(.C) c_int;
+pub extern fn sceNetAdhocGameModeUpdateReplica(id: c_int, unk1: c_int) callconv(.c) c_int;
 
 /// Delete own game object type data.
 /// Returns 0 on success, < 0 on error.
-pub extern fn sceNetAdhocGameModeDeleteMaster() callconv(.C) c_int;
+pub extern fn sceNetAdhocGameModeDeleteMaster() callconv(.c) c_int;
 
 /// Delete peer game object type data.
 /// `id` - The id of the replica.
 /// Returns 0 on success, < 0 on error.
-pub extern fn sceNetAdhocGameModeDeleteReplica(id: c_int) callconv(.C) c_int;
+pub extern fn sceNetAdhocGameModeDeleteReplica(id: c_int) callconv(.c) c_int;
 
 comptime {
     asm (macro.import_module_start("sceNetAdhoc", "0x00090000", "25"));

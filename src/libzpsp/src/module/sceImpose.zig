@@ -2,35 +2,35 @@
 const types = @import("../types.zig");
 const macro = @import("../macro.zig");
 
-pub extern fn sceImposeGetHomePopup() callconv(.C) void;
+pub extern fn sceImposeGetHomePopup() callconv(.c) void;
 
-pub extern fn sceImposeGetLanguageMode() callconv(.C) void;
+pub extern fn sceImposeGetLanguageMode() callconv(.c) void;
 
-pub extern fn sceImposeSetLanguageMode() callconv(.C) void;
+pub extern fn sceImposeSetLanguageMode() callconv(.c) void;
 
-pub extern fn sceImposeHomeButton() callconv(.C) void;
+pub extern fn sceImposeHomeButton() callconv(.c) void;
 
-pub extern fn sceImposeSetHomePopup() callconv(.C) void;
+pub extern fn sceImposeSetHomePopup() callconv(.c) void;
 
-pub extern fn sceImposeSetUMDPopup() callconv(.C) void;
+pub extern fn sceImposeSetUMDPopup() callconv(.c) void;
 
-pub extern fn sceImposeBatteryIconStatus() callconv(.C) void;
+pub extern fn sceImposeBatteryIconStatus() callconv(.c) void;
 
-pub extern fn sceImposeGetBacklightOffTime() callconv(.C) void;
+pub extern fn sceImposeGetBacklightOffTime() callconv(.c) void;
 
-pub extern fn sceImposeSetBacklightOffTime() callconv(.C) void;
+pub extern fn sceImposeSetBacklightOffTime() callconv(.c) void;
 
-pub extern fn sceImpose_9BA61B49() callconv(.C) void;
+pub extern fn sceImpose_9BA61B49() callconv(.c) void;
 
-pub extern fn sceImpose_A9884B00() callconv(.C) void;
+pub extern fn sceImpose_A9884B00() callconv(.c) void;
 
-pub extern fn sceImpose_BB3F5DEC() callconv(.C) void;
+pub extern fn sceImpose_BB3F5DEC() callconv(.c) void;
 
-pub extern fn sceImposeGetUMDPopup() callconv(.C) void;
+pub extern fn sceImposeGetUMDPopup() callconv(.c) void;
 
-pub extern fn sceImpose_FCD44963() callconv(.C) void;
+pub extern fn sceImpose_FCD44963() callconv(.c) void;
 
-pub extern fn sceImpose_FF1A2F07() callconv(.C) void;
+pub extern fn sceImpose_FF1A2F07() callconv(.c) void;
 
 comptime {
     asm (macro.import_module_start("sceImpose", "0x40010011", "15"));

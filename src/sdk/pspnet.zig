@@ -102,7 +102,7 @@ pub extern fn sceNetAdhocctlGetPeerList(length: [*c]c_int, buf: ?*anyopaque) c_i
 pub extern fn sceNetAdhocctlGetPeerInfo(mac: [*c]u8, size: c_int, peerinfo: [*c]struct_SceNetAdhocctlPeerInfo) c_int;
 pub extern fn sceNetAdhocctlScan() c_int;
 pub extern fn sceNetAdhocctlGetScanInfo(length: [*c]c_int, buf: ?*anyopaque) c_int;
-pub const sceNetAdhocctlHandler = ?*const fn (c_int, c_int, ?*anyopaque) callconv(.C) void;
+pub const sceNetAdhocctlHandler = ?*const fn (c_int, c_int, ?*anyopaque) callconv(.c) void;
 pub extern fn sceNetAdhocctlAddHandler(handler: sceNetAdhocctlHandler, unknown: ?*anyopaque) c_int;
 pub extern fn sceNetAdhocctlDelHandler(id: c_int) c_int;
 pub extern fn sceNetAdhocctlGetNameByAddr(mac: [*c]u8, nickname: [*c]u8) c_int;
@@ -144,7 +144,7 @@ pub const struct_pspAdhocPoolStat = extern struct {
 };
 pub extern fn sceNetAdhocMatchingInit(memsize: c_int) c_int;
 pub extern fn sceNetAdhocMatchingTerm() c_int;
-pub const pspAdhocMatchingCallback = ?*const fn (c_int, c_int, [*c]u8, c_int, ?*anyopaque) callconv(.C) void;
+pub const pspAdhocMatchingCallback = ?*const fn (c_int, c_int, [*c]u8, c_int, ?*anyopaque) callconv(.c) void;
 pub extern fn sceNetAdhocMatchingCreate(mode: c_int, maxpeers: c_int, port: c_ushort, bufsize: c_int, hellodelay: c_uint, pingdelay: c_uint, initcount: c_int, msgdelay: c_uint, callback: pspAdhocMatchingCallback) c_int;
 pub extern fn sceNetAdhocMatchingDelete(matchingid: c_int) c_int;
 pub extern fn sceNetAdhocMatchingStart(matchingid: c_int, evthpri: c_int, evthstack: c_int, inthpri: c_int, inthstack: c_int, optlen: c_int, optdata: ?*anyopaque) c_int;
@@ -181,7 +181,7 @@ pub const union_SceNetApctlInfo = extern union {
     startBrowser: c_uint,
     wifisp: c_uint,
 };
-pub const sceNetApctlHandler = ?*const fn (c_int, c_int, c_int, c_int, ?*anyopaque) callconv(.C) void;
+pub const sceNetApctlHandler = ?*const fn (c_int, c_int, c_int, c_int, ?*anyopaque) callconv(.c) void;
 pub extern fn sceNetApctlInit(stackSize: c_int, initPriority: c_int) c_int;
 pub extern fn sceNetApctlTerm() c_int;
 pub extern fn sceNetApctlGetInfo(code: c_int, pInfo: [*c]union_SceNetApctlInfo) c_int;

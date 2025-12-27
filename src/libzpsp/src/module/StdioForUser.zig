@@ -2,29 +2,29 @@
 const types = @import("../types.zig");
 const macro = @import("../macro.zig");
 
-pub extern fn sceKernelStdioRead() callconv(.C) void;
+pub extern fn sceKernelStdioRead() callconv(.c) void;
 
-pub extern fn sceKernelStdioLseek() callconv(.C) void;
+pub extern fn sceKernelStdioLseek() callconv(.c) void;
 
-pub extern fn sceKernelStdioSendChar() callconv(.C) void;
+pub extern fn sceKernelStdioSendChar() callconv(.c) void;
 
-pub extern fn sceKernelStdioWrite() callconv(.C) void;
+pub extern fn sceKernelStdioWrite() callconv(.c) void;
 
-pub extern fn sceKernelStdioClose() callconv(.C) void;
+pub extern fn sceKernelStdioClose() callconv(.c) void;
 
-pub extern fn sceKernelStdioOpen() callconv(.C) void;
+pub extern fn sceKernelStdioOpen() callconv(.c) void;
 
 /// Function to get the current standard in file no
 /// Returns The stdin fileno
-pub extern fn sceKernelStdin() callconv(.C) types.SceUID;
+pub extern fn sceKernelStdin() callconv(.c) types.SceUID;
 
 /// Function to get the current standard out file no
 /// Returns The stdout fileno
-pub extern fn sceKernelStdout() callconv(.C) types.SceUID;
+pub extern fn sceKernelStdout() callconv(.c) types.SceUID;
 
 /// Function to get the current standard err file no
 /// Returns The stderr fileno
-pub extern fn sceKernelStderr() callconv(.C) types.SceUID;
+pub extern fn sceKernelStderr() callconv(.c) types.SceUID;
 
 comptime {
     asm (macro.import_module_start("StdioForUser", "0x40010000", "9"));

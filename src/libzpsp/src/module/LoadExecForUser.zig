@@ -6,13 +6,13 @@ const macro = @import("../macro.zig");
 /// `file` - The file to execute.
 /// `param` - Pointer to a ::SceKernelLoadExecParam structure, or NULL.
 /// Returns < 0 on error, probably.
-pub extern fn sceKernelLoadExec(file: [*c]const c_char, param: [*c]types.SceKernelLoadExecParam) callconv(.C) c_int;
+pub extern fn sceKernelLoadExec(file: [*c]const c_char, param: [*c]types.SceKernelLoadExecParam) callconv(.c) c_int;
 
-pub extern fn sceKernelExitGameWithStatus() callconv(.C) void;
+pub extern fn sceKernelExitGameWithStatus() callconv(.c) void;
 
 /// Exit game and go back to the PSP browser.
 /// @note You need to be in a thread in order for this function to work
-pub extern fn sceKernelExitGame() callconv(.C) void;
+pub extern fn sceKernelExitGame() callconv(.c) void;
 
 /// Register callback
 /// @note By installing the exit callback the home button becomes active. However if sceKernelExitGame
@@ -25,7 +25,7 @@ pub extern fn sceKernelExitGame() callconv(.C) void;
 /// `
 /// `cbid Callback id`
 /// Returns < 0 on error
-pub extern fn sceKernelRegisterExitCallback(cbid: c_int) callconv(.C) c_int;
+pub extern fn sceKernelRegisterExitCallback(cbid: c_int) callconv(.c) c_int;
 
 comptime {
     asm (macro.import_module_start("LoadExecForUser", "0x40010000", "4"));

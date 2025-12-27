@@ -5,11 +5,11 @@ const macro = @import("../macro.zig");
 /// Initialise the Adhoc matching library
 /// `memsize` - Internal memory pool size. Lumines uses 0x20000
 /// Returns 0 on success, < 0 on error
-pub extern fn sceNetAdhocMatchingInit(memsize: c_int) callconv(.C) c_int;
+pub extern fn sceNetAdhocMatchingInit(memsize: c_int) callconv(.c) c_int;
 
 /// Terminate the Adhoc matching library
 /// Returns 0 on success, < 0 on error
-pub extern fn sceNetAdhocMatchingTerm() callconv(.C) c_int;
+pub extern fn sceNetAdhocMatchingTerm() callconv(.c) c_int;
 
 /// Create an Adhoc matching object
 /// `mode` - One of ::pspAdhocMatchingModes
@@ -22,7 +22,7 @@ pub extern fn sceNetAdhocMatchingTerm() callconv(.C) c_int;
 /// `msgdelay` - Message send delay in microseconds
 /// `callback` - Callback to be called for matching
 /// Returns ID of object on success, < 0 on error.
-pub extern fn sceNetAdhocMatchingCreate(mode: c_int, maxpeers: c_int, port: c_ushort, bufsize: c_int, hellodelay: c_uint, pingdelay: c_uint, initcount: c_int, msgdelay: c_uint, callback: c_int) callconv(.C) c_int;
+pub extern fn sceNetAdhocMatchingCreate(mode: c_int, maxpeers: c_int, port: c_ushort, bufsize: c_int, hellodelay: c_uint, pingdelay: c_uint, initcount: c_int, msgdelay: c_uint, callback: c_int) callconv(.c) c_int;
 
 /// Start a matching object
 /// `matchingid` - The ID returned from ::sceNetAdhocMatchingCreate
@@ -33,17 +33,17 @@ pub extern fn sceNetAdhocMatchingCreate(mode: c_int, maxpeers: c_int, port: c_us
 /// `optlen` - Size of hellodata
 /// `optdata` - Pointer to block of data passed to callback
 /// Returns 0 on success, < 0 on error
-pub extern fn sceNetAdhocMatchingStart(matchingid: c_int, evthpri: c_int, evthstack: c_int, inthpri: c_int, inthstack: c_int, optlen: c_int, optdata: ?*anyopaque) callconv(.C) c_int;
+pub extern fn sceNetAdhocMatchingStart(matchingid: c_int, evthpri: c_int, evthstack: c_int, inthpri: c_int, inthstack: c_int, optlen: c_int, optdata: ?*anyopaque) callconv(.c) c_int;
 
 /// Stop a matching object
 /// `matchingid` - The ID returned from ::sceNetAdhocMatchingCreate
 /// Returns 0 on success, < 0 on error.
-pub extern fn sceNetAdhocMatchingStop(matchingid: c_int) callconv(.C) c_int;
+pub extern fn sceNetAdhocMatchingStop(matchingid: c_int) callconv(.c) c_int;
 
 /// Delete an Adhoc matching object
 /// `matchingid` - The ID returned from ::sceNetAdhocMatchingCreate
 /// Returns 0 on success, < 0 on error.
-pub extern fn sceNetAdhocMatchingDelete(matchingid: c_int) callconv(.C) c_int;
+pub extern fn sceNetAdhocMatchingDelete(matchingid: c_int) callconv(.c) c_int;
 
 /// Select a matching target
 /// `matchingid` - The ID returned from ::sceNetAdhocMatchingCreate
@@ -51,38 +51,38 @@ pub extern fn sceNetAdhocMatchingDelete(matchingid: c_int) callconv(.C) c_int;
 /// `optlen` - Optional data length
 /// `optdata` - Pointer to the optional data
 /// Returns 0 on success, < 0 on error.
-pub extern fn sceNetAdhocMatchingSelectTarget(matchingid: c_int, mac: [*c]u8, optlen: c_int, optdata: ?*anyopaque) callconv(.C) c_int;
+pub extern fn sceNetAdhocMatchingSelectTarget(matchingid: c_int, mac: [*c]u8, optlen: c_int, optdata: ?*anyopaque) callconv(.c) c_int;
 
 /// Cancel a matching target
 /// `matchingid` - The ID returned from ::sceNetAdhocMatchingCreate
 /// `mac` - The MAC address to cancel
 /// Returns 0 on success, < 0 on error.
-pub extern fn sceNetAdhocMatchingCancelTarget(matchingid: c_int, mac: [*c]u8) callconv(.C) c_int;
+pub extern fn sceNetAdhocMatchingCancelTarget(matchingid: c_int, mac: [*c]u8) callconv(.c) c_int;
 
 /// Set the optional hello message
 /// `matchingid` - The ID returned from ::sceNetAdhocMatchingCreate
 /// `optlen` - Length of the hello data
 /// `optdata` - Pointer to the hello data
 /// Returns 0 on success, < 0 on error.
-pub extern fn sceNetAdhocMatchingSetHelloOpt(matchingid: c_int, optlen: c_int, optdata: ?*anyopaque) callconv(.C) c_int;
+pub extern fn sceNetAdhocMatchingSetHelloOpt(matchingid: c_int, optlen: c_int, optdata: ?*anyopaque) callconv(.c) c_int;
 
 /// Get the optional hello message
 /// `matchingid` - The ID returned from ::sceNetAdhocMatchingCreate
 /// `optlen` - Length of the hello data
 /// `optdata` - Pointer to the hello data
 /// Returns 0 on success, < 0 on error.
-pub extern fn sceNetAdhocMatchingGetHelloOpt(matchingid: c_int, optlen: [*c]c_int, optdata: ?*anyopaque) callconv(.C) c_int;
+pub extern fn sceNetAdhocMatchingGetHelloOpt(matchingid: c_int, optlen: [*c]c_int, optdata: ?*anyopaque) callconv(.c) c_int;
 
 /// Get a list of matching members
 /// `matchingid` - The ID returned from ::sceNetAdhocMatchingCreate
 /// `length` - The length of the list.
 /// `buf` - An allocated area of size length.
 /// Returns 0 on success, < 0 on error.
-pub extern fn sceNetAdhocMatchingGetMembers(matchingid: c_int, length: [*c]c_int, buf: ?*anyopaque) callconv(.C) c_int;
+pub extern fn sceNetAdhocMatchingGetMembers(matchingid: c_int, length: [*c]c_int, buf: ?*anyopaque) callconv(.c) c_int;
 
 /// Get the maximum memory usage by the matching library
 /// Returns The memory usage on success, < 0 on error.
-pub extern fn sceNetAdhocMatchingGetPoolMaxAlloc() callconv(.C) c_int;
+pub extern fn sceNetAdhocMatchingGetPoolMaxAlloc() callconv(.c) c_int;
 
 /// Cancel a matching target (with optional data)
 /// `matchingid` - The ID returned from ::sceNetAdhocMatchingCreate
@@ -90,12 +90,12 @@ pub extern fn sceNetAdhocMatchingGetPoolMaxAlloc() callconv(.C) c_int;
 /// `optlen` - Optional data length
 /// `optdata` - Pointer to the optional data
 /// Returns 0 on success, < 0 on error.
-pub extern fn sceNetAdhocMatchingCancelTargetWithOpt(matchingid: c_int, mac: [*c]u8, optlen: c_int, optdata: ?*anyopaque) callconv(.C) c_int;
+pub extern fn sceNetAdhocMatchingCancelTargetWithOpt(matchingid: c_int, mac: [*c]u8, optlen: c_int, optdata: ?*anyopaque) callconv(.c) c_int;
 
 /// Get the status of the memory pool used by the matching library
 /// `poolstat` - A ::pspAdhocPoolStat.
 /// Returns 0 on success, < 0 on error.
-pub extern fn sceNetAdhocMatchingGetPoolStat(poolstat: [*c]c_int) callconv(.C) c_int;
+pub extern fn sceNetAdhocMatchingGetPoolStat(poolstat: [*c]c_int) callconv(.c) c_int;
 
 /// Send data to a matching target
 /// `matchingid` - The ID returned from ::sceNetAdhocMatchingCreate
@@ -103,13 +103,13 @@ pub extern fn sceNetAdhocMatchingGetPoolStat(poolstat: [*c]c_int) callconv(.C) c
 /// `datalen` - Length of the data
 /// `data` - Pointer to the data
 /// Returns 0 on success, < 0 on error.
-pub extern fn sceNetAdhocMatchingSendData(matchingid: c_int, mac: [*c]u8, datalen: c_int, data: ?*anyopaque) callconv(.C) c_int;
+pub extern fn sceNetAdhocMatchingSendData(matchingid: c_int, mac: [*c]u8, datalen: c_int, data: ?*anyopaque) callconv(.c) c_int;
 
 /// Abort a data send to a matching target
 /// `matchingid` - The ID returned from ::sceNetAdhocMatchingCreate
 /// `mac` - The MAC address to send the data to
 /// Returns 0 on success, < 0 on error.
-pub extern fn sceNetAdhocMatchingAbortSendData(matchingid: c_int, mac: [*c]u8) callconv(.C) c_int;
+pub extern fn sceNetAdhocMatchingAbortSendData(matchingid: c_int, mac: [*c]u8) callconv(.c) c_int;
 
 comptime {
     asm (macro.import_module_start("sceNetAdhocMatching", "0x00090000", "16"));

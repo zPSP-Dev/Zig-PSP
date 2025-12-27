@@ -3,14 +3,14 @@ const types = @import("../types.zig");
 const macro = @import("../macro.zig");
 
 /// Invalidate a range of addresses in data cache
-pub extern fn sceKernelDcacheInvalidateRange(p: ?*const anyopaque, size: c_uint) callconv(.C) void;
+pub extern fn sceKernelDcacheInvalidateRange(p: ?*const anyopaque, size: c_uint) callconv(.c) void;
 
 /// Function to perform an MD5 digest of a data block.
 /// `data` - Pointer to a data block to make a digest of.
 /// `size` - Size of the data block.
 /// `digest` - Pointer to a 16byte buffer to store the resulting digest
 /// Returns < 0 on error.
-pub extern fn sceKernelUtilsMd5Digest(data: [*c]u8, size: u32, digest: [*c]u8) callconv(.C) c_int;
+pub extern fn sceKernelUtilsMd5Digest(data: [*c]u8, size: u32, digest: [*c]u8) callconv(.c) c_int;
 
 /// Function to initialise a MD5 digest context
 /// `ctx` - A context block to initialise
@@ -23,27 +23,27 @@ pub extern fn sceKernelUtilsMd5Digest(data: [*c]u8, size: u32, digest: [*c]u8) c
 /// sceKernelUtilsMd5BlockUpdate(&ctx, (u8*) "Hello", 5);
 /// sceKernelUtilsMd5BlockResult(&ctx, digest);
 /// `
-pub extern fn sceKernelUtilsMd5BlockInit(ctx: [*c]c_int) callconv(.C) c_int;
+pub extern fn sceKernelUtilsMd5BlockInit(ctx: [*c]c_int) callconv(.c) c_int;
 
 /// Function to update the MD5 digest with a block of data.
 /// `ctx` - A filled in context block.
 /// `data` - The data block to hash.
 /// `size` - The size of the data to hash
 /// Returns < 0 on error.
-pub extern fn sceKernelUtilsMd5BlockUpdate(ctx: [*c]c_int, data: [*c]u8, size: u32) callconv(.C) c_int;
+pub extern fn sceKernelUtilsMd5BlockUpdate(ctx: [*c]c_int, data: [*c]u8, size: u32) callconv(.c) c_int;
 
 /// Function to get the digest result of the MD5 hash.
 /// `ctx` - A filled in context block.
 /// `digest` - A 16 byte array to hold the digest.
 /// Returns < 0 on error.
-pub extern fn sceKernelUtilsMd5BlockResult(ctx: [*c]c_int, digest: [*c]u8) callconv(.C) c_int;
+pub extern fn sceKernelUtilsMd5BlockResult(ctx: [*c]c_int, digest: [*c]u8) callconv(.c) c_int;
 
 /// Function to SHA1 hash a data block.
 /// `data` - The data to hash.
 /// `size` - The size of the data.
 /// `digest` - Pointer to a 20 byte array for storing the digest
 /// Returns < 0 on error.
-pub extern fn sceKernelUtilsSha1Digest(data: [*c]u8, size: u32, digest: [*c]u8) callconv(.C) c_int;
+pub extern fn sceKernelUtilsSha1Digest(data: [*c]u8, size: u32, digest: [*c]u8) callconv(.c) c_int;
 
 /// Function to initialise a context for SHA1 hashing.
 /// `ctx` - Pointer to a context.
@@ -56,20 +56,20 @@ pub extern fn sceKernelUtilsSha1Digest(data: [*c]u8, size: u32, digest: [*c]u8) 
 /// sceKernelUtilsSha1BlockUpdate(&ctx, (u8*) "Hello", 5);
 /// sceKernelUtilsSha1BlockResult(&ctx, digest);
 /// `
-pub extern fn sceKernelUtilsSha1BlockInit(ctx: [*c]c_int) callconv(.C) c_int;
+pub extern fn sceKernelUtilsSha1BlockInit(ctx: [*c]c_int) callconv(.c) c_int;
 
 /// Function to update the current hash.
 /// `ctx` - Pointer to a prefilled context.
 /// `data` - The data block to hash.
 /// `size` - The size of the data block
 /// Returns < 0 on error.
-pub extern fn sceKernelUtilsSha1BlockUpdate(ctx: [*c]c_int, data: [*c]u8, size: u32) callconv(.C) c_int;
+pub extern fn sceKernelUtilsSha1BlockUpdate(ctx: [*c]c_int, data: [*c]u8, size: u32) callconv(.c) c_int;
 
 /// Function to get the result of the SHA1 hash.
 /// `ctx` - Pointer to a prefilled context.
 /// `digest` - A pointer to a 20 byte array to contain the digest.
 /// Returns < 0 on error.
-pub extern fn sceKernelUtilsSha1BlockResult(ctx: [*c]c_int, digest: [*c]u8) callconv(.C) c_int;
+pub extern fn sceKernelUtilsSha1BlockResult(ctx: [*c]c_int, digest: [*c]u8) callconv(.c) c_int;
 
 /// Function to initialise a mersenne twister context.
 /// `ctx` - Pointer to a context
@@ -81,51 +81,51 @@ pub extern fn sceKernelUtilsSha1BlockResult(ctx: [*c]c_int, digest: [*c]u8) call
 /// u23 rand_val = sceKernelUtilsMt19937UInt(&ctx);
 /// `
 /// Returns < 0 on error.
-pub extern fn sceKernelUtilsMt19937Init(ctx: [*c]c_int, seed: u32) callconv(.C) c_int;
+pub extern fn sceKernelUtilsMt19937Init(ctx: [*c]c_int, seed: u32) callconv(.c) c_int;
 
 /// Function to return a new psuedo random number.
 /// `ctx` - Pointer to a pre-initialised context.
 /// Returns A pseudo random number (between 0 and MAX_INT).
-pub extern fn sceKernelUtilsMt19937UInt(ctx: [*c]c_int) callconv(.C) u32;
+pub extern fn sceKernelUtilsMt19937UInt(ctx: [*c]c_int) callconv(.c) u32;
 
-pub extern fn sceKernelGetGPI() callconv(.C) void;
+pub extern fn sceKernelGetGPI() callconv(.c) void;
 
-pub extern fn sceKernelSetGPO() callconv(.C) void;
+pub extern fn sceKernelSetGPO() callconv(.c) void;
 
 /// Get the processor clock used since the start of the process
-pub extern fn sceKernelLibcClock() callconv(.C) c_int;
+pub extern fn sceKernelLibcClock() callconv(.c) c_int;
 
 /// Get the time in seconds since the epoc (1st Jan 1970)
-pub extern fn sceKernelLibcTime(t: [*c]c_int) callconv(.C) c_int;
+pub extern fn sceKernelLibcTime(t: [*c]c_int) callconv(.c) c_int;
 
 /// Get the current time of time and time zone information
-pub extern fn sceKernelLibcGettimeofday(tp: [*c]c_int, tzp: [*c]c_int) callconv(.C) c_int;
+pub extern fn sceKernelLibcGettimeofday(tp: [*c]c_int, tzp: [*c]c_int) callconv(.c) c_int;
 
 /// Write back the data cache to memory
-pub extern fn sceKernelDcacheWritebackAll() callconv(.C) void;
+pub extern fn sceKernelDcacheWritebackAll() callconv(.c) void;
 
 /// Write back and invalidate the data cache
-pub extern fn sceKernelDcacheWritebackInvalidateAll() callconv(.C) void;
+pub extern fn sceKernelDcacheWritebackInvalidateAll() callconv(.c) void;
 
 /// Write back a range of addresses from the data cache to memory
-pub extern fn sceKernelDcacheWritebackRange(p: ?*const anyopaque, size: c_uint) callconv(.C) void;
+pub extern fn sceKernelDcacheWritebackRange(p: ?*const anyopaque, size: c_uint) callconv(.c) void;
 
 /// Write back and invalidate a range of addresses in the data cache
-pub extern fn sceKernelDcacheWritebackInvalidateRange(p: ?*const anyopaque, size: c_uint) callconv(.C) void;
+pub extern fn sceKernelDcacheWritebackInvalidateRange(p: ?*const anyopaque, size: c_uint) callconv(.c) void;
 
-pub extern fn sceKernelDcacheProbe() callconv(.C) void;
+pub extern fn sceKernelDcacheProbe() callconv(.c) void;
 
-pub extern fn sceKernelDcacheReadTag() callconv(.C) void;
+pub extern fn sceKernelDcacheReadTag() callconv(.c) void;
 
-pub extern fn sceKernelIcacheProbe() callconv(.C) void;
+pub extern fn sceKernelIcacheProbe() callconv(.c) void;
 
-pub extern fn sceKernelIcacheReadTag() callconv(.C) void;
+pub extern fn sceKernelIcacheReadTag() callconv(.c) void;
 
 /// Invalidate the instruction cache
-pub extern fn sceKernelIcacheInvalidateAll() callconv(.C) void;
+pub extern fn sceKernelIcacheInvalidateAll() callconv(.c) void;
 
 /// Invalidate a range of addresses in the instruction cache
-pub extern fn sceKernelIcacheInvalidateRange(p: ?*const anyopaque, size: c_uint) callconv(.C) void;
+pub extern fn sceKernelIcacheInvalidateRange(p: ?*const anyopaque, size: c_uint) callconv(.c) void;
 
 comptime {
     asm (macro.import_module_start("UtilsForUser", "0x40010000", "26"));

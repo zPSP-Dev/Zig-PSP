@@ -4,23 +4,23 @@ const macro = @import("../macro.zig");
 
 /// Inititalise the resolver library
 /// Returns 0 on sucess, < 0 on error.
-pub extern fn sceNetResolverInit() callconv(.C) c_int;
+pub extern fn sceNetResolverInit() callconv(.c) c_int;
 
 /// Terminate the resolver library
 /// Returns 0 on success, < 0 on error
-pub extern fn sceNetResolverTerm() callconv(.C) c_int;
+pub extern fn sceNetResolverTerm() callconv(.c) c_int;
 
 /// Create a resolver object
 /// `rid` - Pointer to receive the resolver id
 /// `buf` - Temporary buffer
 /// `buflen` - Length of the temporary buffer
 /// Returns 0 on success, < 0 on error
-pub extern fn sceNetResolverCreate(rid: [*c]c_int, buf: ?*anyopaque, buflen: types.SceSize) callconv(.C) c_int;
+pub extern fn sceNetResolverCreate(rid: [*c]c_int, buf: ?*anyopaque, buflen: types.SceSize) callconv(.c) c_int;
 
 /// Delete a resolver
 /// `rid` - The resolver to delete
 /// Returns 0 on success, < 0 on error
-pub extern fn sceNetResolverDelete(rid: c_int) callconv(.C) c_int;
+pub extern fn sceNetResolverDelete(rid: c_int) callconv(.c) c_int;
 
 /// Begin a name to address lookup
 /// `rid` - Resolver id
@@ -29,7 +29,7 @@ pub extern fn sceNetResolverDelete(rid: c_int) callconv(.C) c_int;
 /// `timeout` - Number of seconds before timeout
 /// `retry` - Number of retires
 /// Returns 0 on success, < 0 on error
-pub extern fn sceNetResolverStartNtoA(rid: c_int, hostname: [*c]const c_char, addr: [*c]c_int, timeout: c_uint, retry: c_int) callconv(.C) c_int;
+pub extern fn sceNetResolverStartNtoA(rid: c_int, hostname: [*c]const c_char, addr: [*c]c_int, timeout: c_uint, retry: c_int) callconv(.c) c_int;
 
 /// Begin a address to name lookup
 /// `rid -Resolver id`
@@ -39,12 +39,12 @@ pub extern fn sceNetResolverStartNtoA(rid: c_int, hostname: [*c]const c_char, ad
 /// `timeout` - Number of seconds before timeout
 /// `retry` - Number of retries
 /// Returns 0 on success, < 0 on error
-pub extern fn sceNetResolverStartAtoN(rid: c_int, addr: [*c]const c_int, hostname: [*c]c_char, hostname_len: types.SceSize, timeout: c_uint, retry: c_int) callconv(.C) c_int;
+pub extern fn sceNetResolverStartAtoN(rid: c_int, addr: [*c]const c_int, hostname: [*c]c_char, hostname_len: types.SceSize, timeout: c_uint, retry: c_int) callconv(.c) c_int;
 
 /// Stop a resolver operation
 /// `rid` - Resolver id
 /// Returns 0 on success, < 0 on error
-pub extern fn sceNetResolverStop(rid: c_int) callconv(.C) c_int;
+pub extern fn sceNetResolverStop(rid: c_int) callconv(.c) c_int;
 
 comptime {
     asm (macro.import_module_start("sceNetResolver", "0x00090000", "7"));

@@ -5,62 +5,62 @@ const macro = @import("../macro.zig");
 /// Init the game sharing
 /// `params` - game sharing parameters
 /// Returns 0 on success, < 0 on error.
-pub extern fn sceUtilityGameSharingInitStart(params: [*c]c_int) callconv(.C) c_int;
+pub extern fn sceUtilityGameSharingInitStart(params: [*c]c_int) callconv(.c) c_int;
 
 /// Shutdown game sharing.
-pub extern fn sceUtilityGameSharingShutdownStart() callconv(.C) void;
+pub extern fn sceUtilityGameSharingShutdownStart() callconv(.c) void;
 
 /// Refresh the GUI for game sharing
 /// `n` - unknown, pass 1
-pub extern fn sceUtilityGameSharingUpdate(n: c_int) callconv(.C) void;
+pub extern fn sceUtilityGameSharingUpdate(n: c_int) callconv(.c) void;
 
 /// Get the current status of game sharing.
 /// Returns 2 if the GUI is visible (you need to call sceUtilityGameSharingGetStatus).
 /// 3 if the user cancelled the dialog, and you need to call sceUtilityGameSharingShutdownStart.
 /// 4 if the dialog has been successfully shut down.
-pub extern fn sceUtilityGameSharingGetStatus() callconv(.C) c_int;
+pub extern fn sceUtilityGameSharingGetStatus() callconv(.c) c_int;
 
-pub extern fn sceNetplayDialogInitStart() callconv(.C) void;
+pub extern fn sceNetplayDialogInitStart() callconv(.c) void;
 
-pub extern fn sceNetplayDialogShutdownStart() callconv(.C) void;
+pub extern fn sceNetplayDialogShutdownStart() callconv(.c) void;
 
-pub extern fn sceNetplayDialogUpdate() callconv(.C) void;
+pub extern fn sceNetplayDialogUpdate() callconv(.c) void;
 
-pub extern fn sceNetplayDialogGetStatus() callconv(.C) void;
+pub extern fn sceNetplayDialogGetStatus() callconv(.c) void;
 
 /// Init the Network Configuration Dialog Utility
 /// `data` - pointer to pspUtilityNetconfData to be initialized
 /// Returns 0 on success, < 0 on error
-pub extern fn sceUtilityNetconfInitStart(data: [*c]c_int) callconv(.C) c_int;
+pub extern fn sceUtilityNetconfInitStart(data: [*c]c_int) callconv(.c) c_int;
 
 /// Shutdown the Network Configuration Dialog Utility
 /// Returns 0 on success, < 0 on error
-pub extern fn sceUtilityNetconfShutdownStart() callconv(.C) c_int;
+pub extern fn sceUtilityNetconfShutdownStart() callconv(.c) c_int;
 
 /// Update the Network Configuration Dialog GUI
 /// `unknown` - unknown; set to 1
 /// Returns 0 on success, < 0 on error
-pub extern fn sceUtilityNetconfUpdate(unknown: c_int) callconv(.C) c_int;
+pub extern fn sceUtilityNetconfUpdate(unknown: c_int) callconv(.c) c_int;
 
 /// Get the status of a running Network Configuration Dialog
 /// Returns one of pspUtilityDialogState on success, < 0 on error
-pub extern fn sceUtilityNetconfGetStatus() callconv(.C) c_int;
+pub extern fn sceUtilityNetconfGetStatus() callconv(.c) c_int;
 
 /// Saves or Load savedata to/from the passed structure
 /// After having called this continue calling sceUtilitySavedataGetStatus to
 /// check if the operation is completed
 /// `params` - savedata parameters
 /// Returns 0 on success
-pub extern fn sceUtilitySavedataInitStart(params: [*c]c_int) callconv(.C) c_int;
+pub extern fn sceUtilitySavedataInitStart(params: [*c]c_int) callconv(.c) c_int;
 
 /// Shutdown the savedata utility. after calling this continue calling
 /// ::sceUtilitySavedataGetStatus to check when it has shutdown
 /// Returns 0 on success
-pub extern fn sceUtilitySavedataShutdownStart() callconv(.C) c_int;
+pub extern fn sceUtilitySavedataShutdownStart() callconv(.c) c_int;
 
 /// Refresh status of the savedata function
 /// `unknown` - unknown, pass 1
-pub extern fn sceUtilitySavedataUpdate(unknown: c_int) callconv(.C) void;
+pub extern fn sceUtilitySavedataUpdate(unknown: c_int) callconv(.c) void;
 
 /// Check the current status of the saving/loading/shutdown process
 /// Continue calling this to check current status of the process
@@ -68,84 +68,84 @@ pub extern fn sceUtilitySavedataUpdate(unknown: c_int) callconv(.C) void;
 /// Returns 2 if the process is still being processed.
 /// 3 on save/load success, then you can call sceUtilitySavedataShutdownStart.
 /// 4 on complete shutdown.
-pub extern fn sceUtilitySavedataGetStatus() callconv(.C) c_int;
+pub extern fn sceUtilitySavedataGetStatus() callconv(.c) c_int;
 
-pub extern fn sceUtility_2995D020() callconv(.C) void;
+pub extern fn sceUtility_2995D020() callconv(.c) void;
 
-pub extern fn sceUtility_B62A4061() callconv(.C) void;
+pub extern fn sceUtility_B62A4061() callconv(.c) void;
 
-pub extern fn sceUtility_ED0FAD38() callconv(.C) void;
+pub extern fn sceUtility_ED0FAD38() callconv(.c) void;
 
-pub extern fn sceUtility_88BC7406() callconv(.C) void;
+pub extern fn sceUtility_88BC7406() callconv(.c) void;
 
 /// Create a message dialog
 /// `params` - dialog parameters
 /// Returns 0 on success
-pub extern fn sceUtilityMsgDialogInitStart(params: [*c]c_int) callconv(.C) c_int;
+pub extern fn sceUtilityMsgDialogInitStart(params: [*c]c_int) callconv(.c) c_int;
 
 /// Remove a message dialog currently active.  After calling this
 /// function you need to keep calling GetStatus and Update until
 /// you get a status of 4.
-pub extern fn sceUtilityMsgDialogShutdownStart() callconv(.C) void;
+pub extern fn sceUtilityMsgDialogShutdownStart() callconv(.c) void;
 
 /// Refresh the GUI for a message dialog currently active
 /// `n` - unknown, pass 1
-pub extern fn sceUtilityMsgDialogUpdate(n: c_int) callconv(.C) void;
+pub extern fn sceUtilityMsgDialogUpdate(n: c_int) callconv(.c) void;
 
 /// Get the current status of a message dialog currently active.
 /// Returns 2 if the GUI is visible (you need to call sceUtilityMsgDialogGetStatus).
 /// 3 if the user cancelled the dialog, and you need to call sceUtilityMsgDialogShutdownStart.
 /// 4 if the dialog has been successfully shut down.
-pub extern fn sceUtilityMsgDialogGetStatus() callconv(.C) c_int;
+pub extern fn sceUtilityMsgDialogGetStatus() callconv(.c) c_int;
 
 /// Create an on-screen keyboard
 /// `params` - OSK parameters.
 /// Returns < 0 on error.
-pub extern fn sceUtilityOskInitStart(params: [*c]c_int) callconv(.C) c_int;
+pub extern fn sceUtilityOskInitStart(params: [*c]c_int) callconv(.c) c_int;
 
 /// Remove a currently active keyboard. After calling this function you must
 /// poll sceUtilityOskGetStatus() until it returns PSP_UTILITY_DIALOG_NONE.
 /// Returns < 0 on error.
-pub extern fn sceUtilityOskShutdownStart() callconv(.C) c_int;
+pub extern fn sceUtilityOskShutdownStart() callconv(.c) c_int;
 
 /// Refresh the GUI for a keyboard currently active
 /// `n` - Unknown, pass 1.
 /// Returns < 0 on error.
-pub extern fn sceUtilityOskUpdate(n: c_int) callconv(.C) c_int;
+pub extern fn sceUtilityOskUpdate(n: c_int) callconv(.c) c_int;
 
 /// Get the status of a on-screen keyboard currently active.
 /// Returns the current status of the keyboard. See ::pspUtilityDialogState for details.
-pub extern fn sceUtilityOskGetStatus() callconv(.C) c_int;
+pub extern fn sceUtilityOskGetStatus() callconv(.c) c_int;
 
 /// Set Integer System Parameter
 /// `id` - which parameter to set
 /// `value` - integer value to set
 /// Returns 0 on success, PSP_SYSTEMPARAM_RETVAL_FAIL on failure
-pub extern fn sceUtilitySetSystemParamInt(id: c_int, value: c_int) callconv(.C) c_int;
+pub extern fn sceUtilitySetSystemParamInt(id: c_int, value: c_int) callconv(.c) c_int;
 
 /// Set String System Parameter
 /// `id` - which parameter to set
 /// `str` - char * value to set
 /// Returns 0 on success, PSP_SYSTEMPARAM_RETVAL_FAIL on failure
-pub extern fn sceUtilitySetSystemParamString(id: c_int, str: [*c]const c_char) callconv(.C) c_int;
+pub extern fn sceUtilitySetSystemParamString(id: c_int, str: [*c]const c_char) callconv(.c) c_int;
 
 /// Get Integer System Parameter
 /// `id` - which parameter to get
 /// `value` - pointer to integer value to place result in
 /// Returns 0 on success, PSP_SYSTEMPARAM_RETVAL_FAIL on failure
-pub extern fn sceUtilityGetSystemParamInt(id: c_int, value: [*c]c_int) callconv(.C) c_int;
+pub extern fn sceUtilityGetSystemParamInt(id: c_int, value: [*c]c_int) callconv(.c) c_int;
 
 /// Get String System Parameter
 /// `id` - which parameter to get
 /// `str` - char * buffer to place result in
 /// `len` - length of str buffer
 /// Returns 0 on success, PSP_SYSTEMPARAM_RETVAL_FAIL on failure
-pub extern fn sceUtilityGetSystemParamString(id: c_int, str: [*c]c_char, len: c_int) callconv(.C) c_int;
+pub extern fn sceUtilityGetSystemParamString(id: c_int, str: [*c]c_char, len: c_int) callconv(.c) c_int;
 
 /// Check existance of a Net Configuration
 /// `id` - id of net Configuration (1 to n)
 /// Returns 0 on success,
-pub extern fn sceUtilityCheckNetParam(id: c_int) callconv(.C) c_int;
+pub extern fn sceUtilityCheckNetParam(id: c_int) callconv(.c) c_int;
 
 /// Get Net Configuration Parameter
 /// `conf` - Net Configuration number (1 to n)
@@ -153,7 +153,7 @@ pub extern fn sceUtilityCheckNetParam(id: c_int) callconv(.C) c_int;
 /// `param` - which parameter to get
 /// `data` - parameter data
 /// Returns 0 on success,
-pub extern fn sceUtilityGetNetParam(conf: c_int, param: c_int, data: [*c]c_int) callconv(.C) c_int;
+pub extern fn sceUtilityGetNetParam(conf: c_int, param: c_int, data: [*c]c_int) callconv(.c) c_int;
 
 /// Load a network module (PRX) from user mode.
 /// Load PSP_NET_MODULE_COMMON and PSP_NET_MODULE_INET
@@ -161,86 +161,86 @@ pub extern fn sceUtilityGetNetParam(conf: c_int, param: c_int, data: [*c]c_int) 
 /// Available on firmware 2.00 and higher only.
 /// `module` - module number to load (PSP_NET_MODULE_xxx)
 /// Returns 0 on success, < 0 on error
-pub extern fn sceUtilityLoadNetModule(module: c_int) callconv(.C) c_int;
+pub extern fn sceUtilityLoadNetModule(module: c_int) callconv(.c) c_int;
 
 /// Unload a network module (PRX) from user mode.
 /// Available on firmware 2.00 and higher only.
 /// `module` - module number be unloaded
 /// Returns 0 on success, < 0 on error
-pub extern fn sceUtilityUnloadNetModule(module: c_int) callconv(.C) c_int;
+pub extern fn sceUtilityUnloadNetModule(module: c_int) callconv(.c) c_int;
 
 /// Load an audio/video module (PRX) from user mode.
 /// Available on firmware 2.00 and higher only.
 /// `module` - module number to load (PSP_AV_MODULE_xxx)
 /// Returns 0 on success, < 0 on error
-pub extern fn sceUtilityLoadAvModule(module: c_int) callconv(.C) c_int;
+pub extern fn sceUtilityLoadAvModule(module: c_int) callconv(.c) c_int;
 
 /// Unload an audio/video module (PRX) from user mode.
 /// Available on firmware 2.00 and higher only.
 /// `module` - module number to be unloaded
 /// Returns 0 on success, < 0 on error
-pub extern fn sceUtilityUnloadAvModule(module: c_int) callconv(.C) c_int;
+pub extern fn sceUtilityUnloadAvModule(module: c_int) callconv(.c) c_int;
 
 /// Load a usb module (PRX) from user mode.
 /// Available on firmware 2.70 and higher only.
 /// `module` - module number to load (PSP_USB_MODULE_xxx)
 /// Returns 0 on success, < 0 on error
-pub extern fn sceUtilityLoadUsbModule(module: c_int) callconv(.C) c_int;
+pub extern fn sceUtilityLoadUsbModule(module: c_int) callconv(.c) c_int;
 
 /// Unload a usb module (PRX) from user mode.
 /// Available on firmware 2.70 and higher only.
 /// `module` - module number to be unloaded
 /// Returns 0 on success, < 0 on error
-pub extern fn sceUtilityUnloadUsbModule(module: c_int) callconv(.C) c_int;
+pub extern fn sceUtilityUnloadUsbModule(module: c_int) callconv(.c) c_int;
 
 /// Abort a message dialog currently active
-pub extern fn sceUtilityMsgDialogAbort() callconv(.C) c_int;
+pub extern fn sceUtilityMsgDialogAbort() callconv(.c) c_int;
 
 /// Refresh the GUI for html viewer
 /// `n` - unknown, pass 1
-pub extern fn sceUtilityHtmlViewerUpdate(n: c_int) callconv(.C) c_int;
+pub extern fn sceUtilityHtmlViewerUpdate(n: c_int) callconv(.c) c_int;
 
 /// Get the current status of the html viewer.
 /// Returns 2 if the GUI is visible (you need to call sceUtilityHtmlViewerGetStatus).
 /// 3 if the user cancelled the dialog, and you need to call sceUtilityHtmlViewerShutdownStart.
 /// 4 if the dialog has been successfully shut down.
-pub extern fn sceUtilityHtmlViewerGetStatus() callconv(.C) c_int;
+pub extern fn sceUtilityHtmlViewerGetStatus() callconv(.c) c_int;
 
 /// Init the html viewer
 /// `params` - html viewer parameters
 /// Returns 0 on success, < 0 on error.
-pub extern fn sceUtilityHtmlViewerInitStart(params: [*c]c_int) callconv(.C) c_int;
+pub extern fn sceUtilityHtmlViewerInitStart(params: [*c]c_int) callconv(.c) c_int;
 
 /// Shutdown html viewer.
-pub extern fn sceUtilityHtmlViewerShutdownStart() callconv(.C) c_int;
+pub extern fn sceUtilityHtmlViewerShutdownStart() callconv(.c) c_int;
 
 /// Load a module (PRX) from user mode.
 /// `module` - module to load (PSP_MODULE_xxx)
 /// Returns 0 on success, < 0 on error
-pub extern fn sceUtilityLoadModule(module: c_int) callconv(.C) c_int;
+pub extern fn sceUtilityLoadModule(module: c_int) callconv(.c) c_int;
 
 /// Unload a module (PRX) from user mode.
 /// `module` - module to unload (PSP_MODULE_xxx)
 /// Returns 0 on success, < 0 on error
-pub extern fn sceUtilityUnloadModule(module: c_int) callconv(.C) c_int;
+pub extern fn sceUtilityUnloadModule(module: c_int) callconv(.c) c_int;
 
-pub extern fn sceUtilityScreenshotInitStart() callconv(.C) void;
+pub extern fn sceUtilityScreenshotInitStart() callconv(.c) void;
 
-pub extern fn sceUtilityScreenshotShutdownStart() callconv(.C) void;
+pub extern fn sceUtilityScreenshotShutdownStart() callconv(.c) void;
 
-pub extern fn sceUtilityScreenshotUpdate() callconv(.C) void;
+pub extern fn sceUtilityScreenshotUpdate() callconv(.c) void;
 
-pub extern fn sceUtilityScreenshotGetStatus() callconv(.C) void;
+pub extern fn sceUtilityScreenshotGetStatus() callconv(.c) void;
 
-pub extern fn sceUtilityScreenshotContStart() callconv(.C) void;
+pub extern fn sceUtilityScreenshotContStart() callconv(.c) void;
 
-pub extern fn sceUtilityNpSigninInitStart() callconv(.C) void;
+pub extern fn sceUtilityNpSigninInitStart() callconv(.c) void;
 
-pub extern fn sceUtilityNpSigninShutdownStart() callconv(.C) void;
+pub extern fn sceUtilityNpSigninShutdownStart() callconv(.c) void;
 
-pub extern fn sceUtilityNpSigninUpdate() callconv(.C) void;
+pub extern fn sceUtilityNpSigninUpdate() callconv(.c) void;
 
-pub extern fn sceUtilityNpSigninGetStatus() callconv(.C) void;
+pub extern fn sceUtilityNpSigninGetStatus() callconv(.c) void;
 
 comptime {
     asm (macro.import_module_start("sceUtility", "0x40010000", "56"));

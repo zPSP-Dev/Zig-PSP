@@ -18,7 +18,7 @@ pub fn exitErr() void {
 const bad_main_ret = @compileError("Where is this from?!");
 
 //This calls your main function as a thread.
-pub fn _module_main_thread(argc: threadman.SceSize, _: ?*anyopaque) callconv(.C) c_int {
+pub fn _module_main_thread(argc: threadman.SceSize, _: ?*anyopaque) callconv(.c) c_int {
     _ = argc;
     // if (has_std_os) {
     // pspos.system.__pspOsInit(argv);
