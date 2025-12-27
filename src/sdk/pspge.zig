@@ -160,8 +160,8 @@ pub fn sceGeContinue() c_int {
 /// Register callback handlers for the the GE.
 /// `cb` - Configured callback data structure.
 /// Returns The callback ID, < 0 on error.
-pub fn sceGeSetCallback(cb: [*c]PspGeCallbackData) c_int {
-    return module.sceGeSetCallback(cb);
+pub fn sceGeSetCallback(cb: PspGeCallbackData) c_int {
+    return module.sceGeSetCallback(@constCast(&cb));
 }
 
 /// Unregister the callback handlers.
