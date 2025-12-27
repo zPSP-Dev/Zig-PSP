@@ -392,3 +392,196 @@ pub const SceKernelLoadExecParam = extern struct {
     argp: ?*anyopaque,
     key: [*c]const u8,
 };
+
+pub const SceKernelIdListType = enum(c_int) {
+    SCE_KERNEL_TMID_Thread = 1,
+    SCE_KERNEL_TMID_Semaphore = 2,
+    SCE_KERNEL_TMID_EventFlag = 3,
+    SCE_KERNEL_TMID_Mbox = 4,
+    SCE_KERNEL_TMID_Vpl = 5,
+    SCE_KERNEL_TMID_Fpl = 6,
+    SCE_KERNEL_TMID_Mpipe = 7,
+    SCE_KERNEL_TMID_Callback = 8,
+    SCE_KERNEL_TMID_ThreadEventHandler = 9,
+    SCE_KERNEL_TMID_Alarm = 10,
+    SCE_KERNEL_TMID_VTimer = 11,
+    SCE_KERNEL_TMID_SleepThread = 64,
+    SCE_KERNEL_TMID_DelayThread = 65,
+    SCE_KERNEL_TMID_SuspendThread = 66,
+    SCE_KERNEL_TMID_DormantThread = 67,
+    _,
+};
+
+pub const SceKernelCallbackFunction = ?*const fn (c_int, c_int, ?*anyopaque) callconv(.C) c_int;
+pub const SceKernelCallbackInfo = extern struct {
+    size: SceSize,
+    name: [32]u8,
+    threadId: SceUID,
+    callback: SceKernelCallbackFunction,
+    common: ?*anyopaque,
+    notifyCount: c_int,
+    notifyArg: c_int,
+};
+
+pub const SceKernelVTimerOptParam = extern struct {
+    size: SceSize,
+};
+
+pub const SceKernelFplOptParam = extern struct {
+    size: SceSize,
+};
+
+pub const SceKernelVplOptParam = extern struct {
+    size: SceSize,
+};
+
+pub const PspEventFlagWaitTypes = enum(c_int) {
+    PSP_EVENT_WAITAND = 0,
+    PSP_EVENT_WAITOR = 1,
+    PSP_EVENT_WAITCLEAR = 32,
+    _,
+};
+
+pub const SceKernelThreadEventHandler = ?*const fn (c_int, SceUID, ?*anyopaque) callconv(.C) c_int;
+pub const SceKernelThreadEventHandlerInfo = extern struct {
+    size: SceSize,
+    name: [32]u8,
+    threadId: SceUID,
+    mask: c_int,
+    handler: SceKernelThreadEventHandler,
+    common: ?*anyopaque,
+};
+
+pub const SceKernelVTimerInfo = extern struct {
+    size: SceSize,
+    name: [32]u8,
+    active: c_int,
+    base: SceKernelSysClock,
+    current: SceKernelSysClock,
+    schedule: SceKernelSysClock,
+    handler: SceKernelVTimerHandler,
+    common: ?*anyopaque,
+};
+
+pub const SceKernelFplInfo = extern struct {
+    size: SceSize,
+    name: [32]u8,
+    attr: SceUInt,
+    blockSize: c_int,
+    numBlocks: c_int,
+    freeBlocks: c_int,
+    numWaitThreads: c_int,
+};
+
+pub const SceKernelSysClock = extern struct {
+    low: SceUInt32,
+    hi: SceUInt32,
+};
+
+pub const SceKernelThreadEntry = ?*const fn (SceSize, ?*anyopaque) callconv(.C) c_int;
+pub const SceKernelThreadOptParam = extern struct {
+    size: SceSize,
+    stackMpid: SceUID,
+};
+pub const SceKernelThreadInfo = extern struct {
+    size: SceSize,
+    name: [32]u8,
+    attr: SceUInt,
+    status: c_int,
+    entry: SceKernelThreadEntry,
+    stack: ?*anyopaque,
+    stackSize: c_int,
+    gpReg: ?*anyopaque,
+    initPriority: c_int,
+    currentPriority: c_int,
+    waitType: c_int,
+    waitId: SceUID,
+    wakeupCount: c_int,
+    exitStatus: c_int,
+    runClocks: SceKernelSysClock,
+    intrPreemptCount: SceUInt,
+    threadPreemptCount: SceUInt,
+    releaseCount: SceUInt,
+};
+pub const SceKernelThreadRunStatus = extern struct {
+    size: SceSize,
+    status: c_int,
+    currentPriority: c_int,
+    waitType: c_int,
+    waitId: c_int,
+    wakeupCount: c_int,
+    runClocks: SceKernelSysClock,
+    intrPreemptCount: SceUInt,
+    threadPreemptCount: SceUInt,
+    releaseCount: SceUInt,
+};
+
+pub const SceKernelSemaOptParam = extern struct {
+    size: SceSize,
+};
+pub const SceKernelSemaInfo = extern struct {
+    size: SceSize,
+    name: [32]u8,
+    attr: SceUInt,
+    initCount: c_int,
+    currentCount: c_int,
+    maxCount: c_int,
+    numWaitThreads: c_int,
+};
+pub const SceKernelEventFlagInfo = extern struct {
+    size: SceSize,
+    name: [32]u8,
+    attr: SceUInt,
+    initPattern: SceUInt,
+    currentPattern: SceUInt,
+    numWaitThreads: c_int,
+};
+pub const SceKernelEventFlagOptParam = extern struct {
+    size: SceSize,
+};
+pub const SceKernelVTimerHandler = ?*const fn (SceUID, [*c]SceKernelSysClock, [*c]SceKernelSysClock, ?*anyopaque) callconv(.C) SceUInt;
+pub const SceKernelVTimerHandlerWide = ?*const fn (SceUID, SceInt64, SceInt64, ?*anyopaque) callconv(.C) SceUInt;
+
+pub const SceKernelMbxOptParam = extern struct {
+    size: SceSize,
+};
+pub const SceKernelMbxInfo = extern struct {
+    size: SceSize,
+    name: [32]u8,
+    attr: SceUInt,
+    numWaitThreads: c_int,
+    numMessages: c_int,
+    firstMessage: ?*anyopaque,
+};
+pub const SceKernelAlarmHandler = ?*const fn (?*anyopaque) callconv(.C) SceUInt;
+pub const SceKernelAlarmInfo = extern struct {
+    size: SceSize,
+    schedule: SceKernelSysClock,
+    handler: SceKernelAlarmHandler,
+    common: ?*anyopaque,
+};
+pub const SceKernelSystemStatus = extern struct {
+    size: SceSize,
+    status: SceUInt,
+    idleClocks: SceKernelSysClock,
+    comesOutOfIdleCount: SceUInt,
+    threadSwitchCount: SceUInt,
+    vfpuSwitchCount: SceUInt,
+};
+pub const SceKernelMppInfo = extern struct {
+    size: SceSize,
+    name: [32]u8,
+    attr: SceUInt,
+    bufSize: c_int,
+    freeSize: c_int,
+    numSendWaitThreads: c_int,
+    numReceiveWaitThreads: c_int,
+};
+pub const SceKernelVplInfo = extern struct {
+    size: SceSize,
+    name: [32]u8,
+    attr: SceUInt,
+    poolSize: c_int,
+    freeSize: c_int,
+    numWaitThreads: c_int,
+};

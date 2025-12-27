@@ -1,12 +1,11 @@
 pub const types = @import("pspgutypes.zig");
 
 const libzpsp = @import("libzpsp");
-const libzpsp_threadman = libzpsp.ThreadManForUser;
+pub const ScePspFVector3 = libzpsp.types.ScePspFVector3;
+pub const ScePspIMatrix4 = libzpsp.types.ScePspIMatrix4;
+pub const ScePspFMatrix4 = libzpsp.types.ScePspFMatrix4;
 
-const ScePspFVector3 = libzpsp.types.ScePspFVector3;
-const ScePspIMatrix4 = libzpsp.types.ScePspIMatrix4;
-const ScePspFMatrix4 = libzpsp.types.ScePspFMatrix4;
-
+const threadman = @import("pspthreadman.zig");
 const pspge = @import("pspge.zig");
 const pspdisplay = @import("pspdisplay.zig");
 
@@ -187,7 +186,6 @@ var light_settings: [4]GuLightSettings = [_]GuLightSettings{
     },
 };
 
-const pspthreadman = @import("pspthreadman.zig");
 pub export fn callbackSig(id: c_int, arg: ?*anyopaque) void {
     @setRuntimeSafety(false);
     var settings: ?*GuSettings = @as(?*GuSettings, @ptrFromInt(@intFromPtr(arg)));
@@ -197,7 +195,7 @@ pub export fn callbackSig(id: c_int, arg: ?*anyopaque) void {
     if (settings.?.sig != null)
         settings.?.sig.?(id & 0xffff);
 
-    _ = pspthreadman.sceKernelSetEventFlag(settings.?.kernel_event_flag, 1);
+    _ = threadman.sceKernelSetEventFlag(settings.?.kernel_event_flag, 1);
 }
 
 pub export fn callbackFin(id: c_int, arg: ?*anyopaque) void {
@@ -1238,7 +1236,7 @@ pub fn guSync(mode: types.GuSyncMode, sync_type: pspge.PspGeSyncBehavior) void {
 
 pub fn sceGuTerm() void {
     @setRuntimeSafety(false);
-    _ = libzpsp_threadman.sceKernelDeleteEventFlag(gu_settings.kernel_event_flag);
+    _ = threadman.sceKernelDeleteEventFlag(gu_settings.kernel_event_flag);
     _ = pspge.sceGeUnsetCallback(gu_settings.ge_callback_id);
 }
 
@@ -1393,14 +1391,14 @@ const ge_init_list = [_]c_uint{
 };
 
 pub fn sceGuInit() void {
-    @setRuntimeSafety(false);
-    var callback: pspge.PspGeCallbackData = undefined;
-    callback.signal_func = callbackSig;
-    callback.signal_arg = &gu_settings;
-    callback.finish_func = callbackFin;
-    callback.finish_arg = &gu_settings;
+    const callback_data = pspge.PspGeCallbackData{
+        .signal_func = callbackSig,
+        .signal_arg = &gu_settings,
+        .finish_func = callbackFin,
+        .finish_arg = &gu_settings,
+    };
 
-    gu_settings.ge_callback_id = pspge.sceGeSetCallback(@ptrCast(&callback));
+    gu_settings.ge_callback_id = pspge.sceGeSetCallback(callback_data);
     gu_settings.swapBuffersCallback = null;
     gu_settings.swapBuffersBehaviour = .NextVSync;
 
@@ -1409,7 +1407,7 @@ pub fn sceGuInit() void {
     ge_list_executed[0] = pspge.sceGeListEnQueue((@as(*anyopaque, @ptrFromInt(@intFromPtr(&ge_init_list) & 0x1fffffff))), null, gu_settings.ge_callback_id, 0);
 
     resetValues();
-    gu_settings.kernel_event_flag = pspthreadman.sceKernelCreateEventFlag("SceGuSignal", 512, 3, 0);
+    gu_settings.kernel_event_flag = threadman.sceKernelCreateEventFlag("SceGuSignal", .WaitMultiple, 3, null);
 
     _ = pspge.sceGeListSync(ge_list_executed[0], .Wait);
 }
