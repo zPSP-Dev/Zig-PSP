@@ -3,6 +3,8 @@ const sdk = @import("pspsdk");
 const gu = sdk.gu;
 const gum = sdk.gum;
 
+pub const panic = sdk.extra.debug.panic; // Import panic handler
+
 comptime {
     asm (sdk.extra.module.module_info("SDK Clear Screen", 0, 1, 0));
 }
