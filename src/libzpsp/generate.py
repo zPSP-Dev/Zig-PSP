@@ -164,6 +164,7 @@ def parse_c_type_to_zig(c_type: str) -> str:
         "PspGeContext": "types.PspGeContext",
         "PspGeListArgs": "types.PspGeListArgs",
         "PspGeStack": "types.PspGeStack",
+        "struct SceKernelLoadExecParam": "types.SceKernelLoadExecParam",
     }
 
     # Handle const first

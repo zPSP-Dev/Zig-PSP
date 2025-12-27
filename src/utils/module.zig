@@ -1,6 +1,7 @@
 const libzpsp = @import("libzpsp");
 const libzpsp_threadman = libzpsp.ThreadManForUser;
-const libzpsp_loadexec = libzpsp.LoadExecForUser;
+
+const loadexec = @import("../sdk/psploadexec.zig");
 
 const debug = @import("debug.zig");
 
@@ -12,7 +13,7 @@ pub fn exitErr() void {
     const stat = libzpsp_threadman.sceKernelDelayThread(10 * 1000 * 1000);
     _ = stat;
     //Exit out.
-    libzpsp_loadexec.sceKernelExitGame();
+    loadexec.sceKernelExitGame();
 }
 
 // const has_std_os = if (@hasDecl(root, "os")) true else false;
@@ -63,7 +64,7 @@ pub fn _module_main_thread(argc: libzpsp.types.SceSize, _: ?*anyopaque) callconv
     }
 
     if (debug.exitOnEnd) {
-        libzpsp_loadexec.sceKernelExitGame();
+        loadexec.sceKernelExitGame();
     }
     return 0;
 }
