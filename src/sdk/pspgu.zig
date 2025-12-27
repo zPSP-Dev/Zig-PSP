@@ -564,14 +564,14 @@ pub fn sceGuDispBuffer(width: c_int, height: c_int, dispbp: ?*anyopaque, dispbw:
     _ = pspdisplay.sceDisplaySetMode(0, gu_draw_buffer.width, gu_draw_buffer.height);
 
     if (gu_psp_on != 0)
-        _ = pspdisplay.sceDisplaySetFrameBuf(@as(*anyopaque, @ptrFromInt(@intFromPtr(ge_edram_address) + @intFromPtr(gu_draw_buffer.disp_buffer))), dispbw, gu_draw_buffer.pixel_format, .Nextframe);
+        _ = pspdisplay.sceDisplaySetFrameBuf(@as(*anyopaque, @ptrFromInt(@intFromPtr(ge_edram_address) + @intFromPtr(gu_draw_buffer.disp_buffer))), dispbw, gu_draw_buffer.pixel_format, .NextVSync);
 }
 
 pub fn sceGuDisplay(state: bool) void {
     if (state) {
-        _ = pspdisplay.sceDisplaySetFrameBuf(@as(*anyopaque, @ptrFromInt(@intFromPtr(ge_edram_address) + @intFromPtr(gu_draw_buffer.disp_buffer))), gu_draw_buffer.frame_width, gu_draw_buffer.pixel_format, .Nextframe);
+        _ = pspdisplay.sceDisplaySetFrameBuf(@as(*anyopaque, @ptrFromInt(@intFromPtr(ge_edram_address) + @intFromPtr(gu_draw_buffer.disp_buffer))), gu_draw_buffer.frame_width, gu_draw_buffer.pixel_format, .NextVSync);
     } else {
-        _ = pspdisplay.sceDisplaySetFrameBuf(null, 0, .Format565, .Nextframe);
+        _ = pspdisplay.sceDisplaySetFrameBuf(null, 0, .Format565, .NextVSync);
     }
 
     gu_psp_on = @intFromBool(state);
@@ -1402,7 +1402,7 @@ pub fn sceGuInit() void {
 
     gu_settings.ge_callback_id = pspge.sceGeSetCallback(@ptrCast(&callback));
     gu_settings.swapBuffersCallback = null;
-    gu_settings.swapBuffersBehaviour = .Nextframe;
+    gu_settings.swapBuffersBehaviour = .NextVSync;
 
     ge_edram_address = pspge.sceGeEdramGetAddr();
 

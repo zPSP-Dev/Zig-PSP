@@ -8,8 +8,8 @@ pub const PspDisplayPixelFormats = enum(c_int) {
 };
 
 pub const PspDisplaySetBufSync = enum(c_int) {
-    Immediate = 0,
-    Nextframe = 1,
+    NextHSync = 0,
+    NextVSync = 1,
 };
 
 pub const PspDisplayErrorCodes = enum(c_int) {
