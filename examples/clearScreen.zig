@@ -15,6 +15,7 @@ pub fn main() !void {
     const SCR_BUF_WIDTH = sdk.extra.constants.SCR_BUF_WIDTH;
 
     sdk.extra.utils.enableHBCB();
+    sdk.extra.debug.screenInit();
 
     const fbp0 = sdk.extra.vram.allocVramRelative(SCR_BUF_WIDTH, SCREEN_HEIGHT, .Psm8888);
     const fbp1 = sdk.extra.vram.allocVramRelative(SCR_BUF_WIDTH, SCREEN_HEIGHT, .Psm8888);

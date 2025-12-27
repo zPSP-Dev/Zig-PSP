@@ -64,6 +64,7 @@ pub fn build(b: *std.Build) void {
     const example_step = b.step("examples", "Build examples");
 
     inline for (.{
+        PSPBuildInfo{ .name = "hello_world", .src_file = "examples/hello_world.zig", .title = "SDK HelloWorld" },
         PSPBuildInfo{ .name = "ziggy_cube", .src_file = "examples/ziggy_cube.zig", .title = "SDK Ziggy Cube" },
         PSPBuildInfo{ .name = "clear_screen", .src_file = "examples/clearScreen.zig", .title = "SDK Clear Screen" },
     }) |example| {
