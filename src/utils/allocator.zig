@@ -2,14 +2,13 @@ const std = @import("std");
 const mem = std.mem;
 const debug = std.debug;
 const assert = debug.assert;
+const Allocator = mem.Allocator;
 
-const psploadexec = @import("../sdk/psploadexec.zig");
+const loadexec = @import("../sdk/psploadexec.zig");
+
 const psp = @import("libzpsp");
-
 const SceSize = psp.SceSize;
 const SceUID = psp.SceUID;
-
-const Allocator = mem.Allocator;
 
 // This Allocator is a very basic allocator for the PSP
 // It uses the PSP's kernel to allocate and free memory
@@ -40,7 +39,7 @@ pub const PSPAllocator = struct {
         if (len > 0) {
 
             //Gets a block of memory
-            const id: SceUID = psp.sceKernelAllocPartitionMemory(2, "block", @intFromEnum(psploadexec.PspSysMemBlockTypes.MemLow), len + @sizeOf(SceUID), null);
+            const id: SceUID = psp.sceKernelAllocPartitionMemory(2, "block", @intFromEnum(loadexec.PspSysMemBlockTypes.MemLow), len + @sizeOf(SceUID), null);
 
             if (id < 0) {
                 //TODO: Handle error cases that aren't out of memory...

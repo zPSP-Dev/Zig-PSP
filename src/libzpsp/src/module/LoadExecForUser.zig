@@ -6,7 +6,7 @@ const macro = @import("../macro.zig");
 /// `file` - The file to execute.
 /// `param` - Pointer to a ::SceKernelLoadExecParam structure, or NULL.
 /// Returns < 0 on error, probably.
-pub extern fn sceKernelLoadExec(file: [*c]const c_char, param: [*c]c_int) callconv(.C) c_int;
+pub extern fn sceKernelLoadExec(file: [*c]const c_char, param: [*c]types.SceKernelLoadExecParam) callconv(.C) c_int;
 
 pub extern fn sceKernelExitGameWithStatus() callconv(.C) void;
 

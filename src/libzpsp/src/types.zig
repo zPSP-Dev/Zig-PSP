@@ -385,3 +385,10 @@ pub const PspGeBreakParam = extern struct {
 pub const PspGeStack = extern struct {
     stack: [8]c_uint,
 };
+
+pub const SceKernelLoadExecParam = extern struct {
+    size: SceSize,
+    args: SceSize,
+    argp: ?*anyopaque,
+    key: [*c]const u8,
+};
