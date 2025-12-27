@@ -72,7 +72,7 @@ pub fn screenInit() void {
 
     vram_base = @as(?[*]u32, @ptrFromInt(0x40000000 | @intFromPtr(pspge.sceGeEdramGetAddr())));
 
-    _ = pspdisplay.sceDisplaySetMode(0, constants.SCREEN_WIDTH, constants.SCREEN_HEIGHT);
+    _ = pspdisplay.sceDisplaySetMode(.LCD, constants.SCREEN_WIDTH, constants.SCREEN_HEIGHT);
     _ = pspdisplay.sceDisplaySetFrameBuf(vram_base, constants.SCR_BUF_WIDTH, .Format8888, .NextVSync);
 
     screenClear();
