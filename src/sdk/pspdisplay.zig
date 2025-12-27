@@ -18,6 +18,12 @@ pub const PspDisplayErrorCodes = enum(c_int) {
     Argument = 2147483911,
 };
 
+pub const PspDisplayMode = enum(c_int) {
+    LCD = 0, // LCD MAX 480x272 at 59.94005995 Hz
+    VESA1A = 0x1A, // VESA VGA MAX 640x480 at 59.94047618Hz
+    PSEUDO_VGA = 0x60, // PSEUDO VGA MAX 640x480 at 59.94005995Hz
+};
+
 /// Set display mode
 /// @par Example1:
 /// `
@@ -30,8 +36,8 @@ pub const PspDisplayErrorCodes = enum(c_int) {
 /// `width` - Width of screen in pixels.
 /// `height` - Height of screen in pixels.
 /// Returns when error, a negative value is returned.
-pub fn sceDisplaySetMode(mode: c_int, width: c_int, height: c_int) c_int {
-    return module.sceDisplaySetMode(mode, width, height);
+pub fn sceDisplaySetMode(mode: PspDisplayMode, width: c_int, height: c_int) c_int {
+    return module.sceDisplaySetMode(@intFromEnum(mode), width, height);
 }
 
 /// Get display mode

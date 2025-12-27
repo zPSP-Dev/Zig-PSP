@@ -561,7 +561,7 @@ pub fn sceGuDispBuffer(width: c_int, height: c_int, dispbp: ?*anyopaque, dispbw:
         gu_draw_buffer.frame_width = dispbw;
 
     drawRegion(0, 0, gu_draw_buffer.width, gu_draw_buffer.height);
-    _ = pspdisplay.sceDisplaySetMode(0, gu_draw_buffer.width, gu_draw_buffer.height);
+    _ = pspdisplay.sceDisplaySetMode(.LCD, gu_draw_buffer.width, gu_draw_buffer.height);
 
     if (gu_psp_on != 0)
         _ = pspdisplay.sceDisplaySetFrameBuf(@as(*anyopaque, @ptrFromInt(@intFromPtr(ge_edram_address) + @intFromPtr(gu_draw_buffer.disp_buffer))), dispbw, gu_draw_buffer.pixel_format, .NextVSync);
