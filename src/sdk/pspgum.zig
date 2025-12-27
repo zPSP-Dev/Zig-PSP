@@ -109,8 +109,8 @@ pub fn sceGumRotateX(angle: f32) void {
         @as([*]f32, @ptrCast(&t))[(i << 2) + i] = 1.0;
     }
 
-    const c: f32 = @import("cos.zig").cos(angle);
-    const s: f32 = @import("sin.zig").sin(angle);
+    const c: f32 = std.math.cos(angle);
+    const s: f32 = std.math.sin(angle);
 
     t.y.y = c;
     t.y.z = s;
@@ -130,8 +130,8 @@ pub fn sceGumRotateY(angle: f32) void {
         @as([*]f32, @ptrCast(&t))[(i << 2) + i] = 1.0;
     }
 
-    const c: f32 = @import("cos.zig").cos(angle);
-    const s: f32 = @import("sin.zig").sin(angle);
+    const c: f32 = std.math.cos(angle);
+    const s: f32 = std.math.sin(angle);
 
     t.x.x = c;
     t.x.z = -s;
@@ -151,8 +151,8 @@ pub fn sceGumRotateZ(angle: f32) void {
         @as([*]f32, @ptrCast(&t))[(i << 2) + i] = 1.0;
     }
 
-    const c: f32 = @import("cos.zig").cos(angle);
-    const s: f32 = @import("sin.zig").sin(angle);
+    const c: f32 = std.math.cos(angle);
+    const s: f32 = std.math.sin(angle);
 
     t.x.x = c;
     t.x.y = s;
