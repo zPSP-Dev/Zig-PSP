@@ -26,7 +26,6 @@ pub const AtracError = enum(u32) {
 };
 
 fn intToError(res: c_int) !void {
-    @setRuntimeSafety(false);
     if (res < 0) {
         const translated = @as(u32, @bitCast(res));
         _ = translated;

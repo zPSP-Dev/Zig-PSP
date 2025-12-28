@@ -1,6 +1,6 @@
 const module = @import("libzpsp").sceDisplay;
 
-pub const PspDisplayPixelFormats = enum(c_int) {
+pub const PspDisplayPixelFormats = enum(u24) {
     Format565 = 0,
     Format5551 = 1,
     Format4444 = 2,
