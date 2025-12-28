@@ -7,8 +7,6 @@ on:
   pull_request:
     branches:
       - master
-env:
-  zig_version: 0.14.0
 
 jobs:
   build:
@@ -18,18 +16,12 @@ jobs:
     runs-on: ${{matrix.os}}
     steps:
       - uses: actions/checkout@v4
-        with:
-          submodules: recursive
-      - uses: mlugg/setup-zig@v1
-        with:
-          version: ${{ env.zig_version }}
-      - run: zig build
+      - uses: mlugg/setup-zig@v2
+      - run: zig build examples
 
   lint:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: mlugg/setup-zig@v1
-        with:
-          version: ${{ env.zig_version }}
+      - uses: mlugg/setup-zig@v2
       - run: zig fmt --check *.zig
