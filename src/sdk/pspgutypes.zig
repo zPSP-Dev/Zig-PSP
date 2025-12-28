@@ -1,4 +1,4 @@
-pub const GuPixelMode = enum(c_int) {
+pub const GuPixelMode = enum(u24) {
     Psm5650 = 0,
     Psm5551 = 1,
     Psm4444 = 2,
@@ -16,7 +16,7 @@ pub const GuPixelMode = enum(c_int) {
     PsmDXT5EXT = 10 + 256,
 };
 
-pub const GuPrimitive = enum(c_int) {
+pub const GuPrimitive = enum(u24) {
     Points = 0,
     Lines = 1,
     LineStrip = 2,
@@ -32,7 +32,7 @@ pub const PatchPrimitive = enum(c_int) {
     TriangleStrip = 4,
 };
 
-pub const GuState = enum(c_int) {
+pub const GuState = enum(u8) {
     AlphaTest = 0,
     DepthTest = 1,
     ScissorTest = 2,
@@ -95,7 +95,7 @@ pub const GuLogicalOperation = enum(c_int) {
     Set = 15,
 };
 
-pub const TextureFilter = enum(c_int) {
+pub const TextureFilter = enum(u24) {
     Nearest = 0,
     Linear = 1,
     NearestMipmapNearest = 4,
@@ -162,7 +162,7 @@ pub const ColorFunc = enum(c_int) {
     NotEqual,
 };
 
-pub const DepthFunc = enum(c_int) {
+pub const DepthFunc = enum(u24) {
     Never = 0,
     Always,
     Equal,
@@ -173,7 +173,7 @@ pub const DepthFunc = enum(c_int) {
     GreaterOrEqual,
 };
 
-pub const TextureEffect = enum(c_int) {
+pub const TextureEffect = enum(u24) {
     Modulate = 0,
     Decal = 1,
     Blend = 2,
@@ -181,7 +181,7 @@ pub const TextureEffect = enum(c_int) {
     Add = 4,
 };
 
-pub const TextureColorComponent = enum(c_int) {
+pub const TextureColorComponent = enum(u24) {
     Rgb = 0,
     Rgba = 1,
 };
@@ -238,7 +238,7 @@ pub const GuLightType = enum(u2) {
     Spotlight = 2,
 };
 
-pub const GuContextType = enum(c_int) {
+pub const GuContextType = enum(u32) {
     Direct = 0,
     Call = 1,
     Send = 2,
@@ -267,7 +267,7 @@ pub const GuSignalBehavior = enum(c_int) {
     Continue = 2,
 };
 
-pub const ClearBitFlags = enum(c_int) {
+pub const ClearBitFlags = enum(u24) {
     ColorBuffer = 1,
     StencilBuffer = 2,
     DepthBuffer = 4,
@@ -341,5 +341,3 @@ pub const VertexType = packed struct(u24) {
         Transform2D = 1, // Skips transforming vertex
     },
 };
-
-pub const GuSwapBuffersCallback = ?*const fn ([*c]?*anyopaque, [*c]?*anyopaque) callconv(.C) void;

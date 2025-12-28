@@ -42,7 +42,7 @@ pub fn main() !void {
     while (!sdk.extra.utils.isExitRequested()) {
         gu.sceGuStart(.Direct, &display_list);
 
-        gu.sceGuClearColor(gu.rgba(0xff, 0xff, 0, 0xff));
+        gu.sceGuClearColor(0x00ffff);
         gu.sceGuClearDepth(0);
         gu.sceGuClear(@intFromEnum(gu.types.ClearBitFlags.ColorBuffer) |
             @intFromEnum(gu.types.ClearBitFlags.DepthBuffer));
