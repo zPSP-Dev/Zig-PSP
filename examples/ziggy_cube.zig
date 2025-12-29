@@ -1,7 +1,7 @@
 //A quick graphics example
 const sdk = @import("pspsdk");
-const gu = sdk.gu;
-const gum = sdk.gum;
+const gu = sdk.psp.gu;
+const gum = sdk.psp.gum;
 
 pub const panic = sdk.extra.debug.panic; // Import panic handler
 
@@ -98,7 +98,7 @@ pub fn main() !void {
 
     gu.guFinish();
     gu.guSync(.Finish, .Wait);
-    _ = sdk.display.sceDisplayWaitVblankStart();
+    _ = sdk.psp.display.wait_vblank_start();
     gu.sceGuDisplay(true);
 
     var i: u32 = 0;
@@ -136,7 +136,7 @@ pub fn main() !void {
 
         gu.guFinish();
         gu.guSync(.Finish, .Wait);
-        _ = sdk.display.sceDisplayWaitVblankStart();
+        _ = sdk.psp.display.wait_vblank_start();
         gu.guSwapBuffers();
     }
 }
