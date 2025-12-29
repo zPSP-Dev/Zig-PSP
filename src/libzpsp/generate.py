@@ -688,7 +688,7 @@ def main():
         "src/sircs",
         "tools",
     ]
-    bad_files = ["sceUmd.S"]
+    bad_files = []
 
     with temporary_directory(target_dir):
         # Clone repository
