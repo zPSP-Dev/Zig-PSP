@@ -1,12 +1,8 @@
 pub const psp = struct {
-    pub const atrac3 = @import("sdk/pspatrac3.zig");
     pub const audio = @import("sdk/pspaudio.zig");
     pub const audiocodec = @import("sdk/pspaudiocodec.zig");
     pub const ctrl = @import("sdk/pspctrl.zig");
-    pub const display = @import("psp/display.zig");
     pub const dmac = @import("sdk/pspdmac.zig");
-    pub const ge = @import("sdk/pspge.zig");
-    pub const gu = @import("sdk/pspgu.zig");
     pub const gum = @import("sdk/pspgum.zig");
     pub const hprm = @import("sdk/psphprm.zig");
     pub const http = @import("sdk/psphttp.zig");
@@ -29,7 +25,14 @@ pub const psp = struct {
     pub const usb = @import("sdk/pspusb.zig");
     pub const utility = @import("sdk/psputility.zig");
     pub const utils = @import("sdk/psputils.zig");
-    pub const wlan = @import("sdk/pspwlan.zig");
+
+    // NEW SDK
+
+    pub const atrac3 = @import("psp/atrac3.zig");
+    pub const display = @import("psp/display.zig");
+    pub const ge = @import("psp/ge.zig");
+    pub const gu = @import("psp/gu.zig");
+    pub const wlan = @import("psp/wlan.zig");
 };
 
 pub const c = @import("libzpsp");

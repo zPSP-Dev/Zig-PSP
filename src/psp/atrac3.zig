@@ -1,4 +1,5 @@
-const psptypes = @import("libzpsp");
+const libzpsp = @import("libzpsp");
+const c = libzpsp.sceAtrac3plus;
 
 pub const AtracError = enum(u32) {
     ParamFail = (0x80630001),
@@ -112,8 +113,6 @@ pub const PspBufferInfo = extern struct {
     uiReadPositionSecondBuf: u32,
 };
 
-pub extern fn sceAtracGetAtracID(uiCodecType: u32) c_int;
-
 // Codec ID Enumeration
 pub const AtracCodecType = enum(u32) {
     At3Plus = 0x1000,
@@ -122,8 +121,8 @@ pub const AtracCodecType = enum(u32) {
 
 // Gets the ID for a certain codec.
 // Can return error for invalid ID.
-pub fn atracGetAtracID(uiCodecType: AtracCodecType) !i32 {
-    const res = sceAtracGetAtracID(@intFromEnum(uiCodecType));
+pub fn get_atrac_id(uiCodecType: AtracCodecType) !i32 {
+    const res = c.sceAtracGetAtracID(@intFromEnum(uiCodecType));
     try intToError(res);
     return res;
 }
@@ -134,10 +133,8 @@ pub fn atracGetAtracID(uiCodecType: AtracCodecType) !i32 {
 // @param bufsize - the size of the buffer pointed by buf
 //
 // @return the new atrac ID, or < 0 on error
-pub extern fn sceAtracSetDataAndGetID(buf: ?*anyopaque, bufsize: psptypes.SceSize) c_int;
-
-pub fn atracSetDataAndGetID(buf: *anyopaque, bufSize: usize) !u32 {
-    const res = sceAtracSetDataAndGetID(buf, bufSize);
+pub fn set_data_and_get_id(buf: *anyopaque, bufSize: usize) !u32 {
+    const res = c.sceAtracSetDataAndGetID(buf, bufSize);
     try intToError(res);
     return res;
 }
@@ -153,10 +150,8 @@ pub fn atracSetDataAndGetID(buf: *anyopaque, bufSize: usize) !u32 {
 //
 //
 // @return < 0 on error, otherwise 0
-pub extern fn sceAtracDecodeData(atracID: u32, outSamples: [*c]u16, outN: [*c]c_int, outEnd: [*c]c_int, outRemainFrame: [*c]c_int) c_int;
-
-pub fn atracDecodeData(atracID: u32, outSamples: []u16, outN: []i32, outEnd: []i32, outRemainFrame: []i32) !void {
-    const res = sceAtracDecodeData(atracID, outSamples, outN, outEnd, outRemainFrame);
+pub fn decode_data(atracID: u32, outSamples: []u16, outN: []i32, outEnd: []i32, outRemainFrame: []i32) !void {
+    const res = c.sceAtracDecodeData(atracID, outSamples, outN, outEnd, outRemainFrame);
     try intToError(res);
 }
 
@@ -167,10 +162,8 @@ pub fn atracDecodeData(atracID: u32, outSamples: []u16, outN: []i32, outEnd: []i
 //  or the remaining (not decoded yet) frames at memory if not all at3 data is on memory
 //
 // @return < 0 on error, otherwise 0
-pub extern fn sceAtracGetRemainFrame(atracID: u32, outRemainFrame: [*c]c_int) c_int;
-
-pub fn atracGetRemainFrame(atracID: u32, outRemainFrame: []i32) !void {
-    const res = sceAtracDecodeData(atracID, psptypes.outSamples, psptypes.outN, psptypes.outEnd, outRemainFrame);
+pub fn get_remain_frame(atracID: u32, outRemainFrame: []i32) !void {
+    const res = c.sceAtracGetRemainFrame(@bitCast(atracID), @ptrCast(outRemainFrame.ptr));
     try intToError(res);
 }
 
@@ -181,10 +174,8 @@ pub fn atracGetRemainFrame(atracID: u32, outRemainFrame: []i32) !void {
 // @param readOffset - Offset where to seek into the atrac file before reading
 //
 // @return < 0 on error, otherwise 0
-pub extern fn sceAtracGetStreamDataInfo(atracID: u32, writePointer: [*c][*c]u8, availableBytes: [*c]u32, readOffset: [*c]u32) c_int;
-
-pub fn atracGetStreamDataInfo(atracID: u32, writePointer: [*c][*c]u8, availableBytes: [*c]u32, readOffset: [*c]u32) !void {
-    const res = sceAtracGetStreamDataInfo(atracID, writePointer, availableBytes, readOffset);
+pub fn get_stream_data_info(atracID: u32, writePointer: [*c][*c]u8, availableBytes: [*c]u32, readOffset: [*c]u32) !void {
+    const res = c.sceAtracGetStreamDataInfo(@bitCast(atracID), writePointer, availableBytes, readOffset);
     try intToError(res);
 }
 
@@ -193,10 +184,8 @@ pub fn atracGetStreamDataInfo(atracID: u32, writePointer: [*c][*c]u8, availableB
 // @param bytesToAdd - Number of bytes read into location given by sceAtracGetStreamDataInfo().
 //
 // @return < 0 on error, otherwise 0
-pub extern fn sceAtracAddStreamData(atracID: u32, bytesToAdd: c_uint) c_int;
-
-pub fn atracAddStreamData(atracID: u32, bytesToAdd: u32) !void {
-    const res = sceAtracAddStreamData(atracID, bytesToAdd);
+pub fn add_stream_data(atracID: u32, bytesToAdd: u32) !void {
+    const res = c.sceAtracAddStreamData(@bitCast(atracID), @bitCast(bytesToAdd));
     try intToError(res);
 }
 
@@ -206,10 +195,8 @@ pub fn atracAddStreamData(atracID: u32, bytesToAdd: u32) !void {
 // @param outBitrate - pointer to a integer that receives the bitrate in kbps
 //
 // @return < 0 on error, otherwise 0
-pub extern fn sceAtracGetBitrate(atracID: u32, outBitrate: [*c]c_int) c_int;
-
-pub fn atracGetBitrate(atracID: u32, outBitrate: [*c]c_int) !void {
-    const res = sceAtracGetBitrate(atracID, outBitrate);
+pub fn get_bitrate(atracID: u32, outBitrate: [*c]c_int) !void {
+    const res = c.sceAtracGetBitrate(@bitCast(atracID), outBitrate);
     try intToError(res);
 }
 
@@ -219,10 +206,8 @@ pub fn atracGetBitrate(atracID: u32, outBitrate: [*c]c_int) !void {
 // @param nloops - the number of loops to set
 //
 // @return < 0 on error, otherwise 0
-pub extern fn sceAtracSetLoopNum(atracID: u32, nloops: c_int) c_int;
-
-pub fn atracSetLoopNum(atracID: u32, nloops: c_int) !void {
-    const res = atracSetLoopNum(atracID, nloops);
+pub fn set_loop_num(atracID: u32, nloops: c_int) !void {
+    const res = c.sceAtracSetLoopNum(@bitCast(atracID), @bitCast(nloops));
     try intToError(res);
 }
 
@@ -231,10 +216,8 @@ pub fn atracSetLoopNum(atracID: u32, nloops: c_int) !void {
 // @param atracID - the atrac ID to release
 //
 // @return < 0 on error
-pub extern fn sceAtracReleaseAtracID(atracID: u32) c_int;
-
-pub fn atracReleaseAtracID(atracID: u32) !i32 {
-    const res = sceAtracReleaseAtracID(atracID);
+pub fn release_atrac_id(atracID: u32) !i32 {
+    const res = c.sceAtracReleaseAtracID(@bitCast(atracID));
     try intToError(res);
     return res;
 }
@@ -245,24 +228,7 @@ pub fn atracReleaseAtracID(atracID: u32) !i32 {
 //@param outN - pointer to receives the number of samples of the next frame.
 //
 //@return < 0 on error, otherwise 0
-pub extern fn sceAtracGetNextSample(atracID: u32, outN: [*c]c_int) c_int;
-
-pub fn atracGetNextSample(atracID: u32, outN: [*c]c_int) !void {
-    const res = sceAtracGetNextSample(atracID, outN);
+pub fn get_next_sample(atracID: u32, outN: [*c]c_int) !void {
+    const res = c.sceAtracGetNextSample(@bitCast(atracID), outN);
     try intToError(res);
 }
-
-//These are undocumented - thus I cannot wrap them
-pub extern fn sceAtracGetMaxSample(atracID: c_int, outMax: [*c]c_int) c_int;
-pub extern fn sceAtracGetBufferInfoForReseting(atracID: c_int, uiSample: u32, pBufferInfo: [*c]PspBufferInfo) c_int;
-pub extern fn sceAtracGetChannel(atracID: c_int, puiChannel: [*c]u32) c_int;
-pub extern fn sceAtracGetInternalErrorInfo(atracID: c_int, piResult: [*c]c_int) c_int;
-pub extern fn sceAtracGetLoopStatus(atracID: c_int, piLoopNum: [*c]c_int, puiLoopStatus: [*c]u32) c_int;
-pub extern fn sceAtracGetNextDecodePosition(atracID: c_int, puiSamplePosition: [*c]u32) c_int;
-pub extern fn sceAtracGetSecondBufferInfo(atracID: c_int, puiPosition: [*c]u32, puiDataByte: [*c]u32) c_int;
-pub extern fn sceAtracGetSoundSample(atracID: c_int, piEndSample: [*c]c_int, piLoopStartSample: [*c]c_int, piLoopEndSample: [*c]c_int) c_int;
-pub extern fn sceAtracResetPlayPosition(atracID: c_int, uiSample: u32, uiWriteByteFirstBuf: u32, uiWriteByteSecondBuf: u32) c_int;
-pub extern fn sceAtracSetData(atracID: c_int, pucBufferAddr: [*c]u8, uiBufferByte: u32) c_int;
-pub extern fn sceAtracSetHalfwayBuffer(atracID: c_int, pucBufferAddr: [*c]u8, uiReadByte: u32, uiBufferByte: u32) c_int;
-pub extern fn sceAtracSetHalfwayBufferAndGetID(pucBufferAddr: [*c]u8, uiReadByte: u32, uiBufferByte: u32) c_int;
-pub extern fn sceAtracSetSecondBuffer(atracID: c_int, pucSecondBufferAddr: [*c]u8, uiSecondBufferByte: u32) c_int;

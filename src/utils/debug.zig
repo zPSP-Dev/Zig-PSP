@@ -1,5 +1,5 @@
 const display = @import("../psp/display.zig");
-const pspge = @import("../sdk/pspge.zig");
+const ge = @import("../psp/ge.zig");
 const constants = @import("constants.zig");
 
 const builtin = @import("builtin");

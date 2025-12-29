@@ -37,7 +37,7 @@ pub const ErrorCodes = enum(c_int) {
 /// `height` - Height of screen in pixels.
 /// When error, a negative value is returned.
 pub fn set_mode(mode: DisplayMode, width: u32, height: u32) !void {
-    if(c.sceDisplaySetMode(@intFromEnum(mode), @bitCast(width), @bitCast(height)) < 0) {
+    if (c.sceDisplaySetMode(@intFromEnum(mode), @bitCast(width), @bitCast(height)) < 0) {
         return error.SetModeFailed;
     }
 }
@@ -48,7 +48,7 @@ pub fn set_mode(mode: DisplayMode, width: u32, height: u32) !void {
 /// `pheight` - Pointer to an integer to receive the current height,
 /// Returns 0 on success
 pub fn get_mode(pmode: *DisplayMode, pwidth: *u32, pheight: *u32) !void {
-    if(c.sceDisplayGetMode(@ptrCast(pmode), @ptrCast(pwidth), @ptrCast(pheight)) < 0) {
+    if (c.sceDisplayGetMode(@ptrCast(pmode), @ptrCast(pwidth), @ptrCast(pheight)) < 0) {
         return error.GetModeFailed;
     }
 }
@@ -73,7 +73,7 @@ pub fn set_resume_mode() void {
 /// `sync` - One of ::PspDisplaySetBufSync
 /// Returns 0 on success
 pub fn set_frame_buf(topaddr: ?*anyopaque, bufferwidth: u32, pixelformat: PixelFormats, sync: SetBufSync) !void {
-    if(c.sceDisplaySetFrameBuf(topaddr, @bitCast(bufferwidth), @intFromEnum(pixelformat), @intFromEnum(sync)) < 0) {
+    if (c.sceDisplaySetFrameBuf(topaddr, @bitCast(bufferwidth), @intFromEnum(pixelformat), @intFromEnum(sync)) < 0) {
         return error.SetFrameBufFailed;
     }
 }
@@ -85,7 +85,7 @@ pub fn set_frame_buf(topaddr: ?*anyopaque, bufferwidth: u32, pixelformat: PixelF
 /// `sync` - One of ::PspDisplaySetBufSync
 /// Returns 0 on success
 pub fn get_frame_buf(topaddr: ?*anyopaque, bufferwidth: *u32, pixelformat: *PixelFormats, sync: SetBufSync) !void {
-    if(c.sceDisplayGetFrameBuf(topaddr, @ptrCast(bufferwidth), @ptrCast(pixelformat), @intFromEnum(sync)) < 0) {
+    if (c.sceDisplayGetFrameBuf(topaddr, @ptrCast(bufferwidth), @ptrCast(pixelformat), @intFromEnum(sync)) < 0) {
         return error.GetFrameBufFailed;
     }
 }
@@ -95,7 +95,7 @@ pub fn is_foreground() c_int {
     return c.sceDisplayIsForeground();
 }
 
-pub fn @"_31C4BAA8"() void {
+pub fn _31C4BAA8() void {
     return c.sceDisplay_31C4BAA8();
 }
 
