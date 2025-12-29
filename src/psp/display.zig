@@ -1,7 +1,7 @@
 const c = @import("libzpsp").sceDisplay;
 
 pub const DisplayMode = enum(c_int) {
-    Lcd = 0,
+    LCD = 0,
     Vesa = 0x1A,
     PseudoVGA = 0x60,
 };
@@ -15,7 +15,7 @@ pub const PixelFormats = enum(c_int) {
 
 pub const SetBufSync = enum(c_int) {
     Immediate = 0,
-    Nextframe = 1,
+    NextVSync = 1,
 };
 
 pub const ErrorCodes = enum(c_int) {
@@ -47,8 +47,10 @@ pub fn set_mode(mode: DisplayMode, width: u32, height: u32) !void {
 /// `pwidth` - Pointer to an integer to receive the current width.
 /// `pheight` - Pointer to an integer to receive the current height,
 /// Returns 0 on success
-pub fn get_mode(pmode: *DisplayMode, pwidth: *u32, pheight: *u32) c_int {
-    return c.sceDisplayGetMode(@ptrCast(pmode), @ptrCast(pwidth), @ptrCast(pheight));
+pub fn get_mode(pmode: *DisplayMode, pwidth: *u32, pheight: *u32) !void {
+    if(c.sceDisplayGetMode(@ptrCast(pmode), @ptrCast(pwidth), @ptrCast(pheight)) < 0) {
+        return error.GetModeFailed;
+    }
 }
 
 /// Get number of frames per second
@@ -70,8 +72,10 @@ pub fn set_resume_mode() void {
 /// `pixelformat` - One of ::PspDisplayPixelFormats.
 /// `sync` - One of ::PspDisplaySetBufSync
 /// Returns 0 on success
-pub fn set_frame_buf(topaddr: ?*anyopaque, bufferwidth: u32, pixelformat: PixelFormats, sync: SetBufSync) c_int {
-    return c.sceDisplaySetFrameBuf(topaddr, @bitCast(bufferwidth), @intFromEnum(pixelformat), @intFromEnum(sync));
+pub fn set_frame_buf(topaddr: ?*anyopaque, bufferwidth: u32, pixelformat: PixelFormats, sync: SetBufSync) !void {
+    if(c.sceDisplaySetFrameBuf(topaddr, @bitCast(bufferwidth), @intFromEnum(pixelformat), @intFromEnum(sync)) < 0) {
+        return error.SetFrameBufFailed;
+    }
 }
 
 /// Get Display Framebuffer information
@@ -80,8 +84,10 @@ pub fn set_frame_buf(topaddr: ?*anyopaque, bufferwidth: u32, pixelformat: PixelF
 /// `pixelformat` - pointer to int to receive one of ::PspDisplayPixelFormats.
 /// `sync` - One of ::PspDisplaySetBufSync
 /// Returns 0 on success
-pub fn sceDisplayGetFrameBuf(topaddr: ?*anyopaque, bufferwidth: *u32, pixelformat: *PixelFormats, sync: SetBufSync) c_int {
-    return c.sceDisplayGetFrameBuf(topaddr, @ptrCast(bufferwidth), @ptrCast(pixelformat), @intFromEnum(sync));
+pub fn get_frame_buf(topaddr: ?*anyopaque, bufferwidth: *u32, pixelformat: *PixelFormats, sync: SetBufSync) !void {
+    if(c.sceDisplayGetFrameBuf(topaddr, @ptrCast(bufferwidth), @ptrCast(pixelformat), @intFromEnum(sync)) < 0) {
+        return error.GetFrameBufFailed;
+    }
 }
 
 /// Get whether or not frame buffer is being displayed

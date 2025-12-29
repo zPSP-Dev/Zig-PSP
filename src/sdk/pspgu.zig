@@ -6,7 +6,7 @@ pub const ScePspIMatrix4 = libzpsp.types.ScePspIMatrix4;
 pub const ScePspFMatrix4 = libzpsp.types.ScePspFMatrix4;
 
 const ge = @import("pspge.zig");
-const display = @import("pspdisplay.zig");
+const display = @import("../psp/display.zig");
 const threadman = @import("pspthreadman.zig");
 
 pub const GuSwapBuffersCallback = *const fn ([*c]?*anyopaque, [*c]?*anyopaque) void;
@@ -21,7 +21,7 @@ const GuSettings = struct {
     ge_callback_id: i32,
 
     swapBuffersCallback: ?GuSwapBuffersCallback,
-    swapBuffersBehaviour: display.PspDisplaySetBufSync,
+    swapBuffersBehaviour: display.SetBufSync,
 };
 
 const GupspList = struct {
@@ -50,7 +50,7 @@ const GuContext = struct {
 };
 
 const GuDrawBuffer = struct {
-    pixel_format: display.PspDisplayPixelFormats,
+    pixel_format: display.PixelFormats,
     frame_width: u24,
     frame_buffer: ?*anyopaque,
     disp_buffer: ?*anyopaque,
@@ -526,17 +526,17 @@ pub fn sceGuDispBuffer(width: u24, height: u24, dispbp: ?*anyopaque, dispbw: u24
         gu_draw_buffer.frame_width = dispbw;
 
     drawRegion(0, 0, gu_draw_buffer.width, gu_draw_buffer.height);
-    _ = display.sceDisplaySetMode(.LCD, gu_draw_buffer.width, gu_draw_buffer.height);
+    display.set_mode(.LCD, gu_draw_buffer.width, gu_draw_buffer.height) catch {};
 
     if (gu_psp_on != 0)
-        _ = display.sceDisplaySetFrameBuf(@as(?*anyopaque, @ptrFromInt(@intFromPtr(ge_edram_address) + @intFromPtr(gu_draw_buffer.disp_buffer))), dispbw, gu_draw_buffer.pixel_format, .NextVSync);
+        display.set_frame_buf(@as(?*anyopaque, @ptrFromInt(@intFromPtr(ge_edram_address) + @intFromPtr(gu_draw_buffer.disp_buffer))), dispbw, gu_draw_buffer.pixel_format, .NextVSync) catch {};
 }
 
 pub fn sceGuDisplay(state: bool) void {
     if (state) {
-        _ = display.sceDisplaySetFrameBuf(@as(?*anyopaque, @ptrFromInt(@intFromPtr(ge_edram_address) + @intFromPtr(gu_draw_buffer.disp_buffer))), gu_draw_buffer.frame_width, gu_draw_buffer.pixel_format, .NextVSync);
+        display.set_frame_buf(@as(?*anyopaque, @ptrFromInt(@intFromPtr(ge_edram_address) + @intFromPtr(gu_draw_buffer.disp_buffer))), gu_draw_buffer.frame_width, gu_draw_buffer.pixel_format, .NextVSync) catch {};
     } else {
-        _ = display.sceDisplaySetFrameBuf(null, 0, .Format565, .NextVSync);
+        display.set_frame_buf(null, 0, .Format565, .NextVSync)  catch {};
     }
 
     gu_psp_on = @intFromBool(state);
@@ -601,7 +601,7 @@ pub fn sceGuDrawBezier(vtype: u24, ucount: c_int, vcount: c_int, indices: ?*cons
     sendCommandi(5, (vcount << 8) | ucount);
 }
 
-pub fn sceGuDrawBuffer(pixel_format: display.PspDisplayPixelFormats, fbp: ?*anyopaque, fbw: u24) void {
+pub fn sceGuDrawBuffer(pixel_format: display.PixelFormats, fbp: ?*anyopaque, fbw: u24) void {
     gu_draw_buffer.pixel_format = pixel_format;
     gu_draw_buffer.frame_width = fbw;
     gu_draw_buffer.frame_buffer = fbp;
@@ -617,7 +617,8 @@ pub fn sceGuDrawBuffer(pixel_format: display.PspDisplayPixelFormats, fbp: ?*anyo
     const buffer_color_offset_u32: u32 = @intFromPtr(gu_draw_buffer.frame_buffer);
     const buffer_depth_offset_u32: u32 = @intFromPtr(gu_draw_buffer.depth_buffer);
 
-    sendCommandi(210, @intFromEnum(pixel_format));
+    const pformat : u32 = @bitCast(@intFromEnum(pixel_format));
+    sendCommandi(210, @truncate(pformat));
     sendCommandi(156, @truncate(buffer_color_offset_u32));
     sendCommandi(157, @truncate(((buffer_color_offset_u32 & 0xff000000) >> 8) | gu_draw_buffer.frame_width));
     sendCommandi(158, @truncate(buffer_depth_offset_u32));
@@ -1133,7 +1134,7 @@ pub fn sceGuSwapBuffers() ?*anyopaque {
     }
 
     if (gu_psp_on != 0) {
-        _ = display.sceDisplaySetFrameBuf(@as(?*anyopaque, @ptrFromInt(@intFromPtr(ge_edram_address) + @intFromPtr(gu_draw_buffer.disp_buffer))), gu_draw_buffer.frame_width, gu_draw_buffer.pixel_format, gu_settings.swapBuffersBehaviour);
+        display.set_frame_buf(@as(?*anyopaque, @ptrFromInt(@intFromPtr(ge_edram_address) + @intFromPtr(gu_draw_buffer.disp_buffer))), gu_draw_buffer.frame_width, gu_draw_buffer.pixel_format, gu_settings.swapBuffersBehaviour) catch {};
     }
 
     gu_current_frame ^= 1;
