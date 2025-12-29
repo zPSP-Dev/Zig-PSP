@@ -83,6 +83,7 @@ pub fn build(b: *std.Build) void {
 
         example_exe.link_eh_frame_hdr = true;
         example_exe.link_emit_relocs = true;
+        example_exe.entry = .{ .symbol_name = "module_start" };
 
         // Call prxgen
         const mk_prx = b.addRunArtifact(prxgen);
