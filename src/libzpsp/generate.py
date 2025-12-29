@@ -284,8 +284,10 @@ def parse_c_type_to_zig(c_type: str) -> str:
             return "?*anyopaque"
         return f"[*c]{parse_c_type_to_zig(base_type)}"
 
-    # Handle basic types
-    return type_map.get(c_type, "c_int")  # Default to c_int if unknown
+    try:
+        return type_map[c_type]
+    except KeyError:
+        raise KeyError(f"Missing C type '{c_type}' in type_map")
 
 
 def parse_c_function_signature(
