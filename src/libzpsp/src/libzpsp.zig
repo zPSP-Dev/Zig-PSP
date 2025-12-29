@@ -42,6 +42,7 @@ pub const sceMpegbase = @import("module/sceMpegbase.zig");
 pub const sceMpeg = @import("module/sceMpeg.zig");
 pub const sceUsbstor = @import("module/sceUsbstor.zig");
 pub const sceRtc = @import("module/sceRtc.zig");
+pub const sceUmd = @import("module/sceUmd.zig");
 pub const sceUmdUser = @import("module/sceUmdUser.zig");
 pub const sceReg = @import("module/sceReg.zig");
 pub const sceUsb = @import("module/sceUsb.zig");
