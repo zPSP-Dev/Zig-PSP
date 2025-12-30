@@ -31,6 +31,7 @@ pub const utils = @import("sdk/psputils.zig");
 pub const wlan = @import("sdk/pspwlan.zig");
 
 pub const extra = struct {
+    pub const allocator = @import("utils/allocator.zig");
     pub const constants = @import("utils/constants.zig");
     pub const debug = @import("utils/debug.zig");
     pub const module = @import("utils/module.zig");
