@@ -66,11 +66,11 @@ pub fn screenSetFrontColor(color: u32) void {
 }
 
 //Initialize the screen
-pub fn screenInit() void {
+pub fn screenInit() !void {
     x = 0;
     y = 0;
 
-    vram_base = @as(?[*]u32, @ptrFromInt(0x40000000 | @intFromPtr(pspge.sceGeEdramGetAddr())));
+    vram_base = @as(?[*]u32, @ptrFromInt(0x40000000 | @intFromPtr(ge.edram_get_addr())));
 
     try display.set_mode(.LCD, constants.SCREEN_WIDTH, constants.SCREEN_HEIGHT);
     try display.set_frame_buf(vram_base, constants.SCR_BUF_WIDTH, .Format8888, .NextVSync);
