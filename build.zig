@@ -63,6 +63,7 @@ pub fn build(b: *std.Build) void {
 
     inline for (.{
         PSPBuildInfo{ .name = "hello_world", .src_file = "examples/hello_world.zig", .title = "SDK HelloWorld" },
+        PSPBuildInfo{ .name = "allocator", .src_file = "examples/allocator.zig", .title = "SDK Allocator" },
         PSPBuildInfo{ .name = "ziggy_cube", .src_file = "examples/ziggy_cube.zig", .title = "SDK Ziggy Cube" },
         PSPBuildInfo{ .name = "clear_screen", .src_file = "examples/clearScreen.zig", .title = "SDK Clear Screen" },
     }) |example| {

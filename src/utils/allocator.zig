@@ -1,53 +1,49 @@
+// FIXME This file is all sorts of broken ATM, a proper rework is needed
 const std = @import("std");
-const mem = std.mem;
-const debug = std.debug;
-const assert = debug.assert;
-const Allocator = mem.Allocator;
 
 const loadexec = @import("../sdk/psploadexec.zig");
-
-const psp = @import("libzpsp");
-const SceSize = psp.SceSize;
-const SceUID = psp.SceUID;
+const sysmem = @import("../sdk/pspsysmem.zig");
+const SceUID = sysmem.SceUID;
 
 // This Allocator is a very basic allocator for the PSP
 // It uses the PSP's kernel to allocate and free memory
 // This may not be 100% correct for alignment
 pub const PSPAllocator = struct {
-    allocator: Allocator,
+    pub fn init(self: *@This()) std.mem.Allocator {
+        const vtable = std.mem.Allocator.VTable{
+            .alloc = PSPAllocator.alloc,
+            .resize = PSPAllocator.resize,
+            .remap = unreachable, // FIXME
+            .free = unreachable, // FIXME
+        };
 
-    //Initialize and send back an allocator object
-    pub fn init() PSPAllocator {
-        return PSPAllocator{
-            .allocator = Allocator{
-                .allocFn = psp_realloc,
-                .resizeFn = psp_shrink,
-            },
+        return std.mem.Allocator{
+            .ptr = self,
+            .vtable = &vtable,
         };
     }
 
     //Our Allocator
-    fn psp_realloc(allocator: *Allocator, len: usize, alignment: u29, len_align: u29, ra: usize) std.mem.Allocator.Error![]u8 {
+    fn alloc(allocator: *anyopaque, len: usize, alignment: std.mem.Alignment, ret_addr: usize) ?[*]u8 {
         _ = allocator;
-        _ = len_align;
-        _ = ra;
+        _ = ret_addr;
+
         //Assume alignment is less than double aligns
-        assert(len > 0);
-        assert(alignment <= @alignOf(c_longdouble));
+        std.debug.assert(len > 0);
+        std.debug.assert(alignment.compare(.gte, .@"64"));
 
         //If not allocated - allocate!
         if (len > 0) {
-
             //Gets a block of memory
-            const id: SceUID = psp.sceKernelAllocPartitionMemory(2, "block", @intFromEnum(loadexec.PspSysMemBlockTypes.MemLow), len + @sizeOf(SceUID), null);
+            const id = sysmem.sceKernelAllocPartitionMemory(.User, "block", .MemLow, len + @sizeOf(SceUID), null);
 
             if (id < 0) {
                 //TODO: Handle error cases that aren't out of memory...
-                return Allocator.Error.OutOfMemory;
+                return std.mem.Allocator.Error.OutOfMemory;
             }
 
             //Get the head address
-            const ptr = @as([*]u32, @ptrCast(@alignCast(psp.sceKernelGetBlockHeadAddr(id))));
+            const ptr = @as([*]u32, @ptrCast(@alignCast(sysmem.sceKernelGetBlockHeadAddr(id))));
 
             //Store our ID to free
             @as(*c_int, @ptrCast(ptr)).* = id;
@@ -59,29 +55,27 @@ pub const PSPAllocator = struct {
             return ptr2[0..len];
         }
 
-        return Allocator.Error.OutOfMemory;
+        return null; // FIXME what about errors?
     }
 
-    //Our de-allocator
-    fn psp_shrink(allocator: *Allocator, buf_unaligned: []u8, buf_align: u29, new_size: usize, len_align: u29, return_address: usize) std.mem.Allocator.Error!usize {
+    fn resize(allocator: *anyopaque, memory: []u8, alignment: std.mem.Alignment, new_len: usize, ret_addr: usize) bool {
         _ = allocator;
-        _ = buf_align;
-        _ = new_size;
-        _ = len_align;
-        _ = return_address;
+        _ = new_len;
+        _ = ret_addr;
 
-        //Get ptr
-        var ptr = @as([*]u8, @ptrCast(buf_unaligned));
+        std.debug.assert(alignment.compare(.gte, .@"64"));
 
-        //Go back to our ID
+        // Get ptr
+        var ptr = @as([*]u8, @ptrCast(memory));
+
+        // Go back to our ID
         ptr -= @sizeOf(SceUID);
         const id = @as(*c_int, @ptrCast(@alignCast(ptr))).*;
 
-        //Free the ID
-        const s = psp.sceKernelFreePartitionMemory(id);
+        // Free the ID
+        const s = sysmem.sceKernelFreePartitionMemory(id);
         _ = s;
 
-        //Return 0
-        return 0;
+        return true;
     }
 };
