@@ -9,7 +9,7 @@ const ge = @import("../sdk/pspge.zig");
 var vramOff: usize = 0;
 
 //Get the amount of memory needed
-fn getMemSize(width: u32, height: u32, format: gu.types.GuPixelMode) c_uint {
+fn getMemSize(width: u32, height: u32, format: gu.types.GuPixelFormat) c_uint {
     switch (format) {
         .PsmT4 => {
             return width * height / 2;
@@ -32,13 +32,13 @@ fn getMemSize(width: u32, height: u32, format: gu.types.GuPixelMode) c_uint {
 }
 
 //Allocate a buffer of VRAM in VRAM-Relative pointers (0 is 0x04000000)
-pub fn allocVramRelative(width: u32, height: u32, format: gu.types.GuPixelMode) ?*anyopaque {
+pub fn allocVramRelative(width: u32, height: u32, format: gu.types.GuPixelFormat) ?*anyopaque {
     const res = vramOff;
     vramOff += getMemSize(width, height, format);
     return @as(?*anyopaque, @ptrFromInt(res));
 }
 
-pub fn allocVramAbsolute(width: u32, height: u32, format: gu.types.GuPixelMode) *align(16) anyopaque {
+pub fn allocVramAbsolute(width: u32, height: u32, format: gu.types.GuPixelFormat) *align(16) anyopaque {
     const relative_offset = allocVramRelative(width, height, format);
     return @ptrFromInt(@intFromPtr(relative_offset) + @intFromPtr(ge.sceGeEdramGetAddr()));
 }

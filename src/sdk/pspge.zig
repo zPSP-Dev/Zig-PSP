@@ -37,7 +37,7 @@ pub const PspGeSyncBehavior = enum(c_int) {
 
 /// Get the size of VRAM.
 /// Returns The size of VRAM (in bytes).
-pub fn sceGeEdramGetSize() c_uint {
+pub fn sceGeEdramGetSize() usize {
     return module.sceGeEdramGetSize();
 }
 

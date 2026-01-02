@@ -123,7 +123,7 @@ pub fn main() !void {
         gum.sceGumTranslate(&.{ .x = 0, .y = 0, .z = -2.5 });
         gum.sceGumRotateXYZ(&.{ .x = @as(f32, @floatFromInt(i)) * 0.79 * (3.14159 / 180.0), .y = @as(f32, @floatFromInt(i)) * 0.98 * (3.14159 / 180.0), .z = @as(f32, @floatFromInt(i)) * 1.32 * (3.14159 / 180.0) });
 
-        gu.sceGuTexMode(.Psm8888, 0, 0, 0);
+        gu.sceGuTexMode(.Psm8888, 0, .Single, false);
         gu.sceGuTexImage(0, 128, 128, 128, &logo_start);
         gu.sceGuTexFunc(.Replace, .Rgba);
         gu.sceGuTexFilter(.Linear, .Linear);

@@ -1,3 +1,5 @@
+const std = @import("std");
+
 pub const types = @import("pspgutypes.zig");
 
 const libzpsp = @import("libzpsp");
@@ -274,15 +276,14 @@ pub fn sceGuAmbientColor(col: u32) void {
     sendCommandi(88, @truncate(col >> 24));
 }
 
-pub fn sceGuBlendFunc(bop: types.BlendOp, sc: types.BlendArg, dst: types.BlendArg, srcfix: u24, destfix: u24) void {
-    const op: u24 = @intFromEnum(bop);
+pub fn sceGuBlendFunc(bop: types.BlendOp, src: types.BlendFactor, dst: types.BlendFactor, src_fixed_value: u24, dst_fixed_value: u24) void {
+    const op_u24: u24 = @intFromEnum(bop);
+    const src_u24: u24 = @intFromEnum(src);
+    const dest_u24: u24 = @intFromEnum(dst);
 
-    const src: u24 = @intFromEnum(sc);
-    const dest: u24 = @intFromEnum(dst);
-
-    sendCommandi(223, src | (dest << 4) | (op << 8));
-    sendCommandi(224, srcfix);
-    sendCommandi(225, destfix);
+    sendCommandi(223, src_u24 | (dest_u24 << 4) | (op_u24 << 8));
+    sendCommandi(224, src_fixed_value);
+    sendCommandi(225, dst_fixed_value);
 }
 
 pub fn sceGuBreak(a0: c_int) void {
@@ -327,7 +328,7 @@ pub fn sceGuClearStencil(stencil: c_uint) void {
     gu_contexts[gu_curr_context].clear_stencil = stencil;
 }
 
-pub fn sceGuClutLoad(num_blocks: u24, cbp: ?*const anyopaque) void {
+pub fn sceGuClutLoad(num_blocks: u24, cbp: ?*align(16) const anyopaque) void {
     const a = @as(u32, @intCast(@intFromPtr(cbp)));
     sendCommandi(176, @truncate(a));
     sendCommandi(177, @truncate((a >> 8) & 0xf_00_00));
@@ -335,26 +336,26 @@ pub fn sceGuClutLoad(num_blocks: u24, cbp: ?*const anyopaque) void {
 }
 
 // NOTE: u24 is probably too wide for most args here
-pub fn sceGuClutMode(cpsm: types.GuPixelMode, shift: u24, mask: u24, a3: u24) void {
+pub fn sceGuClutMode(cpsm: types.GuPixelFormat, shift: u24, mask: u24, a3: u24) void {
     const argument: u24 = @intFromEnum(cpsm) | (shift << 2) | (mask << 8) | (a3 << 16);
     sendCommandi(197, argument);
 }
 
-pub fn sceGuColor(col: c_int) void {
+pub fn sceGuColor(col: u32) void {
     sceGuMaterial(7, col);
 }
 
-pub fn sceGuMaterial(mode: c_int, col: c_int) void {
+pub fn sceGuMaterial(mode: c_int, col: u32) void {
     if (mode & 0x01 != 0) {
-        sendCommandi(85, col & 0xffffff);
-        sendCommandi(88, col >> 24);
+        sendCommandi(85, @truncate(col));
+        sendCommandi(88, @truncate(col >> 24));
     }
 
     if (mode & 0x02 != 0)
-        sendCommandi(86, col & 0xffffff);
+        sendCommandi(86, @truncate(col));
 
     if (mode & 0x04 != 0)
-        sendCommandi(87, col & 0xffffff);
+        sendCommandi(87, @truncate(col));
 }
 
 pub fn sceGuColorFunc(func: types.ColorFunc, color: c_int, mask: c_int) void {
@@ -368,7 +369,7 @@ pub fn sceGuColorMaterial(components: u24) void {
 }
 
 // NOTE: u24 is probably too wide for most args here
-pub fn sceGuCopyImage(psm: types.GuPixelMode, sx: u24, sy: u24, width: u24, height: u24, srcw: u24, src: ?*anyopaque, dx: u24, dy: u24, destw: u24, dest: ?*anyopaque) void {
+pub fn sceGuCopyImage(psm: types.GuPixelFormat, sx: u24, sy: u24, width: u24, height: u24, srcw: u24, src: ?*anyopaque, dx: u24, dy: u24, destw: u24, dest: ?*anyopaque) void {
     const sr = @as(u32, @intCast(@intFromPtr(src)));
     const ds = @as(u32, @intCast(@intFromPtr(dest)));
 
@@ -762,7 +763,7 @@ pub fn sceGuBeginObject(vtype: u24, count: c_int, indices: ?*const anyopaque, ve
     sendCommandi(9, 0);
 }
 
-pub fn sceGuFinish() c_int {
+pub fn sceGuFinish() u32 {
     switch (@as(types.GuContextType, @enumFromInt(gu_curr_context))) {
         .Direct, .Send => {
             sendCommandi(15, 0);
@@ -785,7 +786,7 @@ pub fn sceGuFinish() c_int {
     // go to parent list
     gu_curr_context = gu_list.?.parent_context;
     gu_list = &gu_contexts[gu_curr_context].list;
-    return @as(c_int, @intCast(size));
+    return size;
 }
 
 pub fn guFinish() void {
@@ -1092,11 +1093,7 @@ pub fn sceGuSetStatus(state: types.GuState, status: bool) void {
 }
 
 pub fn sceGuShadeModel(mode: types.ShadeModel) void {
-    if (mode == types.ShadeModel.Smooth) {
-        sendCommandi(80, 1);
-    } else {
-        sendCommandi(80, 0);
-    }
+    sendCommandi(80, @intFromEnum(mode));
 }
 
 pub fn sceGuSignal(signal: c_int, behavior: types.GuSignalBehavior) void {
@@ -1195,19 +1192,25 @@ pub fn sceGuTexFunc(tfx: types.TextureEffect, tcc: types.TextureColorComponent) 
     sendCommandi(201, ((@intFromEnum(tcc) << 8) | @intFromEnum(tfx)) | gu_contexts[gu_curr_context].fragment_2x);
 }
 
-const tbpcmd_tbl = [_]u8{ 0xa0, 0xa1, 0xa2, 0xa3, 0xa4, 0xa5, 0xa6, 0xa7 };
-const tbwcmd_tbl = [_]u8{ 0xa8, 0xa9, 0xaa, 0xab, 0xac, 0xad, 0xae, 0xaf };
-const tsizecmd_tbl = [_]u8{ 0xb8, 0xb9, 0xba, 0xbb, 0xbc, 0xbd, 0xbe, 0xbf };
+pub fn sceGuTexImage(mipmap: u3, width: u10, height: u10, tbw: u16, tbp: ?*align(16) const anyopaque) void {
+    std.debug.assert(std.math.isPowerOfTwo(width));
+    std.debug.assert(std.math.isPowerOfTwo(height));
 
-fn getExp(val: u24) u24 {
-    return 24 - 1 - @clz(val);
-}
+    const GeCommandSetTextureSize = packed struct(u24) {
+        width_exp: u8,
+        height_exp: u8,
+        unused: u8 = 0,
+    };
 
-pub fn sceGuTexImage(mipmap: u24, width: u24, height: u24, tbw: u24, tbp: ?*const anyopaque) void {
-    const tbp_u32 = @as(u32, @intCast(@intFromPtr(tbp)));
-    sendCommandi(tbpcmd_tbl[mipmap], @truncate(tbp_u32));
-    sendCommandi(tbwcmd_tbl[mipmap], @intCast(((tbp_u32 >> 8) & 0x0f0000) | tbw));
-    sendCommandi(tsizecmd_tbl[mipmap], getExp(height & 0x3FF) << 8 | getExp(width & 0x3FF));
+    // Width and height should be a power of two!
+    const tbp_u32: u32 = @intFromPtr(tbp);
+    sendCommandi(0xa0 + @as(u8, mipmap), @truncate(tbp_u32));
+    sendCommandi(0xa8 + @as(u8, mipmap), @as(u24, @intCast((tbp_u32 >> 8) & 0x0f0000)) | tbw);
+    sendCommandi(0xb8 + @as(u8, mipmap), @bitCast(GeCommandSetTextureSize{
+        .width_exp = @ctz(width),
+        .height_exp = @ctz(height),
+    }));
+
     sceGuTexFlush();
 }
 
@@ -1228,10 +1231,10 @@ pub fn sceGuTexMapMode(mode: c_int, a1: c_int, a2: c_int) void {
     sendCommandi(193, (a2 << 8) | (a1 & 0x03));
 }
 
-pub fn sceGuTexMode(tpsm: types.GuPixelMode, maxmips: u24, a2: u24, swizzle: u24) void {
+pub fn sceGuTexMode(tpsm: types.GuPixelFormat, maxmips: u24, clut_mode: types.GuClutMode, enable_swizzling: bool) void {
     gu_contexts[gu_curr_context].texture_mode = @intFromEnum(tpsm);
 
-    sendCommandi(194, (maxmips << 16) | (a2 << 8) | (swizzle));
+    sendCommandi(194, (maxmips << 16) | (@intFromEnum(clut_mode) << 8) | @as(u24, if (enable_swizzling) 1 else 0));
     sendCommandi(195, @intFromEnum(tpsm));
     sceGuTexFlush();
 }

@@ -1,4 +1,4 @@
-pub const GuPixelMode = enum(u24) {
+pub const GuPixelFormat = enum(u24) {
     Psm5650 = 0,
     Psm5551 = 1,
     Psm4444 = 2,
@@ -7,13 +7,13 @@ pub const GuPixelMode = enum(u24) {
     PsmT8 = 5,
     PsmT16 = 6,
     PsmT32 = 7,
-    PsmDXT1 = 8,
-    PsmDXT3 = 9,
-    PsmDXT5 = 10,
+    PsmDxt1 = 8,
+    PsmDxt3 = 9,
+    PsmDxt5 = 10,
     // High-order bit extension
-    PsmDXT1EXT = 8 + 256,
-    PsmDXT3EXT = 9 + 256,
-    PsmDXT5EXT = 10 + 256,
+    PsmDxt1Ext = 8 + 256,
+    PsmDxt3Ext = 9 + 256,
+    PsmDxt5Ext = 10 + 256,
 };
 
 pub const GuPrimitive = enum(u24) {
@@ -24,6 +24,11 @@ pub const GuPrimitive = enum(u24) {
     TriangleStrip = 4,
     TriangleFan = 5,
     Sprites = 6,
+};
+
+pub const GuClutMode = enum(u24) {
+    Single = 0,
+    Double = 1,
 };
 
 pub const PatchPrimitive = enum(c_int) {
@@ -71,7 +76,7 @@ pub const SplineMode = enum(c_int) {
     OpenOpen = 3,
 };
 
-pub const ShadeModel = enum(c_int) {
+pub const ShadeModel = enum(u24) {
     Flat = 0,
     Smooth = 1,
 };
@@ -197,7 +202,7 @@ pub const MipmapLevel = enum(c_int) {
     Level7,
 };
 
-pub const BlendOp = enum(c_int) {
+pub const BlendOp = enum(u4) {
     Add = 0,
     Subtract = 1,
     ReverseSubtract = 2,
@@ -206,16 +211,19 @@ pub const BlendOp = enum(c_int) {
     Abs = 5,
 };
 
-pub const BlendArg = enum(c_int) {
-    SrcColor = 0,
-    OneMinusSrcColor = 1,
+pub const BlendFactor = enum(u4) {
+    OtherColor = 0,
+    OneMinusOtherColor = 1,
     SrcAlpha = 2,
     OneMinusSrcAlpha = 3,
-    DstColor = 0,
-    OneMinusDstColor = 1,
     DstAlpha = 4,
     OneMinusDstAlpha = 5,
-    Fix = 10,
+    DoubleSrcAlpha = 6,
+    OneMinus_DoubleSrcAlpha = 7,
+    DoubleDstAlpha = 8,
+    OneMinusDoubleDstAlpha = 9,
+    FixedValue = 10, // Specificy the constant in the dedicated sceGuBlendFunc argument
+    // Note: behavior of 11-15 blend factors is identical to GU_FIX
 };
 
 pub const StencilOperation = enum(c_int) {
