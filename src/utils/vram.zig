@@ -5,40 +5,44 @@ const ge = @import("../sdk/pspge.zig");
 //This isn't an actual "allocator" per se
 //It allocates static chunks of VRAM
 //TODO: Replace with dynamic VRAM allocator
-
-var vramOff: usize = 0;
-
-//Get the amount of memory needed
-fn getMemSize(width: u32, height: u32, format: gu.types.GuPixelFormat) c_uint {
-    switch (format) {
-        .PsmT4 => {
-            return width * height / 2;
-        },
-
-        .PsmT8 => {
-            return width * height;
-        },
-
-        .Psm5650, .Psm5551, .Psm4444, .PsmT16 => {
-            return width * height * 2;
-        },
-
-        .Psm8888, .PsmT32 => {
-            return width * height * 4;
-        },
-
-        else => return 0,
-    }
-}
+var CurrentVramAllocatorOffset: usize = 0;
 
 //Allocate a buffer of VRAM in VRAM-Relative pointers (0 is 0x04000000)
-pub fn allocVramRelative(width: u32, height: u32, format: gu.types.GuPixelFormat) ?*anyopaque {
-    const res = vramOff;
-    vramOff += getMemSize(width, height, format);
-    return @as(?*anyopaque, @ptrFromInt(res));
+pub fn allocVramRelative(stride: u32, height: u32, format: gu.types.GuPixelFormat) ?*align(16) anyopaque {
+    const resource_offset = CurrentVramAllocatorOffset;
+    const size_bytes = texture_buffer_size_bytes(stride, height, format);
+
+    CurrentVramAllocatorOffset += size_bytes;
+
+    return @ptrFromInt(resource_offset);
 }
 
-pub fn allocVramAbsolute(width: u32, height: u32, format: gu.types.GuPixelFormat) *align(16) anyopaque {
-    const relative_offset = allocVramRelative(width, height, format);
+pub fn allocVramAbsolute(stride: u32, height: u32, format: gu.types.GuPixelFormat) ?*align(16) anyopaque {
+    const relative_offset = allocVramRelative(stride, height, format);
+
     return @ptrFromInt(@intFromPtr(relative_offset) + @intFromPtr(ge.sceGeEdramGetAddr()));
+}
+
+fn texture_buffer_size_bytes(stride_elements: u32, height: u32, format: gu.types.GuPixelFormat) usize {
+    const pixel_bits = pixel_format_size_bits(format);
+    const buffer_size_bytes = (stride_elements * height * pixel_bits) / 8;
+
+    return buffer_size_bytes;
+}
+
+// For block-compressed types, this function returns the theoretical size of a pixel inside of a 4x4 block
+pub fn pixel_format_size_bits(pixel_format: gu.types.GuPixelFormat) usize {
+    return switch (pixel_format) {
+        .Psm5650 => 16,
+        .Psm5551 => 16,
+        .Psm4444 => 16,
+        .Psm8888 => 32,
+        .PsmT4 => 4,
+        .PsmT8 => 8,
+        .PsmT16 => 16,
+        .PsmT32 => 32,
+        .PsmDxt1, .PsmDxt1Ext => 4,
+        .PsmDxt3, .PsmDxt3Ext => 8,
+        .PsmDxt5, .PsmDxt5Ext => 8,
+    };
 }
