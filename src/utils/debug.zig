@@ -1,5 +1,5 @@
-const pspdisplay = @import("../sdk/pspdisplay.zig");
-const pspge = @import("../sdk/pspge.zig");
+const display = @import("../psp/display.zig");
+const ge = @import("../psp/ge.zig");
 const constants = @import("constants.zig");
 
 const builtin = @import("builtin");
@@ -66,14 +66,14 @@ pub fn screenSetFrontColor(color: u32) void {
 }
 
 //Initialize the screen
-pub fn screenInit() void {
+pub fn screenInit() !void {
     x = 0;
     y = 0;
 
-    vram_base = @as(?[*]u32, @ptrFromInt(0x40000000 | @intFromPtr(pspge.sceGeEdramGetAddr())));
+    vram_base = @as(?[*]u32, @ptrFromInt(0x40000000 | @intFromPtr(ge.edram_get_addr())));
 
-    _ = pspdisplay.sceDisplaySetMode(.LCD, constants.SCREEN_WIDTH, constants.SCREEN_HEIGHT);
-    _ = pspdisplay.sceDisplaySetFrameBuf(vram_base, constants.SCR_BUF_WIDTH, .Format8888, .NextVSync);
+    try display.set_mode(.LCD, constants.SCREEN_WIDTH, constants.SCREEN_HEIGHT);
+    try display.set_frame_buf(vram_base, constants.SCR_BUF_WIDTH, .Format8888, .NextVSync);
 
     screenClear();
 }
@@ -104,7 +104,7 @@ pub fn print(text: []const u8) void {
 }
 
 export fn pspDebugScreenInit() void {
-    screenInit();
+    screenInit() catch {};
 }
 
 export fn pspDebugScreenClear(color: u32) void {
@@ -165,7 +165,7 @@ pub var pancakeMode: bool = false;
 pub fn panic(message: []const u8, stack_trace: ?*std.builtin.StackTrace, size: ?usize) noreturn {
     _ = size; // autofix
     _ = stack_trace;
-    screenInit();
+    screenInit() catch {};
 
     if (pancakeMode) {
         //For @mrneo240

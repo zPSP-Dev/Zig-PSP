@@ -1,4 +1,4 @@
-const pspgu = @import("pspgu.zig");
+const pspgu = @import("../psp/gu.zig");
 
 const libzpsp = @import("libzpsp");
 const ScePspFMatrix4 = libzpsp.types.ScePspFMatrix4;
@@ -16,22 +16,22 @@ var gum_matrix_stack: [4][32]ScePspFMatrix4 = undefined;
 
 pub fn sceGumDrawArray(prim: pspgu.types.GuPrimitive, vtype: pspgu.types.VertexType, count: u24, indices: ?*const anyopaque, vertices: ?*const anyopaque) void {
     sceGumUpdateMatrix();
-    pspgu.sceGuDrawArray(prim, vtype, count, indices, vertices);
+    pspgu.draw_array(prim, vtype, count, indices, vertices);
 }
 
 pub fn sceGumDrawArrayN(prim: c_int, vtype: c_int, count: c_int, a3: c_int, indices: ?*const anyopaque, vertices: ?*const anyopaque) void {
     sceGumUpdateMatrix();
-    pspgu.sceGuDrawArrayN(prim, vtype, count, a3, indices, vertices);
+    pspgu.draw_array_n(prim, vtype, count, a3, indices, vertices);
 }
 
 pub fn sceGumDrawBezier(vtype: c_int, ucount: c_int, vcount: c_int, indices: ?*const anyopaque, vertices: ?*const anyopaque) void {
     sceGumUpdateMatrix();
-    pspgu.sceGuDrawBezier(vtype, ucount, vcount, indices, vertices);
+    pspgu.draw_bezier(vtype, ucount, vcount, indices, vertices);
 }
 
 pub fn sceGumDrawSpline(vtype: c_int, ucount: c_int, vcount: c_int, uedge: c_int, vedge: c_int, indices: ?*const anyopaque, vertices: ?*const anyopaque) void {
     sceGumUpdateMatrix();
-    pspgu.sceGuDrawSpline(vtype, ucount, vcount, uedge, vedge, indices, vertices);
+    pspgu.draw_spline(vtype, ucount, vcount, uedge, vedge, indices, vertices);
 }
 
 extern fn memset(ptr: [*]u8, value: u32, num: usize) [*]u8;
@@ -62,7 +62,7 @@ pub fn sceGumUpdateMatrix() void {
     var i: usize = 0;
     while (i < 4) : (i += 1) {
         if (gum_matrix_update[i] != 0) {
-            pspgu.sceGuSetMatrix(@as(c_int, @intCast(i)), gum_stack_depth[i]);
+            pspgu.set_matrix(@as(c_int, @intCast(i)), gum_stack_depth[i]);
             gum_matrix_update[i] = 0;
         }
     }

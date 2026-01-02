@@ -1,6 +1,6 @@
 //This is probably broken
-const gu = @import("../sdk/pspgu.zig");
-const ge = @import("../sdk/pspge.zig");
+const gu = @import("../psp/gu.zig");
+const ge = @import("../psp/ge.zig");
 
 //This isn't an actual "allocator" per se
 //It allocates static chunks of VRAM
@@ -40,5 +40,5 @@ pub fn allocVramRelative(width: u32, height: u32, format: gu.types.GuPixelMode) 
 
 pub fn allocVramAbsolute(width: u32, height: u32, format: gu.types.GuPixelMode) *align(16) anyopaque {
     const relative_offset = allocVramRelative(width, height, format);
-    return @ptrFromInt(@intFromPtr(relative_offset) + @intFromPtr(ge.sceGeEdramGetAddr()));
+    return @ptrFromInt(@intFromPtr(relative_offset) + @intFromPtr(ge.edram_get_addr()));
 }

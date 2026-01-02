@@ -8,7 +8,7 @@ comptime {
 
 pub fn main() !void {
     sdk.extra.utils.enableHBCB();
-    sdk.extra.debug.screenInit();
+    try sdk.extra.debug.screenInit();
 
     sdk.extra.debug.print("Hello from Zig!");
 }
