@@ -585,3 +585,60 @@ pub const SceKernelVplInfo = extern struct {
     freeSize: c_int,
     numWaitThreads: c_int,
 };
+
+pub const SceKernelLMOption = extern struct {
+    size: SceSize,
+    mpidtext: SceUID,
+    mpiddata: SceUID,
+    flags: c_uint,
+    position: u8,
+    access: u8,
+    creserved: [2]u8,
+};
+
+pub const SceKernelSMOption = extern struct {
+    size: SceSize,
+    mpidstack: SceUID,
+    stacksize: SceSize,
+    priority: c_int,
+    attribute: c_uint,
+};
+
+pub const SceKernelModuleInfo = extern struct {
+    size: SceSize,
+    nsegment: u8,
+    reserved: [3]u8,
+    segmentaddr: [4]c_int,
+    segmentsize: [4]c_int,
+    entry_addr: c_uint,
+    gp_value: c_uint,
+    text_addr: c_uint,
+    text_size: c_uint,
+    data_size: c_uint,
+    bss_size: c_uint,
+    attribute: c_ushort,
+    version: [2]u8,
+    name: [28]u8,
+};
+
+pub const SceKernelUtilsMt19937Context = extern struct {
+    count: c_uint,
+    state: [624]c_uint,
+};
+
+pub const SceKernelUtilsMd5Context = extern struct {
+    h: [4]c_uint,
+    pad: c_uint,
+    usRemains: SceUShort16,
+    usComputed: SceUShort16,
+    ullTotalLen: SceULong64,
+    buf: [64]u8,
+};
+
+pub const SceKernelUtilsSha1Context = extern struct {
+    h: [5]c_uint,
+    usRemains: SceUShort16,
+    usComputed: SceUShort16,
+    ullTotalLen: SceULong64,
+    buf: [64]u8,
+};

@@ -23,20 +23,20 @@ pub extern fn sceKernelUtilsMd5Digest(data: [*c]u8, size: u32, digest: [*c]u8) c
 /// sceKernelUtilsMd5BlockUpdate(&ctx, (u8*) "Hello", 5);
 /// sceKernelUtilsMd5BlockResult(&ctx, digest);
 /// `
-pub extern fn sceKernelUtilsMd5BlockInit(ctx: [*c]c_int) callconv(.c) c_int;
+pub extern fn sceKernelUtilsMd5BlockInit(ctx: [*c]types.SceKernelUtilsMd5Context) callconv(.c) c_int;
 
 /// Function to update the MD5 digest with a block of data.
 /// `ctx` - A filled in context block.
 /// `data` - The data block to hash.
 /// `size` - The size of the data to hash
 /// Returns < 0 on error.
-pub extern fn sceKernelUtilsMd5BlockUpdate(ctx: [*c]c_int, data: [*c]u8, size: u32) callconv(.c) c_int;
+pub extern fn sceKernelUtilsMd5BlockUpdate(ctx: [*c]types.SceKernelUtilsMd5Context, data: [*c]u8, size: u32) callconv(.c) c_int;
 
 /// Function to get the digest result of the MD5 hash.
 /// `ctx` - A filled in context block.
 /// `digest` - A 16 byte array to hold the digest.
 /// Returns < 0 on error.
-pub extern fn sceKernelUtilsMd5BlockResult(ctx: [*c]c_int, digest: [*c]u8) callconv(.c) c_int;
+pub extern fn sceKernelUtilsMd5BlockResult(ctx: [*c]types.SceKernelUtilsMd5Context, digest: [*c]u8) callconv(.c) c_int;
 
 /// Function to SHA1 hash a data block.
 /// `data` - The data to hash.
@@ -56,20 +56,20 @@ pub extern fn sceKernelUtilsSha1Digest(data: [*c]u8, size: u32, digest: [*c]u8) 
 /// sceKernelUtilsSha1BlockUpdate(&ctx, (u8*) "Hello", 5);
 /// sceKernelUtilsSha1BlockResult(&ctx, digest);
 /// `
-pub extern fn sceKernelUtilsSha1BlockInit(ctx: [*c]c_int) callconv(.c) c_int;
+pub extern fn sceKernelUtilsSha1BlockInit(ctx: [*c]types.SceKernelUtilsSha1Context) callconv(.c) c_int;
 
 /// Function to update the current hash.
 /// `ctx` - Pointer to a prefilled context.
 /// `data` - The data block to hash.
 /// `size` - The size of the data block
 /// Returns < 0 on error.
-pub extern fn sceKernelUtilsSha1BlockUpdate(ctx: [*c]c_int, data: [*c]u8, size: u32) callconv(.c) c_int;
+pub extern fn sceKernelUtilsSha1BlockUpdate(ctx: [*c]types.SceKernelUtilsSha1Context, data: [*c]u8, size: u32) callconv(.c) c_int;
 
 /// Function to get the result of the SHA1 hash.
 /// `ctx` - Pointer to a prefilled context.
 /// `digest` - A pointer to a 20 byte array to contain the digest.
 /// Returns < 0 on error.
-pub extern fn sceKernelUtilsSha1BlockResult(ctx: [*c]c_int, digest: [*c]u8) callconv(.c) c_int;
+pub extern fn sceKernelUtilsSha1BlockResult(ctx: [*c]types.SceKernelUtilsSha1Context, digest: [*c]u8) callconv(.c) c_int;
 
 /// Function to initialise a mersenne twister context.
 /// `ctx` - Pointer to a context
@@ -81,12 +81,12 @@ pub extern fn sceKernelUtilsSha1BlockResult(ctx: [*c]c_int, digest: [*c]u8) call
 /// u23 rand_val = sceKernelUtilsMt19937UInt(&ctx);
 /// `
 /// Returns < 0 on error.
-pub extern fn sceKernelUtilsMt19937Init(ctx: [*c]c_int, seed: u32) callconv(.c) c_int;
+pub extern fn sceKernelUtilsMt19937Init(ctx: [*c]types.SceKernelUtilsMt19937Context, seed: u32) callconv(.c) c_int;
 
 /// Function to return a new psuedo random number.
 /// `ctx` - Pointer to a pre-initialised context.
 /// Returns A pseudo random number (between 0 and MAX_INT).
-pub extern fn sceKernelUtilsMt19937UInt(ctx: [*c]c_int) callconv(.c) u32;
+pub extern fn sceKernelUtilsMt19937UInt(ctx: [*c]types.SceKernelUtilsMt19937Context) callconv(.c) u32;
 
 pub extern fn sceKernelGetGPI() callconv(.c) void;
 

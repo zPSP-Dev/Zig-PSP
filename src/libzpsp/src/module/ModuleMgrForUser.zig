@@ -7,7 +7,7 @@ const macro = @import("../macro.zig");
 /// `flags` - Unused, always 0.
 /// `option` - Pointer to an optional ::SceKernelLMOption structure.
 /// Returns The UID of the loaded module on success, otherwise one of ::PspKernelErrorCodes.
-pub extern fn sceKernelLoadModuleByID(fid: types.SceUID, flags: c_int, option: [*c]c_int) callconv(.c) types.SceUID;
+pub extern fn sceKernelLoadModuleByID(fid: types.SceUID, flags: c_int, option: [*c]types.SceKernelLMOption) callconv(.c) types.SceUID;
 
 /// Load a module.
 /// @note This function restricts where it can load from (such as from flash0)
@@ -16,7 +16,7 @@ pub extern fn sceKernelLoadModuleByID(fid: types.SceUID, flags: c_int, option: [
 /// `flags` - Unused, always 0 .
 /// `option` - Pointer to a mod_param_t structure. Can be NULL.
 /// Returns The UID of the loaded module on success, otherwise one of ::PspKernelErrorCodes.
-pub extern fn sceKernelLoadModule(path: [*c]const c_char, flags: c_int, option: [*c]c_int) callconv(.c) types.SceUID;
+pub extern fn sceKernelLoadModule(path: [*c]const c_char, flags: c_int, option: [*c]types.SceKernelLMOption) callconv(.c) types.SceUID;
 
 /// Load a module from MS.
 /// @note This function restricts what it can load, e.g. it wont load plain executables.
@@ -24,7 +24,7 @@ pub extern fn sceKernelLoadModule(path: [*c]const c_char, flags: c_int, option: 
 /// `flags` - Unused, set to 0.
 /// `option` - Pointer to a mod_param_t structure. Can be NULL.
 /// Returns The UID of the loaded module on success, otherwise one of ::PspKernelErrorCodes.
-pub extern fn sceKernelLoadModuleMs(path: [*c]const c_char, flags: c_int, option: [*c]c_int) callconv(.c) types.SceUID;
+pub extern fn sceKernelLoadModuleMs(path: [*c]const c_char, flags: c_int, option: [*c]types.SceKernelLMOption) callconv(.c) types.SceUID;
 
 /// Load a module from a buffer using the USB/WLAN API.
 /// Can only be called from kernel mode, or from a thread that has attributes of 0xa0000000.
@@ -34,7 +34,7 @@ pub extern fn sceKernelLoadModuleMs(path: [*c]const c_char, flags: c_int, option
 /// `flags` - Unused, always 0.
 /// `option` - Pointer to an optional ::SceKernelLMOption structure.
 /// Returns The UID of the loaded module on success, otherwise one of ::PspKernelErrorCodes.
-pub extern fn sceKernelLoadModuleBufferUsbWlan(bufsize: types.SceSize, buf: ?*anyopaque, flags: c_int, option: [*c]c_int) callconv(.c) types.SceUID;
+pub extern fn sceKernelLoadModuleBufferUsbWlan(bufsize: types.SceSize, buf: ?*anyopaque, flags: c_int, option: [*c]types.SceKernelLMOption) callconv(.c) types.SceUID;
 
 /// Start a loaded module.
 /// `modid` - The ID of the module returned from LoadModule.
@@ -45,7 +45,7 @@ pub extern fn sceKernelLoadModuleBufferUsbWlan(bufsize: types.SceSize, buf: ?*an
 /// Returns modID (modID > 0) UID of the module that was started and made resident,
 /// 0 on success for modules that don't need to be made resident,
 /// otherwise one of ::PspKernelErrorCodes.
-pub extern fn sceKernelStartModule(modid: types.SceUID, argsize: types.SceSize, argp: ?*anyopaque, status: [*c]c_int, option: [*c]c_int) callconv(.c) c_int;
+pub extern fn sceKernelStartModule(modid: types.SceUID, argsize: types.SceSize, argp: ?*anyopaque, status: [*c]c_int, option: [*c]types.SceKernelSMOption) callconv(.c) c_int;
 
 /// Stop a running module.
 /// `modid` - The UID of the module to stop.
@@ -54,7 +54,7 @@ pub extern fn sceKernelStartModule(modid: types.SceUID, argsize: types.SceSize, 
 /// `status` - Return value of the module's module_stop() routine.
 /// `option` - Pointer to an optional ::SceKernelSMOption structure.
 /// Returns ??? on success, otherwise one of ::PspKernelErrorCodes.
-pub extern fn sceKernelStopModule(modid: types.SceUID, argsize: types.SceSize, argp: ?*anyopaque, status: [*c]c_int, option: [*c]c_int) callconv(.c) c_int;
+pub extern fn sceKernelStopModule(modid: types.SceUID, argsize: types.SceSize, argp: ?*anyopaque, status: [*c]c_int, option: [*c]types.SceKernelSMOption) callconv(.c) c_int;
 
 /// Unload a stopped module.
 /// `modid` - The UID of the module to unload.
@@ -74,7 +74,7 @@ pub extern fn sceKernelSelfStopUnloadModule(unknown: c_int, argsize: types.SceSi
 /// `status` - Return value from module_stop().
 /// `option` - Pointer to an optional ::SceKernelSMOption structure.
 /// Returns ??? on success, otherwise one of ::PspKernelErrorCodes.
-pub extern fn sceKernelStopUnloadSelfModule(argsize: types.SceSize, argp: ?*anyopaque, status: [*c]c_int, option: [*c]c_int) callconv(.c) c_int;
+pub extern fn sceKernelStopUnloadSelfModule(argsize: types.SceSize, argp: ?*anyopaque, status: [*c]c_int, option: [*c]types.SceKernelSMOption) callconv(.c) c_int;
 
 /// Query the information about a loaded module from its UID.
 /// @note This fails on v1.0 firmware (and even it worked has a limited structure)
@@ -84,7 +84,7 @@ pub extern fn sceKernelStopUnloadSelfModule(argsize: types.SceSize, argp: ?*anyo
 /// `modid` - The UID of the loaded module.
 /// `info` - Pointer to a ::SceKernelModuleInfo structure.
 /// Returns 0 on success, otherwise one of ::PspKernelErrorCodes.
-pub extern fn sceKernelQueryModuleInfo(modid: types.SceUID, info: [*c]c_int) callconv(.c) c_int;
+pub extern fn sceKernelQueryModuleInfo(modid: types.SceUID, info: [*c]types.SceKernelModuleInfo) callconv(.c) c_int;
 
 /// Get a list of module IDs. NOTE: This is only available on 1.5 firmware
 /// and above. For V1 use ::pspSdkGetModuleIdList.
