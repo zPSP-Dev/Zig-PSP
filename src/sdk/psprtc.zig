@@ -1,16 +1,10 @@
-pub const time_t = u32;
-const struct_unnamed_5 = extern struct {
-    year: u16,
-    month: u16,
-    day: u16,
-    hour: u16,
-    minutes: u16,
-    seconds: u16,
-    microseconds: u32,
-};
-pub const pspTime = struct_unnamed_5;
+const c = @import("libzpsp");
 
-pub const enum_pspRtcCheckValidErrors = enum(c_int) {
+pub const time_t = c.types.time_t;
+pub const ScePspDateTime = c.types.ScePspDateTime;
+
+pub const pspTime = ScePspDateTime;
+pub const pspRtcCheckValidErrors = enum(c_int) {
     PSP_TIME_INVALID_YEAR = -1,
     PSP_TIME_INVALID_MONTH = -2,
     PSP_TIME_INVALID_DAY = -3,
@@ -20,6 +14,7 @@ pub const enum_pspRtcCheckValidErrors = enum(c_int) {
     PSP_TIME_INVALID_MICROSECONDS = -7,
     _,
 };
+
 pub extern fn sceRtcGetTickResolution() u32;
 pub extern fn sceRtcGetCurrentTick(tick: *u64) c_int;
 pub extern fn sceRtcGetCurrentClock(time: [*c]pspTime, tz: c_int) c_int;
@@ -54,5 +49,3 @@ pub extern fn sceRtcFormatRFC2822LocalTime(pszDateTime: [*c]u8, pUtc: [*c]const 
 pub extern fn sceRtcFormatRFC3339(pszDateTime: [*c]u8, pUtc: [*c]const u64, iTimeZoneMinutes: c_int) c_int;
 pub extern fn sceRtcFormatRFC3339LocalTime(pszDateTime: [*c]u8, pUtc: [*c]const u64) c_int;
 pub extern fn sceRtcParseRFC3339(pUtc: [*c]u64, pszDateTime: [*c]const u8) c_int;
-
-pub const pspRtcCheckValidErrors = enum_pspRtcCheckValidErrors;

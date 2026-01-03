@@ -281,16 +281,6 @@ pub const ScePspUnion128 = extern union {
     rgb565: [8]ScePspRGB565,
 };
 
-pub const ScePspDateTime = extern struct {
-    year: c_ushort,
-    month: c_ushort,
-    day: c_ushort,
-    hour: c_ushort,
-    minute: c_ushort,
-    second: c_ushort,
-    microsecond: c_uint,
-};
-
 pub const SceUID = c_int;
 pub const SceSize = c_uint;
 pub const SceSSize = c_int;
@@ -619,6 +609,19 @@ pub const SceKernelModuleInfo = extern struct {
     attribute: c_ushort,
     version: [2]u8,
     name: [28]u8,
+};
+
+pub const time_t = u32;
+pub const clock_t = u32;
+
+pub const ScePspDateTime = extern struct {
+    year: u16,
+    month: u16,
+    day: u16,
+    hour: u16,
+    minutes: u16,
+    seconds: u16,
+    microseconds: u32,
 };
 
 pub const SceKernelUtilsMt19937Context = extern struct {

@@ -93,10 +93,10 @@ pub extern fn sceKernelGetGPI() callconv(.c) void;
 pub extern fn sceKernelSetGPO() callconv(.c) void;
 
 /// Get the processor clock used since the start of the process
-pub extern fn sceKernelLibcClock() callconv(.c) c_int;
+pub extern fn sceKernelLibcClock() callconv(.c) types.clock_t;
 
 /// Get the time in seconds since the epoc (1st Jan 1970)
-pub extern fn sceKernelLibcTime(t: [*c]c_int) callconv(.c) c_int;
+pub extern fn sceKernelLibcTime(t: [*c]types.time_t) callconv(.c) types.time_t;
 
 /// Get the current time of time and time zone information
 pub extern fn sceKernelLibcGettimeofday(tp: [*c]c_int, tzp: [*c]c_int) callconv(.c) c_int;

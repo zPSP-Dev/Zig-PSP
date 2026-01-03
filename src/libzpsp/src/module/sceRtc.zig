@@ -59,9 +59,9 @@ pub extern fn sceRtcGetDayOfWeek(year: c_int, month: c_int, day: c_int) callconv
 /// Returns 0 on success, one of ::pspRtcCheckValidErrors on error
 pub extern fn sceRtcCheckValid(date: [*c]const c_int) callconv(.c) c_int;
 
-pub extern fn sceRtcSetTime_t(date: [*c]c_int, time: c_int) callconv(.c) c_int;
+pub extern fn sceRtcSetTime_t(date: [*c]c_int, time: types.time_t) callconv(.c) c_int;
 
-pub extern fn sceRtcGetTime_t(date: [*c]const c_int, time: [*c]c_int) callconv(.c) c_int;
+pub extern fn sceRtcGetTime_t(date: [*c]const c_int, time: [*c]types.time_t) callconv(.c) c_int;
 
 pub extern fn sceRtcSetDosTime(date: [*c]c_int, dosTime: u32) callconv(.c) c_int;
 
