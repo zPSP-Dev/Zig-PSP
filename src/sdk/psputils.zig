@@ -1,14 +1,14 @@
 const c = @import("libzpsp");
 
-const SceUShort16 = c.types.SceUShort16;
-const SceULong64 = c.types.SceULong64;
-const time_t = c.types.time_t;
+pub const SceUShort16 = c.types.SceUShort16;
+pub const SceULong64 = c.types.SceULong64;
 
-const SceKernelUtilsMt19937Context = c.types.SceKernelUtilsMt19937Context;
-const SceKernelUtilsMd5Context = c.types.SceKernelUtilsMd5Context;
-const SceKernelUtilsSha1Context = c.types.SceKernelUtilsSha1Context;
+pub const time_t = c.types.time_t;
+pub const clock_t = c.types.clock_t;
+pub const SceKernelUtilsMt19937Context = c.types.SceKernelUtilsMt19937Context;
+pub const SceKernelUtilsMd5Context = c.types.SceKernelUtilsMd5Context;
+pub const SceKernelUtilsSha1Context = c.types.SceKernelUtilsSha1Context;
 
-pub const clock_t = u32;
 pub const suseconds_t = u32;
 pub const timeval = extern struct {
     tv_sec: time_t,
