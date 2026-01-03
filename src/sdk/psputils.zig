@@ -1,8 +1,12 @@
-const psptypes = @import("libzpsp");
-const psprtc = @import("libzpsp");
-const SceUShort16 = psptypes.SceUShort16;
-const SceULong64 = psptypes.SceULong64;
-const time_t = psprtc.time_t;
+const c = @import("libzpsp");
+
+const SceUShort16 = c.types.SceUShort16;
+const SceULong64 = c.types.SceULong64;
+const time_t = c.types.time_t;
+
+const SceKernelUtilsMt19937Context = c.types.SceKernelUtilsMt19937Context;
+const SceKernelUtilsMd5Context = c.types.SceKernelUtilsMd5Context;
+const SceKernelUtilsSha1Context = c.types.SceKernelUtilsSha1Context;
 
 pub const clock_t = u32;
 pub const suseconds_t = u32;
@@ -13,28 +17,6 @@ pub const timeval = extern struct {
 pub const timezone = extern struct {
     tz_minuteswest: c_int,
     tz_dsttime: c_int,
-};
-
-pub const SceKernelUtilsMt19937Context = extern struct {
-    count: c_uint,
-    state: [624]c_uint,
-};
-
-pub const SceKernelUtilsMd5Context = extern struct {
-    h: [4]c_uint,
-    pad: c_uint,
-    usRemains: SceUShort16,
-    usComputed: SceUShort16,
-    ullTotalLen: SceULong64,
-    buf: [64]u8,
-};
-
-pub const SceKernelUtilsSha1Context = extern struct {
-    h: [5]c_uint,
-    usRemains: SceUShort16,
-    usComputed: SceUShort16,
-    ullTotalLen: SceULong64,
-    buf: [64]u8,
 };
 
 // Function to initialise a mersenne twister context.

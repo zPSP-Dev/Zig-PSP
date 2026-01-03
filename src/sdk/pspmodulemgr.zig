@@ -1,41 +1,10 @@
-const psptypes = @import("libzpsp");
-const SceSize = psptypes.SceSize;
-const SceUID = psptypes.SceUID;
+const c = @import("libzpsp");
 
-pub const SceKernelLMOption = extern struct {
-    size: SceSize,
-    mpidtext: SceUID,
-    mpiddata: SceUID,
-    flags: c_uint,
-    position: u8,
-    access: u8,
-    creserved: [2]u8,
-};
-
-pub const SceKernelSMOption = extern struct {
-    size: SceSize,
-    mpidstack: SceUID,
-    stacksize: SceSize,
-    priority: c_int,
-    attribute: c_uint,
-};
-
-pub const SceKernelModuleInfo = extern struct {
-    size: SceSize,
-    nsegment: u8,
-    reserved: [3]u8,
-    segmentaddr: [4]c_int,
-    segmentsize: [4]c_int,
-    entry_addr: c_uint,
-    gp_value: c_uint,
-    text_addr: c_uint,
-    text_size: c_uint,
-    data_size: c_uint,
-    bss_size: c_uint,
-    attribute: c_ushort,
-    version: [2]u8,
-    name: [28]u8,
-};
+pub const SceSize = c.SceSize;
+pub const SceUID = c.SceUID;
+pub const SceKernelLMOption = c.types.SceKernelLMOption;
+pub const SceKernelModuleInfo = c.types.SceKernelModuleInfo;
+pub const SceKernelSMOption = c.types.SceKernelSMOption;
 
 pub const PSP_MEMORY_PARTITION_KERNEL = 1;
 pub const PSP_MEMORY_PARTITION_USER = 2;

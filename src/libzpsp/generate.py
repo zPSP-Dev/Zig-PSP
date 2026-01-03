@@ -194,6 +194,12 @@ def parse_c_type_to_zig(c_type: str) -> str:
         "struct SceKernelVTimerOptParam": "types.SceKernelVTimerOptParam",
         "SceKernelVplInfo": "types.SceKernelVplInfo",
         "struct SceKernelVplOptParam": "types.SceKernelVplOptParam",
+        "SceKernelLMOption": "types.SceKernelLMOption",
+        "SceKernelModuleInfo": "types.SceKernelModuleInfo",
+        "SceKernelSMOption": "types.SceKernelSMOption",
+        "SceKernelUtilsMt19937Context": "types.SceKernelUtilsMt19937Context",
+        "SceKernelUtilsMd5Context": "types.SceKernelUtilsMd5Context",
+        "SceKernelUtilsSha1Context": "types.SceKernelUtilsSha1Context",
     }
 
     # Handle const first
