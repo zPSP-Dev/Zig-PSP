@@ -840,11 +840,11 @@ pub extern fn sceKernelGetThreadmanIdType(uid: types.SceUID) callconv(.c) types.
 
 /// Get the thread profiler registers.
 /// Returns Pointer to the registers, NULL on error
-pub extern fn sceKernelReferThreadProfiler() callconv(.c) [*c]c_int;
+pub extern fn sceKernelReferThreadProfiler() callconv(.c) [*c]volatile types.PspDebugProfilerRegs;
 
 /// Get the globile profiler registers.
 /// Returns Pointer to the registers, NULL on error
-pub extern fn sceKernelReferGlobalProfiler() callconv(.c) [*c]c_int;
+pub extern fn sceKernelReferGlobalProfiler() callconv(.c) [*c]volatile types.PspDebugProfilerRegs;
 
 /// Delete a lightweight mutex
 /// `workarea` - The pointer to the workarea
