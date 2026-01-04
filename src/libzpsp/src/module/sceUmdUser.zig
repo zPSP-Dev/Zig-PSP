@@ -9,7 +9,7 @@ pub extern fn sceUmdGetErrorStat() callconv(.c) c_int;
 /// Get the disc info
 /// `info` - A pointer to a ::pspUmdInfo struct
 /// Returns < 0 on error
-pub extern fn sceUmdGetDiscInfo(info: [*c]c_int) callconv(.c) c_int;
+pub extern fn sceUmdGetDiscInfo(info: [*c]types.pspUmdInfo) callconv(.c) c_int;
 
 /// Check whether there is a disc in the UMD drive
 /// Returns 0 if no disc present, anything else indicates a disc is inserted.

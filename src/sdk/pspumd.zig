@@ -1,7 +1,6 @@
-pub const PspUmdInfo = extern struct {
-    size: c_uint,
-    typec: c_uint,
-};
+const c = @import("libzpsp");
+
+pub const pspUmdInfo = c.types.pspUmdInfo;
 
 pub const PspUmdTypes = enum(c_int) {
     Game = 16,
@@ -34,8 +33,8 @@ pub extern fn sceUmdCheckMedium() c_int;
 // @param info - A pointer to a ::pspUmdInfo struct
 //
 // @return < 0 on error
-pub extern fn sceUmdGetDiscInfo(info: *PspUmdInfo) c_int;
-pub fn umdGetDiscInfo(info: *PspUmdInfo) !i32 {
+pub extern fn sceUmdGetDiscInfo(info: *pspUmdInfo) c_int;
+pub fn umdGetDiscInfo(info: *pspUmdInfo) !i32 {
     const res = sceUmdGetDiscInfo(info);
     if (res < 0) {
         return error.Unexpected;

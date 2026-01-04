@@ -206,6 +206,7 @@ def parse_c_type_to_zig(c_type: str) -> str:
         "pdpStatStruct": "types.pdpStatStruct",
         "struct in_addr": "types.in_addr",
         "struct SceNetMallocStat": "types.SceNetMallocStat",
+        "pspUmdInfo": "types.pspUmdInfo",
     }
 
     # Handle const first
