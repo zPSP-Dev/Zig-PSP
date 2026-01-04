@@ -250,6 +250,20 @@ pub extern fn sceIoChstat(file: [*c]const c_char, stat: [*c]types.SceIoStat, bit
 /// Returns < 0 on error.
 pub extern fn sceIoRename(oldname: [*c]const c_char, newname: [*c]const c_char) callconv(.c) c_int;
 
+/// Send a devctl command to a device.
+/// @par Example: Sending a simple command to a device (not a real devctl)
+/// `
+/// sceIoDevctl("ms0:", 0x200000, indata, 4, NULL, NULL);
+/// `
+/// `dev` - String for the device to send the devctl to (e.g. "ms0:")
+/// `cmd` - The command to send to the device
+/// `indata` - A data block to send to the device, if NULL sends no data
+/// `inlen` - Length of indata, if 0 sends no data
+/// `outdata` - A data block to receive the result of a command, if NULL receives no data
+/// `outlen` - Length of outdata, if 0 receives no data
+/// Returns 0 on success, < 0 on error
+pub extern fn sceIoDevctl(dev: [*c]const c_char, cmd: c_uint, indata: ?*anyopaque, inlen: c_int, outdata: ?*anyopaque, outlen: c_int) callconv(.c) c_int;
+
 /// Get the device type of the currently opened file descriptor.
 /// `fd` - The opened file descriptor.
 /// Returns < 0 on error. Otherwise the device type?
