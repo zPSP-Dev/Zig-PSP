@@ -1,22 +1,13 @@
-const psptypes = @import("libzpsp");
-const SceUID = psptypes.SceUID;
-const SceSize = psptypes.SceSize;
-const SceVoid = psptypes.SceVoid;
-const SceInt32 = psptypes.SceInt32;
-const SceUInt32 = psptypes.SceUInt32;
-const SceShort16 = psptypes.SceShort16;
-const SceUChar8 = psptypes.SceUChar8;
+const c = @import("libzpsp");
 
-pub const SceMp3InitArg = extern struct {
-    mp3StreamStart: SceUInt32,
-    unk1: SceUInt32,
-    mp3StreamEnd: SceUInt32,
-    unk2: SceUInt32,
-    mp3Buf: ?*SceVoid,
-    mp3BufSize: SceInt32,
-    pcmBuf: ?*SceVoid,
-    pcmBufSize: SceInt32,
-};
+pub const SceUID = c.types.SceUID;
+pub const SceSize = c.types.SceSize;
+pub const SceVoid = c.types.SceVoid;
+pub const SceInt32 = c.types.SceInt32;
+pub const SceUInt32 = c.types.SceUInt32;
+pub const SceShort16 = c.types.SceShort16;
+pub const SceUChar8 = c.types.SceUChar8;
+pub const SceMp3InitArg = c.types.SceMp3InitArg;
 
 // sceMp3ReserveMp3Handle
 //
