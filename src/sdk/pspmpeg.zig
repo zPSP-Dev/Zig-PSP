@@ -1,65 +1,19 @@
-const psptypes = @import("libzpsp");
-const SceUID = psptypes.SceUID;
-const SceVoid = psptypes.SceVoid;
-const ScePVoid = psptypes.ScePVoid;
-const SceInt32 = psptypes.SceInt32;
-const SceUInt32 = psptypes.SceUInt32;
+const c = @import("libzpsp");
 
-pub const SceMpegLLI = extern struct {
-    pSrc: ScePVoid,
-    pDst: ScePVoid,
-    Next: ScePVoid,
-    iSize: SceInt32,
-};
+const SceUID = c.types.SceUID;
+const SceVoid = c.types.SceVoid;
+const ScePVoid = c.types.ScePVoid;
+const SceInt32 = c.types.SceInt32;
+const SceUInt32 = c.types.SceUInt32;
 
-pub const SceMpegYCrCbBuffer = extern struct {
-    iFrameBufferHeight16: SceInt32,
-    iFrameBufferWidth16: SceInt32,
-    iUnknown: SceInt32,
-    iUnknown2: SceInt32,
-    pYBuffer: ScePVoid,
-    pYBuffer2: ScePVoid,
-    pCrBuffer: ScePVoid,
-    pCbBuffer: ScePVoid,
-    pCrBuffer2: ScePVoid,
-    pCbBuffer2: ScePVoid,
-    iFrameHeight: SceInt32,
-    iFrameWidth: SceInt32,
-    iFrameBufferWidth: SceInt32,
-    iUnknown3: [11]SceInt32,
-};
-
-pub const SceMpeg = ScePVoid;
-pub const SceMpegStream = SceVoid;
-pub const sceMpegRingbufferCB = ?*const fn (ScePVoid, SceInt32, ScePVoid) callconv(.c) SceInt32;
-
-pub const SceMpegRingbuffer = extern struct {
-    iPackets: SceInt32,
-    iUnk0: SceUInt32,
-    iUnk1: SceUInt32,
-    iUnk2: SceUInt32,
-    iUnk3: SceUInt32,
-    pData: ScePVoid,
-    Callback: sceMpegRingbufferCB,
-    pCBparam: ScePVoid,
-    iUnk4: SceUInt32,
-    iUnk5: SceUInt32,
-    pSceMpeg: SceMpeg,
-};
-
-pub const SceMpegAu = extern struct {
-    iPtsMSB: SceUInt32,
-    iPts: SceUInt32,
-    iDtsMSB: SceUInt32,
-    iDts: SceUInt32,
-    iEsBuffer: SceUInt32,
-    iAuSize: SceUInt32,
-};
-
-pub const SceMpegAvcMode = extern struct {
-    iUnk0: SceInt32,
-    iPixelFormat: SceInt32,
-};
+const SceMpeg = c.types.SceMpeg;
+const SceMpegAu = c.types.SceMpegAu;
+const SceMpegAvcMode = c.types.SceMpegAvcMode;
+const SceMpegLLI = c.types.SceMpegLLI;
+const SceMpegRingbuffer = c.types.SceMpegRingbuffer;
+const sceMpegRingbufferCB = c.types.sceMpegRingbufferCB;
+const SceMpegStream = c.types.SceMpegStream;
+const SceMpegYCrCbBuffer = c.types.SceMpegYCrCbBuffer;
 
 //MpegBase
 pub extern fn sceMpegBaseYCrCbCopyVme(YUVBuffer: ScePVoid, Buffer: [*c]SceInt32, Type: SceInt32) SceInt32;

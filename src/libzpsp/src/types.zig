@@ -668,3 +668,59 @@ pub const pspUmdInfo = extern struct {
     size: c_uint,
     typec: c_uint,
 };
+
+pub const SceMpegLLI = extern struct {
+    pSrc: ScePVoid,
+    pDst: ScePVoid,
+    Next: ScePVoid,
+    iSize: SceInt32,
+};
+
+pub const SceMpegYCrCbBuffer = extern struct {
+    iFrameBufferHeight16: SceInt32,
+    iFrameBufferWidth16: SceInt32,
+    iUnknown: SceInt32,
+    iUnknown2: SceInt32,
+    pYBuffer: ScePVoid,
+    pYBuffer2: ScePVoid,
+    pCrBuffer: ScePVoid,
+    pCbBuffer: ScePVoid,
+    pCrBuffer2: ScePVoid,
+    pCbBuffer2: ScePVoid,
+    iFrameHeight: SceInt32,
+    iFrameWidth: SceInt32,
+    iFrameBufferWidth: SceInt32,
+    iUnknown3: [11]SceInt32,
+};
+
+pub const SceMpeg = ScePVoid;
+pub const SceMpegStream = SceVoid;
+pub const sceMpegRingbufferCB = ?*const fn (ScePVoid, SceInt32, ScePVoid) callconv(.c) SceInt32;
+
+pub const SceMpegRingbuffer = extern struct {
+    iPackets: SceInt32,
+    iUnk0: SceUInt32,
+    iUnk1: SceUInt32,
+    iUnk2: SceUInt32,
+    iUnk3: SceUInt32,
+    pData: ScePVoid,
+    Callback: sceMpegRingbufferCB,
+    pCBparam: ScePVoid,
+    iUnk4: SceUInt32,
+    iUnk5: SceUInt32,
+    pSceMpeg: SceMpeg,
+};
+
+pub const SceMpegAu = extern struct {
+    iPtsMSB: SceUInt32,
+    iPts: SceUInt32,
+    iDtsMSB: SceUInt32,
+    iDts: SceUInt32,
+    iEsBuffer: SceUInt32,
+    iAuSize: SceUInt32,
+};
+
+pub const SceMpegAvcMode = extern struct {
+    iUnk0: SceInt32,
+    iPixelFormat: SceInt32,
+};

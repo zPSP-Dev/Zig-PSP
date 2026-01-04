@@ -207,6 +207,14 @@ def parse_c_type_to_zig(c_type: str) -> str:
         "struct in_addr": "types.in_addr",
         "struct SceNetMallocStat": "types.SceNetMallocStat",
         "pspUmdInfo": "types.pspUmdInfo",
+        "SceMpeg": "types.SceMpeg",
+        "SceMpegAu": "types.SceMpegAu",
+        "SceMpegAvcMode": "types.SceMpegAvcMode",
+        "SceMpegLLI": "types.SceMpegLLI",
+        "SceMpegRingbuffer": "types.SceMpegRingbuffer",
+        "sceMpegRingbufferCB": "types.sceMpegRingbufferCB",
+        "SceMpegStream": "types.SceMpegStream",
+        "SceMpegYCrCbBuffer": "types.SceMpegYCrCbBuffer",
     }
 
     # Handle const first

@@ -7,7 +7,7 @@ const macro = @import("../macro.zig");
 /// `pBuffer` - pointer to file header
 /// `iOffset` - will contain stream offset in bytes, usually 2048
 /// Returns 0 if success.
-pub extern fn sceMpegQueryStreamOffset(Mpeg: [*c]c_int, pBuffer: types.ScePVoid, iOffset: [*c]types.SceInt32) callconv(.c) types.SceInt32;
+pub extern fn sceMpegQueryStreamOffset(Mpeg: [*c]types.SceMpeg, pBuffer: types.ScePVoid, iOffset: [*c]types.SceInt32) callconv(.c) types.SceInt32;
 
 /// sceMpegQueryStreamSize
 /// `pBuffer` - pointer to file header
@@ -36,37 +36,37 @@ pub extern fn sceMpegQueryMemSize(iUnk: c_int) callconv(.c) types.SceInt32;
 /// `iUnk1` - unknown, set to 0
 /// `iUnk2` - unknown, set to 0
 /// Returns 0 if success.
-pub extern fn sceMpegCreate(Mpeg: [*c]c_int, pData: types.ScePVoid, iSize: types.SceInt32, Ringbuffer: [*c]c_int, iFrameWidth: types.SceInt32, iUnk1: types.SceInt32, iUnk2: types.SceInt32) callconv(.c) types.SceInt32;
+pub extern fn sceMpegCreate(Mpeg: [*c]types.SceMpeg, pData: types.ScePVoid, iSize: types.SceInt32, Ringbuffer: [*c]types.SceMpegRingbuffer, iFrameWidth: types.SceInt32, iUnk1: types.SceInt32, iUnk2: types.SceInt32) callconv(.c) types.SceInt32;
 
 /// sceMpegDelete
 /// `Mpeg` - SceMpeg handle
-pub extern fn sceMpegDelete(Mpeg: [*c]c_int) callconv(.c) types.SceVoid;
+pub extern fn sceMpegDelete(Mpeg: [*c]types.SceMpeg) callconv(.c) types.SceVoid;
 
 /// sceMpegRegistStream
 /// `Mpeg` - SceMpeg handle
 /// `iStreamID` - stream id, 0 for video, 1 for audio
 /// `iUnk` - unknown, set to 0
 /// Returns 0 if error.
-pub extern fn sceMpegRegistStream(Mpeg: [*c]c_int, iStreamID: types.SceInt32, iUnk: types.SceInt32) callconv(.c) [*c]c_int;
+pub extern fn sceMpegRegistStream(Mpeg: [*c]types.SceMpeg, iStreamID: types.SceInt32, iUnk: types.SceInt32) callconv(.c) [*c]types.SceMpegStream;
 
 /// sceMpegUnRegistStream
 /// `Mpeg` - SceMpeg handle
 /// `pStream` - pointer to stream
-pub extern fn sceMpegUnRegistStream(Mpeg: c_int, pStream: [*c]c_int) callconv(.c) types.SceVoid;
+pub extern fn sceMpegUnRegistStream(Mpeg: types.SceMpeg, pStream: [*c]types.SceMpegStream) callconv(.c) types.SceVoid;
 
 /// sceMpegMallocAvcEsBuf
 /// Returns 0 if error else pointer to buffer.
-pub extern fn sceMpegMallocAvcEsBuf(Mpeg: [*c]c_int) callconv(.c) types.ScePVoid;
+pub extern fn sceMpegMallocAvcEsBuf(Mpeg: [*c]types.SceMpeg) callconv(.c) types.ScePVoid;
 
 /// sceMpegFreeAvcEsBuf
-pub extern fn sceMpegFreeAvcEsBuf(Mpeg: [*c]c_int, pBuf: types.ScePVoid) callconv(.c) types.SceVoid;
+pub extern fn sceMpegFreeAvcEsBuf(Mpeg: [*c]types.SceMpeg, pBuf: types.ScePVoid) callconv(.c) types.SceVoid;
 
 /// sceMpegQueryAtracEsSize
 /// `Mpeg` - SceMpeg handle
 /// `iEsSize` - will contain size of Es
 /// `iOutSize` - will contain size of decoded data
 /// Returns 0 if success.
-pub extern fn sceMpegQueryAtracEsSize(Mpeg: [*c]c_int, iEsSize: [*c]types.SceInt32, iOutSize: [*c]types.SceInt32) callconv(.c) types.SceInt32;
+pub extern fn sceMpegQueryAtracEsSize(Mpeg: [*c]types.SceMpeg, iEsSize: [*c]types.SceInt32, iOutSize: [*c]types.SceInt32) callconv(.c) types.SceInt32;
 
 pub extern fn sceMpegQueryPcmEsSize() callconv(.c) void;
 
@@ -75,7 +75,7 @@ pub extern fn sceMpegQueryPcmEsSize() callconv(.c) void;
 /// `pEsBuffer` - prevously allocated Es buffer
 /// `pAu` - will contain pointer to Au
 /// Returns 0 if success.
-pub extern fn sceMpegInitAu(Mpeg: [*c]c_int, pEsBuffer: types.ScePVoid, pAu: [*c]c_int) callconv(.c) types.SceInt32;
+pub extern fn sceMpegInitAu(Mpeg: [*c]types.SceMpeg, pEsBuffer: types.ScePVoid, pAu: [*c]types.SceMpegAu) callconv(.c) types.SceInt32;
 
 pub extern fn sceMpegChangeGetAvcAuMode() callconv(.c) void;
 
@@ -87,7 +87,7 @@ pub extern fn sceMpegChangeGetAuMode() callconv(.c) void;
 /// `pAu` - will contain pointer to Au
 /// `iUnk` - unknown
 /// Returns 0 if success.
-pub extern fn sceMpegGetAvcAu(Mpeg: [*c]c_int, pStream: [*c]c_int, pAu: [*c]c_int, iUnk: [*c]types.SceInt32) callconv(.c) types.SceInt32;
+pub extern fn sceMpegGetAvcAu(Mpeg: [*c]types.SceMpeg, pStream: [*c]types.SceMpegStream, pAu: [*c]types.SceMpegAu, iUnk: [*c]types.SceInt32) callconv(.c) types.SceInt32;
 
 pub extern fn sceMpegGetPcmAu() callconv(.c) void;
 
@@ -97,13 +97,13 @@ pub extern fn sceMpegGetPcmAu() callconv(.c) void;
 /// `pAu` - will contain pointer to Au
 /// `pUnk` - unknown
 /// Returns 0 if success.
-pub extern fn sceMpegGetAtracAu(Mpeg: [*c]c_int, pStream: [*c]c_int, pAu: [*c]c_int, pUnk: types.ScePVoid) callconv(.c) types.SceInt32;
+pub extern fn sceMpegGetAtracAu(Mpeg: [*c]types.SceMpeg, pStream: [*c]types.SceMpegStream, pAu: [*c]types.SceMpegAu, pUnk: types.ScePVoid) callconv(.c) types.SceInt32;
 
 pub extern fn sceMpegFlushStream() callconv(.c) void;
 
 /// sceMpegFlushAllStreams
 /// Returns 0 if success.
-pub extern fn sceMpegFlushAllStream(Mpeg: [*c]c_int) callconv(.c) types.SceInt32;
+pub extern fn sceMpegFlushAllStream(Mpeg: [*c]types.SceMpeg) callconv(.c) types.SceInt32;
 
 /// sceMpegAvcDecode
 /// `Mpeg` - SceMpeg handle
@@ -116,7 +116,7 @@ pub extern fn sceMpegFlushAllStream(Mpeg: [*c]c_int) callconv(.c) types.SceInt32
 /// `Mpeg` - SceMpeg handle
 /// `pMode` - pointer to SceMpegAvcMode struct defining the decode mode (pixelformat)
 /// Returns 0 if success.
-pub extern fn sceMpegAvcDecode(Mpeg: [*c]c_int, pAu: [*c]c_int, iFrameWidth: types.SceInt32, pBuffer: types.ScePVoid, iInit: [*c]types.SceInt32) callconv(.c) types.SceInt32;
+pub extern fn sceMpegAvcDecode(Mpeg: [*c]types.SceMpeg, pAu: [*c]types.SceMpegAu, iFrameWidth: types.SceInt32, pBuffer: types.ScePVoid, iInit: [*c]types.SceInt32) callconv(.c) types.SceInt32;
 
 pub extern fn sceMpegAvcDecodeDetail() callconv(.c) void;
 
@@ -124,7 +124,7 @@ pub extern fn sceMpegAvcDecodeDetail() callconv(.c) void;
 /// `Mpeg` - SceMpeg handle
 /// `pMode` - pointer to SceMpegAvcMode struct defining the decode mode (pixelformat)
 /// Returns 0 if success.
-pub extern fn sceMpegAvcDecodeMode(Mpeg: [*c]c_int, pMode: [*c]c_int) callconv(.c) types.SceInt32;
+pub extern fn sceMpegAvcDecodeMode(Mpeg: [*c]types.SceMpeg, pMode: [*c]types.SceMpegAvcMode) callconv(.c) types.SceInt32;
 
 /// sceMpegAvcDecodeStop
 /// `Mpeg` - SceMpeg handle
@@ -132,7 +132,7 @@ pub extern fn sceMpegAvcDecodeMode(Mpeg: [*c]c_int, pMode: [*c]c_int) callconv(.
 /// `pBuffer` - buffer that will contain the decoded frame
 /// `iStatus` - frame number
 /// Returns 0 if success.
-pub extern fn sceMpegAvcDecodeStop(Mpeg: [*c]c_int, iFrameWidth: types.SceInt32, pBuffer: types.ScePVoid, iStatus: [*c]types.SceInt32) callconv(.c) types.SceInt32;
+pub extern fn sceMpegAvcDecodeStop(Mpeg: [*c]types.SceMpeg, iFrameWidth: types.SceInt32, pBuffer: types.ScePVoid, iStatus: [*c]types.SceInt32) callconv(.c) types.SceInt32;
 
 /// sceMpegAtracDecode
 /// `Mpeg` - SceMpeg handle
@@ -140,7 +140,7 @@ pub extern fn sceMpegAvcDecodeStop(Mpeg: [*c]c_int, iFrameWidth: types.SceInt32,
 /// `pBuffer` - buffer that will contain the decoded frame
 /// `iInit` - set this to 1 on first call
 /// Returns 0 if success.
-pub extern fn sceMpegAtracDecode(Mpeg: [*c]c_int, pAu: [*c]c_int, pBuffer: types.ScePVoid, iInit: types.SceInt32) callconv(.c) types.SceInt32;
+pub extern fn sceMpegAtracDecode(Mpeg: [*c]types.SceMpeg, pAu: [*c]types.SceMpegAu, pBuffer: types.ScePVoid, iInit: types.SceInt32) callconv(.c) types.SceInt32;
 
 /// sceMpegRingbufferQueryMemSize
 /// `iPackets` - number of packets in the ringbuffer
@@ -155,23 +155,23 @@ pub extern fn sceMpegRingbufferQueryMemSize(iPackets: types.SceInt32) callconv(.
 /// `Callback` - ringbuffer callback
 /// `pCBparam` - param passed to callback
 /// Returns 0 if success.
-pub extern fn sceMpegRingbufferConstruct(Ringbuffer: [*c]c_int, iPackets: types.SceInt32, pData: types.ScePVoid, iSize: types.SceInt32, Callback: c_int, pCBparam: types.ScePVoid) callconv(.c) types.SceInt32;
+pub extern fn sceMpegRingbufferConstruct(Ringbuffer: [*c]types.SceMpegRingbuffer, iPackets: types.SceInt32, pData: types.ScePVoid, iSize: types.SceInt32, Callback: types.sceMpegRingbufferCB, pCBparam: types.ScePVoid) callconv(.c) types.SceInt32;
 
 /// sceMpegRingbufferDestruct
 /// `Ringbuffer` - pointer to a sceMpegRingbuffer struct
-pub extern fn sceMpegRingbufferDestruct(Ringbuffer: [*c]c_int) callconv(.c) types.SceVoid;
+pub extern fn sceMpegRingbufferDestruct(Ringbuffer: [*c]types.SceMpegRingbuffer) callconv(.c) types.SceVoid;
 
 /// sceMpegRingbufferPut
 /// `Ringbuffer` - pointer to a sceMpegRingbuffer struct
 /// `iNumPackets` - num packets to put into the ringbuffer
 /// `iAvailable` - free packets in the ringbuffer, should be sceMpegRingbufferAvailableSize()
 /// Returns < 0 if error else number of packets.
-pub extern fn sceMpegRingbufferPut(Ringbuffer: [*c]c_int, iNumPackets: types.SceInt32, iAvailable: types.SceInt32) callconv(.c) types.SceInt32;
+pub extern fn sceMpegRingbufferPut(Ringbuffer: [*c]types.SceMpegRingbuffer, iNumPackets: types.SceInt32, iAvailable: types.SceInt32) callconv(.c) types.SceInt32;
 
 /// sceMpegQueryMemSize
 /// `Ringbuffer` - pointer to a sceMpegRingbuffer struct
 /// Returns < 0 if error else number of free packets in the ringbuffer.
-pub extern fn sceMpegRingbufferAvailableSize(Ringbuffer: [*c]c_int) callconv(.c) types.SceInt32;
+pub extern fn sceMpegRingbufferAvailableSize(Ringbuffer: [*c]types.SceMpegRingbuffer) callconv(.c) types.SceInt32;
 
 pub extern fn sceMpeg_11CAB459() callconv(.c) void;
 
