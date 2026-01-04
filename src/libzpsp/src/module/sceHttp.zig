@@ -54,7 +54,7 @@ pub extern fn sceHttpGetNetworkPspError() callconv(.c) void;
 
 pub extern fn sceHttpSetAuthInfoCallback() callconv(.c) void;
 
-pub extern fn sceHttpSetAuthInfoCB(id: c_int, cbfunc: c_int) callconv(.c) c_int;
+pub extern fn sceHttpSetAuthInfoCB(id: c_int, cbfunc: types.PspHttpPasswordCB) callconv(.c) c_int;
 
 pub extern fn sceHttpFlushAuthList() callconv(.c) void;
 
@@ -78,7 +78,7 @@ pub extern fn sceHttp_457D221D() callconv(.c) void;
 /// `path` - Path to access
 /// `contentlength` - Length of the content (POST method only)
 /// Returns A request ID on success, < 0 on error.
-pub extern fn sceHttpCreateRequest(connectionid: c_int, method: c_int, path: [*c]c_char, contentlength: types.SceULong64) callconv(.c) c_int;
+pub extern fn sceHttpCreateRequest(connectionid: c_int, method: types.PspHttpMethod, path: [*c]c_char, contentlength: types.SceULong64) callconv(.c) c_int;
 
 /// Set resolver timeout
 /// `id` - ID of the template or connection
@@ -206,7 +206,7 @@ pub extern fn sceHttpsDisableOption() callconv(.c) void;
 /// `url` - url to access
 /// `contentlength` - Length of the content (POST method only)
 /// Returns A request ID on success, < 0 on error.
-pub extern fn sceHttpCreateRequestWithURL(connectionid: c_int, method: c_int, url: [*c]c_char, contentlength: types.SceULong64) callconv(.c) c_int;
+pub extern fn sceHttpCreateRequestWithURL(connectionid: c_int, method: types.PspHttpMethod, url: [*c]c_char, contentlength: types.SceULong64) callconv(.c) c_int;
 
 pub extern fn sceHttpsEnableOption() callconv(.c) void;
 
@@ -285,7 +285,7 @@ pub extern fn sceHttpSetProxy(id: c_int, activate_flag: c_int, mode: c_int, new_
 /// Returns 0 on success, < 0 on error.
 pub extern fn sceHttpLoadSystemCookie() callconv(.c) c_int;
 
-pub extern fn sceHttpSetMallocFunction(malloc_func: c_int, free_func: c_int, realloc_func: c_int) callconv(.c) c_int;
+pub extern fn sceHttpSetMallocFunction(malloc_func: types.PspHttpMallocFunction, free_func: types.PspHttpFreeFunction, realloc_func: types.PspHttpReallocFunction) callconv(.c) c_int;
 
 /// Terminate the https library
 /// Returns 0 on success, < 0 on error.

@@ -724,3 +724,22 @@ pub const SceMpegAvcMode = extern struct {
     iUnk0: SceInt32,
     iPixelFormat: SceInt32,
 };
+
+pub const PspHttpMallocFunction = ?*const fn (SceSize) callconv(.c) ?*anyopaque;
+pub const PspHttpFreeFunction = ?*const fn (?*anyopaque) callconv(.c) void;
+pub const PspHttpReallocFunction = ?*const fn (?*anyopaque, SceSize) callconv(.c) ?*anyopaque;
+
+const PspHttpMethod = enum(c_int) {
+    PSP_HTTP_METHOD_GET,
+    PSP_HTTP_METHOD_POST,
+    PSP_HTTP_METHOD_HEAD,
+    _,
+};
+
+const PspHttpAuthType = enum(c_int) {
+    PSP_HTTP_AUTH_BASIC,
+    PSP_HTTP_AUTH_DIGEST,
+    _,
+};
+
+pub const PspHttpPasswordCB = ?*const fn (c_int, PspHttpAuthType, [*c]const u8, [*c]u8, [*c]u8, SceBool, [*c][*c]u8, [*c]SceSize, [*c]SceBool) callconv(.c) c_int;
