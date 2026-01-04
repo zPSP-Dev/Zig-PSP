@@ -1,19 +1,19 @@
 const c = @import("libzpsp");
 
-const SceUID = c.types.SceUID;
-const SceVoid = c.types.SceVoid;
-const ScePVoid = c.types.ScePVoid;
-const SceInt32 = c.types.SceInt32;
-const SceUInt32 = c.types.SceUInt32;
+pub const SceUID = c.types.SceUID;
+pub const SceVoid = c.types.SceVoid;
+pub const ScePVoid = c.types.ScePVoid;
+pub const SceInt32 = c.types.SceInt32;
+pub const SceUInt32 = c.types.SceUInt32;
 
-const SceMpeg = c.types.SceMpeg;
-const SceMpegAu = c.types.SceMpegAu;
-const SceMpegAvcMode = c.types.SceMpegAvcMode;
-const SceMpegLLI = c.types.SceMpegLLI;
-const SceMpegRingbuffer = c.types.SceMpegRingbuffer;
-const sceMpegRingbufferCB = c.types.sceMpegRingbufferCB;
-const SceMpegStream = c.types.SceMpegStream;
-const SceMpegYCrCbBuffer = c.types.SceMpegYCrCbBuffer;
+pub const SceMpeg = c.types.SceMpeg;
+pub const SceMpegAu = c.types.SceMpegAu;
+pub const SceMpegAvcMode = c.types.SceMpegAvcMode;
+pub const SceMpegLLI = c.types.SceMpegLLI;
+pub const SceMpegRingbuffer = c.types.SceMpegRingbuffer;
+pub const sceMpegRingbufferCB = c.types.sceMpegRingbufferCB;
+pub const SceMpegStream = c.types.SceMpegStream;
+pub const SceMpegYCrCbBuffer = c.types.SceMpegYCrCbBuffer;
 
 //MpegBase
 pub extern fn sceMpegBaseYCrCbCopyVme(YUVBuffer: ScePVoid, Buffer: [*c]SceInt32, Type: SceInt32) SceInt32;

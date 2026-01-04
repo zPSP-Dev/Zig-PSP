@@ -16,13 +16,13 @@ pub extern fn sceNetApctlTerm() callconv(.c) c_int;
 /// `code` - One of the PSP_NET_APCTL_INFO_* defines.
 /// `pInfo` - Pointer to a ::SceNetApctlInfo.
 /// Returns < 0 on error.
-pub extern fn sceNetApctlGetInfo(code: c_int, pInfo: [*c]c_int) callconv(.c) c_int;
+pub extern fn sceNetApctlGetInfo(code: c_int, pInfo: [*c]types.SceNetApctlInfo) callconv(.c) c_int;
 
 /// Add an apctl event handler.
 /// `handler` - Pointer to the event handler function.
 /// `pArg` - Value to be passed to the pArg parameter of the handler function.
 /// Returns A handler id or < 0 on error.
-pub extern fn sceNetApctlAddHandler(handler: c_int, pArg: ?*anyopaque) callconv(.c) c_int;
+pub extern fn sceNetApctlAddHandler(handler: types.sceNetApctlHandler, pArg: ?*anyopaque) callconv(.c) c_int;
 
 /// Delete an apctl event handler.
 /// `handlerId` - A handler as created returned from sceNetApctlAddHandler.

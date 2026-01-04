@@ -658,12 +658,6 @@ pub const in_addr = extern struct {
     s_addr: u32,
 };
 
-pub const SceNetMallocStat = extern struct {
-    pool: c_int,
-    maximum: c_int,
-    free: c_int,
-};
-
 pub const pspUmdInfo = extern struct {
     size: c_uint,
     typec: c_uint,
@@ -743,3 +737,85 @@ const PspHttpAuthType = enum(c_int) {
 };
 
 pub const PspHttpPasswordCB = ?*const fn (c_int, PspHttpAuthType, [*c]const u8, [*c]u8, [*c]u8, SceBool, [*c][*c]u8, [*c]SceSize, [*c]SceBool) callconv(.c) c_int;
+
+pub const SceNetMallocStat = extern struct {
+    pool: c_int,
+    maximum: c_int,
+    free: c_int,
+};
+
+pub const SceNetAdhocctlGameModeInfo = extern struct {
+    count: c_int,
+    macs: [16][6]u8,
+};
+
+pub const SceNetAdhocctlParams = extern struct {
+    channel: c_int,
+    name: [8]u8,
+    bssid: [6]u8,
+    nickname: [128]u8,
+};
+
+pub const SceNetAdhocctlPeerInfo = extern struct {
+    next: [*c]SceNetAdhocctlPeerInfo,
+    nickname: [128]u8,
+    mac: [6]u8,
+    unknown: [6]u8,
+    timestamp: c_ulong,
+};
+
+pub const SceNetAdhocctlScanInfo = extern struct {
+    next: [*c]SceNetAdhocctlScanInfo,
+    channel: c_int,
+    name: [8]u8,
+    bssid: [6]u8,
+    unknown: [2]u8,
+    unknown2: c_int,
+};
+
+pub const SceNetInetTimeval = extern struct {
+    tv_sec: c_uint,
+    tv_usec: c_uint,
+};
+
+pub const SceNetApctlInfo = extern union {
+    name: [64]u8,
+    bssid: [6]u8,
+    ssid: [32]u8,
+    ssidLength: c_uint,
+    securityType: c_uint,
+    strength: u8,
+    channel: u8,
+    powerSave: u8,
+    ip: [16]u8,
+    subNetMask: [16]u8,
+    gateway: [16]u8,
+    primaryDns: [16]u8,
+    secondaryDns: [16]u8,
+    useProxy: c_uint,
+    proxyUrl: [128]u8,
+    proxyPort: c_ushort,
+    eapType: c_uint,
+    startBrowser: c_uint,
+    wifisp: c_uint,
+};
+
+pub const ptpStatStruct = extern struct {
+    next: [*c]ptpStatStruct,
+    ptpId: c_int,
+    mac: [6]u8,
+    peermac: [6]u8,
+    port: c_ushort,
+    peerport: c_ushort,
+    sentData: c_uint,
+    rcvdData: c_uint,
+    unk1: c_int,
+};
+
+pub const sceNetAdhocctlHandler = ?*const fn (c_int, c_int, ?*anyopaque) callconv(.c) void;
+pub const sceNetApctlHandler = ?*const fn (c_int, c_int, c_int, c_int, ?*anyopaque) callconv(.c) void;
+pub const pspAdhocMatchingCallback = ?*const fn (c_int, c_int, [*c]u8, c_int, ?*anyopaque) callconv(.c) void;
+
+pub const PspOpenPSID = extern struct {
+    data: [16]u8,
+};

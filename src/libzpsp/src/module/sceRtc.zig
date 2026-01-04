@@ -17,12 +17,12 @@ pub extern fn sceRtc_029CA3B3() callconv(.c) void;
 /// `time` - pointer to ScePspDateTime struct to receive time
 /// `tz` - time zone to adjust to (minutes from UTC)
 /// Returns 0 on success, < 0 on error
-pub extern fn sceRtcGetCurrentClock(time: [*c]c_int, tz: c_int) callconv(.c) c_int;
+pub extern fn sceRtcGetCurrentClock(time: [*c]types.ScePspDateTime, tz: c_int) callconv(.c) c_int;
 
 /// Get current local time into a ScePspDateTime struct
 /// `time` - pointer to ScePspDateTime struct to receive time
 /// Returns 0 on success, < 0 on error
-pub extern fn sceRtcGetCurrentClockLocalTime(time: [*c]c_int) callconv(.c) c_int;
+pub extern fn sceRtcGetCurrentClockLocalTime(time: [*c]types.ScePspDateTime) callconv(.c) c_int;
 
 /// Convert a UTC-based tickcount into a local time tick count
 /// `tickUTC` - pointer to u64 tick in UTC time
@@ -57,25 +57,25 @@ pub extern fn sceRtcGetDayOfWeek(year: c_int, month: c_int, day: c_int) callconv
 /// Validate pspDate component ranges
 /// `date` - pointer to pspDate struct to be checked
 /// Returns 0 on success, one of ::pspRtcCheckValidErrors on error
-pub extern fn sceRtcCheckValid(date: [*c]const c_int) callconv(.c) c_int;
+pub extern fn sceRtcCheckValid(date: [*c]const types.ScePspDateTime) callconv(.c) c_int;
 
-pub extern fn sceRtcSetTime_t(date: [*c]c_int, time: types.time_t) callconv(.c) c_int;
+pub extern fn sceRtcSetTime_t(date: [*c]types.ScePspDateTime, time: types.time_t) callconv(.c) c_int;
 
-pub extern fn sceRtcGetTime_t(date: [*c]const c_int, time: [*c]types.time_t) callconv(.c) c_int;
+pub extern fn sceRtcGetTime_t(date: [*c]const types.ScePspDateTime, time: [*c]types.time_t) callconv(.c) c_int;
 
-pub extern fn sceRtcSetDosTime(date: [*c]c_int, dosTime: u32) callconv(.c) c_int;
+pub extern fn sceRtcSetDosTime(date: [*c]types.ScePspDateTime, dosTime: u32) callconv(.c) c_int;
 
-pub extern fn sceRtcGetDosTime(date: [*c]c_int, dosTime: u32) callconv(.c) c_int;
+pub extern fn sceRtcGetDosTime(date: [*c]types.ScePspDateTime, dosTime: u32) callconv(.c) c_int;
 
-pub extern fn sceRtcSetWin32FileTime(date: [*c]c_int, win32Time: [*c]u64) callconv(.c) c_int;
+pub extern fn sceRtcSetWin32FileTime(date: [*c]types.ScePspDateTime, win32Time: [*c]u64) callconv(.c) c_int;
 
-pub extern fn sceRtcGetWin32FileTime(date: [*c]c_int, win32Time: [*c]u64) callconv(.c) c_int;
+pub extern fn sceRtcGetWin32FileTime(date: [*c]types.ScePspDateTime, win32Time: [*c]u64) callconv(.c) c_int;
 
 /// Set a ScePspDateTime struct based on ticks
 /// `date` - pointer to ScePspDateTime struct to set
 /// `tick` - pointer to ticks to convert
 /// Returns 0 on success, < 0 on error
-pub extern fn sceRtcSetTick(date: [*c]c_int, tick: [*c]const u64) callconv(.c) c_int;
+pub extern fn sceRtcSetTick(date: [*c]types.ScePspDateTime, tick: [*c]const u64) callconv(.c) c_int;
 
 /// Set ticks based on a ScePspDateTime struct
 /// `date` - pointer to ScePspDateTime to convert
@@ -83,7 +83,7 @@ pub extern fn sceRtcSetTick(date: [*c]c_int, tick: [*c]const u64) callconv(.c) c
 /// Returns 0 on success, < 0 on error
 /// Get the resolution of the tick counter
 /// Returns # of ticks per second
-pub extern fn sceRtcGetTick(date: [*c]const c_int, tick: [*c]u64) callconv(.c) c_int;
+pub extern fn sceRtcGetTick(date: [*c]const types.ScePspDateTime, tick: [*c]u64) callconv(.c) c_int;
 
 /// Compare two ticks
 /// `tick1` - pointer to first tick

@@ -22,7 +22,7 @@ pub extern fn sceNetAdhocMatchingTerm() callconv(.c) c_int;
 /// `msgdelay` - Message send delay in microseconds
 /// `callback` - Callback to be called for matching
 /// Returns ID of object on success, < 0 on error.
-pub extern fn sceNetAdhocMatchingCreate(mode: c_int, maxpeers: c_int, port: c_ushort, bufsize: c_int, hellodelay: c_uint, pingdelay: c_uint, initcount: c_int, msgdelay: c_uint, callback: c_int) callconv(.c) c_int;
+pub extern fn sceNetAdhocMatchingCreate(mode: c_int, maxpeers: c_int, port: c_ushort, bufsize: c_int, hellodelay: c_uint, pingdelay: c_uint, initcount: c_int, msgdelay: c_uint, callback: types.pspAdhocMatchingCallback) callconv(.c) c_int;
 
 /// Start a matching object
 /// `matchingid` - The ID returned from ::sceNetAdhocMatchingCreate

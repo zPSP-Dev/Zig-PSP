@@ -132,7 +132,7 @@ pub extern fn sceNetAdhocPtpClose(id: c_int, unk1: c_int) callconv(.c) c_int;
 /// `size` - Pointer to the size of the stat array (e.g 20 for one structure)
 /// `stat` - Pointer to a list of ::ptpStatStruct structures.
 /// Returns 0 on success, < 0 on error
-pub extern fn sceNetAdhocGetPtpStat(size: [*c]c_int, stat: [*c]c_int) callconv(.c) c_int;
+pub extern fn sceNetAdhocGetPtpStat(size: [*c]c_int, stat: [*c]types.ptpStatStruct) callconv(.c) c_int;
 
 /// Create own game object type data.
 /// `data` - A pointer to the game object data.
