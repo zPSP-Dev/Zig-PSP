@@ -646,7 +646,7 @@ pub const SceKernelUtilsSha1Context = extern struct {
     buf: [64]u8,
 };
 
-pub const pdpStatStruct  = extern struct {
+pub const pdpStatStruct = extern struct {
     next: [*c]pdpStatStruct,
     pdpId: c_int,
     mac: [6]u8,
@@ -658,8 +658,13 @@ pub const in_addr = extern struct {
     s_addr: u32,
 };
 
-pub const SceNetMallocStat  = extern struct {
+pub const SceNetMallocStat = extern struct {
     pool: c_int,
     maximum: c_int,
     free: c_int,
+};
+
+pub const pspUmdInfo = extern struct {
+    size: c_uint,
+    typec: c_uint,
 };

@@ -17,7 +17,7 @@ pub extern fn sceUmd_319ED97C() callconv(.c) void;
 /// Get the disc info
 /// `info` - A pointer to a ::pspUmdInfo struct
 /// Returns < 0 on error
-pub extern fn sceUmdGetDiscInfo(info: [*c]c_int) callconv(.c) c_int;
+pub extern fn sceUmdGetDiscInfo(info: [*c]types.pspUmdInfo) callconv(.c) c_int;
 
 pub extern fn sceUmd_3925CBD8() callconv(.c) void;
 
