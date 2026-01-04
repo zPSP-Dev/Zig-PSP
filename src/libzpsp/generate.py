@@ -745,7 +745,7 @@ def main():
         "src/sircs",
         "tools",
     ]
-    bad_files = []
+    bad_files = ["pspmscm.h"]
 
     with temporary_directory(target_dir):
         # Clone repository
