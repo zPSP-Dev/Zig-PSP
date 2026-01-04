@@ -1039,3 +1039,26 @@ pub const netData = extern union {
     asUint: u32,
     asString: [128]u8,
 };
+
+pub const PspDebugProfilerRegs = extern struct {
+    enable: u32,
+    systemck: u32,
+    cpuck: u32,
+    internal: u32,
+    memory: u32,
+    copz: u32,
+    vfpu: u32,
+    sleep: u32,
+    bus_access: u32,
+    uncached_load: u32,
+    uncached_store: u32,
+    cached_load: u32,
+    cached_store: u32,
+    i_miss: u32,
+    d_miss: u32,
+    d_writeback: u32,
+    cop0_inst: u32,
+    fpu_inst: u32,
+    vfpu_inst: u32,
+    local_bus: u32,
+};

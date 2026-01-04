@@ -251,6 +251,7 @@ def parse_c_type_to_zig(c_type: str) -> str:
         "PspIntrHandlerOptionParam": "types.PspIntrHandlerOptionParam",
         "fd_set": "types.fd_set",
         "netData": "types.netData",
+        "PspDebugProfilerRegs": "volatile types.PspDebugProfilerRegs",
     }
 
     # Handle const first
