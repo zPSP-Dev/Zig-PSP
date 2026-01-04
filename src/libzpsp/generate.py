@@ -232,6 +232,8 @@ def parse_c_type_to_zig(c_type: str) -> str:
         "sceNetApctlHandler": "types.sceNetApctlHandler",
         "pspAdhocMatchingCallback": "types.pspAdhocMatchingCallback",
         "PspOpenPSID": "types.PspOpenPSID",
+        "SceIoDirent": "types.SceIoDirent",
+        "SceIoStat": "types.SceIoStat",
     }
 
     # Handle const first
