@@ -198,7 +198,7 @@ pub extern fn sceIoDopen(dirname: [*c]const c_char) callconv(.c) types.SceUID;
 /// -   0 - No more directory entries left
 /// - > 0 - More directory entired to go
 /// - < 0 - Error
-pub extern fn sceIoDread(fd: types.SceUID, dir: [*c]c_int) callconv(.c) c_int;
+pub extern fn sceIoDread(fd: types.SceUID, dir: [*c]types.SceIoDirent) callconv(.c) c_int;
 
 /// Close an opened directory file descriptor
 /// `fd` - Already opened file descriptor (using sceIoDopen)
@@ -235,14 +235,14 @@ pub extern fn sceIoSync(device: [*c]const c_char, unk: c_uint) callconv(.c) c_in
 /// `file` - The path to the file.
 /// `stat` - A pointer to an io_stat_t structure.
 /// Returns < 0 on error.
-pub extern fn sceIoGetstat(file: [*c]const c_char, stat: [*c]c_int) callconv(.c) c_int;
+pub extern fn sceIoGetstat(file: [*c]const c_char, stat: [*c]types.SceIoStat) callconv(.c) c_int;
 
 /// Change the status of a file.
 /// `file` - The path to the file.
 /// `stat` - A pointer to an io_stat_t structure.
 /// `bits` - Bitmask defining which bits to change.
 /// Returns < 0 on error.
-pub extern fn sceIoChstat(file: [*c]const c_char, stat: [*c]c_int, bits: c_int) callconv(.c) c_int;
+pub extern fn sceIoChstat(file: [*c]const c_char, stat: [*c]types.SceIoStat, bits: c_int) callconv(.c) c_int;
 
 /// Change the name of a file
 /// `oldname` - The old filename

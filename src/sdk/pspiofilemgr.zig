@@ -1,12 +1,14 @@
-const psptypes = @import("libzpsp");
-const SceUID = psptypes.SceUID;
-const SceSize = psptypes.SceSize;
-const SceMode = psptypes.SceMode;
-const SceOff = psptypes.SceOff;
-const ScePspDateTime = psptypes.ScePspDateTime;
-const SceInt64 = psptypes.SceInt64;
+const c = @import("libzpsp");
 
-pub const enum_IOAccessModes = enum(c_int) {
+pub const SceUID = c.types.SceUID;
+pub const SceSize = c.types.SceSize;
+pub const SceMode = c.types.SceMode;
+pub const SceOff = c.types.SceOff;
+pub const SceInt64 = c.types.SceInt64;
+pub const SceIoStat = c.types.SceIoStat;
+pub const SceIoDirent = c.types.SceIoDirent;
+
+pub const IOAccessModes = enum(c_int) {
     FIO_S_IFMT = 61440,
     FIO_S_IFLNK = 16384,
     FIO_S_IFDIR = 4096,
@@ -29,7 +31,7 @@ pub const enum_IOAccessModes = enum(c_int) {
     _,
 };
 
-pub const enum_IOFileModes = enum(c_int) {
+pub const IOFileModes = enum(c_int) {
     FIO_SO_IFMT = 56,
     FIO_SO_IFLNK = 8,
     FIO_SO_IFDIR = 16,
@@ -54,25 +56,7 @@ pub const PSP_O_NOWAIT = 0x8000;
 pub const PSP_SEEK_SET = 0;
 pub const PSP_O_APPEND = 0x0100;
 
-pub const SceIoStat = extern struct {
-    st_mode: SceMode,
-    st_attr: c_uint,
-    st_size: SceOff,
-    st_ctime: ScePspDateTime,
-    st_atime: ScePspDateTime,
-    st_mtime: ScePspDateTime,
-    st_private: [6]c_uint,
-};
-
-pub const struct_SceIoDirent = extern struct {
-    d_stat: SceIoStat,
-    d_name: [256]u8,
-    d_private: ?*anyopaque,
-    dummy: c_int,
-};
-pub const SceIoDirent = struct_SceIoDirent;
-
-pub const enum_IoAssignPerms = enum(c_int) {
+pub const IoAssignPerms = enum(c_int) {
     IOASSIGN_RDWR = 0,
     IOASSIGN_RDONLY = 1,
     _,
@@ -164,7 +148,3 @@ pub extern fn sceIoDelDrv(drv_name: [*c]const u8) c_int;
 pub extern fn sceIoReopen(file: [*c]const u8, flags: c_int, mode: SceMode, fd: SceUID) c_int;
 pub extern fn sceIoGetThreadCwd(uid: SceUID, dir: [*c]u8, len: c_int) c_int;
 pub extern fn sceIoChangeThreadCwd(uid: SceUID, dir: [*c]u8) c_int;
-
-pub const IOAccessModes = enum_IOAccessModes;
-pub const IOFileModes = enum_IOFileModes;
-pub const IoAssignPerms = enum_IoAssignPerms;

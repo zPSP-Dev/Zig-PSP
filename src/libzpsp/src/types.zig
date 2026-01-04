@@ -819,3 +819,20 @@ pub const pspAdhocMatchingCallback = ?*const fn (c_int, c_int, [*c]u8, c_int, ?*
 pub const PspOpenPSID = extern struct {
     data: [16]u8,
 };
+
+pub const SceIoStat = extern struct {
+    st_mode: SceMode,
+    st_attr: c_uint,
+    st_size: SceOff,
+    st_ctime: ScePspDateTime,
+    st_atime: ScePspDateTime,
+    st_mtime: ScePspDateTime,
+    st_private: [6]c_uint,
+};
+
+pub const SceIoDirent = extern struct {
+    d_stat: SceIoStat,
+    d_name: [256]u8,
+    d_private: ?*anyopaque,
+    dummy: c_int,
+};
