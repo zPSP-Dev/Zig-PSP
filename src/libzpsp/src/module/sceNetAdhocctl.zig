@@ -26,7 +26,7 @@ pub extern fn sceNetAdhocctlCreate(name: [*c]const c_char) callconv(.c) c_int;
 /// Connect to the Adhoc control (as a client)
 /// `scaninfo` - A valid ::SceNetAdhocctlScanInfo struct that has been filled by sceNetAchocctlGetScanInfo
 /// Returns 0 on success, < 0 on error.
-pub extern fn sceNetAdhocctlJoin(scaninfo: [*c]c_int) callconv(.c) c_int;
+pub extern fn sceNetAdhocctlJoin(scaninfo: [*c]types.SceNetAdhocctlScanInfo) callconv(.c) c_int;
 
 /// Scan the adhoc channels
 /// Returns 0 on success, < 0 on error.
@@ -40,7 +40,7 @@ pub extern fn sceNetAdhocctlDisconnect() callconv(.c) c_int;
 /// `handler` - The event handler.
 /// `unknown` - Pass NULL.
 /// Returns Handler id on success, < 0 on error.
-pub extern fn sceNetAdhocctlAddHandler(handler: c_int, unknown: ?*anyopaque) callconv(.c) c_int;
+pub extern fn sceNetAdhocctlAddHandler(handler: types.sceNetAdhocctlHandler, unknown: ?*anyopaque) callconv(.c) c_int;
 
 /// Delete an adhoc event handler
 /// `id` - The handler id as returned by sceNetAdhocctlAddHandler.
@@ -79,7 +79,7 @@ pub extern fn sceNetAdhocctlGetNameByAddr(mac: [*c]u8, nickname: [*c]c_char) cal
 /// Get Adhocctl parameter
 /// `params` - Pointer to a ::SceNetAdhocctlParams
 /// Returns 0 on success, < 0 on error.
-pub extern fn sceNetAdhocctlGetParameter(params: [*c]c_int) callconv(.c) c_int;
+pub extern fn sceNetAdhocctlGetParameter(params: [*c]types.SceNetAdhocctlParams) callconv(.c) c_int;
 
 /// Get the results of a scan
 /// `length` - The length of the list.
@@ -112,14 +112,14 @@ pub extern fn sceNetAdhocctlExitGameMode() callconv(.c) c_int;
 /// Get game mode information
 /// `gamemodeinfo` - Pointer to store the info.
 /// Returns 0 on success, < 0 on error.
-pub extern fn sceNetAdhocctlGetGameModeInfo(gamemodeinfo: [*c]c_int) callconv(.c) c_int;
+pub extern fn sceNetAdhocctlGetGameModeInfo(gamemodeinfo: [*c]types.SceNetAdhocctlGameModeInfo) callconv(.c) c_int;
 
 /// Get peer information
 /// `mac` - The mac address of the peer.
 /// `size` - Size of peerinfo.
 /// `peerinfo` - Pointer to store the information.
 /// Returns 0 on success, < 0 on error.
-pub extern fn sceNetAdhocctlGetPeerInfo(mac: [*c]u8, size: c_int, peerinfo: [*c]c_int) callconv(.c) c_int;
+pub extern fn sceNetAdhocctlGetPeerInfo(mac: [*c]u8, size: c_int, peerinfo: [*c]types.SceNetAdhocctlPeerInfo) callconv(.c) c_int;
 
 comptime {
     asm (macro.import_module_start("sceNetAdhocctl", "0x00090000", "21"));

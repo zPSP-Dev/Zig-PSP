@@ -199,7 +199,7 @@ def parse_c_type_to_zig(c_type: str) -> str:
         "SceKernelSMOption": "types.SceKernelSMOption",
         "time_t": "types.time_t",
         "clock_t": "types.clock_t",
-        "ScePspDateTime ": "types.ScePspDateTime",
+        "ScePspDateTime": "types.ScePspDateTime",
         "SceKernelUtilsMt19937Context": "types.SceKernelUtilsMt19937Context",
         "SceKernelUtilsMd5Context": "types.SceKernelUtilsMd5Context",
         "SceKernelUtilsSha1Context": "types.SceKernelUtilsSha1Context",
@@ -220,6 +220,18 @@ def parse_c_type_to_zig(c_type: str) -> str:
         "PspHttpMethod": "types.PspHttpMethod",
         "PspHttpPasswordCB": "types.PspHttpPasswordCB",
         "PspHttpReallocFunction": "types.PspHttpReallocFunction",
+        "SceNetMallocStat": "types.SceNetMallocStat",
+        "struct SceNetAdhocctlGameModeInfo": "types.SceNetAdhocctlGameModeInfo",
+        "struct SceNetAdhocctlParams": "types.SceNetAdhocctlParams",
+        "struct SceNetAdhocctlPeerInfo": "types.SceNetAdhocctlPeerInfo",
+        "struct SceNetAdhocctlScanInfo": "types.SceNetAdhocctlScanInfo",
+        "struct SceNetInetTimeval": "types.SceNetInetTimeval",
+        "union SceNetApctlInfo": "types.SceNetApctlInfo",
+        "ptpStatStruct": "types.ptpStatStruct",
+        "sceNetAdhocctlHandler": "types.sceNetAdhocctlHandler",
+        "sceNetApctlHandler": "types.sceNetApctlHandler",
+        "pspAdhocMatchingCallback": "types.pspAdhocMatchingCallback",
+        "PspOpenPSID": "types.PspOpenPSID",
     }
 
     # Handle const first

@@ -2,60 +2,33 @@ const c = @import("libzpsp");
 
 pub const SceSize = c.types.SceSize;
 pub const pdpStatStruct = c.types.pdpStatStruct;
-pub const SceNetMallocStat = c.types.SceNetMallocStat;
 pub const in_addr = c.types.in_addr;
 
-pub const ptpStatStruct  = extern struct {
-    next: [*c]ptpStatStruct,
-    ptpId: c_int,
-    mac: [6]u8,
-    peermac: [6]u8,
-    port: c_ushort,
-    peerport: c_ushort,
-    sentData: c_uint,
-    rcvdData: c_uint,
-    unk1: c_int,
-};
+pub const SceNetMallocStat = c.types.SceNetMallocStat;
+pub const SceNetAdhocctlGameModeInfo = c.types.SceNetAdhocctlGameModeInfo;
+pub const SceNetAdhocctlParams = c.types.SceNetAdhocctlParams;
+pub const SceNetAdhocctlPeerInfo = c.types.SceNetAdhocctlPeerInfo;
+pub const SceNetAdhocctlScanInfo = c.types.SceNetAdhocctlScanInfo;
+pub const SceNetInetTimeval = c.types.SceNetInetTimeval;
+pub const SceNetApctlInfo = c.types.SceNetApctlInfo;
+pub const sceNetAdhocctlHandler = c.types.sceNetAdhocctlHandler;
+pub const sceNetApctlHandler = c.types.sceNetApctlHandler;
+pub const pspAdhocMatchingCallback = c.types.pspAdhocMatchingCallback;
+pub const ptpStatStruct = c.types.ptpStatStruct;
 
 pub const socklen_t = u32;
 pub const sa_family_t = u8;
 
-pub const struct_sockaddr = extern struct {
+pub const sockaddr = extern struct {
     sa_len: u8,
     sa_family: sa_family_t,
     sa_data: [14]u8,
 };
-pub const sockaddr = struct_sockaddr;
 
-pub const struct_productStruct = extern struct {
+pub const productStruct = extern struct {
     unknown: c_int,
     product: [9]u8,
     unk: [3]u8,
-};
-pub const struct_SceNetAdhocctlPeerInfo = extern struct {
-    next: [*c]struct_SceNetAdhocctlPeerInfo,
-    nickname: [128]u8,
-    mac: [6]u8,
-    unknown: [6]u8,
-    timestamp: c_ulong,
-};
-pub const struct_SceNetAdhocctlScanInfo = extern struct {
-    next: [*c]struct_SceNetAdhocctlScanInfo,
-    channel: c_int,
-    name: [8]u8,
-    bssid: [6]u8,
-    unknown: [2]u8,
-    unknown2: c_int,
-};
-pub const struct_SceNetAdhocctlGameModeInfo = extern struct {
-    count: c_int,
-    macs: [16][6]u8,
-};
-pub const struct_SceNetAdhocctlParams = extern struct {
-    channel: c_int,
-    name: [8]u8,
-    bssid: [6]u8,
-    nickname: [128]u8,
 };
 
 pub const ApctlState = enum(c_int) {
@@ -110,9 +83,7 @@ pub const ApctlInfoSecurityType = enum(c_int) {
     Wpa,
 };
 
-pub const sceNetAdhocctlHandler = ?*const fn (c_int, c_int, ?*anyopaque) callconv(.c) void;
-
-pub const enum_pspAdhocMatchingEvents = enum(c_int) {
+pub const pspAdhocMatchingEvents = enum(c_int) {
     PSP_ADHOC_MATCHING_EVENT_HELLO = 1,
     PSP_ADHOC_MATCHING_EVENT_JOIN = 2,
     PSP_ADHOC_MATCHING_EVENT_LEFT = 3,
@@ -129,14 +100,14 @@ pub const enum_pspAdhocMatchingEvents = enum(c_int) {
     _,
 };
 
-pub const enum_pspAdhocMatchingModes = enum(c_int) {
+pub const pspAdhocMatchingModes = enum(c_int) {
     PSP_ADHOC_MATCHING_MODE_HOST = 1,
     PSP_ADHOC_MATCHING_MODE_CLIENT = 2,
     PSP_ADHOC_MATCHING_MODE_PTP = 3,
     _,
 };
-pub const struct_pspAdhocMatchingMember = extern struct {
-    next: [*c]struct_pspAdhocMatchingMember,
+pub const pspAdhocMatchingMember = extern struct {
+    next: [*c]pspAdhocMatchingMember,
     mac: [6]u8,
     unknown: [2]u8,
 };
@@ -145,39 +116,6 @@ pub const pspAdhocPoolStat = extern struct {
     maxsize: c_int,
     freesize: c_int,
 };
-
-pub const SceNetApctlInfo = extern union {
-    name: [64]u8,
-    bssid: [6]u8,
-    ssid: [32]u8,
-    ssidLength: c_uint,
-    securityType: c_uint,
-    strength: u8,
-    channel: u8,
-    powerSave: u8,
-    ip: [16]u8,
-    subNetMask: [16]u8,
-    gateway: [16]u8,
-    primaryDns: [16]u8,
-    secondaryDns: [16]u8,
-    useProxy: c_uint,
-    proxyUrl: [128]u8,
-    proxyPort: c_ushort,
-    eapType: c_uint,
-    startBrowser: c_uint,
-    wifisp: c_uint,
-};
-pub const sceNetApctlHandler = ?*const fn (c_int, c_int, c_int, c_int, ?*anyopaque) callconv(.c) void;
-pub const productStruct = struct_productStruct;
-pub const SceNetAdhocctlPeerInfo = struct_SceNetAdhocctlPeerInfo;
-pub const SceNetAdhocctlScanInfo = struct_SceNetAdhocctlScanInfo;
-pub const SceNetAdhocctlGameModeInfo = struct_SceNetAdhocctlGameModeInfo;
-pub const SceNetAdhocctlParams = struct_SceNetAdhocctlParams;
-pub const pspAdhocMatchingEvents = enum_pspAdhocMatchingEvents;
-pub const pspAdhocMatchingModes = enum_pspAdhocMatchingModes;
-pub const pspAdhocMatchingMember = struct_pspAdhocMatchingMember;
-
-pub const pspAdhocMatchingCallback = ?*const fn (c_int, c_int, [*c]u8, c_int, ?*anyopaque) callconv(.c) void;
 
 pub extern fn sceNetInit(poolsize: c_int, calloutprio: c_int, calloutstack: c_int, netintrprio: c_int, netintrstack: c_int) c_int;
 pub extern fn sceNetTerm() c_int;
@@ -209,27 +147,27 @@ pub extern fn sceNetAdhocPtpRecv(id: c_int, data: ?*anyopaque, datasize: [*c]c_i
 pub extern fn sceNetAdhocPtpFlush(id: c_int, timeout: c_uint, nonblock: c_int) c_int;
 pub extern fn sceNetAdhocPtpClose(id: c_int, unk1: c_int) c_int;
 pub extern fn sceNetAdhocGetPtpStat(size: [*c]c_int, stat: [*c]ptpStatStruct) c_int;
-pub extern fn sceNetAdhocctlInit(stacksize: c_int, priority: c_int, product: [*c]struct_productStruct) c_int;
+pub extern fn sceNetAdhocctlInit(stacksize: c_int, priority: c_int, product: [*c]productStruct) c_int;
 pub extern fn sceNetAdhocctlTerm() c_int;
 pub extern fn sceNetAdhocctlConnect(name: [*c]const u8) c_int;
 pub extern fn sceNetAdhocctlDisconnect() c_int;
 pub extern fn sceNetAdhocctlGetState(event: [*c]c_int) c_int;
 pub extern fn sceNetAdhocctlCreate(name: [*c]const u8) c_int;
-pub extern fn sceNetAdhocctlJoin(scaninfo: [*c]struct_SceNetAdhocctlScanInfo) c_int;
-pub extern fn sceNetAdhocctlGetAdhocId(product: [*c]struct_productStruct) c_int;
+pub extern fn sceNetAdhocctlJoin(scaninfo: [*c]SceNetAdhocctlScanInfo) c_int;
+pub extern fn sceNetAdhocctlGetAdhocId(product: [*c]productStruct) c_int;
 pub extern fn sceNetAdhocctlCreateEnterGameMode(name: [*c]const u8, unknown: c_int, num: c_int, macs: [*c]u8, timeout: c_uint, unknown2: c_int) c_int;
 pub extern fn sceNetAdhocctlJoinEnterGameMode(name: [*c]const u8, hostmac: [*c]u8, timeout: c_uint, unknown: c_int) c_int;
-pub extern fn sceNetAdhocctlGetGameModeInfo(gamemodeinfo: [*c]struct_SceNetAdhocctlGameModeInfo) c_int;
+pub extern fn sceNetAdhocctlGetGameModeInfo(gamemodeinfo: [*c]SceNetAdhocctlGameModeInfo) c_int;
 pub extern fn sceNetAdhocctlExitGameMode() c_int;
 pub extern fn sceNetAdhocctlGetPeerList(length: [*c]c_int, buf: ?*anyopaque) c_int;
-pub extern fn sceNetAdhocctlGetPeerInfo(mac: [*c]u8, size: c_int, peerinfo: [*c]struct_SceNetAdhocctlPeerInfo) c_int;
+pub extern fn sceNetAdhocctlGetPeerInfo(mac: [*c]u8, size: c_int, peerinfo: [*c]SceNetAdhocctlPeerInfo) c_int;
 pub extern fn sceNetAdhocctlScan() c_int;
 pub extern fn sceNetAdhocctlGetScanInfo(length: [*c]c_int, buf: ?*anyopaque) c_int;
 pub extern fn sceNetAdhocctlAddHandler(handler: sceNetAdhocctlHandler, unknown: ?*anyopaque) c_int;
 pub extern fn sceNetAdhocctlDelHandler(id: c_int) c_int;
 pub extern fn sceNetAdhocctlGetNameByAddr(mac: [*c]u8, nickname: [*c]u8) c_int;
 pub extern fn sceNetAdhocctlGetAddrByName(nickname: [*c]u8, length: [*c]c_int, buf: ?*anyopaque) c_int;
-pub extern fn sceNetAdhocctlGetParameter(params: [*c]struct_SceNetAdhocctlParams) c_int;
+pub extern fn sceNetAdhocctlGetParameter(params: [*c]SceNetAdhocctlParams) c_int;
 pub extern fn sceNetAdhocMatchingInit(memsize: c_int) c_int;
 pub extern fn sceNetAdhocMatchingTerm() c_int;
 pub extern fn sceNetAdhocMatchingCreate(mode: c_int, maxpeers: c_int, port: c_ushort, bufsize: c_int, hellodelay: c_uint, pingdelay: c_uint, initcount: c_int, msgdelay: c_uint, callback: pspAdhocMatchingCallback) c_int;
@@ -256,15 +194,15 @@ pub extern fn sceNetApctlDisconnect() c_int;
 pub extern fn sceNetApctlGetState(pState: [*c]c_int) c_int;
 pub extern fn sceNetInetInit() c_int;
 pub extern fn sceNetInetTerm() c_int;
-pub extern fn sceNetInetAccept(s: c_int, addr: [*c]struct_sockaddr, addrlen: [*c]socklen_t) c_int;
-pub extern fn sceNetInetBind(s: c_int, my_addr: [*c]const struct_sockaddr, addrlen: socklen_t) c_int;
-pub extern fn sceNetInetConnect(s: c_int, serv_addr: [*c]const struct_sockaddr, addrlen: socklen_t) c_int;
+pub extern fn sceNetInetAccept(s: c_int, addr: [*c]sockaddr, addrlen: [*c]socklen_t) c_int;
+pub extern fn sceNetInetBind(s: c_int, my_addr: [*c]const sockaddr, addrlen: socklen_t) c_int;
+pub extern fn sceNetInetConnect(s: c_int, serv_addr: [*c]const sockaddr, addrlen: socklen_t) c_int;
 pub extern fn sceNetInetGetsockopt(s: c_int, level: c_int, optname: c_int, optval: ?*anyopaque, optlen: [*c]socklen_t) c_int;
 pub extern fn sceNetInetListen(s: c_int, backlog: c_int) c_int;
 pub extern fn sceNetInetRecv(s: c_int, buf: ?*anyopaque, len: u32, flags: c_int) u32;
-pub extern fn sceNetInetRecvfrom(s: c_int, buf: ?*anyopaque, flags: u32, c_int, from: [*c]struct_sockaddr, fromlen: [*c]socklen_t) u32;
+pub extern fn sceNetInetRecvfrom(s: c_int, buf: ?*anyopaque, flags: u32, c_int, from: [*c]sockaddr, fromlen: [*c]socklen_t) u32;
 pub extern fn sceNetInetSend(s: c_int, buf: ?*const anyopaque, len: u32, flags: c_int) u32;
-pub extern fn sceNetInetSendto(s: c_int, buf: ?*const anyopaque, len: u32, flags: c_int, to: [*c]const struct_sockaddr, tolen: socklen_t) u32;
+pub extern fn sceNetInetSendto(s: c_int, buf: ?*const anyopaque, len: u32, flags: c_int, to: [*c]const sockaddr, tolen: socklen_t) u32;
 pub extern fn sceNetInetSetsockopt(s: c_int, level: c_int, optname: c_int, optval: ?*const anyopaque, optlen: socklen_t) c_int;
 pub extern fn sceNetInetShutdown(s: c_int, how: c_int) c_int;
 pub extern fn sceNetInetSocket(domain: c_int, type: c_int, protocol: c_int) c_int;

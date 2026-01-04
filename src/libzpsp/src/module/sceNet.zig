@@ -43,7 +43,7 @@ pub extern fn sceNetGetLocalEtherAddr(mac: [*c]u8) callconv(.c) c_int;
 /// Retrieve the networking library memory usage
 /// `stat` - Pointer to a ::SceNetMallocStat type to store the result.
 /// Returns 0 on success, < 0 on error
-pub extern fn sceNetGetMallocStat(stat: [*c]c_int) callconv(.c) c_int;
+pub extern fn sceNetGetMallocStat(stat: [*c]types.SceNetMallocStat) callconv(.c) c_int;
 
 comptime {
     asm (macro.import_module_start("sceNet", "0x00090000", "8"));

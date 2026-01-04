@@ -1,5 +1,5 @@
-pub const PspOpenPSID = extern struct {
-    data: [16]u8,
-};
+const c = @import("libzpsp");
+
+pub const PspOpenPSID = c.types.PspOpenPSID;
 
 pub extern fn sceOpenPSIDGetOpenPSID(openpsid: *PspOpenPSID) c_int;
