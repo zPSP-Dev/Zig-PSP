@@ -1,5 +1,8 @@
-const psptypes = @import("libzpsp");
-const SceSize = psptypes.SceSize;
+const c = @import("libzpsp");
+
+pub const SceSize = c.types.SceSize;
+pub const RegHandle = c.types.REGHANDLE;
+pub const RegParam = c.types.RegParam;
 
 pub const RegKeyTypes = enum(c_int) {
     REG_TYPE_DIR = 1,
@@ -7,14 +10,6 @@ pub const RegKeyTypes = enum(c_int) {
     REG_TYPE_STR = 3,
     REG_TYPE_BIN = 4,
     _,
-};
-pub const RegHandle = c_uint;
-pub const RegParam = extern struct {
-    regtype: c_uint,
-    name: [256]u8,
-    namelen: c_uint,
-    unk2: c_uint,
-    unk3: c_uint,
 };
 
 // Open the registry

@@ -131,6 +131,8 @@ def parse_c_type_to_zig(c_type: str) -> str:
         "i32": "i32",
         "i16": "i16",
         "i8": "i8",
+        "unsigned": "i32",
+        "s32": "i32",
         # PSP-specific types
         "SceUID": "types.SceUID",
         "SceSize": "types.SceSize",
@@ -199,6 +201,7 @@ def parse_c_type_to_zig(c_type: str) -> str:
         "SceKernelSMOption": "types.SceKernelSMOption",
         "time_t": "types.time_t",
         "clock_t": "types.clock_t",
+        "struct timezone": "types.timezone",
         "ScePspDateTime": "types.ScePspDateTime",
         "SceKernelUtilsMt19937Context": "types.SceKernelUtilsMt19937Context",
         "SceKernelUtilsMd5Context": "types.SceKernelUtilsMd5Context",
@@ -227,6 +230,7 @@ def parse_c_type_to_zig(c_type: str) -> str:
         "struct SceNetAdhocctlScanInfo": "types.SceNetAdhocctlScanInfo",
         "struct SceNetInetTimeval": "types.SceNetInetTimeval",
         "union SceNetApctlInfo": "types.SceNetApctlInfo",
+        "struct productStruct": "types.productStruct",
         "ptpStatStruct": "types.ptpStatStruct",
         "sceNetAdhocctlHandler": "types.sceNetAdhocctlHandler",
         "sceNetApctlHandler": "types.sceNetApctlHandler",
@@ -235,6 +239,18 @@ def parse_c_type_to_zig(c_type: str) -> str:
         "SceIoDirent": "types.SceIoDirent",
         "SceIoStat": "types.SceIoStat",
         "SceMp3InitArg": "types.SceMp3InitArg",
+        "PspBufferInfo": "types.PspBufferInfo",
+        "pspAudioInputParams": "types.pspAudioInputParams",
+        "SceLwMutexWorkarea": "types.SceLwMutexWorkarea",
+        "REGHANDLE": "types.REGHANDLE",
+        "struct RegParam": "types.RegParam",
+        "struct SceKernelTimeval": "types.SceKernelTimeval",
+        "struct pspAdhocPoolStat": "types.pspAdhocPoolStat",
+        "SceUtilitySavedataParam": "types.SceUtilitySavedataParam",
+        "SceUtilityOskParams": "types.SceUtilityOskParams",
+        "PspIntrHandlerOptionParam": "types.PspIntrHandlerOptionParam",
+        "fd_set": "types.fd_set",
+        "netData": "types.netData",
     }
 
     # Handle const first

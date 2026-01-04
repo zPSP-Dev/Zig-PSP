@@ -11,10 +11,13 @@ pub const SceNetAdhocctlPeerInfo = c.types.SceNetAdhocctlPeerInfo;
 pub const SceNetAdhocctlScanInfo = c.types.SceNetAdhocctlScanInfo;
 pub const SceNetInetTimeval = c.types.SceNetInetTimeval;
 pub const SceNetApctlInfo = c.types.SceNetApctlInfo;
+pub const pspAdhocPoolStat = c.types.pspAdhocPoolStat;
 pub const sceNetAdhocctlHandler = c.types.sceNetAdhocctlHandler;
 pub const sceNetApctlHandler = c.types.sceNetApctlHandler;
 pub const pspAdhocMatchingCallback = c.types.pspAdhocMatchingCallback;
+pub const productStruct = c.types.productStruct;
 pub const ptpStatStruct = c.types.ptpStatStruct;
+
 
 pub const socklen_t = u32;
 pub const sa_family_t = u8;
@@ -23,12 +26,6 @@ pub const sockaddr = extern struct {
     sa_len: u8,
     sa_family: sa_family_t,
     sa_data: [14]u8,
-};
-
-pub const productStruct = extern struct {
-    unknown: c_int,
-    product: [9]u8,
-    unk: [3]u8,
 };
 
 pub const ApctlState = enum(c_int) {
@@ -110,11 +107,6 @@ pub const pspAdhocMatchingMember = extern struct {
     next: [*c]pspAdhocMatchingMember,
     mac: [6]u8,
     unknown: [2]u8,
-};
-pub const pspAdhocPoolStat = extern struct {
-    size: c_int,
-    maxsize: c_int,
-    freesize: c_int,
 };
 
 pub extern fn sceNetInit(poolsize: c_int, calloutprio: c_int, calloutstack: c_int, netintrprio: c_int, netintrstack: c_int) c_int;

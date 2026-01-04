@@ -37,7 +37,7 @@ pub extern fn sceUsbActivate(pid: u32) callconv(.c) c_int;
 /// Returns 0 on success
 pub extern fn sceUsbDeactivate(pid: u32) callconv(.c) c_int;
 
-pub extern fn sceUsbWaitState(state: u32, waitmode: c_int, timeout: [*c]u32) callconv(.c) c_int;
+pub extern fn sceUsbWaitState(state: u32, waitmode: i32, timeout: [*c]u32) callconv(.c) c_int;
 
 pub extern fn sceUsbWaitCancel() callconv(.c) c_int;
 

@@ -145,7 +145,7 @@ pub extern fn sceAudioGetChannelRestLength(channel: c_int) callconv(.c) c_int;
 /// Init audio input (with extra arguments)
 /// `params` - A pointer to a ::pspAudioInputParams struct.
 /// Returns 0 on success, an error if less than 0.
-pub extern fn sceAudioInputInitEx(params: [*c]c_int) callconv(.c) c_int;
+pub extern fn sceAudioInputInitEx(params: [*c]types.pspAudioInputParams) callconv(.c) c_int;
 
 /// Reserve the audio output and set the output sample count
 /// `samplecount` - The number of samples to output in one output call (min 17, max 4111).

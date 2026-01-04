@@ -1,4 +1,7 @@
-const psptypes = @import("libzpsp");
+const c = @import("libzpsp");
+const psptypes = c;
+
+pub const PspBufferInfo = c.types.PspBufferInfo;
 
 pub const AtracError = enum(u32) {
     ParamFail = (0x80630001),
@@ -99,18 +102,6 @@ fn intToError(res: c_int) !void {
         }
     }
 }
-
-//Buffer information
-pub const PspBufferInfo = extern struct {
-    pucWritePositionFirstBuf: [*c]u8,
-    uiWritableByteFirstBuf: u32,
-    uiMinWriteByteFirstBuf: u32,
-    uiReadPositionFirstBuf: u32,
-    pucWritePositionSecondBuf: [*c]u8,
-    uiWritableByteSecondBuf: u32,
-    uiMinWriteByteSecondBuf: u32,
-    uiReadPositionSecondBuf: u32,
-};
 
 pub extern fn sceAtracGetAtracID(uiCodecType: u32) c_int;
 

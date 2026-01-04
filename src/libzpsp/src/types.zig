@@ -614,6 +614,11 @@ pub const SceKernelModuleInfo = extern struct {
 pub const time_t = u32;
 pub const clock_t = u32;
 
+pub const timezone = extern struct {
+    tz_minuteswest: c_int,
+    tz_dsttime: c_int,
+};
+
 pub const ScePspDateTime = extern struct {
     year: u16,
     month: u16,
@@ -800,6 +805,12 @@ pub const SceNetApctlInfo = extern union {
     wifisp: c_uint,
 };
 
+pub const productStruct = extern struct {
+    unknown: c_int,
+    product: [9]u8,
+    unk: [3]u8,
+};
+
 pub const ptpStatStruct = extern struct {
     next: [*c]ptpStatStruct,
     ptpId: c_int,
@@ -810,6 +821,12 @@ pub const ptpStatStruct = extern struct {
     sentData: c_uint,
     rcvdData: c_uint,
     unk1: c_int,
+};
+
+pub const pspAdhocPoolStat = extern struct {
+    size: c_int,
+    maxsize: c_int,
+    freesize: c_int,
 };
 
 pub const sceNetAdhocctlHandler = ?*const fn (c_int, c_int, ?*anyopaque) callconv(.c) void;
@@ -846,4 +863,179 @@ pub const SceMp3InitArg = extern struct {
     mp3BufSize: SceInt32,
     pcmBuf: ?*SceVoid,
     pcmBufSize: SceInt32,
+};
+
+pub const PspBufferInfo = extern struct {
+    pucWritePositionFirstBuf: [*c]u8,
+    uiWritableByteFirstBuf: u32,
+    uiMinWriteByteFirstBuf: u32,
+    uiReadPositionFirstBuf: u32,
+    pucWritePositionSecondBuf: [*c]u8,
+    uiWritableByteSecondBuf: u32,
+    uiMinWriteByteSecondBuf: u32,
+    uiReadPositionSecondBuf: u32,
+};
+
+pub const pspAudioInputParams = extern struct {
+    unknown1: c_int, // Unknown. Pass 0
+    gain: c_int,
+    unknown2: c_int, // Unknown. Pass 0
+    unknown3: c_int, // Unknown. Pass 0
+    unknown4: c_int, // Unknown. Pass 0
+    unknown5: c_int, // Unknown. Pass 0
+};
+
+// Struct as workarea for lightweight mutex
+pub const SceLwMutexWorkarea = extern struct {
+    lockLevel: c_int, //* Count */
+    lockThread: SceUID, //* Locking thread */
+    attr: c_int, //* Attribute */
+    numWaitThreads: c_int, //* Number of waiting threads */
+    uid: SceUID, //* UID */
+    pad: [3]c_int, //* Padding */
+};
+
+pub const REGHANDLE = u32;
+
+pub const RegParam = extern struct {
+    regtype: c_uint,
+    name: [256]u8,
+    namelen: c_uint,
+    unk2: c_uint,
+    unk3: c_uint,
+};
+
+pub const SceKernelTimeval = SceNetInetTimeval;
+
+pub const PspUtilityDialogCommon = extern struct {
+    size: c_uint,
+    language: c_int,
+    buttonSwap: c_int,
+    graphicsThread: c_int,
+    accessThread: c_int,
+    fontThread: c_int,
+    soundThread: c_int,
+    result: c_int,
+    reserved: [4]c_int,
+};
+
+const PspUtilitySavedataMode = enum(c_int) {
+    Autoload = 0,
+    Autosave = 1,
+    Load = 2,
+    Save = 3,
+    ListLoad = 4,
+    ListSave = 5,
+    ListDelete = 6,
+    Delete = 7,
+    _,
+};
+
+const PspUtilitySavedataFocus = enum(c_int) {
+    Unknown = 0,
+    FirstList = 1,
+    LastList = 2,
+    Latest = 3,
+    Oldest = 4,
+    Unknown2 = 5,
+    Unknown3 = 6,
+    FirstEmpty = 7,
+    LastEmpty = 8,
+    _,
+};
+
+pub const PspUtilitySavedataSFOParam = extern struct {
+    title: [128]u8,
+    savedataTitle: [128]u8,
+    detail: [1024]u8,
+    parentalLevel: u8,
+    unknown: [3]u8,
+};
+
+pub const PspUtilitySavedataFileData = extern struct {
+    buf: ?*anyopaque,
+    bufSize: SceSize,
+    size: SceSize,
+    unknown: c_int,
+};
+
+pub const PspUtilitySavedataListSaveNewData = extern struct {
+    icon0: PspUtilitySavedataFileData,
+    title: [*c]u8,
+};
+
+pub const SceUtilitySavedataParam = extern struct {
+    base: PspUtilityDialogCommon,
+    mode: PspUtilitySavedataMode,
+    unknown1: c_int,
+    overwrite: c_int,
+    gameName: [13]u8,
+    reserved: [3]u8,
+    saveName: [20]u8,
+    saveNameList: [*c][20]u8,
+    fileName: [13]u8,
+    reserved1: [3]u8,
+    dataBuf: ?*anyopaque,
+    dataBufSize: SceSize,
+    dataSize: SceSize,
+    sfoParam: PspUtilitySavedataSFOParam,
+    icon0FileData: PspUtilitySavedataFileData,
+    icon1FileData: PspUtilitySavedataFileData,
+    pic1FileData: PspUtilitySavedataFileData,
+    snd0FileData: PspUtilitySavedataFileData,
+    newData: [*c]PspUtilitySavedataListSaveNewData,
+    focus: PspUtilitySavedataFocus,
+    unknown2: [4]c_int,
+};
+
+pub const SceUtilityOskData = extern struct {
+    unk_00: c_int,
+    unk_04: c_int,
+    language: c_int,
+    unk_12: c_int,
+    inputtype: c_int,
+    lines: c_int,
+    unk_24: c_int,
+    desc: [*c]c_ushort,
+    intext: [*c]c_ushort,
+    outtextlength: c_int,
+    outtext: [*c]c_ushort,
+    result: c_int,
+    outtextlimit: c_int,
+};
+
+pub const SceUtilityOskParams = extern struct {
+    base: PspUtilityDialogCommon,
+    datacount: c_int,
+    data: [*c]SceUtilityOskData,
+    state: c_int,
+    unk_60: c_int,
+};
+
+pub const PspIntrHandlerOptionParam = extern struct {
+    size: u32, //+00
+    entry: u32, //+04
+    common: u32, //+08
+    gp: u32, //+0C
+    intr_code: u16, //+10
+    sub_count: u16, //+12
+    intr_level: u16, //+14
+    enabled: u16, //+16
+    calls: u32, //+18
+    field_1C: u32, //+1C
+    total_clock_lo: u32, //+20
+    total_clock_hi: u32, //+24
+    min_clock_lo: u32, //+28
+    min_clock_hi: u32, //+2C
+    max_clock_lo: u32, //+30
+    max_clock_hi: u32, //+34
+}; //=38
+
+pub const fd_set = extern struct {
+    fds_bits: u32[8],
+};
+
+pub const netData = extern union {
+    asUint: u32,
+    asString: [128]u8,
 };

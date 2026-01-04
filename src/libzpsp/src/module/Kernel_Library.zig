@@ -28,19 +28,19 @@ pub extern fn sceKernelIsCpuIntrEnable() callconv(.c) c_int;
 /// `lockCount` - value of increase the lock counter
 /// `pTimeout` - The pointer for timeout waiting
 /// Returns 0 on success, otherwise one of ::PspKernelErrorCodes
-pub extern fn sceKernelLockLwMutex(workarea: [*c]c_int, lockCount: c_int, pTimeout: [*c]c_uint) callconv(.c) c_int;
+pub extern fn sceKernelLockLwMutex(workarea: [*c]types.SceLwMutexWorkarea, lockCount: c_int, pTimeout: [*c]c_uint) callconv(.c) c_int;
 
 /// Lock a lightweight mutex
 /// `workarea` - The pointer to the workarea
 /// `lockCount` - value of decrease the lock counter
 /// Returns 0 on success, otherwise one of ::PspKernelErrorCodes
-pub extern fn sceKernelUnlockLwMutex(workarea: [*c]c_int, lockCount: c_int) callconv(.c) c_int;
+pub extern fn sceKernelUnlockLwMutex(workarea: [*c]types.SceLwMutexWorkarea, lockCount: c_int) callconv(.c) c_int;
 
 /// Try to lock a lightweight mutex
 /// `workarea` - The pointer to the workarea
 /// `lockCount` - value of increase the lock counter
 /// Returns 0 on success, otherwise one of ::PspKernelErrorCodes
-pub extern fn sceKernelTryLockLwMutex(workarea: [*c]c_int, lockCount: c_int) callconv(.c) c_int;
+pub extern fn sceKernelTryLockLwMutex(workarea: [*c]types.SceLwMutexWorkarea, lockCount: c_int) callconv(.c) c_int;
 
 comptime {
     asm (macro.import_module_start("Kernel_Library", "0x00010000", "8"));

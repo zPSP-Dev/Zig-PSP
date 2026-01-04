@@ -1,15 +1,11 @@
+const c = @import("libzpsp");
+
+pub const pspAudioInputParams = c.types.pspAudioInputParams;
+
 pub const PspAudioFormats = enum(c_int) {
     Stereo = 0,
     Mono = 16,
     _,
-};
-pub const PspAudioInputParams = extern struct {
-    unknown1: c_int,
-    gain: c_int,
-    unknown2: c_int,
-    unknown3: c_int,
-    unknown4: c_int,
-    unknown5: c_int,
 };
 
 // Allocate and initialize a hardware output channel.
@@ -196,7 +192,7 @@ pub extern fn sceAudioInputInit(unknown1: c_int, gain: c_int, unknown2: c_int) c
 // @param params - A pointer to a ::pspAudioInputParams struct.
 //
 // @return 0 on success, an error if less than 0.
-pub extern fn sceAudioInputInitEx(params: [*]PspAudioInputParams) c_int;
+pub extern fn sceAudioInputInitEx(params: [*]pspAudioInputParams) c_int;
 
 // Perform audio input (blocking)
 //

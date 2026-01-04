@@ -1,24 +1,18 @@
-const psptypes = @import("libzpsp");
-const SceUID = psptypes.SceUID;
-const SceSize = psptypes.SceSize;
+const c = @import("libzpsp");
 
-pub const PspUtilityDialogCommon = extern struct {
-    size: c_uint,
-    language: c_int,
-    buttonSwap: c_int,
-    graphicsThread: c_int,
-    accessThread: c_int,
-    fontThread: c_int,
-    soundThread: c_int,
-    result: c_int,
-    reserved: [4]c_int,
-};
+pub const SceUID = c.types.SceUID;
+pub const SceSize = c.types.SceSize;
+
+pub const SceUtilitySavedataParam = c.types.SceUtilitySavedataParam;
+pub const PspUtilityDialogCommon = c.types.PspUtilityDialogCommon;
+pub const SceUtilityOskParams = c.types.SceUtilityOskParams;
 
 pub const PspUtilityMsgDialogMode = enum(c_int) {
     Error = 0,
     Text = 1,
     _,
 };
+
 const PspUtilityMsgDialogOption = enum(c_int) {
     Error = 0,
     Text = 1,
@@ -32,6 +26,7 @@ pub const PspUtilityMsgDialogPressed = enum(c_int) {
     No = 2,
     Back = 3,
 };
+
 pub const PspUtilityMsgDialogParams = extern struct {
     base: PspUtilityDialogCommon,
     unknown: c_int,
@@ -80,75 +75,6 @@ pub extern fn sceUtilityCreateNetParam(conf: c_int) c_int;
 pub extern fn sceUtilitySetNetParam(param: c_int, val: ?*const anyopaque) c_int;
 pub extern fn sceUtilityCopyNetParam(src: c_int, dest: c_int) c_int;
 pub extern fn sceUtilityDeleteNetParam(conf: c_int) c_int;
-
-const PspUtilitySavedataMode = enum(c_int) {
-    Autoload = 0,
-    Autosave = 1,
-    Load = 2,
-    Save = 3,
-    ListLoad = 4,
-    ListSave = 5,
-    ListDelete = 6,
-    Delete = 7,
-    _,
-};
-
-const PspUtilitySavedataFocus = enum(c_int) {
-    Unknown = 0,
-    FirstList = 1,
-    LastList = 2,
-    Latest = 3,
-    Oldest = 4,
-    Unknown2 = 5,
-    Unknown3 = 6,
-    FirstEmpty = 7,
-    LastEmpty = 8,
-    _,
-};
-
-pub const PspUtilitySavedataSFOParam = extern struct {
-    title: [128]u8,
-    savedataTitle: [128]u8,
-    detail: [1024]u8,
-    parentalLevel: u8,
-    unknown: [3]u8,
-};
-
-pub const PspUtilitySavedataFileData = extern struct {
-    buf: ?*anyopaque,
-    bufSize: SceSize,
-    size: SceSize,
-    unknown: c_int,
-};
-
-pub const PspUtilitySavedataListSaveNewData = extern struct {
-    icon0: PspUtilitySavedataFileData,
-    title: [*c]u8,
-};
-
-pub const SceUtilitySavedataParam = extern struct {
-    base: PspUtilityDialogCommon,
-    mode: PspUtilitySavedataMode,
-    unknown1: c_int,
-    overwrite: c_int,
-    gameName: [13]u8,
-    reserved: [3]u8,
-    saveName: [20]u8,
-    saveNameList: [*c][20]u8,
-    fileName: [13]u8,
-    reserved1: [3]u8,
-    dataBuf: ?*anyopaque,
-    dataBufSize: SceSize,
-    dataSize: SceSize,
-    sfoParam: PspUtilitySavedataSFOParam,
-    icon0FileData: PspUtilitySavedataFileData,
-    icon1FileData: PspUtilitySavedataFileData,
-    pic1FileData: PspUtilitySavedataFileData,
-    snd0FileData: PspUtilitySavedataFileData,
-    newData: [*c]PspUtilitySavedataListSaveNewData,
-    focus: PspUtilitySavedataFocus,
-    unknown2: [4]c_int,
-};
 pub extern fn sceUtilitySavedataInitStart(params: *SceUtilitySavedataParam) c_int;
 pub extern fn sceUtilitySavedataGetStatus() c_int;
 pub extern fn sceUtilitySavedataShutdownStart() c_int;
@@ -338,30 +264,6 @@ pub const PspUtilityHtmlViewerParam = extern struct {
     disconnectmode: c_uint,
     memused: c_uint,
     unknown4: [10]c_int,
-};
-
-pub const SceUtilityOskData = extern struct {
-    unk_00: c_int,
-    unk_04: c_int,
-    language: c_int,
-    unk_12: c_int,
-    inputtype: c_int,
-    lines: c_int,
-    unk_24: c_int,
-    desc: [*c]c_ushort,
-    intext: [*c]c_ushort,
-    outtextlength: c_int,
-    outtext: [*c]c_ushort,
-    result: c_int,
-    outtextlimit: c_int,
-};
-
-pub const SceUtilityOskParams = extern struct {
-    base: PspUtilityDialogCommon,
-    datacount: c_int,
-    data: [*c]SceUtilityOskData,
-    state: c_int,
-    unk_60: c_int,
 };
 
 pub const ModuleNet = enum(c_int) { Common = 1, Adhoc = 2, Inet = 3, Parseuri = 4, Parsehttp = 5, Http = 6, Ssl = 7 };
