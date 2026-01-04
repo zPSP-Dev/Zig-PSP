@@ -203,6 +203,9 @@ def parse_c_type_to_zig(c_type: str) -> str:
         "SceKernelUtilsMt19937Context": "types.SceKernelUtilsMt19937Context",
         "SceKernelUtilsMd5Context": "types.SceKernelUtilsMd5Context",
         "SceKernelUtilsSha1Context": "types.SceKernelUtilsSha1Context",
+        "pdpStatStruct": "types.pdpStatStruct",
+        "struct in_addr": "types.in_addr",
+        "struct SceNetMallocStat": "types.SceNetMallocStat",
     }
 
     # Handle const first

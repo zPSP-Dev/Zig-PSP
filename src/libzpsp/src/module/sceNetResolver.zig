@@ -29,7 +29,7 @@ pub extern fn sceNetResolverDelete(rid: c_int) callconv(.c) c_int;
 /// `timeout` - Number of seconds before timeout
 /// `retry` - Number of retires
 /// Returns 0 on success, < 0 on error
-pub extern fn sceNetResolverStartNtoA(rid: c_int, hostname: [*c]const c_char, addr: [*c]c_int, timeout: c_uint, retry: c_int) callconv(.c) c_int;
+pub extern fn sceNetResolverStartNtoA(rid: c_int, hostname: [*c]const c_char, addr: [*c]types.in_addr, timeout: c_uint, retry: c_int) callconv(.c) c_int;
 
 /// Begin a address to name lookup
 /// `rid -Resolver id`
@@ -39,7 +39,7 @@ pub extern fn sceNetResolverStartNtoA(rid: c_int, hostname: [*c]const c_char, ad
 /// `timeout` - Number of seconds before timeout
 /// `retry` - Number of retries
 /// Returns 0 on success, < 0 on error
-pub extern fn sceNetResolverStartAtoN(rid: c_int, addr: [*c]const c_int, hostname: [*c]c_char, hostname_len: types.SceSize, timeout: c_uint, retry: c_int) callconv(.c) c_int;
+pub extern fn sceNetResolverStartAtoN(rid: c_int, addr: [*c]const types.in_addr, hostname: [*c]c_char, hostname_len: types.SceSize, timeout: c_uint, retry: c_int) callconv(.c) c_int;
 
 /// Stop a resolver operation
 /// `rid` - Resolver id

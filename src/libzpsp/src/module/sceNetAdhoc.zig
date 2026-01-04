@@ -56,7 +56,7 @@ pub extern fn sceNetAdhocPdpDelete(id: c_int, unk1: c_int) callconv(.c) c_int;
 /// `size` - Pointer to the size of the stat array (e.g 20 for one structure)
 /// `stat` - Pointer to a list of ::pdpStatStruct structures.
 /// Returns 0 on success, < 0 on error
-pub extern fn sceNetAdhocGetPdpStat(size: [*c]c_int, stat: [*c]c_int) callconv(.c) c_int;
+pub extern fn sceNetAdhocGetPdpStat(size: [*c]c_int, stat: [*c]types.pdpStatStruct) callconv(.c) c_int;
 
 /// Open a PTP connection
 /// `srcmac` - Local mac address.
