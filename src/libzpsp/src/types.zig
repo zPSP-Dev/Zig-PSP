@@ -836,3 +836,14 @@ pub const SceIoDirent = extern struct {
     d_private: ?*anyopaque,
     dummy: c_int,
 };
+
+pub const SceMp3InitArg = extern struct {
+    mp3StreamStart: SceUInt32,
+    unk1: SceUInt32,
+    mp3StreamEnd: SceUInt32,
+    unk2: SceUInt32,
+    mp3Buf: ?*SceVoid,
+    mp3BufSize: SceInt32,
+    pcmBuf: ?*SceVoid,
+    pcmBufSize: SceInt32,
+};

@@ -5,7 +5,7 @@ const macro = @import("../macro.zig");
 /// sceMp3ReserveMp3Handle
 /// `args` - Pointer to SceMp3InitArg structure
 /// Returns sceMp3 handle on success, < 0 on error.
-pub extern fn sceMp3ReserveMp3Handle(args: [*c]c_int) callconv(.c) types.SceInt32;
+pub extern fn sceMp3ReserveMp3Handle(args: [*c]types.SceMp3InitArg) callconv(.c) types.SceInt32;
 
 /// sceMp3NotifyAddStreamData
 /// `handle` - sceMp3 handle

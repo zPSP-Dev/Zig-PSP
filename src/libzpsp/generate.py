@@ -234,6 +234,7 @@ def parse_c_type_to_zig(c_type: str) -> str:
         "PspOpenPSID": "types.PspOpenPSID",
         "SceIoDirent": "types.SceIoDirent",
         "SceIoStat": "types.SceIoStat",
+        "SceMp3InitArg": "types.SceMp3InitArg",
     }
 
     # Handle const first
