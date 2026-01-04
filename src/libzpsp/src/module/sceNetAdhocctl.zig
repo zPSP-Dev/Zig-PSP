@@ -7,7 +7,7 @@ const macro = @import("../macro.zig");
 /// `priority` - Priority of the adhocctl thread. Set to 0x30
 /// `product` - Pass a filled in ::productStruct
 /// Returns 0 on success, < 0 on error
-pub extern fn sceNetAdhocctlInit(stacksize: c_int, priority: c_int, product: [*c]c_int) callconv(.c) c_int;
+pub extern fn sceNetAdhocctlInit(stacksize: c_int, priority: c_int, product: [*c]types.productStruct) callconv(.c) c_int;
 
 /// Terminate the Adhoc control library
 /// Returns 0 on success, < on error.
@@ -55,7 +55,7 @@ pub extern fn sceNetAdhocctlGetState(event: [*c]c_int) callconv(.c) c_int;
 /// Get the adhoc ID
 /// `product` - A pointer to a  ::productStruct
 /// Returns 0 on success, < 0 on error.
-pub extern fn sceNetAdhocctlGetAdhocId(product: [*c]c_int) callconv(.c) c_int;
+pub extern fn sceNetAdhocctlGetAdhocId(product: [*c]types.productStruct) callconv(.c) c_int;
 
 /// Get a list of peers
 /// `length` - The length of the list.

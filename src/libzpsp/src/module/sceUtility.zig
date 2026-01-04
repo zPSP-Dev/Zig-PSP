@@ -51,7 +51,7 @@ pub extern fn sceUtilityNetconfGetStatus() callconv(.c) c_int;
 /// check if the operation is completed
 /// `params` - savedata parameters
 /// Returns 0 on success
-pub extern fn sceUtilitySavedataInitStart(params: [*c]c_int) callconv(.c) c_int;
+pub extern fn sceUtilitySavedataInitStart(params: [*c]types.SceUtilitySavedataParam) callconv(.c) c_int;
 
 /// Shutdown the savedata utility. after calling this continue calling
 /// ::sceUtilitySavedataGetStatus to check when it has shutdown
@@ -101,7 +101,7 @@ pub extern fn sceUtilityMsgDialogGetStatus() callconv(.c) c_int;
 /// Create an on-screen keyboard
 /// `params` - OSK parameters.
 /// Returns < 0 on error.
-pub extern fn sceUtilityOskInitStart(params: [*c]c_int) callconv(.c) c_int;
+pub extern fn sceUtilityOskInitStart(params: [*c]types.SceUtilityOskParams) callconv(.c) c_int;
 
 /// Remove a currently active keyboard. After calling this function you must
 /// poll sceUtilityOskGetStatus() until it returns PSP_UTILITY_DIALOG_NONE.
@@ -153,7 +153,7 @@ pub extern fn sceUtilityCheckNetParam(id: c_int) callconv(.c) c_int;
 /// `param` - which parameter to get
 /// `data` - parameter data
 /// Returns 0 on success,
-pub extern fn sceUtilityGetNetParam(conf: c_int, param: c_int, data: [*c]c_int) callconv(.c) c_int;
+pub extern fn sceUtilityGetNetParam(conf: c_int, param: c_int, data: [*c]types.netData) callconv(.c) c_int;
 
 /// Load a network module (PRX) from user mode.
 /// Load PSP_NET_MODULE_COMMON and PSP_NET_MODULE_INET

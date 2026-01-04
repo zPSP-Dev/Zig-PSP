@@ -95,7 +95,7 @@ pub extern fn sceNetAdhocMatchingCancelTargetWithOpt(matchingid: c_int, mac: [*c
 /// Get the status of the memory pool used by the matching library
 /// `poolstat` - A ::pspAdhocPoolStat.
 /// Returns 0 on success, < 0 on error.
-pub extern fn sceNetAdhocMatchingGetPoolStat(poolstat: [*c]c_int) callconv(.c) c_int;
+pub extern fn sceNetAdhocMatchingGetPoolStat(poolstat: [*c]types.pspAdhocPoolStat) callconv(.c) c_int;
 
 /// Send data to a matching target
 /// `matchingid` - The ID returned from ::sceNetAdhocMatchingCreate

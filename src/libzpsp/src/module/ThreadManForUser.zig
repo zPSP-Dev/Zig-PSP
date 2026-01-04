@@ -580,7 +580,7 @@ pub extern fn sceKernelSysClock2USec(clock: [*c]types.SceKernelSysClock, low: [*
 /// `low` - Pointer to the low part of the time
 /// `high` - Pointer to the high part of the time
 /// Returns 0 on success, < 0 on error
-pub extern fn sceKernelSysClock2USecWide(clock: types.SceInt64, low: [*c]c_int, high: [*c]c_uint) callconv(.c) c_int;
+pub extern fn sceKernelSysClock2USecWide(clock: types.SceInt64, low: [*c]i32, high: [*c]c_uint) callconv(.c) c_int;
 
 /// Get the system time
 /// `time` - Pointer to a ::SceKernelSysClock structure
@@ -849,7 +849,7 @@ pub extern fn sceKernelReferGlobalProfiler() callconv(.c) [*c]c_int;
 /// Delete a lightweight mutex
 /// `workarea` - The pointer to the workarea
 /// Returns 0 on success, otherwise one of ::PspKernelErrorCodes
-pub extern fn sceKernelDeleteLwMutex(workarea: [*c]c_int) callconv(.c) c_int;
+pub extern fn sceKernelDeleteLwMutex(workarea: [*c]types.SceLwMutexWorkarea) callconv(.c) c_int;
 
 /// Create a lightweight mutex
 /// `workarea` - The pointer to the workarea
@@ -858,7 +858,7 @@ pub extern fn sceKernelDeleteLwMutex(workarea: [*c]c_int) callconv(.c) c_int;
 /// `initialCount` - THe inital value of the mutex
 /// `optionsPtr` - Other options for mutex
 /// Returns 0 on success, otherwise one of ::PspKernelErrorCodes
-pub extern fn sceKernelCreateLwMutex(workarea: [*c]c_int, name: [*c]const c_char, attr: types.SceUInt32, initialCount: c_int, optionsPtr: [*c]u32) callconv(.c) c_int;
+pub extern fn sceKernelCreateLwMutex(workarea: [*c]types.SceLwMutexWorkarea, name: [*c]const c_char, attr: types.SceUInt32, initialCount: c_int, optionsPtr: [*c]u32) callconv(.c) c_int;
 
 comptime {
     asm (macro.import_module_start("ThreadManForUser", "0x40010000", "128"));

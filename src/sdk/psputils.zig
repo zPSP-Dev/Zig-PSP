@@ -5,6 +5,7 @@ pub const SceULong64 = c.types.SceULong64;
 
 pub const time_t = c.types.time_t;
 pub const clock_t = c.types.clock_t;
+pub const timezone = c.types.timezone;
 pub const SceKernelUtilsMt19937Context = c.types.SceKernelUtilsMt19937Context;
 pub const SceKernelUtilsMd5Context = c.types.SceKernelUtilsMd5Context;
 pub const SceKernelUtilsSha1Context = c.types.SceKernelUtilsSha1Context;
@@ -13,10 +14,6 @@ pub const suseconds_t = u32;
 pub const timeval = extern struct {
     tv_sec: time_t,
     tv_usec: suseconds_t,
-};
-pub const timezone = extern struct {
-    tz_minuteswest: c_int,
-    tz_dsttime: c_int,
 };
 
 // Function to initialise a mersenne twister context.

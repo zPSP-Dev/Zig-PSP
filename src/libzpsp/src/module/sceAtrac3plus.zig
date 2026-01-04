@@ -89,7 +89,7 @@ pub extern fn sceAtracGetLoopStatus(atracID: c_int, piLoopNum: [*c]c_int, puiLoo
 /// Returns < 0 on error, otherwise 0
 pub extern fn sceAtracSetLoopNum(atracID: c_int, nloops: c_int) callconv(.c) c_int;
 
-pub extern fn sceAtracGetBufferInfoForReseting(atracID: c_int, uiSample: u32, pBufferInfo: [*c]c_int) callconv(.c) c_int;
+pub extern fn sceAtracGetBufferInfoForReseting(atracID: c_int, uiSample: u32, pBufferInfo: [*c]types.PspBufferInfo) callconv(.c) c_int;
 
 pub extern fn sceAtracResetPlayPosition(atracID: c_int, uiSample: u32, uiWriteByteFirstBuf: u32, uiWriteByteSecondBuf: u32) callconv(.c) c_int;
 

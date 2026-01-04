@@ -34,7 +34,7 @@ pub extern fn sceKernelResumeSubIntr() callconv(.c) void;
 
 pub extern fn sceKernelIsSubInterruptOccurred() callconv(.c) void;
 
-pub extern fn QueryIntrHandlerInfo(intr_code: types.SceUID, sub_intr_code: types.SceUID, data: [*c]c_int) callconv(.c) c_int;
+pub extern fn QueryIntrHandlerInfo(intr_code: types.SceUID, sub_intr_code: types.SceUID, data: [*c]types.PspIntrHandlerOptionParam) callconv(.c) c_int;
 
 pub extern fn sceKernelRegisterUserSpaceIntrStack() callconv(.c) void;
 

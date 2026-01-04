@@ -99,7 +99,7 @@ pub extern fn sceKernelLibcClock() callconv(.c) types.clock_t;
 pub extern fn sceKernelLibcTime(t: [*c]types.time_t) callconv(.c) types.time_t;
 
 /// Get the current time of time and time zone information
-pub extern fn sceKernelLibcGettimeofday(tp: [*c]c_int, tzp: [*c]c_int) callconv(.c) c_int;
+pub extern fn sceKernelLibcGettimeofday(tp: [*c]types.SceKernelTimeval, tzp: [*c]types.timezone) callconv(.c) c_int;
 
 /// Write back the data cache to memory
 pub extern fn sceKernelDcacheWritebackAll() callconv(.c) void;
