@@ -1,47 +1,33 @@
-const psptypes = @import("libzpsp");
-const SceSize = psptypes.SceSize;
-const SceBool = psptypes.SceBool;
-const SceULong64 = psptypes.SceULong64;
+const c = @import("libzpsp");
 
-const enum_unnamed_5 = enum(c_int) {
+const SceSize = c.types.SceSize;
+const SceBool = c.types.SceBool;
+const SceULong64 = c.types.SceULong64;
+
+const PspHttpFreeFunction = c.types.PspHttpFreeFunction;
+const PspHttpMallocFunction = c.types.PspHttpMallocFunction;
+const PspHttpMethod = c.types.PspHttpMethod;
+const PspHttpPasswordCB = c.types.PspHttpPasswordCB;
+const PspHttpReallocFunction = c.types.PspHttpReallocFunction;
+
+const PspHttpHttpVersion = enum(c_int) {
     PSP_HTTP_VERSION_1_0,
     PSP_HTTP_VERSION_1_1,
     _,
 };
-pub const PspHttpHttpVersion = enum_unnamed_5;
 
-const enum_unnamed_6 = enum(c_int) {
-    PSP_HTTP_METHOD_GET,
-    PSP_HTTP_METHOD_POST,
-    PSP_HTTP_METHOD_HEAD,
-    _,
-};
-pub const PspHttpMethod = enum_unnamed_6;
-
-const enum_unnamed_7 = enum(c_int) {
-    PSP_HTTP_AUTH_BASIC,
-    PSP_HTTP_AUTH_DIGEST,
-    _,
-};
-pub const PspHttpAuthType = enum_unnamed_7;
-
-const enum_unnamed_8 = enum(c_int) {
+const PspHttpProxyMode = enum(c_int) {
     PSP_HTTP_PROXY_AUTO,
     PSP_HTTP_PROXY_MANUAL,
     _,
 };
-pub const PspHttpProxyMode = enum_unnamed_8;
 
-const enum_unnamed_9 = enum(c_int) {
+const PspHttpAddHeaderMode = enum(c_int) {
     PSP_HTTP_HEADER_OVERWRITE,
     PSP_HTTP_HEADER_ADD,
     _,
 };
-pub const PspHttpAddHeaderMode = enum_unnamed_9;
-pub const PspHttpMallocFunction = ?*const fn (SceSize) callconv(.c) ?*anyopaque;
-pub const PspHttpReallocFunction = ?*const fn (?*anyopaque, SceSize) callconv(.c) ?*anyopaque;
-pub const PspHttpFreeFunction = ?*const fn (?*anyopaque) callconv(.c) void;
-pub const PspHttpPasswordCB = ?*const fn (c_int, PspHttpAuthType, [*c]const u8, [*c]u8, [*c]u8, SceBool, [*c][*c]u8, [*c]SceSize, [*c]SceBool) callconv(.c) c_int;
+
 pub extern fn sceHttpInit(unknown1: c_uint) c_int;
 pub extern fn sceHttpEnd() c_int;
 pub extern fn sceHttpCreateTemplate(agent: [*c]u8, unknown1: c_int, unknown2: c_int) c_int;

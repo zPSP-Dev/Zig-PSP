@@ -215,6 +215,11 @@ def parse_c_type_to_zig(c_type: str) -> str:
         "sceMpegRingbufferCB": "types.sceMpegRingbufferCB",
         "SceMpegStream": "types.SceMpegStream",
         "SceMpegYCrCbBuffer": "types.SceMpegYCrCbBuffer",
+        "PspHttpFreeFunction": "types.PspHttpFreeFunction",
+        "PspHttpMallocFunction": "types.PspHttpMallocFunction",
+        "PspHttpMethod": "types.PspHttpMethod",
+        "PspHttpPasswordCB": "types.PspHttpPasswordCB",
+        "PspHttpReallocFunction": "types.PspHttpReallocFunction",
     }
 
     # Handle const first
