@@ -6,7 +6,7 @@ pub extern fn sceMpegBaseYCrCbCopyVme(YUVBuffer: types.ScePVoid, Buffer: [*c]typ
 
 pub extern fn sceMpegBaseCscInit(width: types.SceInt32) callconv(.c) types.SceInt32;
 
-pub extern fn sceMpegBaseCscVme(pRGBbuffer: types.ScePVoid, pRGBbuffer2: types.ScePVoid, width: types.SceInt32, pYCrCbBuffer: [*c]c_int) callconv(.c) types.SceInt32;
+pub extern fn sceMpegBaseCscVme(pRGBbuffer: types.ScePVoid, pRGBbuffer2: types.ScePVoid, width: types.SceInt32, pYCrCbBuffer: [*c]types.SceMpegYCrCbBuffer) callconv(.c) types.SceInt32;
 
 pub extern fn sceMpegbase_0530BE4E() callconv(.c) void;
 
@@ -18,7 +18,7 @@ pub extern fn sceMpegBaseCscAvc() callconv(.c) void;
 
 pub extern fn sceMpegbase_AC9E717E() callconv(.c) void;
 
-pub extern fn sceMpegbase_BEA18F91(pLLI: [*c]c_int) callconv(.c) types.SceInt32;
+pub extern fn sceMpegbase_BEA18F91(pLLI: [*c]types.SceMpegLLI) callconv(.c) types.SceInt32;
 
 comptime {
     asm (macro.import_module_start("sceMpegbase", "0x00090000", "9"));
