@@ -907,18 +907,6 @@ pub const RegParam = extern struct {
 
 pub const SceKernelTimeval = SceNetInetTimeval;
 
-pub const PspUtilityDialogCommon = extern struct {
-    size: c_uint,
-    language: c_int,
-    buttonSwap: c_int,
-    graphicsThread: c_int,
-    accessThread: c_int,
-    fontThread: c_int,
-    soundThread: c_int,
-    result: c_int,
-    reserved: [4]c_int,
-};
-
 const PspUtilitySavedataMode = enum(c_int) {
     Autoload = 0,
     Autosave = 1,
@@ -965,7 +953,7 @@ pub const PspUtilitySavedataListSaveNewData = extern struct {
 };
 
 pub const SceUtilitySavedataParam = extern struct {
-    base: PspUtilityDialogCommon,
+    base: pspUtilityDialogCommon,
     mode: PspUtilitySavedataMode,
     unknown1: c_int,
     overwrite: c_int,
@@ -1005,7 +993,7 @@ pub const SceUtilityOskData = extern struct {
 };
 
 pub const SceUtilityOskParams = extern struct {
-    base: PspUtilityDialogCommon,
+    base: pspUtilityDialogCommon,
     datacount: c_int,
     data: [*c]SceUtilityOskData,
     state: c_int,
@@ -1078,4 +1066,151 @@ pub const msghdr = extern struct {
     msg_control: ?*anyopaque, // ancillary data, see below
     msg_controllen: socklen_t, // ancillary data buffer len
     msg_flags: c_int, // flags on received message
+};
+
+pub const pspUtilityDialogCommon = extern struct {
+    size: c_uint,
+    language: c_int,
+    buttonSwap: c_int,
+    graphicsThread: c_int,
+    accessThread: c_int,
+    fontThread: c_int,
+    soundThread: c_int,
+    result: c_int,
+    reserved: [4]c_int,
+};
+
+pub const pspUtilityGameSharingMode = c_uint;
+pub const pspUtilityGameSharingDataType = c_uint;
+
+pub const pspUtilityGameSharingParams = extern struct {
+    base: pspUtilityDialogCommon,
+    unknown1: c_int,
+    unknown2: c_int,
+    name: [8]u8,
+    unknown3: c_int,
+    unknown4: c_int,
+    unknown5: c_int,
+    result: c_int,
+    filepath: [*c]u8,
+    mode: pspUtilityGameSharingMode,
+    datatype: pspUtilityGameSharingDataType,
+    data: ?*anyopaque,
+    datasize: c_uint,
+};
+
+pub const pspUtilityHtmlViewerParam = extern struct {
+    base: pspUtilityDialogCommon,
+    memaddr: ?*anyopaque,
+    memsize: c_uint,
+    unknown1: c_int,
+    unknown2: c_int,
+    initialurl: [*c]u8,
+    numtabs: c_uint,
+    interfacemode: c_uint,
+    options: c_uint,
+    dldirname: [*c]u8,
+    dlfilename: [*c]u8,
+    uldirname: [*c]u8,
+    ulfilename: [*c]u8,
+    cookiemode: c_uint,
+    unknown3: c_uint,
+    homeurl: [*c]u8,
+    textsize: c_uint,
+    displaymode: c_uint,
+    connectmode: c_uint,
+    disconnectmode: c_uint,
+    memused: c_uint,
+    unknown4: [10]c_int,
+};
+
+pub const pspUtilityMsgDialogPressed = c_uint;
+pub const pspUtilityMsgDialogMode = c_uint;
+
+pub const pspUtilityMsgDialogParams = extern struct {
+    base: pspUtilityDialogCommon,
+    unknown: c_int,
+    mode: pspUtilityMsgDialogMode,
+    errorValue: c_uint,
+    message: [512]u8,
+    options: c_int,
+    buttonPressed: pspUtilityMsgDialogPressed,
+};
+
+pub const pspUtilityNetconfAdhoc = extern struct {
+    name: [8]u8,
+    timeout: c_uint,
+};
+
+pub const pspUtilityNetconfData = extern struct {
+    base: pspUtilityDialogCommon,
+    action: c_int,
+    adhocparam: [*c]pspUtilityNetconfAdhoc,
+    hotspot: c_int,
+    hotspot_connected: c_int,
+    wifisp: c_int,
+};
+
+pub const PspUsbCamSetupStillParam = extern struct {
+    size: c_int,
+    resolution: c_int,
+    jpegsize: c_int,
+    reverseflags: c_int,
+    delay: c_int,
+    complevel: c_int,
+};
+
+pub const PspUsbCamSetupStillExParam = extern struct {
+    size: c_int,
+    unk: u32,
+    resolution: c_int,
+    jpegsize: c_int,
+    complevel: c_int,
+    unk2: u32,
+    unk3: u32,
+    flip: c_int,
+    mirror: c_int,
+    delay: c_int,
+    unk4: [5]u32,
+};
+
+pub const PspUsbCamSetupVideoParam = extern struct {
+    size: c_int,
+    resolution: c_int,
+    framerate: c_int,
+    wb: c_int,
+    saturation: c_int,
+    brightness: c_int,
+    contrast: c_int,
+    sharpness: c_int,
+    effectmode: c_int,
+    framesize: c_int,
+    unk: u32,
+    evlevel: c_int,
+};
+
+pub const PspUsbCamSetupVideoExParam = extern struct {
+    size: c_int,
+    unk: u32,
+    resolution: c_int,
+    framerate: c_int,
+    unk2: u32,
+    unk3: u32,
+    wb: c_int,
+    saturation: c_int,
+    brightness: c_int,
+    contrast: c_int,
+    sharpness: c_int,
+    unk4: u32,
+    unk5: u32,
+    unk6: [3]u32,
+    effectmode: c_int,
+    unk7: u32,
+    unk8: u32,
+    unk9: u32,
+    unk10: u32,
+    unk11: u32,
+    framesize: c_int,
+    unk12: u32,
+    evlevel: c_int,
 };
