@@ -252,6 +252,7 @@ def parse_c_type_to_zig(c_type: str) -> str:
         "fd_set": "types.fd_set",
         "netData": "types.netData",
         "PspDebugProfilerRegs": "volatile types.PspDebugProfilerRegs",
+        "struct msghdr": "types.msghdr",
     }
 
     # Handle const first

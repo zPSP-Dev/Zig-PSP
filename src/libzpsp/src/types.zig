@@ -1062,3 +1062,20 @@ pub const PspDebugProfilerRegs = extern struct {
     vfpu_inst: u32,
     local_bus: u32,
 };
+
+pub const socklen_t = u32;
+
+pub const iovec = extern struct {
+    iov_base: ?*anyopaque, // Base address.
+    iov_len: usize, // Length.
+};
+
+pub const msghdr = extern struct {
+    msg_name: ?*anyopaque, // optional address
+    msg_namelen: socklen_t, // size of address
+    msg_iov: [*c]iovec, // scatter/gather array
+    msg_iovlen: c_int, // # elements in msg_iov
+    msg_control: ?*anyopaque, // ancillary data, see below
+    msg_controllen: socklen_t, // ancillary data buffer len
+    msg_flags: c_int, // flags on received message
+};
