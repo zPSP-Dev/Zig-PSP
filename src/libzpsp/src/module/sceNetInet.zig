@@ -30,7 +30,7 @@ pub extern fn sceNetInetRecv() callconv(.c) void;
 
 pub extern fn sceNetInetRecvfrom() callconv(.c) void;
 
-pub extern fn sceNetInetRecvmsg(s: c_int, msg: [*c]c_int, flags: c_int) callconv(.c) isize;
+pub extern fn sceNetInetRecvmsg(s: c_int, msg: [*c]types.msghdr, flags: c_int) callconv(.c) isize;
 
 pub extern fn sceNetInetSelect(n: c_int, readfds: [*c]types.fd_set, writefds: [*c]types.fd_set, exceptfds: [*c]types.fd_set, timeout: [*c]types.SceNetInetTimeval) callconv(.c) c_int;
 
@@ -38,7 +38,7 @@ pub extern fn sceNetInetSend() callconv(.c) void;
 
 pub extern fn sceNetInetSendto() callconv(.c) void;
 
-pub extern fn sceNetInetSendmsg(s: c_int, msg: [*c]const c_int, flags: c_int) callconv(.c) isize;
+pub extern fn sceNetInetSendmsg(s: c_int, msg: [*c]const types.msghdr, flags: c_int) callconv(.c) isize;
 
 pub extern fn sceNetInetSetsockopt() callconv(.c) void;
 
