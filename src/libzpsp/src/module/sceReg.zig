@@ -50,7 +50,7 @@ pub extern fn sceRegFlushCategory(hd: types.REGHANDLE) callconv(.c) c_int;
 /// `type` - Type of key (note cannot be a directory type)
 /// `size` - Size of the allocated value space
 /// Returns 0 on success, < 0 on error
-pub extern fn sceRegCreateKey(hd: types.REGHANDLE, name: [*c]const c_char, type: c_int, size: types.SceSize) callconv(.c) c_int;
+pub extern fn sceRegCreateKey(hd: types.REGHANDLE, name: [*c]const c_char, type: c_int, size: usize) callconv(.c) c_int;
 
 /// Set a key's value
 /// `hd` - The open registry dir handle
@@ -58,7 +58,7 @@ pub extern fn sceRegCreateKey(hd: types.REGHANDLE, name: [*c]const c_char, type:
 /// `buf` - Buffer to hold the value
 /// `size` - The size of the buffer
 /// Returns 0 on success, < 0 on error
-pub extern fn sceRegSetKeyValue(hd: types.REGHANDLE, name: [*c]const c_char, buf: ?*const anyopaque, size: types.SceSize) callconv(.c) c_int;
+pub extern fn sceRegSetKeyValue(hd: types.REGHANDLE, name: [*c]const c_char, buf: ?*const anyopaque, size: usize) callconv(.c) c_int;
 
 /// Get a key's information
 /// `hd` - The open registry dir handle
@@ -67,7 +67,7 @@ pub extern fn sceRegSetKeyValue(hd: types.REGHANDLE, name: [*c]const c_char, buf
 /// `type` - Type of the key, on of ::RegKeyTypes
 /// `size` - The size of the key's value in bytes
 /// Returns 0 on success, < 0 on error
-pub extern fn sceRegGetKeyInfo(hd: types.REGHANDLE, name: [*c]const c_char, hk: [*c]types.REGHANDLE, type: [*c]c_uint, size: [*c]types.SceSize) callconv(.c) c_int;
+pub extern fn sceRegGetKeyInfo(hd: types.REGHANDLE, name: [*c]const c_char, hk: [*c]types.REGHANDLE, type: [*c]c_uint, size: [*c]usize) callconv(.c) c_int;
 
 /// Get a key's value
 /// `hd` - The open registry dir handle
@@ -75,7 +75,7 @@ pub extern fn sceRegGetKeyInfo(hd: types.REGHANDLE, name: [*c]const c_char, hk: 
 /// `buf` - Buffer to hold the value
 /// `size` - The size of the buffer
 /// Returns 0 on success, < 0 on error
-pub extern fn sceRegGetKeyValue(hd: types.REGHANDLE, hk: types.REGHANDLE, buf: ?*anyopaque, size: types.SceSize) callconv(.c) c_int;
+pub extern fn sceRegGetKeyValue(hd: types.REGHANDLE, hk: types.REGHANDLE, buf: ?*anyopaque, size: usize) callconv(.c) c_int;
 
 /// Get number of subkeys in the current dir
 /// `hd` - The open registry dir handle
@@ -108,7 +108,7 @@ pub extern fn sceRegRemoveKey() callconv(.c) void;
 /// `type` - Type of the key, on of ::RegKeyTypes
 /// `size` - The size of the key's value in bytes
 /// Returns 0 on success, < 0 on error
-pub extern fn sceRegGetKeyInfoByName(hd: types.REGHANDLE, name: [*c]const c_char, type: [*c]c_uint, size: [*c]types.SceSize) callconv(.c) c_int;
+pub extern fn sceRegGetKeyInfoByName(hd: types.REGHANDLE, name: [*c]const c_char, type: [*c]c_uint, size: [*c]usize) callconv(.c) c_int;
 
 /// Get a key's value by name
 /// `hd` - The open registry dir handle
@@ -116,7 +116,7 @@ pub extern fn sceRegGetKeyInfoByName(hd: types.REGHANDLE, name: [*c]const c_char
 /// `buf` - Buffer to hold the value
 /// `size` - The size of the buffer
 /// Returns 0 on success, < 0 on error
-pub extern fn sceRegGetKeyValueByName(hd: types.REGHANDLE, name: [*c]const c_char, buf: ?*anyopaque, size: types.SceSize) callconv(.c) c_int;
+pub extern fn sceRegGetKeyValueByName(hd: types.REGHANDLE, name: [*c]const c_char, buf: ?*anyopaque, size: usize) callconv(.c) c_int;
 
 comptime {
     asm (macro.import_module_start("sceReg", "0x40010000", "18"));

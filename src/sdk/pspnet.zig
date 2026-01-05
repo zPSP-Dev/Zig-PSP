@@ -1,9 +1,6 @@
 const c = @import("libzpsp");
 
-pub const SceSize = c.types.SceSize;
-pub const pdpStatStruct = c.types.pdpStatStruct;
 pub const in_addr = c.types.in_addr;
-
 pub const SceNetMallocStat = c.types.SceNetMallocStat;
 pub const SceNetAdhocctlGameModeInfo = c.types.SceNetAdhocctlGameModeInfo;
 pub const SceNetAdhocctlParams = c.types.SceNetAdhocctlParams;
@@ -17,6 +14,7 @@ pub const sceNetApctlHandler = c.types.sceNetApctlHandler;
 pub const pspAdhocMatchingCallback = c.types.pspAdhocMatchingCallback;
 pub const productStruct = c.types.productStruct;
 pub const ptpStatStruct = c.types.ptpStatStruct;
+pub const pdpStatStruct = c.types.pdpStatStruct;
 
 
 pub const socklen_t = u32;
@@ -201,9 +199,9 @@ pub extern fn sceNetInetSocket(domain: c_int, type: c_int, protocol: c_int) c_in
 pub extern fn sceNetInetClose(s: c_int) c_int;
 pub extern fn sceNetInetGetErrno() c_int;
 pub extern fn sceNetResolverInit() c_int;
-pub extern fn sceNetResolverCreate(rid: [*c]c_int, buf: ?*anyopaque, buflen: SceSize) c_int;
+pub extern fn sceNetResolverCreate(rid: [*c]c_int, buf: ?*anyopaque, buflen: usize) c_int;
 pub extern fn sceNetResolverDelete(rid: c_int) c_int;
 pub extern fn sceNetResolverStartNtoA(rid: c_int, hostname: [*c]const u8, addr: [*c]in_addr, timeout: c_uint, retry: c_int) c_int;
-pub extern fn sceNetResolverStartAtoN(rid: c_int, addr: [*c]const in_addr, hostname: [*c]u8, hostname_len: SceSize, timeout: c_uint, retry: c_int) c_int;
+pub extern fn sceNetResolverStartAtoN(rid: c_int, addr: [*c]const in_addr, hostname: [*c]u8, hostname_len: usize, timeout: c_uint, retry: c_int) c_int;
 pub extern fn sceNetResolverStop(rid: c_int) c_int;
 pub extern fn sceNetResolverTerm() c_int;

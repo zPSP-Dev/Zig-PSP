@@ -1,20 +1,8 @@
-pub const SceUChar8 = u8;
-pub const SceUShort16 = u16;
-pub const SceUInt32 = u32;
-pub const SceUInt64 = u64;
-pub const SceULong64 = u64;
-pub const SceChar8 = u8;
-pub const SceShort16 = i16;
-pub const SceInt32 = i32;
-pub const SceInt64 = i64;
-pub const SceLong64 = i64;
-pub const SceFloat = f32;
-pub const SceFloat32 = f32;
-pub const SceWChar16 = c_ushort;
-pub const SceWChar32 = c_uint;
 pub const SceBool = c_int;
-pub const SceVoid = anyopaque;
-pub const ScePVoid = ?*anyopaque;
+pub const SceUID = c_int;
+pub const SceMode = c_int;
+pub const SceIores = i64;
+
 pub const ScePspSRect = extern struct {
     x: c_short,
     y: c_short,
@@ -28,10 +16,10 @@ pub const ScePspIRect = extern struct {
     h: c_int,
 };
 pub const ScePspL64Rect = extern struct {
-    x: SceLong64,
-    y: SceLong64,
-    w: SceLong64,
-    h: SceLong64,
+    x: i64,
+    y: i64,
+    w: i64,
+    h: i64,
 };
 pub const ScePspFRect = extern struct {
     x: f32,
@@ -48,8 +36,8 @@ pub const ScePspIVector2 = extern struct {
     y: c_int,
 };
 pub const ScePspL64Vector2 = extern struct {
-    x: SceLong64,
-    y: SceLong64,
+    x: i64,
+    y: i64,
 };
 pub const ScePspFVector2 = extern struct {
     x: f32,
@@ -72,9 +60,9 @@ pub const ScePspIVector3 = extern struct {
     z: c_int,
 };
 pub const ScePspL64Vector3 = extern struct {
-    x: SceLong64,
-    y: SceLong64,
-    z: SceLong64,
+    x: i64,
+    y: i64,
+    z: i64,
 };
 pub const ScePspFVector3 = extern struct {
     x: f32,
@@ -101,10 +89,10 @@ pub const ScePspIVector4 = extern struct {
     w: c_int,
 };
 pub const ScePspL64Vector4 = extern struct {
-    x: SceLong64,
-    y: SceLong64,
-    z: SceLong64,
-    w: SceLong64,
+    x: i64,
+    y: i64,
+    z: i64,
+    w: i64,
 };
 pub const ScePspFVector4 = extern struct {
     x: f32,
@@ -242,8 +230,8 @@ pub const ScePspUnion32 = extern union {
 };
 
 pub const ScePspUnion64 = extern union {
-    ul: SceULong64,
-    l: SceLong64,
+    ul: u64,
+    l: i64,
     ui: [2]c_uint,
     i: [2]c_int,
     us: [4]c_ushort,
@@ -260,8 +248,8 @@ pub const ScePspUnion64 = extern union {
 };
 
 pub const ScePspUnion128 = extern union {
-    ul: [2]SceULong64,
-    l: [2]SceLong64,
+    ul: [2]u64,
+    l: [2]i64,
     ui: [4]c_uint,
     i: [4]c_int,
     us: [8]c_ushort,
@@ -280,15 +268,6 @@ pub const ScePspUnion128 = extern union {
     rgba5551: [8]ScePspRGBA5551,
     rgb565: [8]ScePspRGB565,
 };
-
-pub const SceUID = c_int;
-pub const SceSize = c_uint;
-pub const SceSSize = c_int;
-pub const SceUChar = u8;
-pub const SceUInt = c_uint;
-pub const SceMode = c_int;
-pub const SceOff = SceInt64;
-pub const SceIores = SceInt64;
 
 // See also: https://github.com/hrydgard/ppsspp/issues/17464
 pub const PspCtrlButtons = packed struct(u32) {
@@ -377,8 +356,8 @@ pub const PspGeStack = extern struct {
 };
 
 pub const SceKernelLoadExecParam = extern struct {
-    size: SceSize,
-    args: SceSize,
+    size: usize,
+    args: usize,
     argp: ?*anyopaque,
     key: [*c]const u8,
 };
@@ -404,7 +383,7 @@ pub const SceKernelIdListType = enum(c_int) {
 
 pub const SceKernelCallbackFunction = ?*const fn (c_int, c_int, ?*anyopaque) callconv(.c) c_int;
 pub const SceKernelCallbackInfo = extern struct {
-    size: SceSize,
+    size: usize,
     name: [32]u8,
     threadId: SceUID,
     callback: SceKernelCallbackFunction,
@@ -414,15 +393,15 @@ pub const SceKernelCallbackInfo = extern struct {
 };
 
 pub const SceKernelVTimerOptParam = extern struct {
-    size: SceSize,
+    size: usize,
 };
 
 pub const SceKernelFplOptParam = extern struct {
-    size: SceSize,
+    size: usize,
 };
 
 pub const SceKernelVplOptParam = extern struct {
-    size: SceSize,
+    size: usize,
 };
 
 pub const PspEventFlagWaitTypes = enum(c_int) {
@@ -434,7 +413,7 @@ pub const PspEventFlagWaitTypes = enum(c_int) {
 
 pub const SceKernelThreadEventHandler = ?*const fn (c_int, SceUID, ?*anyopaque) callconv(.c) c_int;
 pub const SceKernelThreadEventHandlerInfo = extern struct {
-    size: SceSize,
+    size: usize,
     name: [32]u8,
     threadId: SceUID,
     mask: c_int,
@@ -443,7 +422,7 @@ pub const SceKernelThreadEventHandlerInfo = extern struct {
 };
 
 pub const SceKernelVTimerInfo = extern struct {
-    size: SceSize,
+    size: usize,
     name: [32]u8,
     active: c_int,
     base: SceKernelSysClock,
@@ -454,9 +433,9 @@ pub const SceKernelVTimerInfo = extern struct {
 };
 
 pub const SceKernelFplInfo = extern struct {
-    size: SceSize,
+    size: usize,
     name: [32]u8,
-    attr: SceUInt,
+    attr: u32,
     blockSize: c_int,
     numBlocks: c_int,
     freeBlocks: c_int,
@@ -464,19 +443,19 @@ pub const SceKernelFplInfo = extern struct {
 };
 
 pub const SceKernelSysClock = extern struct {
-    low: SceUInt32,
-    hi: SceUInt32,
+    low: u32,
+    hi: u32,
 };
 
-pub const SceKernelThreadEntry = ?*const fn (SceSize, ?*anyopaque) callconv(.c) c_int;
+pub const SceKernelThreadEntry = ?*const fn (usize, ?*anyopaque) callconv(.c) c_int;
 pub const SceKernelThreadOptParam = extern struct {
-    size: SceSize,
+    size: usize,
     stackMpid: SceUID,
 };
 pub const SceKernelThreadInfo = extern struct {
-    size: SceSize,
+    size: usize,
     name: [32]u8,
-    attr: SceUInt,
+    attr: u32,
     status: c_int,
     entry: SceKernelThreadEntry,
     stack: ?*anyopaque,
@@ -489,95 +468,95 @@ pub const SceKernelThreadInfo = extern struct {
     wakeupCount: c_int,
     exitStatus: c_int,
     runClocks: SceKernelSysClock,
-    intrPreemptCount: SceUInt,
-    threadPreemptCount: SceUInt,
-    releaseCount: SceUInt,
+    intrPreemptCount: u32,
+    threadPreemptCount: u32,
+    releaseCount: u32,
 };
 pub const SceKernelThreadRunStatus = extern struct {
-    size: SceSize,
+    size: usize,
     status: c_int,
     currentPriority: c_int,
     waitType: c_int,
     waitId: c_int,
     wakeupCount: c_int,
     runClocks: SceKernelSysClock,
-    intrPreemptCount: SceUInt,
-    threadPreemptCount: SceUInt,
-    releaseCount: SceUInt,
+    intrPreemptCount: u32,
+    threadPreemptCount: u32,
+    releaseCount: u32,
 };
 
 pub const SceKernelSemaOptParam = extern struct {
-    size: SceSize,
+    size: usize,
 };
 pub const SceKernelSemaInfo = extern struct {
-    size: SceSize,
+    size: usize,
     name: [32]u8,
-    attr: SceUInt,
+    attr: u32,
     initCount: c_int,
     currentCount: c_int,
     maxCount: c_int,
     numWaitThreads: c_int,
 };
 pub const SceKernelEventFlagInfo = extern struct {
-    size: SceSize,
+    size: usize,
     name: [32]u8,
-    attr: SceUInt,
-    initPattern: SceUInt,
-    currentPattern: SceUInt,
+    attr: u32,
+    initPattern: u32,
+    currentPattern: u32,
     numWaitThreads: c_int,
 };
 pub const SceKernelEventFlagOptParam = extern struct {
-    size: SceSize,
+    size: usize,
 };
-pub const SceKernelVTimerHandler = ?*const fn (SceUID, [*c]SceKernelSysClock, [*c]SceKernelSysClock, ?*anyopaque) callconv(.c) SceUInt;
-pub const SceKernelVTimerHandlerWide = ?*const fn (SceUID, SceInt64, SceInt64, ?*anyopaque) callconv(.c) SceUInt;
+pub const SceKernelVTimerHandler = ?*const fn (SceUID, [*c]SceKernelSysClock, [*c]SceKernelSysClock, ?*anyopaque) callconv(.c) u32;
+pub const SceKernelVTimerHandlerWide = ?*const fn (SceUID, i64, i64, ?*anyopaque) callconv(.c) u32;
 
 pub const SceKernelMbxOptParam = extern struct {
-    size: SceSize,
+    size: usize,
 };
 pub const SceKernelMbxInfo = extern struct {
-    size: SceSize,
+    size: usize,
     name: [32]u8,
-    attr: SceUInt,
+    attr: u32,
     numWaitThreads: c_int,
     numMessages: c_int,
     firstMessage: ?*anyopaque,
 };
-pub const SceKernelAlarmHandler = ?*const fn (?*anyopaque) callconv(.c) SceUInt;
+pub const SceKernelAlarmHandler = ?*const fn (?*anyopaque) callconv(.c) u32;
 pub const SceKernelAlarmInfo = extern struct {
-    size: SceSize,
+    size: usize,
     schedule: SceKernelSysClock,
     handler: SceKernelAlarmHandler,
     common: ?*anyopaque,
 };
 pub const SceKernelSystemStatus = extern struct {
-    size: SceSize,
-    status: SceUInt,
+    size: usize,
+    status: u32,
     idleClocks: SceKernelSysClock,
-    comesOutOfIdleCount: SceUInt,
-    threadSwitchCount: SceUInt,
-    vfpuSwitchCount: SceUInt,
+    comesOutOfIdleCount: u32,
+    threadSwitchCount: u32,
+    vfpuSwitchCount: u32,
 };
 pub const SceKernelMppInfo = extern struct {
-    size: SceSize,
+    size: usize,
     name: [32]u8,
-    attr: SceUInt,
+    attr: u32,
     bufSize: c_int,
     freeSize: c_int,
     numSendWaitThreads: c_int,
     numReceiveWaitThreads: c_int,
 };
 pub const SceKernelVplInfo = extern struct {
-    size: SceSize,
+    size: usize,
     name: [32]u8,
-    attr: SceUInt,
+    attr: u32,
     poolSize: c_int,
     freeSize: c_int,
     numWaitThreads: c_int,
 };
 
 pub const SceKernelLMOption = extern struct {
-    size: SceSize,
+    size: usize,
     mpidtext: SceUID,
     mpiddata: SceUID,
     flags: c_uint,
@@ -587,15 +566,15 @@ pub const SceKernelLMOption = extern struct {
 };
 
 pub const SceKernelSMOption = extern struct {
-    size: SceSize,
+    size: usize,
     mpidstack: SceUID,
-    stacksize: SceSize,
+    stacksize: usize,
     priority: c_int,
     attribute: c_uint,
 };
 
 pub const SceKernelModuleInfo = extern struct {
-    size: SceSize,
+    size: usize,
     nsegment: u8,
     reserved: [3]u8,
     segmentaddr: [4]c_int,
@@ -637,17 +616,17 @@ pub const SceKernelUtilsMt19937Context = extern struct {
 pub const SceKernelUtilsMd5Context = extern struct {
     h: [4]c_uint,
     pad: c_uint,
-    usRemains: SceUShort16,
-    usComputed: SceUShort16,
-    ullTotalLen: SceULong64,
+    usRemains: u16,
+    usComputed: u16,
+    ullTotalLen: u64,
     buf: [64]u8,
 };
 
 pub const SceKernelUtilsSha1Context = extern struct {
     h: [5]c_uint,
-    usRemains: SceUShort16,
-    usComputed: SceUShort16,
-    ullTotalLen: SceULong64,
+    usRemains: u16,
+    usComputed: u16,
+    ullTotalLen: u64,
     buf: [64]u8,
 };
 
@@ -669,64 +648,64 @@ pub const pspUmdInfo = extern struct {
 };
 
 pub const SceMpegLLI = extern struct {
-    pSrc: ScePVoid,
-    pDst: ScePVoid,
-    Next: ScePVoid,
-    iSize: SceInt32,
+    pSrc: ?*anyopaque,
+    pDst: ?*anyopaque,
+    Next: ?*anyopaque,
+    iSize: i32,
 };
 
 pub const SceMpegYCrCbBuffer = extern struct {
-    iFrameBufferHeight16: SceInt32,
-    iFrameBufferWidth16: SceInt32,
-    iUnknown: SceInt32,
-    iUnknown2: SceInt32,
-    pYBuffer: ScePVoid,
-    pYBuffer2: ScePVoid,
-    pCrBuffer: ScePVoid,
-    pCbBuffer: ScePVoid,
-    pCrBuffer2: ScePVoid,
-    pCbBuffer2: ScePVoid,
-    iFrameHeight: SceInt32,
-    iFrameWidth: SceInt32,
-    iFrameBufferWidth: SceInt32,
-    iUnknown3: [11]SceInt32,
+    iFrameBufferHeight16: i32,
+    iFrameBufferWidth16: i32,
+    iUnknown: i32,
+    iUnknown2: i32,
+    pYBuffer: ?*anyopaque,
+    pYBuffer2: ?*anyopaque,
+    pCrBuffer: ?*anyopaque,
+    pCbBuffer: ?*anyopaque,
+    pCrBuffer2: ?*anyopaque,
+    pCbBuffer2: ?*anyopaque,
+    iFrameHeight: i32,
+    iFrameWidth: i32,
+    iFrameBufferWidth: i32,
+    iUnknown3: [11]i32,
 };
 
-pub const SceMpeg = ScePVoid;
-pub const SceMpegStream = SceVoid;
-pub const sceMpegRingbufferCB = ?*const fn (ScePVoid, SceInt32, ScePVoid) callconv(.c) SceInt32;
+pub const SceMpeg = ?*anyopaque;
+pub const SceMpegStream = anyopaque; // Super weird typing in the PSPSDK here
+pub const sceMpegRingbufferCB = ?*const fn (?*anyopaque, i32, ?*anyopaque) callconv(.c) i32;
 
 pub const SceMpegRingbuffer = extern struct {
-    iPackets: SceInt32,
-    iUnk0: SceUInt32,
-    iUnk1: SceUInt32,
-    iUnk2: SceUInt32,
-    iUnk3: SceUInt32,
-    pData: ScePVoid,
+    iPackets: i32,
+    iUnk0: u32,
+    iUnk1: u32,
+    iUnk2: u32,
+    iUnk3: u32,
+    pData: ?*anyopaque,
     Callback: sceMpegRingbufferCB,
-    pCBparam: ScePVoid,
-    iUnk4: SceUInt32,
-    iUnk5: SceUInt32,
+    pCBparam: ?*anyopaque,
+    iUnk4: u32,
+    iUnk5: u32,
     pSceMpeg: SceMpeg,
 };
 
 pub const SceMpegAu = extern struct {
-    iPtsMSB: SceUInt32,
-    iPts: SceUInt32,
-    iDtsMSB: SceUInt32,
-    iDts: SceUInt32,
-    iEsBuffer: SceUInt32,
-    iAuSize: SceUInt32,
+    iPtsMSB: u32,
+    iPts: u32,
+    iDtsMSB: u32,
+    iDts: u32,
+    iEsBuffer: u32,
+    iAuSize: u32,
 };
 
 pub const SceMpegAvcMode = extern struct {
-    iUnk0: SceInt32,
-    iPixelFormat: SceInt32,
+    iUnk0: i32,
+    iPixelFormat: i32,
 };
 
-pub const PspHttpMallocFunction = ?*const fn (SceSize) callconv(.c) ?*anyopaque;
+pub const PspHttpMallocFunction = ?*const fn (usize) callconv(.c) ?*anyopaque;
 pub const PspHttpFreeFunction = ?*const fn (?*anyopaque) callconv(.c) void;
-pub const PspHttpReallocFunction = ?*const fn (?*anyopaque, SceSize) callconv(.c) ?*anyopaque;
+pub const PspHttpReallocFunction = ?*const fn (?*anyopaque, usize) callconv(.c) ?*anyopaque;
 
 const PspHttpMethod = enum(c_int) {
     PSP_HTTP_METHOD_GET,
@@ -741,7 +720,7 @@ const PspHttpAuthType = enum(c_int) {
     _,
 };
 
-pub const PspHttpPasswordCB = ?*const fn (c_int, PspHttpAuthType, [*c]const u8, [*c]u8, [*c]u8, SceBool, [*c][*c]u8, [*c]SceSize, [*c]SceBool) callconv(.c) c_int;
+pub const PspHttpPasswordCB = ?*const fn (c_int, PspHttpAuthType, [*c]const u8, [*c]u8, [*c]u8, SceBool, [*c][*c]u8, [*c]usize, [*c]SceBool) callconv(.c) c_int;
 
 pub const SceNetMallocStat = extern struct {
     pool: c_int,
@@ -840,7 +819,7 @@ pub const PspOpenPSID = extern struct {
 pub const SceIoStat = extern struct {
     st_mode: SceMode,
     st_attr: c_uint,
-    st_size: SceOff,
+    st_size: i64,
     st_ctime: ScePspDateTime,
     st_atime: ScePspDateTime,
     st_mtime: ScePspDateTime,
@@ -855,14 +834,14 @@ pub const SceIoDirent = extern struct {
 };
 
 pub const SceMp3InitArg = extern struct {
-    mp3StreamStart: SceUInt32,
-    unk1: SceUInt32,
-    mp3StreamEnd: SceUInt32,
-    unk2: SceUInt32,
-    mp3Buf: ?*SceVoid,
-    mp3BufSize: SceInt32,
-    pcmBuf: ?*SceVoid,
-    pcmBufSize: SceInt32,
+    mp3StreamStart: u32,
+    unk1: u32,
+    mp3StreamEnd: u32,
+    unk2: u32,
+    mp3Buf: ?*anyopaque,
+    mp3BufSize: i32,
+    pcmBuf: ?*anyopaque,
+    pcmBufSize: i32,
 };
 
 pub const PspBufferInfo = extern struct {
@@ -942,8 +921,8 @@ pub const PspUtilitySavedataSFOParam = extern struct {
 
 pub const PspUtilitySavedataFileData = extern struct {
     buf: ?*anyopaque,
-    bufSize: SceSize,
-    size: SceSize,
+    bufSize: usize,
+    size: usize,
     unknown: c_int,
 };
 
@@ -964,8 +943,8 @@ pub const SceUtilitySavedataParam = extern struct {
     fileName: [13]u8,
     reserved1: [3]u8,
     dataBuf: ?*anyopaque,
-    dataBufSize: SceSize,
-    dataSize: SceSize,
+    dataBufSize: usize,
+    dataSize: usize,
     sfoParam: PspUtilitySavedataSFOParam,
     icon0FileData: PspUtilitySavedataFileData,
     icon1FileData: PspUtilitySavedataFileData,

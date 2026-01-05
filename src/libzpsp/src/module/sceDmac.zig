@@ -7,9 +7,9 @@ const macro = @import("../macro.zig");
 /// `src` - The pointer to the source
 /// `n` - The size of data
 /// Returns 0 on success; otherwise an error code
-pub extern fn sceDmacMemcpy(dst: ?*anyopaque, src: ?*const anyopaque, n: types.SceSize) callconv(.c) c_int;
+pub extern fn sceDmacMemcpy(dst: ?*anyopaque, src: ?*const anyopaque, n: usize) callconv(.c) c_int;
 
-pub extern fn sceDmacTryMemcpy(dst: ?*anyopaque, src: ?*const anyopaque, n: types.SceSize) callconv(.c) c_int;
+pub extern fn sceDmacTryMemcpy(dst: ?*anyopaque, src: ?*const anyopaque, n: usize) callconv(.c) c_int;
 
 comptime {
     asm (macro.import_module_start("sceDmac", "0x40010011", "2"));

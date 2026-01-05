@@ -1,8 +1,5 @@
 const c = @import("libzpsp");
 
-pub const SceUShort16 = c.types.SceUShort16;
-pub const SceULong64 = c.types.SceULong64;
-
 pub const time_t = c.types.time_t;
 pub const clock_t = c.types.clock_t;
 pub const timezone = c.types.timezone;
