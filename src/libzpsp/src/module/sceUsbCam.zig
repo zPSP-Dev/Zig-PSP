@@ -90,7 +90,7 @@ pub extern fn sceUsbCamGetMicDataLength() callconv(.c) void;
 /// `buf` - The buffer that receives the image jpeg data
 /// `size` - The size of the buffer.
 /// Returns size of acquired image on success, < 0 on error
-pub extern fn sceUsbCamStillInputBlocking(buf: [*c]u8, size: types.SceSize) callconv(.c) c_int;
+pub extern fn sceUsbCamStillInputBlocking(buf: [*c]u8, size: usize) callconv(.c) c_int;
 
 /// Sets the sharpness
 /// `sharpness` - The sharpness (0-255)
@@ -122,7 +122,7 @@ pub extern fn sceUsbCamStillWaitInputEnd() callconv(.c) c_int;
 /// `buf` - The buffer that receives the frame jpeg data
 /// `size` - The size of the buffer.
 /// Returns size of acquired frame on success, < 0 on error
-pub extern fn sceUsbCamReadVideoFrameBlocking(buf: [*c]u8, size: types.SceSize) callconv(.c) c_int;
+pub extern fn sceUsbCamReadVideoFrameBlocking(buf: [*c]u8, size: usize) callconv(.c) c_int;
 
 pub extern fn sceUsbCamStartMic() callconv(.c) void;
 
@@ -149,7 +149,7 @@ pub extern fn sceUsbCamGetImageEffectMode(effectmode: [*c]c_int) callconv(.c) c_
 /// `buf` - The buffer that receives the frame jpeg data
 /// `size` - The size of the buffer.
 /// Returns size of acquired frame on success, < 0 on error
-pub extern fn sceUsbCamReadVideoFrame(buf: [*c]u8, size: types.SceSize) callconv(.c) c_int;
+pub extern fn sceUsbCamReadVideoFrame(buf: [*c]u8, size: usize) callconv(.c) c_int;
 
 /// Gets the current zoom.
 /// `zoom` - pointer to a variable that receives the current zoom
@@ -228,7 +228,7 @@ pub extern fn sceUsbCamAutoImageReverseSW(on: c_int) callconv(.c) c_int;
 /// `buf` - The buffer that receives the image jpeg data
 /// `size` - The size of the buffer.
 /// Returns size of acquired image on success, < 0 on error
-pub extern fn sceUsbCamStillInput(buf: [*c]u8, size: types.SceSize) callconv(.c) c_int;
+pub extern fn sceUsbCamStillInput(buf: [*c]u8, size: usize) callconv(.c) c_int;
 
 /// Gets the current sharpness
 /// `sharpness` - pointer to a variable that receives the current sharpness

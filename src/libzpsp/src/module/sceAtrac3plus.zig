@@ -25,7 +25,7 @@ pub extern fn sceAtracSetHalfwayBuffer(atracID: c_int, pucBufferAddr: [*c]u8, ui
 /// `buf` - the buffer holding the atrac3 data, including the RIFF/WAVE header.
 /// `bufsize` - the size of the buffer pointed by buf
 /// Returns the new atrac ID, or < 0 on error
-pub extern fn sceAtracSetDataAndGetID(buf: ?*anyopaque, bufsize: types.SceSize) callconv(.c) c_int;
+pub extern fn sceAtracSetDataAndGetID(buf: ?*anyopaque, bufsize: usize) callconv(.c) c_int;
 
 pub extern fn sceAtracSetHalfwayBufferAndGetID(pucBufferAddr: [*c]u8, uiReadByte: u32, uiBufferByte: u32) callconv(.c) c_int;
 

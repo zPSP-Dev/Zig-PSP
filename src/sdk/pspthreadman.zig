@@ -2,11 +2,6 @@ const libzpsp = @import("libzpsp");
 const module = libzpsp.ThreadManForUser;
 
 pub const SceUID = libzpsp.types.SceUID;
-pub const SceSize = libzpsp.types.SceSize;
-pub const SceUInt = libzpsp.types.SceUInt;
-pub const SceInt64 = libzpsp.types.SceInt64;
-pub const SceUInt32 = libzpsp.types.SceUInt32;
-pub const SceUChar = libzpsp.types.SceUChar;
 
 pub const SceKernelCallbackFunction = libzpsp.types.SceKernelCallbackFunction;
 pub const SceKernelCallbackInfo = libzpsp.types.SceKernelCallbackInfo;
@@ -114,8 +109,8 @@ pub const PspEventFlagAttributes = enum(c_int) {
 
 pub const SceKernelMsgPacket = extern struct {
     next: [*c]SceKernelMsgPacket,
-    msgPriority: SceUChar,
-    dummy: [3]SceUChar,
+    msgPriority: u8,
+    dummy: [3]u8,
 };
 
 /// Return from a callback (used as a syscall for the return
@@ -257,7 +252,7 @@ pub fn sceKernelResumeThread(thid: SceUID) c_int {
 /// `thid` - Id of the thread to wait for.
 /// `timeout` - Timeout in microseconds (assumed).
 /// Returns < 0 on error.
-pub fn sceKernelWaitThreadEnd(thid: SceUID, timeout: [*c]SceUInt) c_int {
+pub fn sceKernelWaitThreadEnd(thid: SceUID, timeout: [*c]u32) c_int {
     return module.sceKernelWaitThreadEnd(thid, timeout);
 }
 
@@ -265,7 +260,7 @@ pub fn sceKernelWaitThreadEnd(thid: SceUID, timeout: [*c]SceUInt) c_int {
 /// `thid` - Id of the thread to wait for.
 /// `timeout` - Timeout in microseconds (assumed).
 /// Returns < 0 on error.
-pub fn sceKernelWaitThreadEndCB(thid: SceUID, timeout: [*c]SceUInt) c_int {
+pub fn sceKernelWaitThreadEndCB(thid: SceUID, timeout: [*c]u32) c_int {
     return module.sceKernelWaitThreadEndCB(thid, timeout);
 }
 
@@ -275,7 +270,7 @@ pub fn sceKernelWaitThreadEndCB(thid: SceUID, timeout: [*c]SceUInt) c_int {
 /// `
 /// sceKernelDelayThread(1000000); // Delay for a second
 /// `
-pub fn sceKernelDelayThread(delay_us: SceUInt) c_int {
+pub fn sceKernelDelayThread(delay_us: u32) c_int {
     return module.sceKernelDelayThread(delay_us);
 }
 
@@ -285,7 +280,7 @@ pub fn sceKernelDelayThread(delay_us: SceUInt) c_int {
 /// `
 /// sceKernelDelayThread(1000000); // Delay for a second
 /// `
-pub fn sceKernelDelayThreadCB(delay_us: SceUInt) c_int {
+pub fn sceKernelDelayThreadCB(delay_us: u32) c_int {
     return module.sceKernelDelayThreadCB(delay_us);
 }
 
@@ -315,7 +310,7 @@ pub fn sceKernelDelaySysClockThreadCB(delay_sysclocks: *SceKernelSysClock) c_int
 /// `maxVal` - Sema maximum value
 /// `option` - Sema options (normally set to 0)
 /// Returns A semaphore id
-pub fn sceKernelCreateSema(name: [*c]const c_char, attr: SceUInt, initVal: c_int, maxVal: c_int, option: [*c]SceKernelSemaOptParam) SceUID {
+pub fn sceKernelCreateSema(name: [*c]const c_char, attr: u32, initVal: c_int, maxVal: c_int, option: [*c]SceKernelSemaOptParam) SceUID {
     return module.sceKernelCreateSema(name, attr, initVal, maxVal, option);
 }
 
@@ -348,7 +343,7 @@ pub fn sceKernelSignalSema(semaid: SceUID, signal: c_int) c_int {
 /// `signal` - The value to wait for (i.e. if 1 then wait till reaches a signal state of 1)
 /// `timeout` - Timeout in microseconds (assumed).
 /// Returns < 0 on error.
-pub fn sceKernelWaitSema(semaid: SceUID, signal: c_int, timeout: [*c]SceUInt) c_int {
+pub fn sceKernelWaitSema(semaid: SceUID, signal: c_int, timeout: [*c]u32) c_int {
     return module.sceKernelWaitSema(semaid, signal, timeout);
 }
 
@@ -361,7 +356,7 @@ pub fn sceKernelWaitSema(semaid: SceUID, signal: c_int, timeout: [*c]SceUInt) c_
 /// `signal` - The value to wait for (i.e. if 1 then wait till reaches a signal state of 1)
 /// `timeout` - Timeout in microseconds (assumed).
 /// Returns < 0 on error.
-pub fn sceKernelWaitSemaCB(semaid: SceUID, signal: c_int, timeout: [*c]SceUInt) c_int {
+pub fn sceKernelWaitSemaCB(semaid: SceUID, signal: c_int, timeout: [*c]u32) c_int {
     return module.sceKernelWaitSemaCB(semaid, signal, timeout);
 }
 
@@ -431,7 +426,7 @@ pub fn sceKernelClearEventFlag(evid: SceUID, bits: u32) c_int {
 /// `outBits` - The bit pattern that was matched.
 /// `timeout` - Timeout in microseconds
 /// Returns < 0 On error
-pub fn sceKernelWaitEventFlag(evid: c_int, bits: u32, wait: PspEventFlagWaitTypesMask, outBits: [*c]u32, timeout: [*c]SceUInt) c_int {
+pub fn sceKernelWaitEventFlag(evid: c_int, bits: u32, wait: PspEventFlagWaitTypesMask, outBits: [*c]u32, timeout: [*c]u32) c_int {
     return module.sceKernelWaitEventFlag(evid, bits, @bitCast(wait), outBits, timeout);
 }
 
@@ -442,7 +437,7 @@ pub fn sceKernelWaitEventFlag(evid: c_int, bits: u32, wait: PspEventFlagWaitType
 /// `outBits` - The bit pattern that was matched.
 /// `timeout` - Timeout in microseconds
 /// Returns < 0 On error
-pub fn sceKernelWaitEventFlagCB(evid: c_int, bits: u32, wait: PspEventFlagWaitTypesMask, outBits: [*c]u32, timeout: [*c]SceUInt) c_int {
+pub fn sceKernelWaitEventFlagCB(evid: c_int, bits: u32, wait: PspEventFlagWaitTypesMask, outBits: [*c]u32, timeout: [*c]u32) c_int {
     return module.sceKernelWaitEventFlagCB(evid, bits, @bitCast(wait), outBits, timeout);
 }
 
@@ -478,7 +473,7 @@ pub fn sceKernelReferEventFlagStatus(event: SceUID, status: [*c]SceKernelEventFl
 /// `attr` - Mbx attribute flags (normally set to 0)
 /// `option` - Mbx options (normally set to NULL)
 /// Returns A messagebox id
-pub fn sceKernelCreateMbx(name: [*c]const c_char, attr: SceUInt, option: [*c]SceKernelMbxOptParam) SceUID {
+pub fn sceKernelCreateMbx(name: [*c]const c_char, attr: u32, option: [*c]SceKernelMbxOptParam) SceUID {
     return module.sceKernelCreateMbx(name, attr, option);
 }
 
@@ -520,7 +515,7 @@ pub fn sceKernelSendMbx(mbxid: SceUID, message: ?*anyopaque) c_int {
 /// received message should be stored
 /// `timeout` - Timeout in microseconds
 /// Returns < 0 on error.
-pub fn sceKernelReceiveMbx(mbxid: SceUID, pmessage: ?*anyopaque, timeout: [*c]SceUInt) c_int {
+pub fn sceKernelReceiveMbx(mbxid: SceUID, pmessage: ?*anyopaque, timeout: [*c]u32) c_int {
     return module.sceKernelReceiveMbx(mbxid, pmessage, timeout);
 }
 
@@ -535,7 +530,7 @@ pub fn sceKernelReceiveMbx(mbxid: SceUID, pmessage: ?*anyopaque, timeout: [*c]Sc
 /// received message should be stored
 /// `timeout` - Timeout in microseconds
 /// Returns < 0 on error.
-pub fn sceKernelReceiveMbxCB(mbxid: SceUID, pmessage: ?*anyopaque, timeout: [*c]SceUInt) c_int {
+pub fn sceKernelReceiveMbxCB(mbxid: SceUID, pmessage: ?*anyopaque, timeout: [*c]u32) c_int {
     return module.sceKernelReceiveMbxCB(mbxid, pmessage, timeout);
 }
 
@@ -836,7 +831,7 @@ pub fn sceKernelUSec2SysClock(usec: c_uint, clock: [*c]SceKernelSysClock) c_int 
 /// Convert a number of microseconds to a wide time
 /// `usec` - Number of microseconds.
 /// Returns The time
-pub fn sceKernelUSec2SysClockWide(usec: c_uint) SceInt64 {
+pub fn sceKernelUSec2SysClockWide(usec: c_uint) i64 {
     return module.sceKernelUSec2SysClockWide(usec);
 }
 
@@ -854,7 +849,7 @@ pub fn sceKernelSysClock2USec(clock: [*c]SceKernelSysClock, low: [*c]c_uint, hig
 /// `low` - Pointer to the low part of the time
 /// `high` - Pointer to the high part of the time
 /// Returns 0 on success, < 0 on error
-pub fn sceKernelSysClock2USecWide(clock: SceInt64, low: [*c]c_int, high: [*c]c_uint) c_int {
+pub fn sceKernelSysClock2USecWide(clock: i64, low: [*c]c_int, high: [*c]c_uint) c_int {
     return module.sceKernelSysClock2USecWide(clock, low, high);
 }
 
@@ -867,7 +862,7 @@ pub fn sceKernelGetSystemTime(time: *SceKernelSysClock) c_int {
 
 /// Get the system time (wide version)
 /// Returns The system time
-pub fn sceKernelGetSystemTimeWide() SceInt64 {
+pub fn sceKernelGetSystemTimeWide() i64 {
     return module.sceKernelGetSystemTimeWide();
 }
 
@@ -882,7 +877,7 @@ pub fn sceKernelGetSystemTimeLow() c_uint {
 /// `handler` - Pointer to a ::SceKernelAlarmHandler
 /// `common` - Common pointer for the alarm handler
 /// Returns A UID representing the created alarm, < 0 on error.
-pub fn sceKernelSetAlarm(clock: SceUInt, handler: SceKernelAlarmHandler, common: ?*anyopaque) SceUID {
+pub fn sceKernelSetAlarm(clock: u32, handler: SceKernelAlarmHandler, common: ?*anyopaque) SceUID {
     return module.sceKernelSetAlarm(clock, handler, common);
 }
 
@@ -936,7 +931,7 @@ pub fn sceKernelGetVTimerBase(uid: SceUID, base: [*c]SceKernelSysClock) c_int {
 /// Get the timer base (wide format)
 /// `uid` - UID of the vtimer
 /// Returns The 64bit timer base
-pub fn sceKernelGetVTimerBaseWide(uid: SceUID) SceInt64 {
+pub fn sceKernelGetVTimerBaseWide(uid: SceUID) i64 {
     return module.sceKernelGetVTimerBaseWide(uid);
 }
 
@@ -951,7 +946,7 @@ pub fn sceKernelGetVTimerTime(uid: SceUID, time: [*c]SceKernelSysClock) c_int {
 /// Get the timer time (wide format)
 /// `uid` - UID of the vtimer
 /// Returns The 64bit timer time
-pub fn sceKernelGetVTimerTimeWide(uid: SceUID) SceInt64 {
+pub fn sceKernelGetVTimerTimeWide(uid: SceUID) i64 {
     return module.sceKernelGetVTimerTimeWide(uid);
 }
 
@@ -967,7 +962,7 @@ pub fn sceKernelSetVTimerTime(uid: SceUID, time: [*c]SceKernelSysClock) c_int {
 /// `uid` - UID of the vtimer
 /// `time` - Pointer to a ::SceKernelSysClock structure
 /// Returns Possibly the last time
-pub fn sceKernelSetVTimerTimeWide(uid: SceUID, time: SceInt64) SceInt64 {
+pub fn sceKernelSetVTimerTimeWide(uid: SceUID, time: i64) i64 {
     return module.sceKernelSetVTimerTimeWide(uid, time);
 }
 
@@ -1001,7 +996,7 @@ pub fn sceKernelSetVTimerHandler(uid: SceUID, time: [*c]SceKernelSysClock, handl
 /// `handler` - The timer handler
 /// `common` - Common pointer
 /// Returns 0 on success, < 0 on error
-pub fn sceKernelSetVTimerHandlerWide(uid: SceUID, time: SceInt64, handler: SceKernelVTimerHandlerWide, common: ?*anyopaque) c_int {
+pub fn sceKernelSetVTimerHandlerWide(uid: SceUID, time: i64, handler: SceKernelVTimerHandlerWide, common: ?*anyopaque) c_int {
     return module.sceKernelSetVTimerHandlerWide(uid, time, handler, common);
 }
 
@@ -1035,7 +1030,7 @@ pub fn sceKernelDeleteThread(thid: SceUID) c_int {
 /// `thid` - Thread id from sceKernelCreateThread
 /// `arglen` - Length of the data pointed to by argp, in bytes
 /// `argp` - Pointer to the arguments.
-pub fn sceKernelStartThread(thid: SceUID, arglen: SceSize, argp: ?*anyopaque) c_int {
+pub fn sceKernelStartThread(thid: SceUID, arglen: usize, argp: ?*anyopaque) c_int {
     return module.sceKernelStartThread(thid, arglen, argp);
 }
 
@@ -1230,6 +1225,6 @@ pub fn sceKernelDeleteLwMutex(workarea: [*c]c_int) c_int {
 /// `initialCount` - THe inital value of the mutex
 /// `optionsPtr` - Other options for mutex
 /// Returns 0 on success, otherwise one of ::PspKernelErrorCodes
-pub fn sceKernelCreateLwMutex(workarea: [*c]c_int, name: [*c]const c_char, attr: SceUInt32, initialCount: c_int, optionsPtr: [*c]u32) c_int {
+pub fn sceKernelCreateLwMutex(workarea: [*c]c_int, name: [*c]const c_char, attr: u32, initialCount: c_int, optionsPtr: [*c]u32) c_int {
     return module.sceKernelCreateLwMutex(workarea, name, attr, initialCount, optionsPtr);
 }

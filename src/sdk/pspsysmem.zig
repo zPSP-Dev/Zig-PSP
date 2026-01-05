@@ -2,7 +2,6 @@ const c = @import("libzpsp");
 const module = c.SysMemUserForUser;
 
 const SceUID = c.types.SceUID;
-const SceSize = c.types.SceSize;
 
 pub const PspSysMemBlockTypes = enum(c_int) {
     MemLow = 0,
@@ -17,13 +16,13 @@ pub const PspSysMemPartitionID = enum(u32) {
 
 /// Get the size of the largest free memory block.
 /// Returns The size of the largest free memory block, in bytes.
-pub fn sceKernelMaxFreeMemSize() SceSize {
+pub fn sceKernelMaxFreeMemSize() usize {
     return module.sceKernelMaxFreeMemSize();
 }
 
 /// Get the total amount of free memory.
 /// Returns The total amount of free memory, in bytes.
-pub fn sceKernelTotalFreeMemSize() SceSize {
+pub fn sceKernelTotalFreeMemSize() usize {
     return module.sceKernelTotalFreeMemSize();
 }
 
@@ -34,7 +33,7 @@ pub fn sceKernelTotalFreeMemSize() SceSize {
 /// `size` - Size of the memory block, in bytes.
 /// `addr` - If type is PSP_SMEM_Addr, then addr specifies the lowest address allocate the block from.
 /// Returns The UID of the new block, or if less than 0 an error.
-pub fn sceKernelAllocPartitionMemory(partitionid: PspSysMemPartitionID, name: [:0]const u8, block_type: PspSysMemBlockTypes, size: SceSize, addr: ?*anyopaque) SceUID {
+pub fn sceKernelAllocPartitionMemory(partitionid: PspSysMemPartitionID, name: [:0]const u8, block_type: PspSysMemBlockTypes, size: usize, addr: ?*anyopaque) SceUID {
     return module.sceKernelAllocPartitionMemory(@intFromEnum(partitionid), @ptrCast(name), @intFromEnum(block_type), size, addr);
 }
 

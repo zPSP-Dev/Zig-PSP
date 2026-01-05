@@ -15,7 +15,7 @@ pub extern fn sceJpegMJpegCsc() callconv(.c) void;
 /// It should have a size of (width * height * 4).
 /// `unk` - Unknown, pass 0
 /// Returns (width * 65536) + height on success, < 0 on error
-pub extern fn sceJpegDecodeMJpeg(jpegbuf: [*c]u8, size: types.SceSize, rgba: [*c]u8, unk: u32) callconv(.c) c_int;
+pub extern fn sceJpegDecodeMJpeg(jpegbuf: [*c]u8, size: usize, rgba: [*c]u8, unk: u32) callconv(.c) c_int;
 
 pub extern fn sceJpeg_227662D7() callconv(.c) void;
 
@@ -45,7 +45,7 @@ pub extern fn sceJpegFinishMJpeg() callconv(.c) c_int;
 /// `colourInfo` - address where the mjpeg chroma information will be stored
 /// `unk` - Unknown, pass 0
 /// Returns number of bytes needed in the buffer that will be used for YCbCr decoding, <= 0 on error
-pub extern fn sceJpegGetOutputInfo(jpegbuf: [*c]u8, size: types.SceSize, colourInfo: [*c]c_int, unk: c_int) callconv(.c) c_int;
+pub extern fn sceJpegGetOutputInfo(jpegbuf: [*c]u8, size: usize, colourInfo: [*c]c_int, unk: c_int) callconv(.c) c_int;
 
 /// Decodes a mjpeg frame to YCbCr encoding
 /// @note Input frame should be encoded as either yuv420p or yuvj420p,
@@ -56,7 +56,7 @@ pub extern fn sceJpegGetOutputInfo(jpegbuf: [*c]u8, size: types.SceSize, colourI
 /// `yCbCrSize` - size of the buffer pointed by yCbCr (see sceJpegGetOutputInfo())
 /// `unk` - Unknown, pass 0
 /// Returns (width * 65536) + height on success, < 0 on error
-pub extern fn sceJpegDecodeMJpegYCbCr(jpegbuf: [*c]u8, size: types.SceSize, yCbCr: [*c]u8, yCbCrSize: types.SceSize, unk: u32) callconv(.c) c_int;
+pub extern fn sceJpegDecodeMJpegYCbCr(jpegbuf: [*c]u8, size: usize, yCbCr: [*c]u8, yCbCrSize: usize, unk: u32) callconv(.c) c_int;
 
 pub extern fn sceJpeg_9B36444C() callconv(.c) void;
 

@@ -15,7 +15,7 @@ pub extern fn sceNetResolverTerm() callconv(.c) c_int;
 /// `buf` - Temporary buffer
 /// `buflen` - Length of the temporary buffer
 /// Returns 0 on success, < 0 on error
-pub extern fn sceNetResolverCreate(rid: [*c]c_int, buf: ?*anyopaque, buflen: types.SceSize) callconv(.c) c_int;
+pub extern fn sceNetResolverCreate(rid: [*c]c_int, buf: ?*anyopaque, buflen: usize) callconv(.c) c_int;
 
 /// Delete a resolver
 /// `rid` - The resolver to delete
@@ -39,7 +39,7 @@ pub extern fn sceNetResolverStartNtoA(rid: c_int, hostname: [*c]const c_char, ad
 /// `timeout` - Number of seconds before timeout
 /// `retry` - Number of retries
 /// Returns 0 on success, < 0 on error
-pub extern fn sceNetResolverStartAtoN(rid: c_int, addr: [*c]const types.in_addr, hostname: [*c]c_char, hostname_len: types.SceSize, timeout: c_uint, retry: c_int) callconv(.c) c_int;
+pub extern fn sceNetResolverStartAtoN(rid: c_int, addr: [*c]const types.in_addr, hostname: [*c]c_char, hostname_len: usize, timeout: c_uint, retry: c_int) callconv(.c) c_int;
 
 /// Stop a resolver operation
 /// `rid` - Resolver id

@@ -1,9 +1,5 @@
 const c = @import("libzpsp");
 
-const SceSize = c.types.SceSize;
-const SceBool = c.types.SceBool;
-const SceULong64 = c.types.SceULong64;
-
 const PspHttpFreeFunction = c.types.PspHttpFreeFunction;
 const PspHttpMallocFunction = c.types.PspHttpMallocFunction;
 const PspHttpMethod = c.types.PspHttpMethod;
@@ -35,13 +31,13 @@ pub extern fn sceHttpDeleteTemplate(templateid: c_int) c_int;
 pub extern fn sceHttpCreateConnection(templateid: c_int, host: [*c]u8, unknown1: [*c]u8, port: c_ushort, unknown2: c_int) c_int;
 pub extern fn sceHttpCreateConnectionWithURL(templateid: c_int, url: [*c]const u8, unknown1: c_int) c_int;
 pub extern fn sceHttpDeleteConnection(connectionid: c_int) c_int;
-pub extern fn sceHttpCreateRequest(connectionid: c_int, method: PspHttpMethod, path: [*c]u8, contentlength: SceULong64) c_int;
-pub extern fn sceHttpCreateRequestWithURL(connectionid: c_int, method: PspHttpMethod, url: [*c]u8, contentlength: SceULong64) c_int;
+pub extern fn sceHttpCreateRequest(connectionid: c_int, method: PspHttpMethod, path: [*c]u8, contentlength: u64) c_int;
+pub extern fn sceHttpCreateRequestWithURL(connectionid: c_int, method: PspHttpMethod, url: [*c]u8, contentlength: u64) c_int;
 pub extern fn sceHttpDeleteRequest(requestid: c_int) c_int;
 pub extern fn sceHttpSendRequest(requestid: c_int, data: ?*anyopaque, datasize: c_uint) c_int;
 pub extern fn sceHttpAbortRequest(requestid: c_int) c_int;
 pub extern fn sceHttpReadData(requestid: c_int, data: ?*anyopaque, datasize: c_uint) c_int;
-pub extern fn sceHttpGetContentLength(requestid: c_int, contentlength: [*c]SceULong64) c_int;
+pub extern fn sceHttpGetContentLength(requestid: c_int, contentlength: [*c]u64) c_int;
 pub extern fn sceHttpGetStatusCode(requestid: c_int, statuscode: [*c]c_int) c_int;
 pub extern fn sceHttpSetResolveTimeOut(id: c_int, timeout: c_uint) c_int;
 pub extern fn sceHttpSetResolveRetry(id: c_int, count: c_int) c_int;
@@ -68,8 +64,8 @@ pub extern fn sceHttpEnableCache(id: c_int) c_int;
 pub extern fn sceHttpEndCache() c_int;
 pub extern fn sceHttpGetAllHeader(request: c_int, header: [*c][*c]u8, header_size: [*c]c_uint) c_int;
 pub extern fn sceHttpGetNetworkErrno(request: c_int, err_num: [*c]c_int) c_int;
-pub extern fn sceHttpGetProxy(id: c_int, activate_flag: [*c]c_int, mode: [*c]c_int, proxy_host: [*c]u8, len: SceSize, proxy_port: [*c]c_ushort) c_int;
-pub extern fn sceHttpInitCache(max_size: SceSize) c_int;
+pub extern fn sceHttpGetProxy(id: c_int, activate_flag: [*c]c_int, mode: [*c]c_int, proxy_host: [*c]u8, len: usize, proxy_port: [*c]c_ushort) c_int;
+pub extern fn sceHttpInitCache(max_size: usize) c_int;
 pub extern fn sceHttpSetAuthInfoCB(id: c_int, cbfunc: PspHttpPasswordCB) c_int;
 pub extern fn sceHttpSetProxy(id: c_int, activate_flag: c_int, mode: c_int, new_proxy_host: [*c]const u8, new_proxy_port: c_ushort) c_int;
 pub extern fn sceHttpSetResHeaderMaxSize(id: c_int, header_size: c_uint) c_int;

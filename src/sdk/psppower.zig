@@ -1,9 +1,5 @@
-const psptypes = @import("libzpsp");
-const SceUID = psptypes.SceUID;
-const SceSize = psptypes.SceSize;
-const SceVoid = psptypes.SceVoid;
-const SceInt32 = psptypes.SceInt32;
-const SceUInt32 = psptypes.SceUInt32;
+const c = @import("libzpsp");
+const SceUID = c.types.SceUID;
 
 pub const PSPPowerCB = enum(u32) {
     Battpower = 0x0000007f,

@@ -1,12 +1,6 @@
 const c = @import("libzpsp");
 
 pub const SceUID = c.types.SceUID;
-pub const SceSize = c.types.SceSize;
-pub const SceVoid = c.types.SceVoid;
-pub const SceInt32 = c.types.SceInt32;
-pub const SceUInt32 = c.types.SceUInt32;
-pub const SceShort16 = c.types.SceShort16;
-pub const SceUChar8 = c.types.SceUChar8;
 pub const SceMp3InitArg = c.types.SceMp3InitArg;
 
 // sceMp3ReserveMp3Handle
@@ -14,8 +8,8 @@ pub const SceMp3InitArg = c.types.SceMp3InitArg;
 // @param args - Pointer to SceMp3InitArg structure
 //
 // @return sceMp3 handle on success, < 0 on error.
-pub extern fn sceMp3ReserveMp3Handle(args: *SceMp3InitArg) SceInt32;
-pub fn mp3ReserveMp3Handle(args: *SceMp3InitArg) !SceInt32 {
+pub extern fn sceMp3ReserveMp3Handle(args: *SceMp3InitArg) i32;
+pub fn mp3ReserveMp3Handle(args: *SceMp3InitArg) !i32 {
     const res = sceMp3ReserveMp3Handle(args);
     if (res < 0) {
         return error.Unexpected;
@@ -28,8 +22,8 @@ pub fn mp3ReserveMp3Handle(args: *SceMp3InitArg) !SceInt32 {
 // @param handle - sceMp3 handle
 //
 // @return 0 if success, < 0 on error.
-pub extern fn sceMp3ReleaseMp3Handle(handle: SceInt32) SceInt32;
-pub fn mp3ReleaseMp3Handle(handle: SceInt32) !void {
+pub extern fn sceMp3ReleaseMp3Handle(handle: i32) i32;
+pub fn mp3ReleaseMp3Handle(handle: i32) !void {
     const res = sceMp3ReleaseMp3Handle(handle);
     if (res < 0) {
         return error.Unexpected;
@@ -39,7 +33,7 @@ pub fn mp3ReleaseMp3Handle(handle: SceInt32) !void {
 // sceMp3InitResource
 //
 // @return 0 if success, < 0 on error.
-pub extern fn sceMp3InitResource() SceInt32;
+pub extern fn sceMp3InitResource() i32;
 pub fn mp3InitResource() !void {
     const res = sceMp3InitResource();
     if (res < 0) {
@@ -50,7 +44,7 @@ pub fn mp3InitResource() !void {
 // sceMp3TermResource
 //
 // @return 0 if success, < 0 on error.
-pub extern fn sceMp3TermResource() SceInt32;
+pub extern fn sceMp3TermResource() i32;
 pub fn mp3TermResource() !void {
     const res = sceMp3TermResource();
     if (res < 0) {
@@ -63,8 +57,8 @@ pub fn mp3TermResource() !void {
 // @param handle - sceMp3 handle
 //
 // @return 0 if success, < 0 on error.
-pub extern fn sceMp3Init(handle: SceInt32) SceInt32;
-pub fn mp3Init(handle: SceInt32) !void {
+pub extern fn sceMp3Init(handle: i32) i32;
+pub fn mp3Init(handle: i32) !void {
     const res = sceMp3Init(handle);
     if (res < 0) {
         return error.Unexpected;
@@ -77,8 +71,8 @@ pub fn mp3Init(handle: SceInt32) !void {
 // @param dst - Pointer to destination pcm samples buffer
 //
 // @return number of bytes in decoded pcm buffer, < 0 on error.
-pub extern fn sceMp3Decode(handle: SceInt32, dst: *[]SceShort16) SceInt32;
-pub fn mp3Decode(handle: SceInt32, dst: *[]SceShort16) !i32 {
+pub extern fn sceMp3Decode(handle: i32, dst: *[]i16) i32;
+pub fn mp3Decode(handle: i32, dst: *[]i16) !i32 {
     const res = sceMp3Decode(handle, dst);
     if (res < 0) {
         return error.Unexpected;
@@ -94,8 +88,8 @@ pub fn mp3Decode(handle: SceInt32, dst: *[]SceShort16) !i32 {
 // @param srcpos - Position in source stream to start reading from
 //
 // @return 0 if success, < 0 on error.
-pub extern fn sceMp3GetInfoToAddStreamData(handle: SceInt32, dst: *[]SceUChar8, towrite: *SceInt32, srcpos: *SceInt32) SceInt32;
-pub fn mp3GetInfoToAddStreamData(handle: SceInt32, dst: *[]SceUChar8, towrite: *SceInt32, srcpos: *SceInt32) !void {
+pub extern fn sceMp3GetInfoToAddStreamData(handle: i32, dst: *[]u8, towrite: *i32, srcpos: *i32) i32;
+pub fn mp3GetInfoToAddStreamData(handle: i32, dst: *[]u8, towrite: *i32, srcpos: *i32) !void {
     const res = sceMp3GetInfoToAddStreamData(handle, dst, towrite, srcpos);
     if (res < 0) {
         return error.Unexpected;
@@ -108,8 +102,8 @@ pub fn mp3GetInfoToAddStreamData(handle: SceInt32, dst: *[]SceUChar8, towrite: *
 // @param size - number of bytes added to the stream data buffer
 //
 // @return 0 if success, < 0 on error.
-pub extern fn sceMp3NotifyAddStreamData(handle: SceInt32, size: SceInt32) SceInt32;
-pub fn mp3NotifyAddStreamData(handle: SceInt32, size: SceInt32) !void {
+pub extern fn sceMp3NotifyAddStreamData(handle: i32, size: i32) i32;
+pub fn mp3NotifyAddStreamData(handle: i32, size: i32) !void {
     const res = sceMp3NotifyAddStreamData(handle, size);
     if (res < 0) {
         return error.Unexpected;
@@ -121,7 +115,7 @@ pub fn mp3NotifyAddStreamData(handle: SceInt32, size: SceInt32) !void {
 // @param handle - sceMp3 handle
 //
 // @return 1 if more stream data is needed, < 0 on error.
-pub extern fn sceMp3CheckStreamDataNeeded(handle: SceInt32) SceInt32;
+pub extern fn sceMp3CheckStreamDataNeeded(handle: i32) i32;
 
 // sceMp3SetLoopNum
 //
@@ -129,8 +123,8 @@ pub extern fn sceMp3CheckStreamDataNeeded(handle: SceInt32) SceInt32;
 // @param loop - Number of loops
 //
 // @return 0 if success, < 0 on error.
-pub extern fn sceMp3SetLoopNum(handle: SceInt32, loop: SceInt32) SceInt32;
-pub fn mp3SetLoopNum(handle: SceInt32, loop: SceInt32) !void {
+pub extern fn sceMp3SetLoopNum(handle: i32, loop: i32) i32;
+pub fn mp3SetLoopNum(handle: i32, loop: i32) !void {
     const res = sceMp3SetLoopNum(handle, loop);
     if (res < 0) {
         return error.Unexpected;
@@ -142,50 +136,50 @@ pub fn mp3SetLoopNum(handle: SceInt32, loop: SceInt32) !void {
 // @param handle - sceMp3 handle
 //
 // @return Number of loops
-pub extern fn sceMp3GetLoopNum(handle: SceInt32) SceInt32;
+pub extern fn sceMp3GetLoopNum(handle: i32) i32;
 
 // sceMp3GetSumDecodedSample
 //
 // @param handle - sceMp3 handle
 //
 // @return Number of decoded samples
-pub extern fn sceMp3GetSumDecodedSample(handle: SceInt32) SceInt32;
+pub extern fn sceMp3GetSumDecodedSample(handle: i32) i32;
 
 // sceMp3GetMaxOutputSample
 //
 // @param handle - sceMp3 handle
 //
 // @return Number of max samples to output
-pub extern fn sceMp3GetMaxOutputSample(handle: SceInt32) SceInt32;
+pub extern fn sceMp3GetMaxOutputSample(handle: i32) i32;
 
 // sceMp3GetSamplingRate
 //
 // @param handle - sceMp3 handle
 //
 // @return Sampling rate of the mp3
-pub extern fn sceMp3GetSamplingRate(handle: SceInt32) SceInt32;
+pub extern fn sceMp3GetSamplingRate(handle: i32) i32;
 
 // sceMp3GetBitRate
 //
 // @param handle - sceMp3 handle
 //
 // @return Bitrate of the mp3
-pub extern fn sceMp3GetBitRate(handle: SceInt32) SceInt32;
+pub extern fn sceMp3GetBitRate(handle: i32) i32;
 
 // sceMp3GetMp3ChannelNum
 //
 // @param handle - sceMp3 handle
 //
 // @return Number of channels of the mp3
-pub extern fn sceMp3GetMp3ChannelNum(handle: SceInt32) SceInt32;
+pub extern fn sceMp3GetMp3ChannelNum(handle: i32) i32;
 
 // sceMp3ResetPlayPosition
 //
 // @param handle - sceMp3 handle
 //
 // @return < 0 on error
-pub extern fn sceMp3ResetPlayPosition(handle: SceInt32) SceInt32;
-pub fn mp3ResetPlayPosition(handle: SceInt32) !void {
+pub extern fn sceMp3ResetPlayPosition(handle: i32) i32;
+pub fn mp3ResetPlayPosition(handle: i32) !void {
     const res = sceMp3ResetPlayPosition(handle);
     if (res < 0) {
         return error.Unexpected;

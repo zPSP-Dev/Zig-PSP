@@ -6,7 +6,7 @@ const macro = @import("../macro.zig");
 /// `requestid` - ID of the request created by sceHttpCreateRequest or sceHttpCreateRequestWithURL
 /// `contentlength` - The size of the content
 /// Returns 0 on success, < 0 on error.
-pub extern fn sceHttpGetContentLength(requestid: c_int, contentlength: [*c]types.SceULong64) callconv(.c) c_int;
+pub extern fn sceHttpGetContentLength(requestid: c_int, contentlength: [*c]u64) callconv(.c) c_int;
 
 /// Set resolver retry
 /// `id` - ID of the template or connection
@@ -78,7 +78,7 @@ pub extern fn sceHttp_457D221D() callconv(.c) void;
 /// `path` - Path to access
 /// `contentlength` - Length of the content (POST method only)
 /// Returns A request ID on success, < 0 on error.
-pub extern fn sceHttpCreateRequest(connectionid: c_int, method: types.PspHttpMethod, path: [*c]c_char, contentlength: types.SceULong64) callconv(.c) c_int;
+pub extern fn sceHttpCreateRequest(connectionid: c_int, method: types.PspHttpMethod, path: [*c]c_char, contentlength: u64) callconv(.c) c_int;
 
 /// Set resolver timeout
 /// `id` - ID of the template or connection
@@ -181,7 +181,7 @@ pub extern fn sceHttp_A461A167() callconv(.c) void;
 /// Returns 0 on success, < 0 on error.
 pub extern fn sceHttpDeleteRequest(requestid: c_int) callconv(.c) c_int;
 
-pub extern fn sceHttpInitCache(max_size: types.SceSize) callconv(.c) c_int;
+pub extern fn sceHttpInitCache(max_size: usize) callconv(.c) c_int;
 
 pub extern fn sceHttp_A909F2AE() callconv(.c) void;
 
@@ -206,7 +206,7 @@ pub extern fn sceHttpsDisableOption() callconv(.c) void;
 /// `url` - url to access
 /// `contentlength` - Length of the content (POST method only)
 /// Returns A request ID on success, < 0 on error.
-pub extern fn sceHttpCreateRequestWithURL(connectionid: c_int, method: types.PspHttpMethod, url: [*c]c_char, contentlength: types.SceULong64) callconv(.c) c_int;
+pub extern fn sceHttpCreateRequestWithURL(connectionid: c_int, method: types.PspHttpMethod, url: [*c]c_char, contentlength: u64) callconv(.c) c_int;
 
 pub extern fn sceHttpsEnableOption() callconv(.c) void;
 
@@ -256,7 +256,7 @@ pub extern fn sceHttpEnd() callconv(.c) c_int;
 
 pub extern fn sceHttp_D29163DA() callconv(.c) void;
 
-pub extern fn sceHttpGetProxy(id: c_int, activate_flag: [*c]c_int, mode: [*c]c_int, proxy_host: [*c]u8, len: types.SceSize, proxy_port: [*c]c_ushort) callconv(.c) c_int;
+pub extern fn sceHttpGetProxy(id: c_int, activate_flag: [*c]c_int, mode: [*c]c_int, proxy_host: [*c]u8, len: usize, proxy_port: [*c]c_ushort) callconv(.c) c_int;
 
 pub extern fn sceHttp_D80BE761() callconv(.c) void;
 

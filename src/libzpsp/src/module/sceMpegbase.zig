@@ -2,11 +2,11 @@
 const types = @import("../types.zig");
 const macro = @import("../macro.zig");
 
-pub extern fn sceMpegBaseYCrCbCopyVme(YUVBuffer: types.ScePVoid, Buffer: [*c]types.SceInt32, Type: types.SceInt32) callconv(.c) types.SceInt32;
+pub extern fn sceMpegBaseYCrCbCopyVme(YUVBuffer: ?*anyopaque, Buffer: [*c]i32, Type: i32) callconv(.c) i32;
 
-pub extern fn sceMpegBaseCscInit(width: types.SceInt32) callconv(.c) types.SceInt32;
+pub extern fn sceMpegBaseCscInit(width: i32) callconv(.c) i32;
 
-pub extern fn sceMpegBaseCscVme(pRGBbuffer: types.ScePVoid, pRGBbuffer2: types.ScePVoid, width: types.SceInt32, pYCrCbBuffer: [*c]types.SceMpegYCrCbBuffer) callconv(.c) types.SceInt32;
+pub extern fn sceMpegBaseCscVme(pRGBbuffer: ?*anyopaque, pRGBbuffer2: ?*anyopaque, width: i32, pYCrCbBuffer: [*c]types.SceMpegYCrCbBuffer) callconv(.c) i32;
 
 pub extern fn sceMpegbase_0530BE4E() callconv(.c) void;
 
@@ -18,7 +18,7 @@ pub extern fn sceMpegBaseCscAvc() callconv(.c) void;
 
 pub extern fn sceMpegbase_AC9E717E() callconv(.c) void;
 
-pub extern fn sceMpegbase_BEA18F91(pLLI: [*c]types.SceMpegLLI) callconv(.c) types.SceInt32;
+pub extern fn sceMpegbase_BEA18F91(pLLI: [*c]types.SceMpegLLI) callconv(.c) i32;
 
 comptime {
     asm (macro.import_module_start("sceMpegbase", "0x00090000", "9"));

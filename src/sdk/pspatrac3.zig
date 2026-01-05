@@ -1,5 +1,4 @@
 const c = @import("libzpsp");
-const psptypes = c;
 
 pub const PspBufferInfo = c.types.PspBufferInfo;
 
@@ -125,7 +124,7 @@ pub fn atracGetAtracID(uiCodecType: AtracCodecType) !i32 {
 // @param bufsize - the size of the buffer pointed by buf
 //
 // @return the new atrac ID, or < 0 on error
-pub extern fn sceAtracSetDataAndGetID(buf: ?*anyopaque, bufsize: psptypes.SceSize) c_int;
+pub extern fn sceAtracSetDataAndGetID(buf: ?*anyopaque, bufsize: usize) c_int;
 
 pub fn atracSetDataAndGetID(buf: *anyopaque, bufSize: usize) !u32 {
     const res = sceAtracSetDataAndGetID(buf, bufSize);
@@ -161,7 +160,7 @@ pub fn atracDecodeData(atracID: u32, outSamples: []u16, outN: []i32, outEnd: []i
 pub extern fn sceAtracGetRemainFrame(atracID: u32, outRemainFrame: [*c]c_int) c_int;
 
 pub fn atracGetRemainFrame(atracID: u32, outRemainFrame: []i32) !void {
-    const res = sceAtracDecodeData(atracID, psptypes.outSamples, psptypes.outN, psptypes.outEnd, outRemainFrame);
+    const res = sceAtracDecodeData(atracID, c.outSamples, c.outN, c.outEnd, outRemainFrame);
     try intToError(res);
 }
 

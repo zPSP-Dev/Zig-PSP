@@ -1,7 +1,6 @@
 const libzpsp = @import("libzpsp");
 const module = libzpsp.LoadExecForUser;
 
-const SceSize = libzpsp.SceSize;
 const SceKernelLoadExecParam = libzpsp.SceKernelLoadExecParam;
 
 /// Execute a new game executable, limited when not running in kernel mode.

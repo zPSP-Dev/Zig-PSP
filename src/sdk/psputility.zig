@@ -1,7 +1,6 @@
 const c = @import("libzpsp");
 
 pub const SceUID = c.types.SceUID;
-pub const SceSize = c.types.SceSize;
 
 pub const SceUtilitySavedataParam = c.types.SceUtilitySavedataParam;
 pub const PspUtilityDialogCommon = c.types.PspUtilityDialogCommon;

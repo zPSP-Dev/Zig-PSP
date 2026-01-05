@@ -6,26 +6,26 @@ const macro = @import("../macro.zig");
 /// `fd` - The file descriptor which is current performing an asynchronous action.
 /// `res` - The result of the async action.
 /// Returns < 0 on error.
-pub extern fn sceIoPollAsync(fd: types.SceUID, res: [*c]types.SceInt64) callconv(.c) c_int;
+pub extern fn sceIoPollAsync(fd: types.SceUID, res: [*c]i64) callconv(.c) c_int;
 
 /// Wait for asyncronous completion.
 /// `fd` - The file descriptor which is current performing an asynchronous action.
 /// `res` - The result of the async action.
 /// Returns < 0 on error.
-pub extern fn sceIoWaitAsync(fd: types.SceUID, res: [*c]types.SceInt64) callconv(.c) c_int;
+pub extern fn sceIoWaitAsync(fd: types.SceUID, res: [*c]i64) callconv(.c) c_int;
 
 /// Wait for asyncronous completion (with callbacks).
 /// `fd` - The file descriptor which is current performing an asynchronous action.
 /// `res` - The result of the async action.
 /// Returns < 0 on error.
-pub extern fn sceIoWaitAsyncCB(fd: types.SceUID, res: [*c]types.SceInt64) callconv(.c) c_int;
+pub extern fn sceIoWaitAsyncCB(fd: types.SceUID, res: [*c]i64) callconv(.c) c_int;
 
 /// Get the asyncronous completion status.
 /// `fd` - The file descriptor which is current performing an asynchronous action.
 /// `poll` - If 0 then waits for the status, otherwise it polls the fd.
 /// `res` - The result of the async action.
 /// Returns < 0 on error.
-pub extern fn sceIoGetAsyncStat(fd: types.SceUID, poll: c_int, res: [*c]types.SceInt64) callconv(.c) c_int;
+pub extern fn sceIoGetAsyncStat(fd: types.SceUID, poll: c_int, res: [*c]i64) callconv(.c) c_int;
 
 /// Change the priority of the asynchronous thread.
 /// `fd` - The opened fd on which the priority should be changed.
@@ -88,7 +88,7 @@ pub extern fn sceIoOpenAsync(file: [*c]const c_char, flags: c_int, mode: types.S
 /// `data` - Pointer to the buffer where the read data will be placed
 /// `size` - Size of the read in bytes
 /// Returns The number of bytes read
-pub extern fn sceIoRead(fd: types.SceUID, data: ?*anyopaque, size: types.SceSize) callconv(.c) c_int;
+pub extern fn sceIoRead(fd: types.SceUID, data: ?*anyopaque, size: usize) callconv(.c) c_int;
 
 /// Read input (asynchronous)
 /// @par Example:
@@ -99,7 +99,7 @@ pub extern fn sceIoRead(fd: types.SceUID, data: ?*anyopaque, size: types.SceSize
 /// `data` - Pointer to the buffer where the read data will be placed
 /// `size` - Size of the read in bytes
 /// Returns < 0 on error.
-pub extern fn sceIoReadAsync(fd: types.SceUID, data: ?*anyopaque, size: types.SceSize) callconv(.c) c_int;
+pub extern fn sceIoReadAsync(fd: types.SceUID, data: ?*anyopaque, size: usize) callconv(.c) c_int;
 
 /// Write output
 /// @par Example:
@@ -110,14 +110,14 @@ pub extern fn sceIoReadAsync(fd: types.SceUID, data: ?*anyopaque, size: types.Sc
 /// `data` - Pointer to the data to write
 /// `size` - Size of data to write
 /// Returns The number of bytes written
-pub extern fn sceIoWrite(fd: types.SceUID, data: ?*const anyopaque, size: types.SceSize) callconv(.c) c_int;
+pub extern fn sceIoWrite(fd: types.SceUID, data: ?*const anyopaque, size: usize) callconv(.c) c_int;
 
 /// Write output (asynchronous)
 /// `fd` - Opened file descriptor to write to
 /// `data` - Pointer to the data to write
 /// `size` - Size of data to write
 /// Returns < 0 on error.
-pub extern fn sceIoWriteAsync(fd: types.SceUID, data: ?*const anyopaque, size: types.SceSize) callconv(.c) c_int;
+pub extern fn sceIoWriteAsync(fd: types.SceUID, data: ?*const anyopaque, size: usize) callconv(.c) c_int;
 
 /// Reposition read/write file descriptor offset
 /// @par Example:
@@ -129,7 +129,7 @@ pub extern fn sceIoWriteAsync(fd: types.SceUID, data: ?*const anyopaque, size: t
 /// `whence` - Set to SEEK_SET to seek from the start of the file, SEEK_CUR
 /// seek from the current position and SEEK_END to seek from the end.
 /// Returns The position in the file after the seek.
-pub extern fn sceIoLseek(fd: types.SceUID, offset: types.SceOff, whence: c_int) callconv(.c) types.SceOff;
+pub extern fn sceIoLseek(fd: types.SceUID, offset: i64, whence: c_int) callconv(.c) i64;
 
 /// Reposition read/write file descriptor offset (asynchronous)
 /// `fd` - Opened file descriptor with which to seek
@@ -137,7 +137,7 @@ pub extern fn sceIoLseek(fd: types.SceUID, offset: types.SceOff, whence: c_int) 
 /// `whence` - Set to SEEK_SET to seek from the start of the file, SEEK_CUR
 /// seek from the current position and SEEK_END to seek from the end.
 /// Returns < 0 on error. Actual value should be passed returned by the ::sceIoWaitAsync call.
-pub extern fn sceIoLseekAsync(fd: types.SceUID, offset: types.SceOff, whence: c_int) callconv(.c) c_int;
+pub extern fn sceIoLseekAsync(fd: types.SceUID, offset: i64, whence: c_int) callconv(.c) c_int;
 
 /// Reposition read/write file descriptor offset (32bit mode)
 /// @par Example:
