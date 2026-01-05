@@ -719,7 +719,8 @@ def generate_root_module(modules: Dict[str, Module], output_dir: str):
         f.write("\n")
 
         # Write module declarations
-        for module in modules.values():
+        # Sort the modules by name because dict order is not guaranteed
+        for module in sorted(modules.values(), key=lambda m: m.name):
             f.write(f'pub const {module.name} = @import("module/{module.name}.zig");\n')
 
 
