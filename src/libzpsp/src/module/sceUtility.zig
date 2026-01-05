@@ -5,7 +5,7 @@ const macro = @import("../macro.zig");
 /// Init the game sharing
 /// `params` - game sharing parameters
 /// Returns 0 on success, < 0 on error.
-pub extern fn sceUtilityGameSharingInitStart(params: [*c]c_int) callconv(.c) c_int;
+pub extern fn sceUtilityGameSharingInitStart(params: [*c]types.pspUtilityGameSharingParams) callconv(.c) c_int;
 
 /// Shutdown game sharing.
 pub extern fn sceUtilityGameSharingShutdownStart() callconv(.c) void;
@@ -31,7 +31,7 @@ pub extern fn sceNetplayDialogGetStatus() callconv(.c) void;
 /// Init the Network Configuration Dialog Utility
 /// `data` - pointer to pspUtilityNetconfData to be initialized
 /// Returns 0 on success, < 0 on error
-pub extern fn sceUtilityNetconfInitStart(data: [*c]c_int) callconv(.c) c_int;
+pub extern fn sceUtilityNetconfInitStart(data: [*c]types.pspUtilityNetconfData) callconv(.c) c_int;
 
 /// Shutdown the Network Configuration Dialog Utility
 /// Returns 0 on success, < 0 on error
@@ -81,7 +81,7 @@ pub extern fn sceUtility_88BC7406() callconv(.c) void;
 /// Create a message dialog
 /// `params` - dialog parameters
 /// Returns 0 on success
-pub extern fn sceUtilityMsgDialogInitStart(params: [*c]c_int) callconv(.c) c_int;
+pub extern fn sceUtilityMsgDialogInitStart(params: [*c]types.pspUtilityMsgDialogParams) callconv(.c) c_int;
 
 /// Remove a message dialog currently active.  After calling this
 /// function you need to keep calling GetStatus and Update until
@@ -209,7 +209,7 @@ pub extern fn sceUtilityHtmlViewerGetStatus() callconv(.c) c_int;
 /// Init the html viewer
 /// `params` - html viewer parameters
 /// Returns 0 on success, < 0 on error.
-pub extern fn sceUtilityHtmlViewerInitStart(params: [*c]c_int) callconv(.c) c_int;
+pub extern fn sceUtilityHtmlViewerInitStart(params: [*c]types.pspUtilityHtmlViewerParam) callconv(.c) c_int;
 
 /// Shutdown html viewer.
 pub extern fn sceUtilityHtmlViewerShutdownStart() callconv(.c) c_int;

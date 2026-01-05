@@ -253,6 +253,14 @@ def parse_c_type_to_zig(c_type: str) -> str:
         "netData": "types.netData",
         "PspDebugProfilerRegs": "volatile types.PspDebugProfilerRegs",
         "struct msghdr": "types.msghdr",
+        "pspUtilityGameSharingParams": "types.pspUtilityGameSharingParams",
+        "pspUtilityHtmlViewerParam": "types.pspUtilityHtmlViewerParam",
+        "pspUtilityMsgDialogParams": "types.pspUtilityMsgDialogParams",
+        "pspUtilityNetconfData": "types.pspUtilityNetconfData",
+        "PspUsbCamSetupStillExParam": "types.PspUsbCamSetupStillExParam",
+        "PspUsbCamSetupStillParam": "types.PspUsbCamSetupStillParam",
+        "PspUsbCamSetupVideoExParam": "types.PspUsbCamSetupVideoExParam",
+        "PspUsbCamSetupVideoParam": "types.PspUsbCamSetupVideoParam",
     }
 
     # Handle const first

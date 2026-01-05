@@ -14,7 +14,7 @@ pub extern fn sceUsbCamSetContrast(contrast: c_int) callconv(.c) c_int;
 /// Setups the parameters to take a still image (with more options)
 /// `param` - pointer to a ::PspUsbCamSetupStillExParam
 /// Returns 0 on success, < 0 on error
-pub extern fn sceUsbCamSetupStillEx(param: [*c]c_int) callconv(.c) c_int;
+pub extern fn sceUsbCamSetupStillEx(param: [*c]types.PspUsbCamSetupStillExParam) callconv(.c) c_int;
 
 /// Gets the state of the autoreversal of the image.
 /// Returns 1 if it is set to automatic, 0 otherwise
@@ -25,7 +25,7 @@ pub extern fn sceUsbCamGetAutoImageReverseState() callconv(.c) c_int;
 /// `workarea` - Pointer to a buffer used as work area by the driver.
 /// `wasize` - Size of the work area.
 /// Returns 0 on success, < 0 on error
-pub extern fn sceUsbCamSetupVideo(param: [*c]c_int, workarea: ?*anyopaque, wasize: c_int) callconv(.c) c_int;
+pub extern fn sceUsbCamSetupVideo(param: [*c]types.PspUsbCamSetupVideoParam, workarea: ?*anyopaque, wasize: c_int) callconv(.c) c_int;
 
 /// Polls the status of still input completion.
 /// Returns the size of the acquired image if still input has ended,
@@ -58,7 +58,7 @@ pub extern fn sceUsbCamReadMic() callconv(.c) void;
 /// Setups the parameters to take a still image.
 /// `param` - pointer to a ::PspUsbCamSetupStillParam
 /// Returns 0 on success, < 0 on error
-pub extern fn sceUsbCamSetupStill(param: [*c]c_int) callconv(.c) c_int;
+pub extern fn sceUsbCamSetupStill(param: [*c]types.PspUsbCamSetupStillParam) callconv(.c) c_int;
 
 /// Polls the status of video frame read completion.
 /// Returns the size of the acquired frame if it has been read,
@@ -181,7 +181,7 @@ pub extern fn sceUsbCam_C72ED6D3() callconv(.c) void;
 /// `workarea` - Pointer to a buffer used as work area by the driver.
 /// `wasize` - Size of the work area.
 /// Returns 0 on success, < 0 on error
-pub extern fn sceUsbCamSetupVideoEx(param: [*c]c_int, workarea: ?*anyopaque, wasize: c_int) callconv(.c) c_int;
+pub extern fn sceUsbCamSetupVideoEx(param: [*c]types.PspUsbCamSetupVideoExParam, workarea: ?*anyopaque, wasize: c_int) callconv(.c) c_int;
 
 pub extern fn sceUsbCamRegisterLensRotationCallback() callconv(.c) void;
 
