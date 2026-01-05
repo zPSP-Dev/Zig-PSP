@@ -28,7 +28,12 @@ pub const GuPrimitive = enum(u24) {
 
 pub const GuClutMode = enum(u24) {
     Single = 0,
-    Double = 1,
+    Multiple = 1,
+};
+
+pub const GuTextureDataLayout = enum(u1) {
+    Linear = 0,
+    Swizzled = 1,
 };
 
 pub const PatchPrimitive = enum(c_int) {

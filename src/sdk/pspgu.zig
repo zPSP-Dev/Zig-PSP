@@ -1202,7 +1202,6 @@ pub fn sceGuTexImage(mipmap: u3, width: u10, height: u10, tbw: u16, tbp: ?*align
         unused: u8 = 0,
     };
 
-    // Width and height should be a power of two!
     const tbp_u32: u32 = @intFromPtr(tbp);
     sendCommandi(0xa0 + @as(u8, mipmap), @truncate(tbp_u32));
     sendCommandi(0xa8 + @as(u8, mipmap), @as(u24, @intCast((tbp_u32 >> 8) & 0x0f0000)) | tbw);
@@ -1231,10 +1230,10 @@ pub fn sceGuTexMapMode(mode: c_int, a1: c_int, a2: c_int) void {
     sendCommandi(193, (a2 << 8) | (a1 & 0x03));
 }
 
-pub fn sceGuTexMode(tpsm: types.GuPixelFormat, maxmips: u24, clut_mode: types.GuClutMode, enable_swizzling: bool) void {
+pub fn sceGuTexMode(tpsm: types.GuPixelFormat, maxmips: u24, clut_mode: types.GuClutMode, data_layout: types.GuTextureDataLayout) void {
     gu_contexts[gu_curr_context].texture_mode = @intFromEnum(tpsm);
 
-    sendCommandi(194, (maxmips << 16) | (@intFromEnum(clut_mode) << 8) | @as(u24, if (enable_swizzling) 1 else 0));
+    sendCommandi(194, (maxmips << 16) | (@intFromEnum(clut_mode) << 8) | @as(u24, @intFromEnum(data_layout)));
     sendCommandi(195, @intFromEnum(tpsm));
     sceGuTexFlush();
 }
