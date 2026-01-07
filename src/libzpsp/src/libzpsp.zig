@@ -44,6 +44,7 @@ pub const sceUmdUser = @import("module/sceUmdUser.zig");
 pub const sceUsb = @import("module/sceUsb.zig");
 pub const sceUsbCam = @import("module/sceUsbCam.zig");
 pub const sceUsbstor = @import("module/sceUsbstor.zig");
+pub const sceUsbstorBoot = @import("module/sceUsbstorBoot.zig");
 pub const sceUtility = @import("module/sceUtility.zig");
 pub const sceUtility_netparam_internal = @import("module/sceUtility_netparam_internal.zig");
 pub const sceVaudio = @import("module/sceVaudio.zig");
