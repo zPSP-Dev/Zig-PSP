@@ -272,8 +272,8 @@ pub fn sceGuAmbient(col: u32) void {
 }
 
 pub fn sceGuAmbientColor(col: u32) void {
-    sendCommandi(85, @truncate(col));
-    sendCommandi(88, @truncate(col >> 24));
+    GuAmbientColor(@truncate(col));
+    GuAmbientAlpha(@truncate(col >> 24));
 }
 
 pub fn sceGuBlendFunc(bop: types.BlendOp, src: types.BlendFactor, dst: types.BlendFactor, src_fixed_value: u24, dst_fixed_value: u24) void {
@@ -345,17 +345,39 @@ pub fn sceGuColor(col: u32) void {
     sceGuMaterial(7, col);
 }
 
+// NOTE: not pub!
+fn GuAmbientColor(ambient_color: u24) void {
+    sendCommandi(85, ambient_color);
+}
+
+// NOTE: not pub!
+fn GuAmbientAlpha(ambient_alpha: u8) void {
+    sendCommandi(88, ambient_alpha);
+}
+
+// NOTE: not pub!
+fn GuDiffuseColor(diffuse_color: u24) void {
+    sendCommandi(86, diffuse_color);
+}
+
+// NOTE: not pub!
+fn GuSpecularColor(specular_color: u24) void {
+    sendCommandi(87, specular_color);
+}
+
 pub fn sceGuMaterial(mode: c_int, col: u32) void {
     if (mode & 0x01 != 0) {
-        sendCommandi(85, @truncate(col));
-        sendCommandi(88, @truncate(col >> 24));
+        GuAmbientColor(@truncate(col));
+        GuAmbientAlpha(@truncate(col >> 24));
     }
 
-    if (mode & 0x02 != 0)
-        sendCommandi(86, @truncate(col));
+    if (mode & 0x02 != 0) {
+        GuDiffuseColor(@truncate(col));
+    }
 
-    if (mode & 0x04 != 0)
-        sendCommandi(87, @truncate(col));
+    if (mode & 0x04 != 0) {
+        GuSpecularColor(@truncate(col));
+    }
 }
 
 pub fn sceGuColorFunc(func: types.ColorFunc, color: c_int, mask: c_int) void {
@@ -910,9 +932,10 @@ pub fn sceGuLogicalOp(op: types.GuLogicalOperation) void {
 
 pub fn sceGuModelColor(emissive: c_int, ambient: c_int, diffuse: c_int, specular: c_int) void {
     sendCommandi(84, emissive & 0xffffff);
-    sendCommandi(86, diffuse & 0xffffff);
-    sendCommandi(85, ambient & 0xffffff);
-    sendCommandi(87, specular & 0xffffff);
+
+    GuAmbientColor(@truncate(ambient));
+    GuDiffuseColor(@truncate(diffuse));
+    GuSpecularColor(@truncate(specular));
 }
 
 pub fn sceGuMorphWeight(index: u8, weight: f32) void {
