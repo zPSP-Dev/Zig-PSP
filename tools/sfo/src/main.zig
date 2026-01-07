@@ -71,14 +71,14 @@ fn readSFO(allocator: std.mem.Allocator, path: []const u8) !SFOStructure {
         entries[i] = try io_reader.takeStruct(TableEntry, .little);
     }
 
-    const currPos = try file.getPos();
-    std.debug.assert(currPos == header.key_start);
+    std.debug.assert(io_reader.seek == header.key_start);
 
-    const keyLen = header.data_start - header.key_start;
-    const key_pool = try allocator.alloc(u8, keyLen);
-    _ = try io_reader.readSliceAll(key_pool);
+    const key_len = header.data_start - header.key_start;
+    const key_pool = try io_reader.readAlloc(allocator, key_len);
+    errdefer allocator.free(key_pool);
 
-    const data_pool = try file.readToEndAlloc(allocator, std.math.maxInt(u24));
+    const data_pool = try io_reader.allocRemaining(allocator, .unlimited);
+    errdefer allocator.free(data_pool);
 
     return SFOStructure{
         .header = header,
@@ -120,6 +120,10 @@ pub fn prettyPrintSFO(allocator: std.mem.Allocator, path: []const u8) !void {
         std.debug.print("\tMax Size: {d}\n", .{entry.data_max_len});
 
         switch (entry.data_fmt) {
+            .Bin => {
+                const data = sfo.data_pool[entry.data_offset .. entry.data_offset + entry.data_len];
+                std.debug.print("\tValue: {X}\n", .{data});
+            },
             .UTF8 => {
                 const data = sfo.data_pool[entry.data_offset .. entry.data_offset + entry.data_len];
                 std.debug.print("\tValue: {s}\n", .{std.mem.span(@as([*:0]u8, @ptrCast(data.ptr)))});
@@ -127,10 +131,6 @@ pub fn prettyPrintSFO(allocator: std.mem.Allocator, path: []const u8) !void {
             .Int32 => {
                 const data = sfo.data_pool[entry.data_offset .. entry.data_offset + entry.data_len];
                 std.debug.print("\tValue: 0x{X}\n", .{std.mem.bytesAsValue(i32, data).*});
-            },
-            .Bin => {
-                const data = sfo.data_pool[entry.data_offset .. entry.data_offset + entry.data_len];
-                std.debug.print("\tValue: {X}\n", .{data});
             },
         }
     }
@@ -143,7 +143,12 @@ pub fn writeSFO(allocator: std.mem.Allocator, path: []const u8, entries: []Inter
     var table_entries = std.array_list.Managed(TableEntry).init(allocator);
     const PAD = [_]u8{0} ** 4;
     for (entries) |entry| {
-        const data_len = if (entry.type == .Int32) @sizeOf(i32) else if (entry.type == .Bin) entry.data.?.len else entry.data.?.len + 1;
+        const data_len = switch (entry.type) {
+            .Bin => entry.data.?.len,
+            .UTF8 => entry.data.?.len + 1,
+            .Int32 => @sizeOf(i32),
+        };
+
         const data_max_len = if (data_len % 4 == 0) data_len else data_len + 4 - (data_len % 4);
 
         const data_padding = PAD[0..(4 - data_len % 4)];
@@ -165,11 +170,11 @@ pub fn writeSFO(allocator: std.mem.Allocator, path: []const u8, entries: []Inter
             try data_segment.insertSlice(data_segment.items.len, entry.data.?);
         }
 
+        if (entry.type == .UTF8) {
+            try data_segment.insertSlice(data_segment.items.len, "\x00");
+        }
         if (data_len % 4 != 0) {
             try data_segment.insertSlice(data_segment.items.len, data_padding);
-            if (entry.type == .UTF8) {
-                try data_segment.insertSlice(data_segment.items.len, "\x00");
-            }
         }
     }
 
