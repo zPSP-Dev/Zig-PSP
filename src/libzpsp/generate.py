@@ -591,9 +591,6 @@ def process_s_files(base_dir: str, verbose: bool = False) -> Dict[str, Module]:
                                 result = parse_import_start(line)
                                 if result:
                                     module_name, data_tag = result
-                                    # Skip sceUsbstorBoot module
-                                    if module_name == "sceUsbstorBoot":
-                                        continue
                                     if module_name in modules:
                                         raise ValueError(
                                             f"Module {module_name} already defined in another file"
