@@ -2,10 +2,10 @@ const std = @import("std");
 
 pub const types = @import("pspgutypes.zig");
 
-const libzpsp = @import("libzpsp");
-pub const ScePspFVector3 = libzpsp.types.ScePspFVector3;
-pub const ScePspIMatrix4 = libzpsp.types.ScePspIMatrix4;
-pub const ScePspFMatrix4 = libzpsp.types.ScePspFMatrix4;
+const c = @import("../c/modules.zig");
+pub const ScePspFVector3 = c.types.ScePspFVector3;
+pub const ScePspIMatrix4 = c.types.ScePspIMatrix4;
+pub const ScePspFMatrix4 = c.types.ScePspFMatrix4;
 
 const ge = @import("pspge.zig");
 const display = @import("pspdisplay.zig");

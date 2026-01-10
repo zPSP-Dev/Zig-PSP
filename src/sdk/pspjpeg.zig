@@ -1,4 +1,4 @@
-const psptypes = @import("libzpsp");
+const psptypes = @import("../c/modules.zig");
 
 // Inits the MJpeg library
 //

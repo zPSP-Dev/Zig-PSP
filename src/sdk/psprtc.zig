@@ -1,4 +1,4 @@
-const c = @import("libzpsp");
+const c = @import("../c/modules.zig");
 
 pub const time_t = c.types.time_t;
 pub const ScePspDateTime = c.types.ScePspDateTime;
