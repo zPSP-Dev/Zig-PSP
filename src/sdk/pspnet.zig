@@ -1,4 +1,4 @@
-const c = @import("libzpsp");
+const c = @import("../c/modules.zig");
 
 pub const in_addr = c.types.in_addr;
 pub const SceNetMallocStat = c.types.SceNetMallocStat;

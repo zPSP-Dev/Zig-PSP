@@ -1,4 +1,4 @@
-const c = @import("libzpsp");
+const c = @import("../c/modules.zig");
 const module = c.SysMemUserForUser;
 
 const SceUID = c.types.SceUID;

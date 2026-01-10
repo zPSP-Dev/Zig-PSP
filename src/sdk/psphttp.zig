@@ -1,4 +1,4 @@
-const c = @import("libzpsp");
+const c = @import("../c/modules.zig");
 
 const PspHttpFreeFunction = c.types.PspHttpFreeFunction;
 const PspHttpMallocFunction = c.types.PspHttpMallocFunction;

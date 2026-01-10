@@ -1,8 +1,8 @@
 const pspgu = @import("pspgu.zig");
 
-const libzpsp = @import("libzpsp");
-const ScePspFMatrix4 = libzpsp.types.ScePspFMatrix4;
-const ScePspFVector3 = libzpsp.types.ScePspFVector3;
+const c = @import("../c/modules.zig");
+const ScePspFMatrix4 = c.types.ScePspFMatrix4;
+const ScePspFVector3 = c.types.ScePspFVector3;
 
 //Internal
 var gum_current_mode: u8 = 0;
@@ -102,13 +102,13 @@ pub fn sceGumRotateX(angle: f32) void {
         @as([*]f32, @ptrCast(&t))[(i << 2) + i] = 1.0;
     }
 
-    const c: f32 = std.math.cos(angle);
-    const s: f32 = std.math.sin(angle);
+    const cos: f32 = std.math.cos(angle);
+    const sin: f32 = std.math.sin(angle);
 
-    t.y.y = c;
-    t.y.z = s;
-    t.z.y = -s;
-    t.z.z = c;
+    t.y.y = cos;
+    t.y.z = sin;
+    t.z.y = -sin;
+    t.z.z = cos;
 
     gumMultMatrix(gum_current_matrix, gum_current_matrix, &t);
 }
@@ -121,13 +121,13 @@ pub fn sceGumRotateY(angle: f32) void {
         @as([*]f32, @ptrCast(&t))[(i << 2) + i] = 1.0;
     }
 
-    const c: f32 = std.math.cos(angle);
-    const s: f32 = std.math.sin(angle);
+    const cos: f32 = std.math.cos(angle);
+    const sin: f32 = std.math.sin(angle);
 
-    t.x.x = c;
-    t.x.z = -s;
-    t.z.x = s;
-    t.z.z = c;
+    t.x.x = cos;
+    t.x.z = -sin;
+    t.z.x = sin;
+    t.z.z = cos;
 
     gumMultMatrix(gum_current_matrix, gum_current_matrix, &t);
 }
@@ -140,13 +140,13 @@ pub fn sceGumRotateZ(angle: f32) void {
         @as([*]f32, @ptrCast(&t))[(i << 2) + i] = 1.0;
     }
 
-    const c: f32 = std.math.cos(angle);
-    const s: f32 = std.math.sin(angle);
+    const cos: f32 = std.math.cos(angle);
+    const sin: f32 = std.math.sin(angle);
 
-    t.x.x = c;
-    t.x.y = s;
-    t.y.x = -s;
-    t.y.y = c;
+    t.x.x = cos;
+    t.x.y = sin;
+    t.y.x = -sin;
+    t.y.y = cos;
 
     gumMultMatrix(gum_current_matrix, gum_current_matrix, &t);
 }

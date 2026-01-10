@@ -1,4 +1,4 @@
-const c = @import("libzpsp");
+const c = @import("../c/modules.zig");
 
 pub const SceUID = c.types.SceUID;
 pub const SceMp3InitArg = c.types.SceMp3InitArg;
