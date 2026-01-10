@@ -1,3 +1,5 @@
+const std = @import("std");
+
 const threadman = @import("../sdk/pspthreadman.zig");
 const loadexec = @import("../sdk/psploadexec.zig");
 
@@ -151,35 +153,41 @@ comptime {
 }
 
 fn intToString(int: u32, buf: []u8) ![]const u8 {
-    return try @import("std").fmt.bufPrint(buf, "{}", .{int});
+    return try std.fmt.bufPrint(buf, "{}", .{int});
 }
 
-pub fn module_info(comptime name: []const u8, comptime attrib: u16, comptime major: u8, comptime minor: u8) []const u8 {
-    @setEvalBranchQuota(10000);
-    var buf: [3]u8 = undefined;
+const ModuleAttributes = packed struct(u16) {
+    no_stop: bool = false, // PSP_MODULE_NO_STOP
+    single_load: bool = false, // PSP_MODULE_SINGLE_LOAD
+    single_start: bool = false, // PSP_MODULE_SINGLE_START
 
-    const maj = intToString(major, &buf) catch unreachable;
-    buf = undefined;
-    const min = intToString(minor, &buf) catch unreachable;
-    buf = undefined;
-    const attr = intToString(attrib, &buf) catch unreachable;
-    buf = undefined;
-    const count = intToString(27 - name.len, &buf) catch unreachable;
+    _nibble0_rest: u1 = 0,
+    _nibble1_unknown: u4 = 0,
+    _nibble2_unknown: u4 = 0,
+
+    mode: enum(u4) {
+        User = 0, // PSP_MODULE_USER
+        Kernel = 0x1, // PSP_MODULE_KERNEL
+    },
+};
+
+pub fn module_info(comptime name: []const u8, comptime module_attributes: ModuleAttributes, comptime major: u8, comptime minor: u8) []const u8 {
+    const MaxNameLength = 27;
+
+    const attrib: u16 = @bitCast(module_attributes);
+
+    std.debug.assert(name.len <= MaxNameLength);
+    const padding_bytes = MaxNameLength - name.len;
 
     return (
         \\.section .rodata.sceModuleInfo, "a", @progbits
         \\module_info:
         \\.align 5
-        \\.hword
-    ++ " " ++ attr ++ "\n" ++
-        \\.byte
-    ++ " " ++ maj ++ "\n" ++
-        \\.byte
-    ++ " " ++ min ++ "\n" ++
-        \\.ascii "
-    ++ name ++ "\"\n" ++
-        \\.space
-    ++ " " ++ count ++ "\n" ++
+    ++ std.fmt.comptimePrint("\n.hword {d}\n", .{attrib}) //
+    ++ std.fmt.comptimePrint(".byte {d}\n", .{major}) //
+    ++ std.fmt.comptimePrint(".byte {d}\n", .{minor}) //
+    ++ std.fmt.comptimePrint(".ascii \"{s}\"\n", .{name}) //
+    ++ std.fmt.comptimePrint(".space {d}\n", .{padding_bytes}) ++ //
         \\.byte 0
         \\.word _gp
         \\.word __lib_ent_top

@@ -4,7 +4,7 @@ const psp = @import("psp/utils/psp.zig");
 pub const panic = psp.debug.panic;
 
 comptime {
-    asm (psp.module_info("Zig PSP App", 0, 1, 0));
+    asm (psp.module_info("Zig PSP App", .{ .mode = .User }, 1, 0));
 }
 
 fn addOne(x: u8) u8 {

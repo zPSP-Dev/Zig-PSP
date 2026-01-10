@@ -6,7 +6,7 @@ const gum = sdk.gum;
 pub const panic = sdk.extra.debug.panic; // Import panic handler
 
 comptime {
-    asm (sdk.extra.module.module_info("SDK Ziggy Cube", 0, 1, 0));
+    asm (sdk.extra.module.module_info("SDK Ziggy Cube", .{ .mode = .User }, 1, 0));
 }
 
 var display_list: [0x40000]u32 align(16) = [_]u32{0} ** 0x40000;
