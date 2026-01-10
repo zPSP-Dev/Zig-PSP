@@ -1,7 +1,7 @@
-const libzpsp = @import("libzpsp");
-const module = libzpsp.LoadExecForUser;
+const c = @import("../c/modules.zig");
+const module = c.LoadExecForUser;
 
-const SceKernelLoadExecParam = libzpsp.SceKernelLoadExecParam;
+const SceKernelLoadExecParam = c.types.SceKernelLoadExecParam;
 
 /// Execute a new game executable, limited when not running in kernel mode.
 /// `file` - The file to execute.

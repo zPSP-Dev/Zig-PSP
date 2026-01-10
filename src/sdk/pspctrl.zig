@@ -1,10 +1,10 @@
-const libzpsp = @import("libzpsp");
+const c = @import("../c/modules.zig");
 
-const module = libzpsp.sceCtrl;
+const module = c.sceCtrl;
 
-pub const PspCtrlButtons = libzpsp.types.PspCtrlButtons;
-pub const SceCtrlData = libzpsp.types.SceCtrlData;
-pub const SceCtrlLatch = libzpsp.types.SceCtrlLatch;
+pub const PspCtrlButtons = c.types.PspCtrlButtons;
+pub const SceCtrlData = c.types.SceCtrlData;
+pub const SceCtrlLatch = c.types.SceCtrlLatch;
 pub const PspCtrlMode = enum(c_int) {
     Digital = 0,
     Analog = 1,
