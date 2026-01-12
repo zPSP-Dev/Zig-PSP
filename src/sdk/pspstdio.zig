@@ -1,4 +1,4 @@
-const psptypes = @import("libzpsp");
+const psptypes = @import("../c/modules.zig");
 const SceUID = psptypes.SceUID;
 
 // Function to get the current standard in file no

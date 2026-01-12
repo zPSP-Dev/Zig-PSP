@@ -51,13 +51,6 @@ pub fn build(b: *std.Build) void {
         .optimize = psp_optimize,
     });
 
-    const libzpsp = b.dependency("libzpsp", .{
-        .target = psp_target,
-        .optimize = psp_optimize,
-    }).module("libzpsp");
-
-    pspsdk_module.addImport("libzpsp", libzpsp);
-
     // Build examples
     const example_step = b.step("examples", "Build examples");
 

@@ -1,11 +1,11 @@
-const libzpsp = @import("libzpsp");
-const module = libzpsp.sceGe_user;
+const c = @import("../c/modules.zig");
+const module = c.sceGe_user;
 
-pub const PspGeBreakParam = libzpsp.types.PspGeBreakParam;
-pub const PspGeCallbackData = libzpsp.types.PspGeCallbackData;
-pub const PspGeContext = libzpsp.types.PspGeContext;
-pub const PspGeListArgs = libzpsp.types.PspGeListArgs;
-pub const PspGeStack = libzpsp.types.PspGeStack;
+pub const PspGeBreakParam = c.types.PspGeBreakParam;
+pub const PspGeCallbackData = c.types.PspGeCallbackData;
+pub const PspGeContext = c.types.PspGeContext;
+pub const PspGeListArgs = c.types.PspGeListArgs;
+pub const PspGeStack = c.types.PspGeStack;
 
 pub const PspGeMatrixTypes = enum(c_int) {
     Bone0 = 0,
