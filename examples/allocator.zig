@@ -16,7 +16,7 @@ fn printFreeMem(alloc: std.mem.Allocator) void {
 pub const panic = sdk.extra.debug.panic; // Import panic handler
 
 comptime {
-    asm (sdk.extra.module.module_info("SDK Hello World", 0, 1, 0));
+    asm (sdk.extra.module.module_info("SDK Allocator", .{ .mode = .User }, 1, 0));
 }
 
 pub fn main() !void {

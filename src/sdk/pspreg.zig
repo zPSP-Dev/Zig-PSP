@@ -1,4 +1,4 @@
-const c = @import("libzpsp");
+const c = @import("../c/modules.zig");
 
 pub const RegHandle = c.types.REGHANDLE;
 pub const RegParam = c.types.RegParam;

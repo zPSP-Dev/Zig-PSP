@@ -1,4 +1,4 @@
-const c = @import("libzpsp");
+const c = @import("../c/modules.zig");
 const SceUID = c.types.SceUID;
 
 pub const PSPPowerCB = enum(u32) {

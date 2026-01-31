@@ -1,4 +1,4 @@
-const module = @import("libzpsp").sceDisplay;
+const module = @import("../c/modules.zig").sceDisplay;
 
 pub const PspDisplayPixelFormats = enum(u24) {
     Format565 = 0,

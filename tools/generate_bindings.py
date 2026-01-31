@@ -706,7 +706,7 @@ def generate_module_files(modules: Dict[str, Module], output_dir: str):
 def generate_root_module(modules: Dict[str, Module], output_dir: str):
     """Generate the Zig root module."""
 
-    root_module_output_path = output_dir + "/libzpsp.zig"
+    root_module_output_path = output_dir + "/modules.zig"
     os.makedirs(os.path.dirname(root_module_output_path), exist_ok=True)
 
     with open(root_module_output_path, "w") as f:
@@ -733,7 +733,7 @@ def main():
     )
     parser.add_argument(
         "--output-dir",
-        default="src",
+        default="src/c",
         help="Output directory for the generated Zig files",
     )
     args = parser.parse_args()

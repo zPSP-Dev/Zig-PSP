@@ -11,9 +11,6 @@
         .zSFOTool = .{
             .path = "tools/sfo",
         },
-        .libzpsp = .{
-            .path = "src/libzpsp",
-        },
     },
     .paths = .{
         "build.zig",

@@ -1,4 +1,4 @@
-const c = @import("libzpsp");
+const c = @import("../c/modules.zig");
 
 pub const SceUID = c.types.SceUID;
 pub const SceMpeg = c.types.SceMpeg;
@@ -10,4 +10,4 @@ pub const sceMpegRingbufferCB = c.types.sceMpegRingbufferCB;
 pub const SceMpegStream = c.types.SceMpegStream;
 pub const SceMpegYCrCbBuffer = c.types.SceMpegYCrCbBuffer;
 
-// Use libzpsp directly for now
+// Use c bindings directly for now
