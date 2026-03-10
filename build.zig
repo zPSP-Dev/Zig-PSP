@@ -76,6 +76,9 @@ pub fn build(b: *std.Build) void {
         PSPBuildInfo{ .name = "allocator", .src_file = "examples/allocator.zig", .title = "SDK Allocator" },
         PSPBuildInfo{ .name = "ziggy_cube", .src_file = "examples/ziggy_cube.zig", .title = "SDK Ziggy Cube" },
         PSPBuildInfo{ .name = "clear_screen", .src_file = "examples/clearScreen.zig", .title = "SDK Clear Screen" },
+        PSPBuildInfo{ .name = "error", .src_file = "examples/error.zig", .title = "SDK Error" },
+        PSPBuildInfo{ .name = "panic", .src_file = "examples/panic.zig", .title = "SDK Panic" },
+        PSPBuildInfo{ .name = "print", .src_file = "examples/print.zig", .title = "SDK Print" },
     }) |example| {
         const example_exe = b.addExecutable(.{
             .name = "main",

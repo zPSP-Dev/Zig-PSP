@@ -1,22 +1,22 @@
-//A brief example of PSP Panic Handling
+// Demonstrates the PSP panic handler via integer overflow.
 
-const psp = @import("psp/utils/psp.zig");
-pub const panic = psp.debug.panic;
+const sdk = @import("pspsdk");
+
+pub const panic = sdk.extra.debug.panic;
 
 comptime {
-    asm (psp.module_info("Zig PSP App", .{ .mode = .User }, 1, 0));
+    asm (sdk.extra.module.module_info("SDK Panic", .{ .mode = .User }, 1, 0));
 }
 
 fn addOne(x: u8) u8 {
     return x + 1;
 }
 
-pub fn main() !void {
-    //psp.debug.pancakeMode = true;
-    psp.utils.enableHBCB();
-    psp.debug.screenInit();
+pub fn main() void {
+    sdk.extra.utils.enableHBCB();
+    sdk.extra.debug.screenInit();
 
     _ = addOne(255);
 
-    try psp.debug.printFormat("Hello {}!\n", .{"world"});
+    sdk.extra.debug.print("Hello world!\n");
 }
