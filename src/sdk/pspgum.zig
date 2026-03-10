@@ -1,8 +1,8 @@
 const pspgu = @import("pspgu.zig");
 
 const c = @import("../c/modules.zig");
-const ScePspFMatrix4 = c.types.ScePspFMatrix4;
-const ScePspFVector3 = c.types.ScePspFVector3;
+pub const ScePspFMatrix4 = c.types.ScePspFMatrix4;
+pub const ScePspFVector3 = c.types.ScePspFVector3;
 
 //Internal
 var gum_current_mode: u8 = 0;

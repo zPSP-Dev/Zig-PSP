@@ -1,7 +1,6 @@
 //A quick graphics initialization
 const sdk = @import("pspsdk");
 const gu = sdk.gu;
-const gum = sdk.gum;
 
 pub const panic = sdk.extra.debug.panic; // Import panic handler
 
@@ -23,33 +22,33 @@ pub fn main() !void {
     const fbp1 = sdk.extra.vram.allocVramRelative(SCR_BUF_WIDTH, SCREEN_HEIGHT, .Psm8888);
     const zbp = sdk.extra.vram.allocVramRelative(SCR_BUF_WIDTH, SCREEN_HEIGHT, .Psm4444);
 
-    gu.sceGuInit();
-    gu.sceGuStart(.Direct, &display_list);
-    gu.sceGuDrawBuffer(.Format8888, fbp0, SCR_BUF_WIDTH);
-    gu.sceGuDispBuffer(SCREEN_WIDTH, SCREEN_HEIGHT, fbp1, SCR_BUF_WIDTH);
-    gu.sceGuDepthBuffer(zbp, SCR_BUF_WIDTH);
-    gu.sceGuOffset(2048 - (SCREEN_WIDTH / 2), 2048 - (SCREEN_HEIGHT / 2));
-    gu.sceGuViewport(2048, 2048, SCREEN_WIDTH, SCREEN_HEIGHT);
-    gu.sceGuDepthRange(65535, 0);
-    gu.sceGuScissor(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
-    gu.sceGuEnable(.ScissorTest);
+    gu.init();
+    gu.start(.Direct, &display_list);
+    gu.draw_buffer(.Format8888, fbp0, SCR_BUF_WIDTH);
+    gu.disp_buffer(SCREEN_WIDTH, SCREEN_HEIGHT, fbp1, SCR_BUF_WIDTH);
+    gu.depth_buffer(zbp, SCR_BUF_WIDTH);
+    gu.offset(2048 - (SCREEN_WIDTH / 2), 2048 - (SCREEN_HEIGHT / 2));
+    gu.viewport(2048, 2048, SCREEN_WIDTH, SCREEN_HEIGHT);
+    gu.depth_range(65535, 0);
+    gu.scissor(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+    gu.enable(.ScissorTest);
 
-    gu.guFinish();
-    gu.guSync(.Finish, .Wait);
-    _ = sdk.display.sceDisplayWaitVblankStart();
-    gu.sceGuDisplay(true);
+    gu.finish();
+    gu.sync(.Finish, .Wait);
+    _ = sdk.display.wait_vblank_start();
+    gu.display(true);
 
     while (!sdk.extra.utils.isExitRequested()) {
-        gu.sceGuStart(.Direct, &display_list);
+        gu.start(.Direct, &display_list);
 
-        gu.sceGuClearColor(0x00ffff);
-        gu.sceGuClearDepth(0);
-        gu.sceGuClear(@intFromEnum(gu.types.ClearBitFlags.ColorBuffer) |
-            @intFromEnum(gu.types.ClearBitFlags.DepthBuffer));
+        gu.clear_color(0x00ffff);
+        gu.clear_depth(0);
+        gu.clear(@intFromEnum(sdk.ClearBitFlags.ColorBuffer) |
+            @intFromEnum(sdk.ClearBitFlags.DepthBuffer));
 
-        gu.guFinish();
-        gu.guSync(.Finish, .Wait);
-        _ = sdk.display.sceDisplayWaitVblankStart();
-        gu.guSwapBuffers();
+        gu.finish();
+        gu.sync(.Finish, .Wait);
+        _ = sdk.display.wait_vblank_start();
+        gu.swap_buffers();
     }
 }

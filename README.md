@@ -9,43 +9,104 @@ In the PSP programming community, many libraries, tools, and other features are 
 
 Special thanks is given to the [Rust-PSP team](https://github.com/overdrivenpotato/rust-psp) whose efforts influenced and helped to get this project off the ground. No harm is intended, and it's thanks to you Rustaceans that fellow Ziguanas can program for the PSP.
 
+## Requirements
+
+- **Zig 0.15.2** or newer
+
+No legacy PSPSDK or external C toolchain is required. All build tools (`zPRXGen`, `zSFOTool`, `zPBPTool`) are written in Zig and built automatically.
+
 ## Usage
 
-Currently, using Zig-PSP is rather straight forward - one must use the psp folder in their project's src folder in order to have the PSP's function definitions, alongside with some custom utilities I have created. One also must include the tools/ folder to use the post-build tools. To build a PSP app, use the included `build.zig` script to generate a PSP executable! (EBOOT.PBP / app.prx) This script is well commented for explanation and documentation.
-
-For a main.zig file one should include something like:
+Add Zig-PSP to your project and import `pspsdk` in your source. Every PSP application needs a `module_info` comptime call and the homebrew callback setup:
 
 ```zig
-const psp = @import("psp/utils/psp.zig");
+const sdk = @import("pspsdk");
+
+pub const panic = sdk.extra.debug.panic;
 
 comptime {
-    asm(psp.module_info("Zig PSP App", 0, 1, 0));
+    asm (sdk.extra.module.module_info("My App Name", .{ .mode = .User }, 1, 0));
 }
 
 pub fn main() !void {
-    psp.utils.enableHBCB();
-    psp.debug.screenInit();
+    sdk.extra.utils.enableHBCB();
+    sdk.extra.debug.screenInit();
 
-    psp.debug.print("Hello from Zig!");
+    sdk.extra.debug.print("Hello from Zig!");
 }
 ```
 
-A quick call to `zig build` will build your program and should emit an EBOOT.PBP and app.prx in your root. These are the two PSP executable formats - .prx for debugging, and .PBP for running normally.
+### API Tiers
 
-One can run a .PBP file on their PSP (assuming CFW is installed) by adding their application to `PSP_DRIVE:/PSP/GAME/YourAppName/EBOOT.PBP` and it will be available under the Games->Memory Stick list in the PSP's XMB.
+The SDK exposes PSP functions through three tiers — pick whichever fits your style:
 
-## EBOOT Customization
-In order to customize the EBOOT, one can look into the `build.zig` file and modify the constant fields to change their application icon, background, and even add animations or sounds to the EBOOT on the XMB screen.
+| Tier | Example | Description |
+|---|---|---|
+| Raw C stub | `sdk.c.LoadExecForUser.sceKernelExitGame()` | Auto-generated bindings, one namespace per firmware module |
+| Top-level sce-prefix | `sdk.sceKernelExitGame()` | Direct re-exports at the package root |
+| Snake_case sub-namespace | `sdk.kernel.exit_game()` | Idiomatic Zig names grouped by subsystem |
+
+Sub-namespaces include: `sdk.gu`, `sdk.gum`, `sdk.ge`, `sdk.ctrl`, `sdk.display`, `sdk.kernel`, `sdk.audio`, `sdk.atrac3`, `sdk.rtc`, `sdk.power`, `sdk.umd`, `sdk.io`, `sdk.hprm`, `sdk.wlan`, `sdk.utility`.
+
+The utility layer lives under `sdk.extra`: `sdk.extra.debug`, `sdk.extra.module`, `sdk.extra.utils`, `sdk.extra.allocator`, `sdk.extra.vram`.
+
+### Build Commands
+
+```bash
+# Build everything (tools + examples) — default
+zig build
+
+# Build only the host tools (zPRXGen, zSFOTool, zPBPTool)
+zig build tools
+
+# Build only examples
+zig build examples
+```
+
+A successful build emits `EBOOT.PBP` and `app.prx` for each example under `zig-out/bin/<name>/`.
+
+### Adding Your App to build.zig
+
+Add a `PSPBuildInfo` entry to the inline loop in `build.zig`:
+
+```zig
+PSPBuildInfo{
+    .name = "my_app",
+    .src_file = "src/main.zig",
+    .title = "My App Title",
+    // Optional: .icon0, .icon1, .pic0, .pic1, .snd0
+},
+```
+
+## Running on PSP
+
+Copy the output to your memory stick:
+
+```
+PSP/GAME/MyAppName/EBOOT.PBP
+```
+
+The application will appear under **Game → Memory Stick** in the XMB. Custom firmware (CFW) is required.
+
+## Examples
+
+The repository includes the following examples:
+
+| Name | Description |
+|---|---|
+| `hello_world` | Screen debug print |
+| `allocator` | PSP heap allocator |
+| `clear_screen` | GU display list, vsync, buffer swap |
+| `ziggy_cube` | 3D rotating cube using GU + GUM |
 
 ## Comparisons To C/C++
-When comparing Zig code to C/C++, it would be rather apparent that by default, Zig is much smaller and tightly knit. LLVM is an excellent backend which produces some very small code, and Zig is an example of that. Without the weight of the entire C standard library needing to be imported, a simple naive Hello World, as seen above, generates in 10,195 bytes, compared to the C/C++ size of 68,098 bytes. That's an 85% reduction in size! With a few structural changes, as seen in `hello-min.zig` sample, that size can get down to 6,674 bytes! That's 90.2% smaller!  
 
-Hopefully in the future, one could reference track the functions used in the SDK for imports, and dynamically generate module import information. This way, the PSP applications could go as small as 3,200 bytes for a hello world! This repository is distributed as part of a template, allowing one to customize their module imports, meaning that full release applications built with small tweaks to the toolchain NIDS directory could result in extraordinarily small executables for release applications!
+Without the weight of the C standard library, Zig produces notably smaller PSP executables. LLVM is an excellent backend, and a simple Hello World in Zig comes in around 10 KB versus ~68 KB for an equivalent C program — roughly an 85% reduction in size.
 
 ## Documentation
 
-Currently Zig-PSP does not include documentation of the PSPSDK in the SDK's .zig files - but rather they are [well documented in C](http://psp.jim.sh/pspsdk-doc/). It is planned to add documentation in the future to resolve this
+PSP system calls are [documented in C](http://psp.jim.sh/pspsdk-doc/). The Zig SDK types and wrappers closely mirror those names and signatures. Binding sources live in `src/c/module/` (auto-generated — do not edit by hand) and `src/sdk/` (idiomatic Zig wrappers).
 
 ## Debugging
 
-If one has an installed copy of the legacy PSPSDK, one can use PSPLink - a USB debugging software, to connect their PSP to their computer and run debugging functions on the application. With legacy PSPSDK, you'll also have access to psp-gdb, a PSP-specific version of GDB to use as well. PSP-GDB with Zig is untested at the moment, but in theory should work.
+PSPLink (from the legacy PSPSDK) can be used for USB debugging and `psp-gdb` access. Zig's own panic handler (`sdk.extra.debug.panic`) prints a backtrace to the screen, which is useful without a USB connection.

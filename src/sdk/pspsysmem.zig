@@ -1,7 +1,7 @@
 const c = @import("../c/modules.zig");
 const module = c.SysMemUserForUser;
 
-const SceUID = c.types.SceUID;
+pub const SceUID = c.types.SceUID;
 
 pub const PspSysMemBlockTypes = enum(c_int) {
     MemLow = 0,
