@@ -45,6 +45,23 @@ pub fn build(b: *std.Build) void {
         .optimize = psp_optimize,
     });
 
+    // Docs step
+    const docs_obj = b.addObject(.{
+        .name = "pspsdk",
+        .root_module = b.createModule(.{
+            .root_source_file = b.path("src/pspsdk.zig"),
+            .target = psp_target,
+            .optimize = .Debug,
+        }),
+    });
+    const install_docs = b.addInstallDirectory(.{
+        .source_dir = docs_obj.getEmittedDocs(),
+        .install_dir = .prefix,
+        .install_subdir = "docs",
+    });
+    const docs_step = b.step("docs", "Generate documentation");
+    docs_step.dependOn(&install_docs.step);
+
     // Build tools step
     const tools_step = b.step("tools", "Build PSP SDK tools");
     tools_step.dependOn(&install_prxgen.step);
