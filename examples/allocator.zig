@@ -4,10 +4,9 @@ const std = @import("std");
 const fmt = std.fmt;
 
 const sdk = @import("pspsdk");
-const sysmem = sdk.sysmem;
 
 fn printFreeMem(alloc: std.mem.Allocator) void {
-    const freeMem = sysmem.sceKernelTotalFreeMemSize();
+    const freeMem = sdk.kernel.total_free_mem_size();
     const fMem = std.fmt.allocPrint(alloc, "{d} Bytes Free\n", .{freeMem}) catch unreachable;
     sdk.extra.debug.print(fMem);
     alloc.free(fMem);

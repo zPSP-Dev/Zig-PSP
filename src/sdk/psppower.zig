@@ -1,5 +1,5 @@
 const c = @import("../c/modules.zig");
-const SceUID = c.types.SceUID;
+pub const SceUID = c.types.SceUID;
 
 pub const PSPPowerCB = enum(u32) {
     Battpower = 0x0000007f,

@@ -1,10 +1,10 @@
 const c = @import("../c/modules.zig");
 
-const PspHttpFreeFunction = c.types.PspHttpFreeFunction;
-const PspHttpMallocFunction = c.types.PspHttpMallocFunction;
-const PspHttpMethod = c.types.PspHttpMethod;
-const PspHttpPasswordCB = c.types.PspHttpPasswordCB;
-const PspHttpReallocFunction = c.types.PspHttpReallocFunction;
+pub const PspHttpFreeFunction = c.types.PspHttpFreeFunction;
+pub const PspHttpMallocFunction = c.types.PspHttpMallocFunction;
+pub const PspHttpMethod = c.types.PspHttpMethod;
+pub const PspHttpPasswordCB = c.types.PspHttpPasswordCB;
+pub const PspHttpReallocFunction = c.types.PspHttpReallocFunction;
 
 const PspHttpHttpVersion = enum(c_int) {
     PSP_HTTP_VERSION_1_0,

@@ -1,6 +1,6 @@
 const c = @import("../c/modules.zig");
 
-pub const SceUID = c.SceUID;
+pub const SceUID = c.types.SceUID;
 pub const SceKernelLMOption = c.types.SceKernelLMOption;
 pub const SceKernelModuleInfo = c.types.SceKernelModuleInfo;
 pub const SceKernelSMOption = c.types.SceKernelSMOption;
