@@ -105,7 +105,9 @@ Without the weight of the C standard library, Zig produces notably smaller PSP e
 
 ## Documentation
 
-PSP system calls are [documented in C](https://pspdev.github.io/pspsdk/). The Zig SDK types and wrappers closely mirror those names and signatures. Binding sources live in `src/c/module/` (auto-generated — do not edit by hand) and `src/sdk/` (idiomatic Zig wrappers).
+Auto-generated API docs are published at **https://zpsp-dev.github.io/Zig-PSP/** and updated on every push to `trunk`.
+
+PSP system calls are also [documented in C](https://pspdev.github.io/pspsdk/). The Zig SDK types and wrappers closely mirror those names and signatures. Binding sources live in `src/c/module/` (auto-generated — do not edit by hand) and `src/sdk/` (idiomatic Zig wrappers).
 
 ## Debugging
 
