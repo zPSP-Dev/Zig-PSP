@@ -1,4 +1,4 @@
-// Demonstrates main() returning an error, exercising the panic handler.
+// Demonstrates error return trace via a try propagation chain.
 
 const sdk = @import("pspsdk");
 
@@ -12,11 +12,15 @@ const MyTestErrors = error{
     TestError,
 };
 
+fn doWork() !void {
+    return MyTestErrors.TestError;
+}
+
 pub fn main() !void {
     sdk.extra.utils.enableHBCB();
     sdk.extra.debug.screenInit();
 
     sdk.extra.debug.print("Hello world!\n");
 
-    return MyTestErrors.TestError;
+    try doWork();
 }

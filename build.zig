@@ -128,6 +128,12 @@ pub fn build(b: *std.Build) void {
 
         const install_prx = b.addInstallBinFile(prx_file, example.name ++ "/app.prx");
         example_step.dependOn(&install_prx.step);
+
+        const install_elf = b.addInstallArtifact(example_exe, .{
+            .dest_dir = .{ .override = .{ .custom = "bin/" ++ example.name } },
+            .dest_sub_path = "app.elf",
+        });
+        example_step.dependOn(&install_elf.step);
     }
 
     // Always build examples by default
