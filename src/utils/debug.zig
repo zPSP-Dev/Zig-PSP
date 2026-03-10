@@ -157,30 +157,58 @@ fn internal_putchar(cx: u32, cy: u32, ch: u8) void {
 
 const module = @import("module.zig");
 
-//Meme panic
-pub var pancakeMode: bool = false;
+// Print a usize as a hex address (e.g. "0x8804000a") without allocating.
+fn printHex(value: usize) void {
+    const hex_chars = "0123456789abcdef";
+    // "0x" + 8 hex digits for 32-bit MIPS addresses
+    var buf = [_]u8{ '0', 'x', 0, 0, 0, 0, 0, 0, 0, 0 };
+    var v = value;
+    var i: usize = 9;
+    while (true) {
+        buf[i] = hex_chars[v & 0xF];
+        v >>= 4;
+        if (i == 2) break;
+        i -= 1;
+    }
+    print(&buf);
+}
+
+pub fn printTrace(trace: *std.builtin.StackTrace) void {
+    if (trace.index == 0) return;
+    print("Stack trace:\n");
+    const addrs = trace.instruction_addresses;
+    const count = @min(trace.index, addrs.len);
+    var i: usize = 0;
+    while (i < count) : (i += 1) {
+        print("  [");
+        printHex(i);
+        print("] ");
+        printHex(addrs[i]);
+        print("\n");
+    }
+}
 
 //Panic handler
 //Import this in main to use!
 pub fn panic(message: []const u8, stack_trace: ?*std.builtin.StackTrace, size: ?usize) noreturn {
-    _ = size; // autofix
-    _ = stack_trace;
+    _ = size;
     screenInit();
 
-    if (pancakeMode) {
-        //For @mrneo240
-        print("!!! PSP HAS PANCAKED !!!\n");
-    } else {
-        print("!!! PSP HAS PANICKED !!!\n");
-    }
+    print("!!! PSP HAS PANICKED !!!\n");
 
     print("REASON: ");
     print(message);
-    //TODO: Stack Traces after STD.
-    //if (@errorReturnTrace()) |trace| {
-    //    std.debug.dumpStackTrace(trace.*);
-    //}
-    print("\nExiting in 10 seconds...");
+    print("\n");
+
+    if (stack_trace) |trace| {
+        printTrace(trace);
+    } else if (@errorReturnTrace()) |trace| {
+        printTrace(trace);
+    } else {
+        print("(no return trace available)\n");
+    }
+
+    print("Exiting...");
 
     module.exitErr();
     while (true) {}

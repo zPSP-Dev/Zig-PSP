@@ -44,8 +44,15 @@ pub fn _module_main_thread(argc: usize, _: ?*anyopaque) callconv(.c) c_int {
             const result = root.main() catch |err| {
                 debug.print("ERROR CAUGHT: ");
                 debug.print(@errorName(err));
-                debug.print("\nExiting in 10 seconds...");
+                debug.print("\n");
 
+                if (@errorReturnTrace()) |trace| {
+                    debug.printTrace(trace);
+                } else {
+                    debug.print("(no return trace available)\n");
+                }
+
+                debug.print("Exiting in 10 seconds...");
                 exitErr();
                 return 1;
             };
