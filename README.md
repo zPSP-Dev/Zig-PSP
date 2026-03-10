@@ -98,6 +98,9 @@ The repository includes the following examples:
 | `allocator` | PSP heap allocator |
 | `clear_screen` | GU display list, vsync, buffer swap |
 | `ziggy_cube` | 3D rotating cube using GU + GUM |
+| `error` | `main()` returning an error, exercising the panic handler |
+| `panic` | Integer overflow triggering the panic handler |
+| `print` | Colored text output using the debug screen |
 
 ## Comparisons To C/C++
 

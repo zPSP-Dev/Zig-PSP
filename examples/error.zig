@@ -1,11 +1,11 @@
-//Testing main error handling.
+// Demonstrates main() returning an error, exercising the panic handler.
 
-const psp = @import("psp/utils/psp.zig");
-const std = @import("std");
-const fmt = std.fmt;
+const sdk = @import("pspsdk");
+
+pub const panic = sdk.extra.debug.panic;
 
 comptime {
-    asm (psp.module_info("Zig PSP App", 0, 1, 0));
+    asm (sdk.extra.module.module_info("SDK Error", .{ .mode = .User }, 1, 0));
 }
 
 const MyTestErrors = error{
@@ -13,10 +13,10 @@ const MyTestErrors = error{
 };
 
 pub fn main() !void {
-    psp.utils.enableHBCB();
-    psp.debug.screenInit();
+    sdk.extra.utils.enableHBCB();
+    sdk.extra.debug.screenInit();
 
-    try psp.debug.printFormat("Hello {}!\n", .{"world"});
+    sdk.extra.debug.print("Hello world!\n");
 
     return MyTestErrors.TestError;
 }
