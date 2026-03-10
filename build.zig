@@ -10,23 +10,15 @@ pub fn build(b: *std.Build) void {
 
     // Build prxgen tool
     const prxgen = b.addExecutable(.{
-        .name = "prxgen",
+        .name = "zPRXGen",
         .root_module = b.createModule(.{
-            .root_source_file = b.path("tools/prxgen/stub.zig"),
-            .link_libc = true,
+            .root_source_file = b.path("tools/prx/main.zig"),
             .target = host_target,
             .optimize = host_optimize,
         }),
     });
-    prxgen.addCSourceFile(.{
-        .file = b.path("tools/prxgen/psp-prxgen.c"),
-        .flags = &[_][]const u8{
-            "-std=c99",
-            "-Wno-address-of-packed-member",
-            "-D_CRT_SECURE_NO_WARNINGS",
-        },
-    });
-    b.installArtifact(prxgen);
+    const install_prxgen = b.addInstallArtifact(prxgen, .{});
+    b.getInstallStep().dependOn(&install_prxgen.step);
 
     // Build SFO tool
     const sfo_dependency = b.dependency("zSFOTool", .{
@@ -34,7 +26,8 @@ pub fn build(b: *std.Build) void {
         .optimize = host_optimize,
     });
     const sfo_tool = sfo_dependency.artifact("zSFOTool");
-    b.installArtifact(sfo_tool);
+    const install_sfo = b.addInstallArtifact(sfo_tool, .{});
+    b.getInstallStep().dependOn(&install_sfo.step);
 
     // Build PBP tool
     const pbp_dependency = b.dependency("zPBPTool", .{
@@ -42,7 +35,8 @@ pub fn build(b: *std.Build) void {
         .optimize = host_optimize,
     });
     const pbp_tool = pbp_dependency.artifact("zPBPTool");
-    b.installArtifact(pbp_tool);
+    const install_pbp = b.addInstallArtifact(pbp_tool, .{});
+    b.getInstallStep().dependOn(&install_pbp.step);
 
     // Buid main pspsdk module
     const pspsdk_module = b.addModule("pspsdk", .{
@@ -50,6 +44,12 @@ pub fn build(b: *std.Build) void {
         .target = psp_target,
         .optimize = psp_optimize,
     });
+
+    // Build tools step
+    const tools_step = b.step("tools", "Build PSP SDK tools");
+    tools_step.dependOn(&install_prxgen.step);
+    tools_step.dependOn(&install_sfo.step);
+    tools_step.dependOn(&install_pbp.step);
 
     // Build examples
     const example_step = b.step("examples", "Build examples");
