@@ -25,26 +25,24 @@ comptime {
     asm(sdk.extra.module.module_info("PSP Arena", .{ .mode = .User }, 1, 0));
 }
 
-const page_alloc = sdk.extra.allocator.psp_page_allocator;
-
-fn printFree(label: []const u8) void {
+fn printFree(gpa: std.mem.Allocator, label: []const u8) void {
     const free_bytes = sdk.kernel.total_free_mem_size();
-    const msg = std.fmt.allocPrint(page_alloc, "{s}: {d} bytes\n", .{ label, free_bytes }) catch unreachable;
-    defer page_alloc.free(msg);
+    const msg = std.fmt.allocPrint(gpa, "{s}: {d} bytes\n", .{ label, free_bytes }) catch unreachable;
+    defer gpa.free(msg);
     sdk.extra.debug.print(msg);
 }
 
-pub fn main() !void {
+pub fn main(init: std.process.Init) !void {
     sdk.extra.utils.enableHBCB();
     sdk.extra.debug.screenInit();
 
-    printFree("[1] baseline");
+    printFree(init.gpa, "[1] baseline");
 
-    var arena = std.heap.ArenaAllocator.init(page_alloc);
+    var arena = std.heap.ArenaAllocator.init(init.gpa);
     defer {
         arena.deinit();
-        // All memory returned to psp_page_allocator here; [3] should match [1].
-        printFree("[3] after deinit");
+        // All memory returned to init.gpa here; [3] should match [1].
+        printFree(init.gpa, "[3] after deinit");
     }
     const alloc = arena.allocator();
 
@@ -61,7 +59,7 @@ pub fn main() !void {
     }
     sdk.extra.debug.print("\n");
 
-    printFree("[2] mid-arena");
+    printFree(init.gpa, "[2] mid-arena");
 
     // Intentionally do NOT free individual arena allocations — that is the
     // whole point. arena.deinit() in the defer above frees everything at once.

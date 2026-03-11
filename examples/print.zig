@@ -1,5 +1,6 @@
 // Demonstrates colored text output using the debug screen.
 
+const std = @import("std");
 const sdk = @import("pspsdk");
 
 pub const panic = sdk.extra.debug.panic;
@@ -8,7 +9,7 @@ comptime {
     asm (sdk.extra.module.module_info("SDK Print", .{ .mode = .User }, 1, 0));
 }
 
-pub fn main() void {
+pub fn main(_: std.process.Init) void {
     sdk.extra.utils.enableHBCB();
     sdk.extra.debug.screenInit();
 

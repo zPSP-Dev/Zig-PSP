@@ -1,4 +1,5 @@
 //A quick graphics example
+const std = @import("std");
 const sdk = @import("pspsdk");
 const gu = sdk.gu;
 const gum = sdk.gum;
@@ -66,7 +67,7 @@ var vertices: [36]Vertex = [_]Vertex{
     Vertex{ .u = 0, .v = 1, .c = 0xff00007f, .x = 1, .y = -1, .z = -1 }, // 5
 };
 
-pub fn main() !void {
+pub fn main(_: std.process.Init) !void {
     const SCREEN_WIDTH = sdk.extra.constants.SCREEN_WIDTH;
     const SCREEN_HEIGHT = sdk.extra.constants.SCREEN_HEIGHT;
     const SCR_BUF_WIDTH = sdk.extra.constants.SCR_BUF_WIDTH;

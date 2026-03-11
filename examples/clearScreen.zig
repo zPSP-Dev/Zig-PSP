@@ -1,4 +1,5 @@
 //A quick graphics initialization
+const std = @import("std");
 const sdk = @import("pspsdk");
 const gu = sdk.gu;
 
@@ -10,7 +11,7 @@ comptime {
 
 var display_list: [0x40000]u32 align(16) = [_]u32{0} ** 0x40000;
 
-pub fn main() !void {
+pub fn main(_: std.process.Init) !void {
     const SCREEN_WIDTH = sdk.extra.constants.SCREEN_WIDTH;
     const SCREEN_HEIGHT = sdk.extra.constants.SCREEN_HEIGHT;
     const SCR_BUF_WIDTH = sdk.extra.constants.SCR_BUF_WIDTH;

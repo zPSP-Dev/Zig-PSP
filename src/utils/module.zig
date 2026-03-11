@@ -4,6 +4,7 @@ const threadman = @import("../sdk/pspthreadman.zig");
 const loadexec = @import("../sdk/psploadexec.zig");
 
 const debug = @import("debug.zig");
+const psp_allocator = @import("allocator.zig");
 
 const root = @import("root");
 
@@ -22,36 +23,71 @@ const bad_main_ret = @compileError("Where is this from?!");
 //This calls your main function as a thread.
 pub fn _module_main_thread(argc: usize, _: ?*anyopaque) callconv(.c) c_int {
     _ = argc;
-    // if (has_std_os) {
-    // pspos.system.__pspOsInit(argv);
-    // }
 
-    switch (@typeInfo(@typeInfo(@TypeOf(root.main)).@"fn".return_type.?)) {
+    const fn_info = @typeInfo(@TypeOf(root.main)).@"fn";
+
+    // PSP is freestanding: Args.vector is void, Environ.block is GlobalBlock.
+    // arena and gpa are backed by psp_page_allocator; io/environ_map are
+    // unused on freestanding and left undefined.
+    var arena_allocator = std.heap.ArenaAllocator.init(psp_allocator.psp_page_allocator);
+    defer arena_allocator.deinit();
+
+    const init: std.process.Init = .{
+        .minimal = .{
+            .args = .{ .vector = {} },
+            .environ = .{ .block = .empty },
+        },
+        .arena = &arena_allocator,
+        .gpa = psp_allocator.psp_page_allocator,
+        .io = undefined,
+        .environ_map = undefined,
+        .preopens = .empty,
+    };
+
+    switch (@typeInfo(fn_info.return_type.?)) {
         .noreturn => {
-            root.main();
+            if (fn_info.params.len == 0)
+                root.main()
+            else if (fn_info.params[0].type.? == std.process.Init.Minimal)
+                root.main(init.minimal)
+            else
+                root.main(init);
         },
         .void => {
-            root.main();
+            if (fn_info.params.len == 0)
+                root.main()
+            else if (fn_info.params[0].type.? == std.process.Init.Minimal)
+                root.main(init.minimal)
+            else
+                root.main(init);
             return 0;
         },
         .int => |info| {
-            if (info.bits != 8 or info.is_signed) {
-                @compileError(bad_main_ret);
-            }
-            return root.main();
+            if (info.bits != 8 or info.is_signed) @compileError(bad_main_ret);
+            return if (fn_info.params.len == 0)
+                root.main()
+            else if (fn_info.params[0].type.? == std.process.Init.Minimal)
+                root.main(init.minimal)
+            else
+                root.main(init);
         },
         .error_union => {
-            const result = root.main() catch |err| {
+            const main_result = if (fn_info.params.len == 0)
+                root.main()
+            else if (fn_info.params[0].type.? == std.process.Init.Minimal)
+                root.main(init.minimal)
+            else
+                root.main(init);
+
+            const result = main_result catch |err| {
                 debug.print("ERROR CAUGHT: ");
                 debug.print(@errorName(err));
                 debug.print("\n");
-
                 if (@errorReturnTrace()) |trace| {
                     debug.printTrace(trace);
                 } else {
                     debug.print("(no return trace available)\n");
                 }
-
                 debug.print("Exiting in 10 seconds...");
                 exitErr();
                 return 1;
@@ -59,9 +95,7 @@ pub fn _module_main_thread(argc: usize, _: ?*anyopaque) callconv(.c) c_int {
             switch (@typeInfo(@TypeOf(result))) {
                 .void => return 0,
                 .int => |info| {
-                    if (info.bits != 8) {
-                        @compileError(bad_main_ret);
-                    }
+                    if (info.bits != 8) @compileError(bad_main_ret);
                     return result;
                 },
                 else => @compileError(bad_main_ret),

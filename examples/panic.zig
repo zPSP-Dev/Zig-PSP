@@ -1,5 +1,6 @@
 // Demonstrates the PSP panic handler via integer overflow.
 
+const std = @import("std");
 const sdk = @import("pspsdk");
 
 pub const panic = sdk.extra.debug.panic;
@@ -12,7 +13,7 @@ fn addOne(x: u8) u8 {
     return x + 1;
 }
 
-pub fn main() void {
+pub fn main(_: std.process.Init) void {
     sdk.extra.utils.enableHBCB();
     sdk.extra.debug.screenInit();
 

@@ -1,5 +1,6 @@
 // Demonstrates error return trace via a try propagation chain.
 
+const std = @import("std");
 const sdk = @import("pspsdk");
 
 pub const panic = sdk.extra.debug.panic;
@@ -16,7 +17,7 @@ fn doWork() !void {
     return MyTestErrors.TestError;
 }
 
-pub fn main() !void {
+pub fn main(_: std.process.Init) !void {
     sdk.extra.utils.enableHBCB();
     sdk.extra.debug.screenInit();
 
