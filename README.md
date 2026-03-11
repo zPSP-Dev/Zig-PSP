@@ -95,7 +95,8 @@ The repository includes the following examples:
 | Name | Description |
 |---|---|
 | `hello_world` | Screen debug print |
-| `allocator` | PSP heap allocator |
+| `allocator` | PSP page allocator — one kernel block per allocation, no overhead |
+| `arena` | `std.heap.ArenaAllocator` backed by the PSP page allocator |
 | `clear_screen` | GU display list, vsync, buffer swap |
 | `ziggy_cube` | 3D rotating cube using GU + GUM |
 | `error` | `main()` returning an error, exercising the panic handler |

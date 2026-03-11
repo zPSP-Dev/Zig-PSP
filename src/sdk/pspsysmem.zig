@@ -34,7 +34,7 @@ pub fn sceKernelTotalFreeMemSize() usize {
 /// `addr` - If type is PSP_SMEM_Addr, then addr specifies the lowest address allocate the block from.
 /// Returns The UID of the new block, or if less than 0 an error.
 pub fn sceKernelAllocPartitionMemory(partitionid: PspSysMemPartitionID, name: [:0]const u8, block_type: PspSysMemBlockTypes, size: usize, addr: ?*anyopaque) SceUID {
-    return module.sceKernelAllocPartitionMemory(@intFromEnum(partitionid), @ptrCast(name), @intFromEnum(block_type), size, addr);
+    return module.sceKernelAllocPartitionMemory(@as(c_int, @intCast(@intFromEnum(partitionid))), @ptrCast(name), @intFromEnum(block_type), size, addr);
 }
 
 /// Free a memory block allocated with ::sceKernelAllocPartitionMemory.

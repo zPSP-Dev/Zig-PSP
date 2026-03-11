@@ -1,81 +1,79 @@
-// FIXME This file is all sorts of broken ATM, a proper rework is needed
+/// PSP Page Allocator — analogous to std.heap.page_allocator.
+///
+/// Each allocation maps directly to one sceKernelAllocPartitionMemory block.
+/// No pooling, no coalescing; free releases the block back to the kernel.
+///
+/// Memory layout per allocation:
+///
+///   [ raw block base ]
+///   [ ... optional padding ... ]
+///   [ Header: SceUID (4 bytes) ]   <- immediately before user pointer
+///   [ user data (len bytes)    ]   <- aligned to requested alignment
+///
+/// Use `psp_page_allocator` directly (stateless, no init required).
 const std = @import("std");
-
-const loadexec = @import("../sdk/psploadexec.zig");
 const sysmem = @import("../sdk/pspsysmem.zig");
 const SceUID = sysmem.SceUID;
 
-// This Allocator is a very basic allocator for the PSP
-// It uses the PSP's kernel to allocate and free memory
-// This may not be 100% correct for alignment
-pub const PSPAllocator = struct {
-    pub fn init(self: *@This()) std.mem.Allocator {
-        const vtable = std.mem.Allocator.VTable{
-            .alloc = PSPAllocator.alloc,
-            .resize = PSPAllocator.resize,
-            .remap = unreachable, // FIXME
-            .free = unreachable, // FIXME
-        };
+const Header = extern struct {
+    uid: SceUID,
+};
 
-        return std.mem.Allocator{
-            .ptr = self,
-            .vtable = &vtable,
-        };
-    }
+fn alloc(_: *anyopaque, len: usize, alignment: std.mem.Alignment, _: usize) ?[*]u8 {
+    const align_bytes = alignment.toByteUnits();
 
-    //Our Allocator
-    fn alloc(allocator: *anyopaque, len: usize, alignment: std.mem.Alignment, ret_addr: usize) ?[*]u8 {
-        _ = allocator;
-        _ = ret_addr;
+    // Worst-case overhead: header must sit immediately before the aligned user
+    // address, so we need up to (align_bytes - 1) bytes of padding after the
+    // raw base to reach the next aligned boundary past the header.
+    const overhead = @sizeOf(Header) + align_bytes - 1;
+    const total = overhead + len;
 
-        //Assume alignment is less than double aligns
-        std.debug.assert(len > 0);
-        std.debug.assert(alignment.compare(.gte, .@"64"));
+    const uid = sysmem.sceKernelAllocPartitionMemory(.User, "psp_page", .MemLow, total, null);
+    if (uid < 0) return null;
 
-        //If not allocated - allocate!
-        if (len > 0) {
-            //Gets a block of memory
-            const id = sysmem.sceKernelAllocPartitionMemory(.User, "block", .MemLow, len + @sizeOf(SceUID), null);
+    const base = @as([*]u8, @ptrCast(sysmem.sceKernelGetBlockHeadAddr(uid) orelse {
+        _ = sysmem.sceKernelFreePartitionMemory(uid);
+        return null;
+    }));
 
-            if (id < 0) {
-                //TODO: Handle error cases that aren't out of memory...
-                return std.mem.Allocator.Error.OutOfMemory;
-            }
+    // Find the first aligned address that leaves room for the header before it.
+    const base_addr = @intFromPtr(base);
+    const min_user_addr = base_addr + @sizeOf(Header);
+    const user_addr = alignment.forward(min_user_addr);
 
-            //Get the head address
-            const ptr = @as([*]u32, @ptrCast(@alignCast(sysmem.sceKernelGetBlockHeadAddr(id))));
+    // Store the UID in the header immediately before the user pointer.
+    const header: *Header = @ptrFromInt(user_addr - @sizeOf(Header));
+    header.uid = uid;
 
-            //Store our ID to free
-            @as(*c_int, @ptrCast(ptr)).* = id;
+    return @ptrFromInt(user_addr);
+}
 
-            //Convert and return
-            var ptr2 = @as([*]u8, @ptrCast(ptr));
-            ptr2 += @sizeOf(SceUID);
+fn resize(_: *anyopaque, memory: []u8, _: std.mem.Alignment, new_len: usize, _: usize) bool {
+    // PSP kernel blocks cannot be resized. Allow shrinks (waste the tail);
+    // deny growths so the caller falls back to alloc + copy + free.
+    return new_len <= memory.len;
+}
 
-            return ptr2[0..len];
-        }
+fn remap(_: *anyopaque, _: []u8, _: std.mem.Alignment, _: usize, _: usize) ?[*]u8 {
+    // Signal to the caller that it must do the alloc + copy + free itself.
+    return null;
+}
 
-        return null; // FIXME what about errors?
-    }
+fn free(_: *anyopaque, memory: []u8, _: std.mem.Alignment, _: usize) void {
+    const user_addr = @intFromPtr(memory.ptr);
+    const header: *Header = @ptrFromInt(user_addr - @sizeOf(Header));
+    _ = sysmem.sceKernelFreePartitionMemory(header.uid);
+}
 
-    fn resize(allocator: *anyopaque, memory: []u8, alignment: std.mem.Alignment, new_len: usize, ret_addr: usize) bool {
-        _ = allocator;
-        _ = new_len;
-        _ = ret_addr;
+const vtable = std.mem.Allocator.VTable{
+    .alloc = alloc,
+    .resize = resize,
+    .remap = remap,
+    .free = free,
+};
 
-        std.debug.assert(alignment.compare(.gte, .@"64"));
-
-        // Get ptr
-        var ptr = @as([*]u8, @ptrCast(memory));
-
-        // Go back to our ID
-        ptr -= @sizeOf(SceUID);
-        const id = @as(*c_int, @ptrCast(@alignCast(ptr))).*;
-
-        // Free the ID
-        const s = sysmem.sceKernelFreePartitionMemory(id);
-        _ = s;
-
-        return true;
-    }
+/// Stateless PSP page allocator. Use this directly — no init needed.
+pub const psp_page_allocator = std.mem.Allocator{
+    .ptr = undefined,
+    .vtable = &vtable,
 };
