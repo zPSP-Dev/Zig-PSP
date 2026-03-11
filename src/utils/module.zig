@@ -5,6 +5,7 @@ const loadexec = @import("../sdk/psploadexec.zig");
 
 const debug = @import("debug.zig");
 const psp_allocator = @import("allocator.zig");
+const psp_io = @import("Io.zig");
 
 const root = @import("root");
 
@@ -39,7 +40,7 @@ pub fn _module_main_thread(argc: usize, _: ?*anyopaque) callconv(.c) c_int {
         },
         .arena = &arena_allocator,
         .gpa = psp_allocator.psp_page_allocator,
-        .io = undefined,
+        .io = psp_io.psp_io,
         .environ_map = undefined,
         .preopens = .empty,
     };
