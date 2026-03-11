@@ -2,7 +2,7 @@
     .name = .pspsdk,
     .version = "0.0.0",
     .fingerprint = 0xe2eb569bca619a05, // Changing this has security and trust implications.
-    .minimum_zig_version = "0.15.2",
+    .minimum_zig_version = "0.16.0-dev.2682+02142a54d",
 
     .dependencies = .{
         .zPBPTool = .{
