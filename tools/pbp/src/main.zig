@@ -31,12 +31,12 @@ fn validate_header(header: PBPHeader) !void {
     }
 }
 
-pub fn analyze_file(file_path: []const u8) !void {
-    var file = try std.fs.cwd().openFile(file_path, .{});
-    defer file.close();
+pub fn analyze_file(io: std.Io, file_path: []const u8) !void {
+    var file = try std.Io.Dir.cwd().openFile(io, file_path, .{});
+    defer file.close(io);
 
     var buffer: [4096]u8 = undefined;
-    var reader = file.reader(&buffer);
+    var reader = file.reader(io, &buffer);
     const io_reader = &reader.interface;
 
     const header = try io_reader.takeStruct(PBPHeader, .little);
@@ -57,22 +57,22 @@ pub fn analyze_file(file_path: []const u8) !void {
 }
 
 // TODO: Optionally disable validation
-pub fn unpack_pbp(allocator: std.mem.Allocator, file_path: []const u8, dir_path: []const u8) !void {
-    var file = try std.fs.cwd().openFile(file_path, .{});
-    defer file.close();
+pub fn unpack_pbp(allocator: std.mem.Allocator, io: std.Io, file_path: []const u8, dir_path: []const u8) !void {
+    var file = try std.Io.Dir.cwd().openFile(io, file_path, .{});
+    defer file.close(io);
 
     var buffer_reader: [4096]u8 = undefined;
-    var reader = file.reader(&buffer_reader);
+    var reader = file.reader(io, &buffer_reader);
     const io_reader = &reader.interface;
 
     const header = try io_reader.takeStruct(PBPHeader, .little);
 
     try validate_header(header);
 
-    try std.fs.cwd().makePath(dir_path);
+    try std.Io.Dir.cwd().createDirPath(io, dir_path);
 
     // I don't think any PBPs are bigger than 16MB
-    const content = try file.readToEndAlloc(allocator, std.math.maxInt(u24));
+    const content = try io_reader.allocRemaining(allocator, .unlimited);
 
     for (header.offset, 0..) |offset, i| {
         const file_size = if (i + 1 < header.offset.len) header.offset[i + 1] -| offset else content.len -| offset;
@@ -82,11 +82,11 @@ pub fn unpack_pbp(allocator: std.mem.Allocator, file_path: []const u8, dir_path:
         const file_name = default_file_names[i];
 
         const filename = try std.fmt.allocPrint(allocator, "{s}/{s}", .{ dir_path, file_name });
-        const out_file = try std.fs.cwd().createFile(filename, .{});
-        defer out_file.close();
+        var out_file = try std.Io.Dir.cwd().createFile(io, filename, .{});
+        defer out_file.close(io);
 
         var buffer_writer: [4096]u8 = undefined;
-        var writer = file.writer(&buffer_writer);
+        var writer = out_file.writer(io, &buffer_writer);
         const io_writer = &writer.interface;
 
         const corrected_offset = offset - @sizeOf(PBPHeader);
@@ -95,7 +95,7 @@ pub fn unpack_pbp(allocator: std.mem.Allocator, file_path: []const u8, dir_path:
     }
 }
 
-pub fn pack_pbp(allocator: std.mem.Allocator, paths: []const []const u8) !void {
+pub fn pack_pbp(allocator: std.mem.Allocator, io: std.Io, paths: []const []const u8) !void {
     const output_path = paths[0];
 
     const input_paths = paths[1..];
@@ -123,10 +123,12 @@ pub fn pack_pbp(allocator: std.mem.Allocator, paths: []const []const u8) !void {
             continue;
         }
 
-        const in_file = try std.fs.cwd().openFile(path, .{});
-        defer in_file.close();
+        var in_file = try std.Io.Dir.cwd().openFile(io, path, .{});
+        defer in_file.close(io);
 
-        const file_content = try in_file.readToEndAlloc(allocator, std.math.maxInt(u24));
+        var read_buf: [4096]u8 = undefined;
+        var in_reader = in_file.reader(io, &read_buf);
+        const file_content = try in_reader.interface.allocRemaining(allocator, .unlimited);
         try files.append(.{
             .file_content = file_content,
             .file_size = @intCast(file_content.len),
@@ -135,11 +137,11 @@ pub fn pack_pbp(allocator: std.mem.Allocator, paths: []const []const u8) !void {
         curr_offset += @intCast(file_content.len);
     }
 
-    var output_file = try std.fs.cwd().createFile(output_path, .{});
-    defer output_file.close();
+    var output_file = try std.Io.Dir.cwd().createFile(io, output_path, .{});
+    defer output_file.close(io);
 
     var buffer_writer: [4096]u8 = undefined;
-    var writer = output_file.writer(&buffer_writer);
+    var writer = output_file.writer(io, &buffer_writer);
     const io_writer = &writer.interface;
 
     try io_writer.writeStruct(header, .little);
@@ -151,59 +153,43 @@ pub fn pack_pbp(allocator: std.mem.Allocator, paths: []const []const u8) !void {
     try io_writer.flush();
 }
 
-fn get_arg_list(allocator: std.mem.Allocator, iterator: *std.process.ArgIterator) ![]const []const u8 {
-    var list = std.array_list.Managed([]const u8).init(allocator);
-    while (iterator.next()) |arg| {
-        try list.append(arg);
-    }
-    return list.toOwnedSlice();
-}
-
-pub fn main() !void {
-    var gpa = std.heap.GeneralPurposeAllocator(.{}){};
-    defer _ = gpa.deinit();
-    var arena = std.heap.ArenaAllocator.init(gpa.allocator());
-    defer arena.deinit();
-
-    const allocator = arena.allocator();
-
-    var arg_it = try std.process.argsWithAllocator(allocator);
-    _ = arg_it.skip();
-
-    const commands = try get_arg_list(allocator, &arg_it);
+pub fn main(init: std.process.Init) !void {
+    const allocator: std.mem.Allocator = init.arena.allocator();
+    const commands = (try init.minimal.args.toSlice(allocator))[1..];
+    const io = init.io;
 
     if (commands.len == 0) {
         std.debug.print("Usage: pbptool <pack | unpack | analyze | help>\n", .{});
-        std.posix.exit(1);
+        std.process.exit(1);
     }
 
     const com = commands[0];
     if (std.mem.eql(u8, com, "pack")) {
         if (commands.len < 10) {
             std.debug.print("Usage: pbptool pack <output.pbp> <param.sfo> <icon0.png> <icon1.pmf> <pic0.png> <pic1.png> <snd0.at3> <data.psp> <data.psar>\n", .{});
-            std.posix.exit(1);
+            std.process.exit(1);
         }
 
-        try pack_pbp(allocator, commands[1..]);
+        try pack_pbp(allocator, io, commands[1..]);
     } else if (std.mem.eql(u8, com, "unpack")) {
         if (commands.len < 3) {
             std.debug.print("Usage: pbptool unpack <input.pbp> <output_dir>\n", .{});
-            std.posix.exit(1);
+            std.process.exit(1);
         }
 
-        try unpack_pbp(allocator, commands[1], commands[2]);
+        try unpack_pbp(allocator, io, commands[1], commands[2]);
     } else if (std.mem.eql(u8, com, "analyze")) {
         if (commands.len < 2) {
             std.debug.print("Usage: pbptool analyze <input.pbp>\n", .{});
-            std.posix.exit(1);
+            std.process.exit(1);
         }
 
-        try analyze_file(commands[1]);
+        try analyze_file(io, commands[1]);
     } else if (std.mem.eql(u8, com, "help")) {
         std.debug.print("Usage: pbptool <pack | unpack | analyze | help>\n", .{});
-        std.posix.exit(0);
+        std.process.exit(0);
     } else {
         std.debug.print("Error: Invalid argument '{s}'\n", .{commands[0]});
-        std.posix.exit(1);
+        std.process.exit(1);
     }
 }

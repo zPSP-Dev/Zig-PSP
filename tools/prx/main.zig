@@ -200,20 +200,20 @@ fn elfRelType(r_info: u32) u8 {
 
 // ── Load & validate ───────────────────────────────────────────────────────────
 
-fn loadFile(allocator: std.mem.Allocator, path: []const u8) ![]u8 {
-    const file = std.fs.cwd().openFile(path, .{}) catch |err| {
+fn loadFile(allocator: std.mem.Allocator, io: std.Io, path: []const u8) ![]u8 {
+    var file = std.Io.Dir.cwd().openFile(io, path, .{}) catch |err| {
         std.debug.print("Error: could not open file '{s}': {}\n", .{ path, err });
         return err;
     };
-    defer file.close();
-    const stat = try file.stat();
-    if (stat.size < EHDR_SIZE) {
+    defer file.close(io);
+    var buffer: [4096]u8 = undefined;
+    var reader = file.reader(io, &buffer);
+    const data = try reader.interface.allocRemaining(allocator, .unlimited);
+    if (data.len < EHDR_SIZE) {
         std.debug.print("Error: file too small to be an ELF\n", .{});
+        allocator.free(data);
         return error.InvalidElf;
     }
-    const data = try allocator.alloc(u8, stat.size);
-    const n = try file.readAll(data);
-    if (n != stat.size) return error.ReadError;
     return data;
 }
 
@@ -641,11 +641,12 @@ fn writeShstrtab(out: []u8, sections: []ElfSection, head: ElfHeader, layout: Lay
 
 fn run(
     allocator: std.mem.Allocator,
+    io: std.Io,
     in_path: []const u8,
     out_path: []const u8,
 ) !void {
     // Load
-    const elf_data = try loadFile(allocator, in_path);
+    const elf_data = try loadFile(allocator, io, in_path);
     defer allocator.free(elf_data);
 
     // Parse header
@@ -680,26 +681,27 @@ fn run(
     writeShstrtab(out_buf, sections, head, layout);
 
     // Write output file
-    const out_file = std.fs.cwd().createFile(out_path, .{}) catch |err| {
+    var out_file = std.Io.Dir.cwd().createFile(io, out_path, .{}) catch |err| {
         std.debug.print("Error: could not create output file '{s}': {}\n", .{ out_path, err });
         return err;
     };
-    defer out_file.close();
-    try out_file.writeAll(out_buf);
+    defer out_file.close(io);
+    var buffer_writer: [4096]u8 = undefined;
+    var writer = out_file.writer(io, &buffer_writer);
+    const io_writer = &writer.interface;
+    try io_writer.writeAll(out_buf);
+    try io_writer.flush();
 }
 
-pub fn main() !void {
-    var gpa = std.heap.GeneralPurposeAllocator(.{}){};
-    defer _ = gpa.deinit();
-    const allocator = gpa.allocator();
+pub fn main(init: std.process.Init) !void {
+    const allocator: std.mem.Allocator = init.arena.allocator();
+    const io = init.io;
+    const args = (try init.minimal.args.toSlice(allocator))[1..];
 
-    const args = try std.process.argsAlloc(allocator);
-    defer std.process.argsFree(allocator, args);
-
-    if (args.len != 3) {
+    if (args.len != 2) {
         std.debug.print("Usage: zprxgen infile.elf outfile.prx\n", .{});
         std.process.exit(1);
     }
 
-    try run(allocator, args[1], args[2]);
+    try run(allocator, io, args[0], args[1]);
 }

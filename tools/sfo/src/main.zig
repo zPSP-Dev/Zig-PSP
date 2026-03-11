@@ -57,12 +57,12 @@ const DefaultTable = [_]InternalEntry{
     .{ .name = "REGION", .type = .Int32, .value = 0x8000, .data = null, .maxsize = 4 },
 };
 
-fn readSFO(allocator: std.mem.Allocator, path: []const u8) !SFOStructure {
-    var file = try std.fs.cwd().openFile(path, .{});
-    defer file.close();
+fn readSFO(allocator: std.mem.Allocator, io: std.Io, path: []const u8) !SFOStructure {
+    var file = try std.Io.Dir.cwd().openFile(io, path, .{});
+    defer file.close(io);
 
     var buffer: [4096]u8 = undefined;
-    var reader = file.reader(&buffer);
+    var reader = file.reader(io, &buffer);
     const io_reader = &reader.interface;
 
     const header = try io_reader.takeStruct(SFOHeader, .little);
@@ -88,16 +88,8 @@ fn readSFO(allocator: std.mem.Allocator, path: []const u8) !SFOStructure {
     };
 }
 
-fn get_arg_list(allocator: std.mem.Allocator, iterator: *std.process.ArgIterator) ![]const []const u8 {
-    var list = std.array_list.Managed([]const u8).init(allocator);
-    while (iterator.next()) |arg| {
-        try list.append(arg);
-    }
-    return list.toOwnedSlice();
-}
-
-pub fn prettyPrintSFO(allocator: std.mem.Allocator, path: []const u8) !void {
-    const sfo = try readSFO(allocator, path);
+pub fn prettyPrintSFO(allocator: std.mem.Allocator, io: std.Io, path: []const u8) !void {
+    const sfo = try readSFO(allocator, io, path);
     std.debug.print("Header:\n", .{});
     std.debug.print("\tMagic: {s}\n", .{sfo.header.magic});
     std.debug.print("\tVersion: {d}.{d}\n", .{ sfo.header.version[0], sfo.header.version[1] });
@@ -136,7 +128,7 @@ pub fn prettyPrintSFO(allocator: std.mem.Allocator, path: []const u8) !void {
     }
 }
 
-pub fn writeSFO(allocator: std.mem.Allocator, path: []const u8, entries: []InternalEntry) !void {
+pub fn writeSFO(allocator: std.mem.Allocator, io: std.Io, path: []const u8, entries: []InternalEntry) !void {
     var data_segment = std.array_list.Managed(u8).init(allocator);
     var key_segment = std.array_list.Managed(u8).init(allocator);
 
@@ -193,11 +185,11 @@ pub fn writeSFO(allocator: std.mem.Allocator, path: []const u8, entries: []Inter
         .data_pool = try data_segment.toOwnedSlice(),
     };
 
-    const file = try std.fs.cwd().createFile(path, .{});
-    defer file.close();
+    const file = try std.Io.Dir.cwd().createFile(io, path, .{});
+    defer file.close(io);
 
     var buffer_writer: [4096]u8 = undefined;
-    var writer = file.writer(&buffer_writer);
+    var writer = file.writer(io, &buffer_writer);
     var io_writer = &writer.interface;
 
     try io_writer.writeStruct(sfo.header, .little);
@@ -209,35 +201,28 @@ pub fn writeSFO(allocator: std.mem.Allocator, path: []const u8, entries: []Inter
     try io_writer.flush();
 }
 
-pub fn main() !void {
-    var gpa = std.heap.GeneralPurposeAllocator(.{}){};
-    defer _ = gpa.deinit();
-    var arena = std.heap.ArenaAllocator.init(gpa.allocator());
-    defer arena.deinit();
+pub fn main(init: std.process.Init) !void {
+    const allocator: std.mem.Allocator = init.arena.allocator();
+    const commands = (try init.minimal.args.toSlice(allocator))[1..];
 
-    const allocator = arena.allocator();
-
-    var arg_it = try std.process.argsWithAllocator(allocator);
-    _ = arg_it.skip();
-
-    const commands = try get_arg_list(allocator, &arg_it);
+    const io = init.io;
 
     if (commands.len == 0) {
         std.debug.print("Usage: sfotool <read | write>\n", .{});
-        std.posix.exit(1);
+        std.process.exit(1);
     }
 
     const com = commands[0];
     if (std.mem.eql(u8, com, "read")) {
         if (commands.len < 2) {
             std.debug.print("Usage: sfotool read <file>\n", .{});
-            std.posix.exit(1);
+            std.process.exit(1);
         }
-        try prettyPrintSFO(allocator, commands[1]);
+        try prettyPrintSFO(allocator, io, commands[1]);
     } else if (std.mem.eql(u8, com, "write")) {
         if (commands.len < 3) {
             std.debug.print("Usage: sfotool write <TITLE> <out.sfo>\n", .{});
-            std.posix.exit(1);
+            std.process.exit(1);
         }
         const entries = try allocator.alloc(InternalEntry, 1 + DefaultTable.len);
         entries[DefaultTable.len] = .{
@@ -252,9 +237,9 @@ pub fn main() !void {
             entries[i] = DefaultTable[i];
         }
 
-        try writeSFO(allocator, commands[2], entries);
+        try writeSFO(allocator, io, commands[2], entries);
     } else {
         std.debug.print("Usage: sfotool <read | write>\n", .{});
-        std.posix.exit(1);
+        std.process.exit(1);
     }
 }
