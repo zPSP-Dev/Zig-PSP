@@ -121,7 +121,7 @@ const std = @import("std");
 //Print with formatting via the default PSP allocator
 pub fn printFormat(comptime fmt: []const u8, args: anytype) !void {
     const alloc = @import("allocator.zig");
-    var psp_allocator = &alloc.PSPAllocator.init().allocator;
+    var psp_allocator = alloc.psp_page_allocator;
 
     const string = try std.fmt.allocPrint(psp_allocator, fmt, args);
     defer psp_allocator.free(string);
