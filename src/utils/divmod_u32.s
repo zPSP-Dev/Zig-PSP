@@ -1,4 +1,4 @@
-    .module hardfloat
+#    .module hardfloat
     .set noreorder
     .set nomacro
 
