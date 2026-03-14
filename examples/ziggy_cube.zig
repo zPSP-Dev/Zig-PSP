@@ -1,10 +1,11 @@
-//A quick graphics example
+// Native GU ziggy cube — spinning textured cube using the PSP GU/GUM API
 const std = @import("std");
 const sdk = @import("pspsdk");
 const gu = sdk.gu;
 const gum = sdk.gum;
+const io = sdk.c.IoFileMgrForUser;
 
-pub const panic = sdk.extra.debug.panic; // Import panic handler
+pub const panic = sdk.extra.debug.panic;
 
 comptime {
     asm (sdk.extra.module.module_info("SDK Ziggy Cube", .{ .mode = .User }, 1, 0));
@@ -29,42 +30,42 @@ const vertex_type = sdk.VertexType{
 };
 
 var vertices: [36]Vertex = [_]Vertex{
-    Vertex{ .u = 0, .v = 0, .c = 0xff7f0000, .x = -1, .y = -1, .z = 1 }, // 0
-    Vertex{ .u = 1, .v = 0, .c = 0xff7f0000, .x = -1, .y = 1, .z = 1 }, // 4
-    Vertex{ .u = 1, .v = 1, .c = 0xff7f0000, .x = 1, .y = 1, .z = 1 }, // 5
-    Vertex{ .u = 0, .v = 0, .c = 0xff7f0000, .x = -1, .y = -1, .z = 1 }, // 0
-    Vertex{ .u = 1, .v = 1, .c = 0xff7f0000, .x = 1, .y = 1, .z = 1 }, // 5
-    Vertex{ .u = 0, .v = 1, .c = 0xff7f0000, .x = 1, .y = -1, .z = 1 }, // 1
-    Vertex{ .u = 0, .v = 0, .c = 0xff7f0000, .x = -1, .y = -1, .z = -1 }, // 3
-    Vertex{ .u = 1, .v = 0, .c = 0xff7f0000, .x = 1, .y = -1, .z = -1 }, // 2
-    Vertex{ .u = 1, .v = 1, .c = 0xff7f0000, .x = 1, .y = 1, .z = -1 }, // 6
-    Vertex{ .u = 0, .v = 0, .c = 0xff7f0000, .x = -1, .y = -1, .z = -1 }, // 3
-    Vertex{ .u = 1, .v = 1, .c = 0xff7f0000, .x = 1, .y = 1, .z = -1 }, // 6
-    Vertex{ .u = 0, .v = 1, .c = 0xff7f0000, .x = -1, .y = 1, .z = -1 }, // 7
-    Vertex{ .u = 0, .v = 0, .c = 0xff007f00, .x = 1, .y = -1, .z = -1 }, // 0
-    Vertex{ .u = 1, .v = 0, .c = 0xff007f00, .x = 1, .y = -1, .z = 1 }, // 3
-    Vertex{ .u = 1, .v = 1, .c = 0xff007f00, .x = 1, .y = 1, .z = 1 }, // 7
-    Vertex{ .u = 0, .v = 0, .c = 0xff007f00, .x = 1, .y = -1, .z = -1 }, // 0
-    Vertex{ .u = 1, .v = 1, .c = 0xff007f00, .x = 1, .y = 1, .z = 1 }, // 7
-    Vertex{ .u = 0, .v = 1, .c = 0xff007f00, .x = 1, .y = 1, .z = -1 }, // 4
-    Vertex{ .u = 0, .v = 0, .c = 0xff007f00, .x = -1, .y = -1, .z = -1 }, // 0
-    Vertex{ .u = 1, .v = 0, .c = 0xff007f00, .x = -1, .y = 1, .z = -1 }, // 3
-    Vertex{ .u = 1, .v = 1, .c = 0xff007f00, .x = -1, .y = 1, .z = 1 }, // 7
-    Vertex{ .u = 0, .v = 0, .c = 0xff007f00, .x = -1, .y = -1, .z = -1 }, // 0
-    Vertex{ .u = 1, .v = 1, .c = 0xff007f00, .x = -1, .y = 1, .z = 1 }, // 7
-    Vertex{ .u = 0, .v = 1, .c = 0xff007f00, .x = -1, .y = -1, .z = 1 }, // 4
-    Vertex{ .u = 0, .v = 0, .c = 0xff00007f, .x = -1, .y = 1, .z = -1 }, // 0
-    Vertex{ .u = 1, .v = 0, .c = 0xff00007f, .x = 1, .y = 1, .z = -1 }, // 1
-    Vertex{ .u = 1, .v = 1, .c = 0xff00007f, .x = 1, .y = 1, .z = 1 }, // 2
-    Vertex{ .u = 0, .v = 0, .c = 0xff00007f, .x = -1, .y = 1, .z = -1 }, // 0
-    Vertex{ .u = 1, .v = 1, .c = 0xff00007f, .x = 1, .y = 1, .z = 1 }, // 2
-    Vertex{ .u = 0, .v = 1, .c = 0xff00007f, .x = -1, .y = 1, .z = 1 }, // 3
-    Vertex{ .u = 0, .v = 0, .c = 0xff00007f, .x = -1, .y = -1, .z = -1 }, // 4
-    Vertex{ .u = 1, .v = 0, .c = 0xff00007f, .x = -1, .y = -1, .z = 1 }, // 7
-    Vertex{ .u = 1, .v = 1, .c = 0xff00007f, .x = 1, .y = -1, .z = 1 }, // 6
-    Vertex{ .u = 0, .v = 0, .c = 0xff00007f, .x = -1, .y = -1, .z = -1 }, // 4
-    Vertex{ .u = 1, .v = 1, .c = 0xff00007f, .x = 1, .y = -1, .z = 1 }, // 6
-    Vertex{ .u = 0, .v = 1, .c = 0xff00007f, .x = 1, .y = -1, .z = -1 }, // 5
+    Vertex{ .u = 0, .v = 0, .c = 0xff7f0000, .x = -1, .y = -1, .z = 1 },
+    Vertex{ .u = 1, .v = 0, .c = 0xff7f0000, .x = -1, .y = 1, .z = 1 },
+    Vertex{ .u = 1, .v = 1, .c = 0xff7f0000, .x = 1, .y = 1, .z = 1 },
+    Vertex{ .u = 0, .v = 0, .c = 0xff7f0000, .x = -1, .y = -1, .z = 1 },
+    Vertex{ .u = 1, .v = 1, .c = 0xff7f0000, .x = 1, .y = 1, .z = 1 },
+    Vertex{ .u = 0, .v = 1, .c = 0xff7f0000, .x = 1, .y = -1, .z = 1 },
+    Vertex{ .u = 0, .v = 0, .c = 0xff7f0000, .x = -1, .y = -1, .z = -1 },
+    Vertex{ .u = 1, .v = 0, .c = 0xff7f0000, .x = 1, .y = -1, .z = -1 },
+    Vertex{ .u = 1, .v = 1, .c = 0xff7f0000, .x = 1, .y = 1, .z = -1 },
+    Vertex{ .u = 0, .v = 0, .c = 0xff7f0000, .x = -1, .y = -1, .z = -1 },
+    Vertex{ .u = 1, .v = 1, .c = 0xff7f0000, .x = 1, .y = 1, .z = -1 },
+    Vertex{ .u = 0, .v = 1, .c = 0xff7f0000, .x = -1, .y = 1, .z = -1 },
+    Vertex{ .u = 0, .v = 0, .c = 0xff007f00, .x = 1, .y = -1, .z = -1 },
+    Vertex{ .u = 1, .v = 0, .c = 0xff007f00, .x = 1, .y = -1, .z = 1 },
+    Vertex{ .u = 1, .v = 1, .c = 0xff007f00, .x = 1, .y = 1, .z = 1 },
+    Vertex{ .u = 0, .v = 0, .c = 0xff007f00, .x = 1, .y = -1, .z = -1 },
+    Vertex{ .u = 1, .v = 1, .c = 0xff007f00, .x = 1, .y = 1, .z = 1 },
+    Vertex{ .u = 0, .v = 1, .c = 0xff007f00, .x = 1, .y = 1, .z = -1 },
+    Vertex{ .u = 0, .v = 0, .c = 0xff007f00, .x = -1, .y = -1, .z = -1 },
+    Vertex{ .u = 1, .v = 0, .c = 0xff007f00, .x = -1, .y = 1, .z = -1 },
+    Vertex{ .u = 1, .v = 1, .c = 0xff007f00, .x = -1, .y = 1, .z = 1 },
+    Vertex{ .u = 0, .v = 0, .c = 0xff007f00, .x = -1, .y = -1, .z = -1 },
+    Vertex{ .u = 1, .v = 1, .c = 0xff007f00, .x = -1, .y = 1, .z = 1 },
+    Vertex{ .u = 0, .v = 1, .c = 0xff007f00, .x = -1, .y = -1, .z = 1 },
+    Vertex{ .u = 0, .v = 0, .c = 0xff00007f, .x = -1, .y = 1, .z = -1 },
+    Vertex{ .u = 1, .v = 0, .c = 0xff00007f, .x = 1, .y = 1, .z = -1 },
+    Vertex{ .u = 1, .v = 1, .c = 0xff00007f, .x = 1, .y = 1, .z = 1 },
+    Vertex{ .u = 0, .v = 0, .c = 0xff00007f, .x = -1, .y = 1, .z = -1 },
+    Vertex{ .u = 1, .v = 1, .c = 0xff00007f, .x = 1, .y = 1, .z = 1 },
+    Vertex{ .u = 0, .v = 1, .c = 0xff00007f, .x = -1, .y = 1, .z = 1 },
+    Vertex{ .u = 0, .v = 0, .c = 0xff00007f, .x = -1, .y = -1, .z = -1 },
+    Vertex{ .u = 1, .v = 0, .c = 0xff00007f, .x = -1, .y = -1, .z = 1 },
+    Vertex{ .u = 1, .v = 1, .c = 0xff00007f, .x = 1, .y = -1, .z = 1 },
+    Vertex{ .u = 0, .v = 0, .c = 0xff00007f, .x = -1, .y = -1, .z = -1 },
+    Vertex{ .u = 1, .v = 1, .c = 0xff00007f, .x = 1, .y = -1, .z = 1 },
+    Vertex{ .u = 0, .v = 1, .c = 0xff00007f, .x = 1, .y = -1, .z = -1 },
 };
 
 pub fn main(_: std.process.Init) !void {
@@ -73,7 +74,6 @@ pub fn main(_: std.process.Init) !void {
     const SCR_BUF_WIDTH = sdk.extra.constants.SCR_BUF_WIDTH;
 
     sdk.extra.utils.enableHBCB();
-    sdk.extra.debug.screenInit();
 
     const fbp0 = sdk.extra.vram.allocVramRelative(SCR_BUF_WIDTH, SCREEN_HEIGHT, .Psm8888);
     const fbp1 = sdk.extra.vram.allocVramRelative(SCR_BUF_WIDTH, SCREEN_HEIGHT, .Psm8888);
@@ -99,11 +99,34 @@ pub fn main(_: std.process.Init) !void {
 
     gu.finish();
     gu.sync(.Finish, .Wait);
+
+    // Dump init display list
+    {
+        var len: usize = 0;
+        for (&display_list, 0..) |cmd, i| {
+            len = i + 1;
+            if ((cmd >> 24) == 0x0F) {
+                if (i + 1 < display_list.len and (display_list[i + 1] >> 24) == 0x0C) {
+                    len = i + 2;
+                }
+                break;
+            }
+        }
+        const fd = io.sceIoOpen(@ptrCast("ms0:/gu_init_dl.bin"), 0x0602, 0o777);
+        if (fd >= 0) {
+            _ = io.sceIoWrite(fd, @ptrCast(&display_list), @intCast(len * 4));
+            _ = io.sceIoClose(fd);
+        }
+    }
+
     _ = sdk.display.wait_vblank_start();
     gu.display(true);
 
-    var i: u32 = 0;
-    while (!sdk.extra.utils.isExitRequested()) : (i += 1) {
+    // Rotation angles (in radians)
+    var val: f32 = 0;
+
+    // Render loop
+    while (true) {
         gu.start(.Direct, &display_list);
 
         gu.clear_color(0x202020);
@@ -122,7 +145,7 @@ pub fn main(_: std.process.Init) !void {
         gum.load_identity();
 
         gum.translate(&.{ .x = 0, .y = 0, .z = -2.5 });
-        gum.rotate_xyz(&.{ .x = @as(f32, @floatFromInt(i)) * 0.79 * (3.14159 / 180.0), .y = @as(f32, @floatFromInt(i)) * 0.98 * (3.14159 / 180.0), .z = @as(f32, @floatFromInt(i)) * 1.32 * (3.14159 / 180.0) });
+        gum.rotate_xyz(&.{ .x = val * 0.79, .y = val * 0.98, .z = val * 1.32 });
 
         gu.tex_mode(.Psm8888, 0, .Single, .Linear);
         gu.tex_image(0, 128, 128, 128, &logo_start);
@@ -132,13 +155,36 @@ pub fn main(_: std.process.Init) !void {
         gu.tex_offset(0.0, 0.0);
         gu.ambient_color(0xffffffff);
 
-        // draw cube
         gum.draw_array(.Triangles, vertex_type, 12 * 3, null, @as(*anyopaque, @ptrCast(&vertices)));
 
         gu.finish();
         gu.sync(.Finish, .Wait);
-        _ = sdk.display.wait_vblank_start();
+
+        // Dump display list after first frame
+        if (val == 0) {
+            // Scan for FINISH command (cmd 0x0F) to find end
+            var len: usize = 0;
+            for (&display_list, 0..) |cmd, i| {
+                len = i + 1;
+                if ((cmd >> 24) == 0x0F) {
+                    if (i + 1 < display_list.len and (display_list[i + 1] >> 24) == 0x0C) {
+                        len = i + 2;
+                    }
+                    break;
+                }
+            }
+            const fd = io.sceIoOpen(@ptrCast("ms0:/gu_dl.bin"), 0x0602, 0o777);
+            if (fd >= 0) {
+                _ = io.sceIoWrite(fd, @ptrCast(&display_list), @intCast(len * 4));
+                _ = io.sceIoClose(fd);
+            }
+        }
+
         gu.swap_buffers();
+
+        _ = sdk.display.wait_vblank_start();
+
+        val += 0.02;
     }
 }
 
