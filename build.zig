@@ -44,7 +44,6 @@ pub fn build(b: *std.Build) void {
         .target = psp_target,
         .optimize = psp_optimize,
     });
-    pspsdk_module.addAssemblyFile(b.path("src/utils/divmod_u32.s"));
 
     // Build zpspgl module (OpenGL compatibility layer on GE)
     const zpspgl_module = b.addModule("zpspgl", .{

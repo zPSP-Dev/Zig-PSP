@@ -26,6 +26,7 @@ const SHT_REL: u32 = 9;
 const SHT_PRXRELOC: u32 = 0x700000A0;
 
 const SHF_ALLOC: u32 = 2;
+const SHF_EXECINSTR: u32 = 4;
 
 const R_MIPS_PC16: u8 = 10;
 
@@ -637,6 +638,37 @@ fn writeShstrtab(out: []u8, sections: []ElfSection, head: ElfHeader, layout: Lay
     @memcpy(out[ptr..][0..ELF_SH_STRTAB.len], ELF_SH_STRTAB);
 }
 
+// ── Allegrex compatibility patches ───────────────────────────────────────────
+
+// The PSP Allegrex CPU does not implement MIPS trap instructions (TEQ, TGE,
+// TGEU, TLT, TLTU, TNE and their immediate forms), even though they are
+// part of the MIPS II ISA.  LLVM's MIPS backend unconditionally emits
+//
+//   teq $divisor, $zero, 7
+//
+// before every integer division instruction as a hardware divide-by-zero
+// check (equivalent to -mcheck-zero-division in GCC).  On Allegrex this
+// raises Exception - Reserved Instruction (CAUSE ExcCode = 10).
+//
+// We replace every TEQ in executable sections with NOP (SLL $zero,$zero,0).
+// TEQ encoding: opcode=SPECIAL(0), funct=0x34; mask = 0xFC00003F == 0x34.
+fn patchTrapInstructions(sections: []ElfSection, head: ElfHeader) void {
+    for (0..head.shnum) |i| {
+        const s = &sections[i];
+        if (!s.output) continue;
+        if (s.shtype != SHT_PROGBITS) continue;
+        if (s.flags & (SHF_ALLOC | SHF_EXECINSTR) != (SHF_ALLOC | SHF_EXECINSTR)) continue;
+
+        const words = s.data.len / 4;
+        for (0..words) |j| {
+            const word = std.mem.readInt(u32, s.data[j * 4 ..][0..4], .little);
+            if (word & 0xFC00003F == 0x00000034) {
+                std.mem.writeInt(u32, s.data[j * 4 ..][0..4], 0x00000000, .little);
+            }
+        }
+    }
+}
+
 // ── Main pipeline ─────────────────────────────────────────────────────────────
 
 fn run(
@@ -660,6 +692,10 @@ fn run(
 
     // Filter relocations
     try processRelocs(allocator, sections, head);
+
+    // Replace TEQ (trap-if-equal) instructions with NOP.  Allegrex does not
+    // implement MIPS trap instructions; LLVM emits them for div-by-zero checks.
+    patchTrapInstructions(sections, head);
 
     // Renumber kept sections
     reindexSections(sections);

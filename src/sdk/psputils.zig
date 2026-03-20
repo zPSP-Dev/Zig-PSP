@@ -1,4 +1,5 @@
-const c = @import("../c/modules.zig");
+pub const module = @import("../c/modules.zig").UtilsForUser;
+const c = module;
 
 pub const time_t = c.types.time_t;
 pub const clock_t = c.types.clock_t;
