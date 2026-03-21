@@ -17,18 +17,21 @@ No legacy PSPSDK or external C toolchain is required. All build tools (`zPRXGen`
 
 ## Usage
 
-Add Zig-PSP to your project and import `pspsdk` in your source. Every PSP application needs a `module_info` comptime call and the homebrew callback setup:
+Add Zig-PSP to your project and import `pspsdk` in your source. Every PSP application needs a `module_info` comptime call, the panic handler import, and the homebrew callback setup:
 
 ```zig
+const std = @import("std");
 const sdk = @import("pspsdk");
 
+// Required: without this, the default panic handler pulls in std.Io.Threaded
+// which references posix symbols that don't exist on PSP.
 pub const panic = sdk.extra.debug.panic;
 
 comptime {
     asm (sdk.extra.module.module_info("My App Name", .{ .mode = .User }, 1, 0));
 }
 
-pub fn main() !void {
+pub fn main(_: std.process.Init) !void {
     sdk.extra.utils.enableHBCB();
     sdk.extra.debug.screenInit();
 

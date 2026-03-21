@@ -127,6 +127,13 @@ pub const vtable: Io.VTable = .{
     .netLookup = netLookup,
 };
 
+fn toNullTerminated(path: []const u8, buf: *[1024]u8) ?[*c]const c_char {
+    if (path.len >= buf.len) return null;
+    @memcpy(buf[0..path.len], path);
+    buf[path.len] = 0;
+    return @ptrCast(buf[0..path.len :0].ptr);
+}
+
 fn crashHandler(_: ?*anyopaque) void {
     @panic("Io.crashHandler not implemented");
 }
@@ -250,6 +257,14 @@ fn futexWake(_: ?*anyopaque, _: *const u32, _: u32) void {
 
 const io_mgr = @import("../c/module/IoFileMgrForUser.zig");
 
+const PSP_O_RDONLY = 0x0001;
+const PSP_O_WRONLY = 0x0002;
+const PSP_O_RDWR = PSP_O_RDONLY | PSP_O_WRONLY;
+const PSP_O_CREAT = 0x0200;
+const PSP_O_TRUNC = 0x0400;
+const PSP_O_APPEND = 0x0100;
+const PSP_O_EXCL = 0x0800;
+
 fn pspWrite(fd: SceUID, buf: []const u8) error{WriteFailed}!usize {
     const ret = io_mgr.sceIoWrite(fd, buf.ptr, buf.len);
     if (ret < 0) return error.WriteFailed;
@@ -260,7 +275,19 @@ fn operate(_: ?*anyopaque, op: Io.Operation) Io.Cancelable!Io.Operation.Result {
     switch (op) {
         .device_io_control => @panic("Io.operate: Device io_ctl Not Implemented"),
         .net_receive => @panic("Io.operate: net_receive Not Implemented"),
-        .file_read_streaming => @panic("Io.operate: file_read_streaming Not Implemented"),
+        .file_read_streaming => |r| {
+            const fd = r.file.handle;
+            var total: usize = 0;
+            for (r.data) |buf| {
+                if (buf.len > 0) {
+                    const ret = io_mgr.sceIoRead(fd, buf.ptr, @intCast(buf.len));
+                    if (ret < 0) return .{ .file_read_streaming = error.InputOutput };
+                    total += @intCast(ret);
+                    if (@as(usize, @intCast(ret)) < buf.len) break;
+                }
+            }
+            return .{ .file_read_streaming = total };
+        },
         .file_write_streaming => |w| {
             const fd = w.file.handle;
             if (fd == 2) @panic("A!");
@@ -309,8 +336,11 @@ fn batchCancel(_: ?*anyopaque, _: *Io.Batch) void {
     @panic("Io.batchCancel not implemented");
 }
 
-fn dirCreateDir(_: ?*anyopaque, _: Dir, _: []const u8, _: Dir.Permissions) Dir.CreateDirError!void {
-    @panic("Io.dirCreateDir not implemented");
+fn dirCreateDir(_: ?*anyopaque, _: Dir, sub_path: []const u8, _: Dir.Permissions) Dir.CreateDirError!void {
+    var path_buf: [1024]u8 = undefined;
+    const path_z = toNullTerminated(sub_path, &path_buf) orelse return error.NameTooLong;
+    const ret = io_mgr.sceIoMkdir(path_z, 0o777);
+    if (ret < 0) return error.AccessDenied;
 }
 
 fn dirCreateDirPath(_: ?*anyopaque, _: Dir, _: []const u8, _: Dir.Permissions) Dir.CreateDirPathError!Dir.CreatePathStatus {
@@ -321,8 +351,12 @@ fn dirCreateDirPathOpen(_: ?*anyopaque, _: Dir, _: []const u8, _: Dir.Permission
     @panic("Io.dirCreateDirPathOpen not implemented");
 }
 
-fn dirOpenDir(_: ?*anyopaque, _: Dir, _: []const u8, _: Dir.OpenOptions) Dir.OpenError!Dir {
-    @panic("Io.dirOpenDir not implemented");
+fn dirOpenDir(_: ?*anyopaque, _: Dir, sub_path: []const u8, _: Dir.OpenOptions) Dir.OpenError!Dir {
+    var path_buf: [1024]u8 = undefined;
+    const path_z = toNullTerminated(sub_path, &path_buf) orelse return error.NameTooLong;
+    const fd = io_mgr.sceIoDopen(path_z);
+    if (fd < 0) return error.FileNotFound;
+    return .{ .handle = fd };
 }
 
 fn dirStat(_: ?*anyopaque, _: Dir) Dir.StatError!Dir.Stat {
@@ -337,24 +371,74 @@ fn dirAccess(_: ?*anyopaque, _: Dir, _: []const u8, _: Dir.AccessOptions) Dir.Ac
     @panic("Io.dirAccess not implemented");
 }
 
-fn dirCreateFile(_: ?*anyopaque, _: Dir, _: []const u8, _: File.CreateFlags) File.OpenError!File {
-    @panic("Io.dirCreateFile not implemented");
+fn dirCreateFile(_: ?*anyopaque, _: Dir, sub_path: []const u8, flags: File.CreateFlags) File.OpenError!File {
+    var path_buf: [1024]u8 = undefined;
+    const path_z = toNullTerminated(sub_path, &path_buf) orelse return error.NameTooLong;
+    var psp_flags: c_int = PSP_O_CREAT;
+    if (flags.read) {
+        psp_flags |= PSP_O_RDWR;
+    } else {
+        psp_flags |= PSP_O_WRONLY;
+    }
+    if (flags.truncate) psp_flags |= PSP_O_TRUNC;
+    if (flags.exclusive) psp_flags |= PSP_O_EXCL;
+    const fd = io_mgr.sceIoOpen(path_z, psp_flags, 0o777);
+    if (fd < 0) return error.AccessDenied;
+    return .{ .handle = fd, .flags = .{ .nonblocking = false } };
 }
 
 fn dirCreateFileAtomic(_: ?*anyopaque, _: Dir, _: []const u8, _: Dir.CreateFileAtomicOptions) Dir.CreateFileAtomicError!File.Atomic {
     @panic("Io.dirCreateFileAtomic not implemented");
 }
 
-fn dirOpenFile(_: ?*anyopaque, _: Dir, _: []const u8, _: File.OpenFlags) File.OpenError!File {
-    @panic("Io.dirOpenFile not implemented");
+fn dirOpenFile(_: ?*anyopaque, _: Dir, sub_path: []const u8, flags: File.OpenFlags) File.OpenError!File {
+    var path_buf: [1024]u8 = undefined;
+    const path_z = toNullTerminated(sub_path, &path_buf) orelse return error.NameTooLong;
+    const psp_flags: c_int = switch (flags.mode) {
+        .read_only => PSP_O_RDONLY,
+        .write_only => PSP_O_WRONLY,
+        .read_write => PSP_O_RDWR,
+    };
+    const fd = io_mgr.sceIoOpen(path_z, psp_flags, 0o777);
+    if (fd < 0) return error.FileNotFound;
+    return .{ .handle = fd, .flags = .{ .nonblocking = false } };
 }
 
-fn dirClose(_: ?*anyopaque, _: []const Dir) void {
-    @panic("Io.dirClose not implemented");
+fn dirClose(_: ?*anyopaque, dirs: []const Dir) void {
+    for (dirs) |dir| {
+        _ = io_mgr.sceIoDclose(dir.handle);
+    }
 }
 
-fn dirRead(_: ?*anyopaque, _: *Dir.Reader, _: []Dir.Entry) Dir.Reader.Error!usize {
-    @panic("Io.dirRead not implemented");
+fn dirRead(_: ?*anyopaque, reader: *Dir.Reader, buffer: []Dir.Entry) Dir.Reader.Error!usize {
+    const c_types = @import("../c/types.zig");
+    var count: usize = 0;
+    while (count < buffer.len) {
+        var dirent: c_types.SceIoDirent = undefined;
+        @memset(std.mem.asBytes(&dirent), 0);
+        const ret = io_mgr.sceIoDread(reader.dir.handle, &dirent);
+        if (ret <= 0) {
+            reader.state = .finished;
+            break;
+        }
+        const name_bytes: []const u8 = &dirent.d_name;
+        const name_len = std.mem.indexOfScalar(u8, name_bytes, 0) orelse name_bytes.len;
+        const name = name_bytes[0..name_len];
+        // Skip . and ..
+        if (std.mem.eql(u8, name, ".") or std.mem.eql(u8, name, "..")) continue;
+        // Copy name into the reader buffer so Entry.name has stable storage
+        const buf = reader.buffer;
+        if (name_len > buf.len) break;
+        @memcpy(buf[0..name_len], name_bytes[0..name_len]);
+        const kind: File.Kind = if (dirent.d_stat.st_attr & 0x10 != 0) .directory else .file;
+        buffer[count] = .{
+            .name = buf[0..name_len],
+            .kind = kind,
+            .inode = {},
+        };
+        count += 1;
+    }
+    return count;
 }
 
 fn dirRealPath(_: ?*anyopaque, _: Dir, _: []u8) Dir.RealPathError!usize {
@@ -421,8 +505,10 @@ fn fileLength(_: ?*anyopaque, _: File) File.LengthError!u64 {
     @panic("Io.fileLength not implemented");
 }
 
-fn fileClose(_: ?*anyopaque, _: []const File) void {
-    @panic("Io.fileClose not implemented");
+fn fileClose(_: ?*anyopaque, files: []const File) void {
+    for (files) |f| {
+        _ = io_mgr.sceIoClose(f.handle);
+    }
 }
 
 fn fileWritePositional(_: ?*anyopaque, _: File, _: []const u8, _: []const []const u8, _: usize, _: u64) File.WritePositionalError!usize {

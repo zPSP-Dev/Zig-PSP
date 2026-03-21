@@ -80,6 +80,7 @@ pub fn build(b: *std.Build) void {
         PSPBuildInfo{ .name = "error", .src_file = "examples/error.zig", .title = "SDK Error" },
         PSPBuildInfo{ .name = "panic", .src_file = "examples/panic.zig", .title = "SDK Panic" },
         PSPBuildInfo{ .name = "print", .src_file = "examples/print.zig", .title = "SDK Print" },
+        PSPBuildInfo{ .name = "io", .src_file = "examples/io.zig", .title = "SDK IO" },
     }) |example| {
         const example_exe = b.addExecutable(.{
             .name = "main",
