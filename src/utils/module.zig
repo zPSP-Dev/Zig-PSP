@@ -250,6 +250,7 @@ pub fn module_info(comptime name: []const u8, comptime module_attributes: Module
 // const pspos = @import("../pspos.zig");
 //Entry point - launches main through the thread above.
 pub export fn module_start(argc: c_uint, argv: ?*anyopaque) c_int {
-    const thid = threadman.sceKernelCreateThread("zig_user_main", _module_main_thread, 0x20, 256 * 1024, .{ .vfpu = true, .user = true }, null);
+    const stack_size: u32 = if (@hasDecl(root, "psp_stack_size")) root.psp_stack_size else 256 * 1024;
+    const thid = threadman.sceKernelCreateThread("zig_user_main", _module_main_thread, 0x20, stack_size, .{ .vfpu = true, .user = true }, null);
     return threadman.sceKernelStartThread(thid, argc, argv);
 }

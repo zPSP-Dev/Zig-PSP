@@ -109,10 +109,11 @@ The repository includes the following examples:
 | `time_random` | Clock resolution, timestamps, sleep, random number generation via `std.Io` |
 | `cwd` | Process working directory — get and set CWD via `std.Io` |
 | `dir_file` | Full directory and file operations — create, stat, seek, rename, delete via `std.Io` |
+| `network` | WiFi init, DNS lookup, HTTP GET over TCP via `sdk.extra.net` + `sceNetInet*` |
 
 ## std.Io Integration
 
-Zig-PSP implements a PSP-native `std.Io` vtable, allowing standard library I/O to work transparently on the PSP. This includes `std.debug.print`, file and directory operations, process CWD, clocks, sleep, and random number generation — all routed through PSP syscalls (`sceIo*`, `sceRtc*`, `sceKernelDelayThread`, etc.).
+Zig-PSP implements a PSP-native `std.Io` vtable, allowing standard library I/O to work transparently on the PSP. This includes `std.debug.print`, file and directory operations, process CWD, clocks, sleep, random number generation, and TCP/UDP networking — all routed through PSP syscalls (`sceIo*`, `sceRtc*`, `sceKernelDelayThread`, `sceNetInet*`, etc.).
 
 To enable `std.Io` in your app, add these declarations:
 
@@ -125,7 +126,19 @@ pub fn std_options_cwd() std.Io.Dir {
 }
 ```
 
-The vtable currently covers 43 of 56 feasible functions (77%) — full directory, file, time/random, stderr, process CWD, and cancellation support. Network operations (`sceNet*`) are the remaining 13. See `ISSUE_41.md` for detailed status.
+The vtable covers all 56 feasible functions (100%) — directory, file, time/random, stderr, process CWD, cancellation, and network support. See `ISSUE_41.md` for detailed status.
+
+### Networking
+
+To use WiFi networking, initialize the stack with `sdk.extra.net`:
+
+```zig
+try sdk.extra.net.init();
+defer sdk.extra.net.deinit();
+try sdk.extra.net.connectToApctl(1, 30_000_000); // connect to saved network #1
+```
+
+After initialization, the `std.Io` network vtable functions (`netConnectIp`, `netRead`, `netWrite`, etc.) and raw `sceNetInet*` socket calls are both available.
 
 ## Comparisons To C/C++
 
