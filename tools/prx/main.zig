@@ -28,6 +28,8 @@ const SHT_PRXRELOC: u32 = 0x700000A0;
 const SHF_ALLOC: u32 = 2;
 const SHF_EXECINSTR: u32 = 4;
 
+const R_MIPS_HI16: u8 = 5;
+const R_MIPS_LO16: u8 = 6;
 const R_MIPS_PC16: u8 = 10;
 
 // On-disk sizes (all little-endian)
@@ -400,16 +402,62 @@ fn processRelocs(allocator: std.mem.Allocator, sections: []ElfSection, head: Elf
             out_count += 1;
         }
 
+        // Ensure each R_MIPS_HI16 is immediately followed by its paired LO16
+        // so the PSP kernel's sequential pairing scan works correctly.
+        sortHiLoPairs(new_rels[0..out_count]);
+
         const new_size: u32 = @intCast(out_count * REL_SIZE);
-        if (out_count < rel_count) {
-            sections[i].size = new_size;
-            if (new_size == 0) {
-                sections[i].output = false;
-            } else {
-                // Copy filtered relocations back into the data slice
-                const bytes = std.mem.sliceAsBytes(new_rels[0..out_count]);
-                @memcpy(sections[i].data[0..new_size], bytes);
+        sections[i].size = new_size;
+        if (new_size == 0) {
+            sections[i].output = false;
+        } else {
+            // Always write back: reloc order may have changed even when the
+            // entry count did not.
+            const bytes = std.mem.sliceAsBytes(new_rels[0..out_count]);
+            @memcpy(sections[i].data[0..new_size], bytes);
+        }
+    }
+}
+
+// sortHiLoPairs ensures each R_MIPS_HI16 is immediately followed by its
+// canonical paired R_MIPS_LO16 (same symbol index) in the relocation table.
+//
+// The PSP kernel pairs HI16 with the next LO16 in the relocation table
+// (sequential scan, no symbol matching).  When the compiler interleaves
+// multiple HI16/LO16 pairs (e.g. HI16_A, HI16_B, LO16_B, LO16_A), the
+// kernel would mismatch them, causing wrong address reconstruction and a
+// bus-error crash at runtime.  Reordering fixes the pairing without
+// changing the meaning of any individual relocation.
+fn sortHiLoPairs(rels: []Elf32_Rel) void {
+    var i: usize = 0;
+    while (i < rels.len) : (i += 1) {
+        if (elfRelType(rels[i].r_info) != R_MIPS_HI16) continue;
+
+        const hi_sym = elfRelSym(rels[i].r_info);
+
+        // Find the canonical paired LO16: first unplaced LO16 with the same
+        // symbol index after position i.
+        var lo_pos: ?usize = null;
+        for (i + 1..rels.len) |j| {
+            if (elfRelType(rels[j].r_info) == R_MIPS_LO16 and
+                elfRelSym(rels[j].r_info) == hi_sym)
+            {
+                lo_pos = j;
+                break;
             }
+        }
+
+        if (lo_pos) |lp| {
+            if (lp != i + 1) {
+                // Move rels[lp] to position i+1 by rotating the slice.
+                const lo_entry = rels[lp];
+                var k: usize = lp;
+                while (k > i + 1) : (k -= 1) {
+                    rels[k] = rels[k - 1];
+                }
+                rels[i + 1] = lo_entry;
+            }
+            i += 1; // advance past the LO16 we just placed
         }
     }
 }
