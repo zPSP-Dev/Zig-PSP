@@ -147,7 +147,7 @@ fn get_psp_target(b: *std.Build) std.Build.ResolvedTarget {
 
     const psp_target = b.resolveTargetQuery(.{
         .cpu_arch = .mipsel,
-        .os_tag = .freestanding,
+        .os_tag = .psp,
         .cpu_model = .{ .explicit = &std.Target.mips.cpu.mips2 },
         .cpu_features_add = feature_set,
     });

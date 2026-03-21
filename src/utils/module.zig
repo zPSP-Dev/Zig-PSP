@@ -27,6 +27,8 @@ pub fn _module_main_thread(argc: usize, _: ?*anyopaque) callconv(.c) c_int {
 
     const fn_info = @typeInfo(@TypeOf(root.main)).@"fn";
 
+    psp_io.init();
+
     // PSP is freestanding: Args.vector is void, Environ.block is GlobalBlock.
     // arena and gpa are backed by psp_page_allocator; io/environ_map are
     // unused on freestanding and left undefined.
@@ -35,7 +37,7 @@ pub fn _module_main_thread(argc: usize, _: ?*anyopaque) callconv(.c) c_int {
 
     const init: std.process.Init = .{
         .minimal = .{
-            .args = .{ .vector = {} },
+            .args = .{ .vector = &.{} },
             .environ = .{ .block = .empty },
         },
         .arena = &arena_allocator,

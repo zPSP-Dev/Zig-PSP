@@ -49,7 +49,7 @@ pub fn main(init: std.process.Init) !void {
     // [5] ArrayList — exercises alloc, resize/remap, and free in a loop.
     // In Zig 0.15, ArrayList is unmanaged; the allocator is passed per-call.
     {
-        var list = std.ArrayList(u32){};
+        var list = std.ArrayList(u32){ .items = &.{}, .capacity = 0 };
         defer list.deinit(gpa);
 
         for (0..10) |i| try list.append(gpa, @intCast(i));
