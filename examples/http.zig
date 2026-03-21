@@ -17,7 +17,7 @@ const sdk = @import("pspsdk");
 
 pub const panic = sdk.extra.debug.panic;
 
-pub const std_options: std.Options = .{};
+pub const std_options: std.Options = .{ .http_disable_tls = true };
 pub const std_options_debug_threaded_io: ?*std.Io.Threaded = null;
 pub const std_options_debug_io: std.Io = sdk.extra.Io.psp_io;
 
