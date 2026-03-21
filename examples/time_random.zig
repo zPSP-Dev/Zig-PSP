@@ -21,11 +21,6 @@ pub const panic = sdk.extra.debug.panic;
 pub const std_options_debug_threaded_io: ?*std.Io.Threaded = null;
 pub const std_options_debug_io: std.Io = sdk.extra.Io.psp_io;
 
-pub const os = struct {
-    pub const PATH_MAX: usize = 256;
-    pub const NAME_MAX: usize = 256;
-};
-
 pub fn std_options_cwd() std.Io.Dir {
     return .{ .handle = -1 };
 }
