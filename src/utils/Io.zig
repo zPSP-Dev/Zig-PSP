@@ -159,11 +159,32 @@ var stderr_writer: File.Writer = .{
     .mode = .streaming,
 };
 
-pub fn init() void {
+pub fn init(arg0: ?[*:0]const u8) void {
     stdin_fd = stdio.sceKernelStdin();
     stdout_fd = stdio.sceKernelStdout();
     stderr_fd = stdio.sceKernelStderr();
     stderr_writer.file = .{ .handle = stderr_fd, .flags = .{ .nonblocking = false } };
+
+    // Derive initial cwd from arg0 (program path, e.g. "ms0:/PSP/GAME/APP/EBOOT.PBP")
+    if (arg0) |path_ptr| {
+        const path = std.mem.sliceTo(path_ptr, 0);
+        if (path.len > 0) {
+            // Find last '/' to get the directory portion
+            if (std.mem.lastIndexOfScalar(u8, path, '/')) |last_slash| {
+                const dir = path[0..last_slash];
+                if (dir.len > 0 and dir.len < cwd_buf.len) {
+                    @memcpy(cwd_buf[0..dir.len], dir);
+                    cwd_len = dir.len;
+                    cwd_initialized = true;
+                    // Also set the PSP kernel's cwd
+                    var chdir_buf: [1024]u8 = undefined;
+                    if (toNullTerminated(dir, &chdir_buf)) |path_z| {
+                        _ = io_mgr.sceIoChdir(path_z);
+                    }
+                }
+            }
+        }
+    }
 }
 
 // ── fd→path tracking table ────────────────────────────────────────────

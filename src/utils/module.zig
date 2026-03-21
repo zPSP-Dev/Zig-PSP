@@ -22,12 +22,18 @@ pub fn exitErr() void {
 const bad_main_ret = @compileError("Where is this from?!");
 
 //This calls your main function as a thread.
-pub fn _module_main_thread(argc: usize, _: ?*anyopaque) callconv(.c) c_int {
-    _ = argc;
-
+pub fn _module_main_thread(argc: usize, argv: ?*anyopaque) callconv(.c) c_int {
     const fn_info = @typeInfo(@TypeOf(root.main)).@"fn";
 
-    psp_io.init();
+    // Extract arg0 (program path) from the PSP argument buffer.
+    // On PSP, argv points to packed null-terminated strings; the first
+    // is the executable path (e.g. "ms0:/PSP/GAME/APP/EBOOT.PBP").
+    const arg0: ?[*:0]const u8 = if (argv != null and argc > 0)
+        @ptrCast(@alignCast(argv.?))
+    else
+        null;
+
+    psp_io.init(arg0);
 
     // PSP is freestanding: Args.vector is void, Environ.block is GlobalBlock.
     // arena and gpa are backed by psp_page_allocator; io/environ_map are
