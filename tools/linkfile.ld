@@ -58,7 +58,9 @@ SECTIONS
 
    /* Compiler-generated read-only data. */
    .rodata         : { *(.rodata .rodata.* .gnu.linkonce.r.*) }
+   __eh_frame_hdr_start = .;
    .eh_frame_hdr   : { *(.eh_frame_hdr) }
+   __eh_frame_hdr_end = .;
    .eh_frame       : { KEEP(*(.eh_frame)) }
 
    /* Read-write data. */

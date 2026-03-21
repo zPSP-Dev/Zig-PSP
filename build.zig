@@ -96,7 +96,7 @@ pub fn build(b: *std.Build) void {
                 .root_source_file = b.path(example.src_file),
                 .target = psp_target,
                 .optimize = psp_optimize,
-                .strip = false, // disable as cannot be used with "link_emit_relocs = true"
+                .strip = false,
             }),
         });
 
@@ -154,7 +154,7 @@ pub fn build(b: *std.Build) void {
 }
 
 fn get_psp_target(b: *std.Build) std.Build.ResolvedTarget {
-    var feature_set: std.Target.Cpu.Feature.Set = std.Target.Cpu.Feature.Set.empty;
+    var feature_set = std.Target.Cpu.Feature.Set.empty;
     feature_set.addFeature(@intFromEnum(std.Target.mips.Feature.single_float));
 
     const psp_target = b.resolveTargetQuery(.{
