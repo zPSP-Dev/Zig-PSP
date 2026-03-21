@@ -149,14 +149,10 @@ pub fn build(b: *std.Build) void {
 }
 
 fn get_psp_target(b: *std.Build) std.Build.ResolvedTarget {
-    var feature_set = std.Target.Cpu.Feature.Set.empty;
-    feature_set.addFeature(@intFromEnum(std.Target.mips.Feature.single_float));
-
     const psp_target = b.resolveTargetQuery(.{
         .cpu_arch = .mipsel,
         .os_tag = .psp,
-        .cpu_model = .{ .explicit = &std.Target.mips.cpu.mips2 },
-        .cpu_features_add = feature_set,
+        .cpu_model = .{ .explicit = &std.Target.mips.cpu.allegrex },
     });
 
     return psp_target;
