@@ -642,6 +642,14 @@ pub const in_addr = extern struct {
     s_addr: u32,
 };
 
+pub const sockaddr_in = extern struct {
+    sin_len: u8 = @sizeOf(sockaddr_in),
+    sin_family: u8 = 2, // AF_INET
+    sin_port: u16, // network byte order (big-endian)
+    sin_addr: in_addr,
+    sin_zero: [8]u8 = .{0} ** 8,
+};
+
 pub const pspUmdInfo = extern struct {
     size: c_uint,
     typec: c_uint,

@@ -11,6 +11,9 @@ const rtc = @import("../c/module/sceRtc.zig");
 const threadman = @import("../c/module/ThreadManForUser.zig");
 const utils_mod = @import("../c/module/UtilsForUser.zig");
 const io_mgr = @import("../c/module/IoFileMgrForUser.zig");
+const inet = @import("../c/module/sceNetInet.zig");
+const resolver = @import("../c/module/sceNetResolver.zig");
+const psp_net = @import("net.zig");
 const c_types = @import("../c/types.zig");
 
 const SceUID = c_types.SceUID;
@@ -231,24 +234,24 @@ fn lookupFdPath(fd: SceUID) ?[]const u8 {
 
 // ── ScePspDateTime ↔ Io.Timestamp helpers ─────────────────────────────
 
-// PSP RTC epoch is 2000-01-01 00:00:00 UTC.
-// Offset from Unix epoch (1970-01-01) to PSP epoch in seconds.
-const psp_epoch_offset_s: i96 = 946684800;
+// PSP RTC tick epoch is January 1, year 1 AD (confirmed by sceRtcGetCurrentTick output).
+// Offset from year 1 AD to Unix epoch (1970-01-01) in seconds.
+const psp_epoch_offset_s: i96 = 62135596800;
 
 fn pspDateTimeToTimestamp(dt: c_types.ScePspDateTime) Io.Timestamp {
     var tick: u64 = 0;
     _ = rtc.sceRtcGetTick(&dt, &tick);
-    // tick = microseconds since PSP epoch (2000-01-01)
+    // tick = microseconds since year 1 AD
     const tick_i96: i96 = @intCast(tick);
-    const ns = tick_i96 * 1000 + psp_epoch_offset_s * 1_000_000_000;
+    const ns = tick_i96 * 1000 - psp_epoch_offset_s * 1_000_000_000;
     return .{ .nanoseconds = ns };
 }
 
 fn timestampToPspDateTime(ts: Io.Timestamp) c_types.ScePspDateTime {
-    // Convert nanoseconds since Unix epoch → microseconds since PSP epoch
+    // Convert nanoseconds since Unix epoch → microseconds since year 1 AD
     const ns = ts.nanoseconds;
-    const us_since_psp: i96 = @divTrunc(ns, 1000) - psp_epoch_offset_s * 1_000_000;
-    var tick: u64 = if (us_since_psp < 0) 0 else @intCast(us_since_psp);
+    const us_since_year1: i96 = @divTrunc(ns, 1000) + psp_epoch_offset_s * 1_000_000;
+    var tick: u64 = if (us_since_year1 < 0) 0 else @intCast(us_since_year1);
     var dt: c_types.ScePspDateTime = undefined;
     _ = rtc.sceRtcSetTick(&dt, &tick);
     return dt;
@@ -284,15 +287,19 @@ const PSP_SEEK_END = 2;
 
 // ── Async/Concurrency (N/A on PSP) ───────────────────────────────────
 
+// PSP is single-core with no async runtime. We run the function synchronously
+// and return null, so Future.await/cancel just return the already-written result.
 fn async(
     _: ?*anyopaque,
-    _: []u8,
+    result_ptr: []u8,
+    result_align: std.mem.Alignment,
+    args_ptr: []const u8,
     _: std.mem.Alignment,
-    _: []const u8,
-    _: std.mem.Alignment,
-    _: *const fn (*const anyopaque, *anyopaque) void,
+    start_fn: *const fn (*const anyopaque, *anyopaque) void,
 ) ?*Io.AnyFuture {
-    @panic("Io.async not implemented");
+    _ = result_align;
+    start_fn(args_ptr.ptr, result_ptr.ptr);
+    return null; // result already populated — await/cancel see null and return it
 }
 
 fn concurrent(
@@ -303,7 +310,7 @@ fn concurrent(
     _: std.mem.Alignment,
     _: *const fn (*const anyopaque, *anyopaque) void,
 ) Io.ConcurrentError!*Io.AnyFuture {
-    @panic("Io.concurrent not implemented");
+    return error.ConcurrencyUnavailable;
 }
 
 fn await(
@@ -312,7 +319,7 @@ fn await(
     _: []u8,
     _: std.mem.Alignment,
 ) void {
-    @panic("Io.await not implemented");
+    // Should never be called — async always returns null
 }
 
 fn cancel(
@@ -321,17 +328,18 @@ fn cancel(
     _: []u8,
     _: std.mem.Alignment,
 ) void {
-    @panic("Io.cancel not implemented");
+    // Should never be called — async always returns null
 }
 
+// Group operations: run synchronously, leave token null so await/cancel are no-ops.
 fn groupAsync(
     _: ?*anyopaque,
     _: *Io.Group,
-    _: []const u8,
+    args_ptr: []const u8,
     _: std.mem.Alignment,
-    _: *const fn (*const anyopaque) void,
+    start_fn: *const fn (*const anyopaque) void,
 ) void {
-    @panic("Io.groupAsync not implemented");
+    start_fn(args_ptr.ptr);
 }
 
 fn groupConcurrent(
@@ -341,20 +349,14 @@ fn groupConcurrent(
     _: std.mem.Alignment,
     _: *const fn (*const anyopaque) void,
 ) Io.ConcurrentError!void {
-    @panic("Io.groupConcurrent not implemented");
+    return error.ConcurrencyUnavailable;
 }
 
-fn groupAwait(_: ?*anyopaque, _: *Io.Group, _: *anyopaque) Io.Cancelable!void {
-    @panic("Io.groupAwait not implemented");
-}
+fn groupAwait(_: ?*anyopaque, _: *Io.Group, _: *anyopaque) Io.Cancelable!void {}
 
-fn groupCancel(_: ?*anyopaque, _: *Io.Group, _: *anyopaque) void {
-    @panic("Io.groupCancel not implemented");
-}
+fn groupCancel(_: ?*anyopaque, _: *Io.Group, _: *anyopaque) void {}
 
-fn recancel(_: ?*anyopaque) void {
-    @panic("Io.recancel not implemented");
-}
+fn recancel(_: ?*anyopaque) void {}
 
 // ── Cancellation/Sync ─────────────────────────────────────────────────
 
@@ -364,21 +366,16 @@ fn swapCancelProtection(_: ?*anyopaque, new_val: Io.CancelProtection) Io.CancelP
     return old;
 }
 
-fn checkCancel(_: ?*anyopaque) Io.Cancelable!void {
-    @panic("Io.checkCancel not implemented");
-}
+// PSP is single-threaded from the Io perspective — cancellation is a no-op.
+fn checkCancel(_: ?*anyopaque) Io.Cancelable!void {}
 
-fn futexWait(_: ?*anyopaque, _: *const u32, _: u32, _: Io.Timeout) Io.Cancelable!void {
-    @panic("Io.futexWait not implemented");
-}
+// Futex operations are no-ops on single-threaded PSP. The mutex fast path
+// (cmpxchgStrong) always succeeds, so these should never actually be reached.
+fn futexWait(_: ?*anyopaque, _: *const u32, _: u32, _: Io.Timeout) Io.Cancelable!void {}
 
-fn futexWaitUncancelable(_: ?*anyopaque, _: *const u32, _: u32) void {
-    @panic("Io.futexWaitUncancelable not implemented");
-}
+fn futexWaitUncancelable(_: ?*anyopaque, _: *const u32, _: u32) void {}
 
-fn futexWake(_: ?*anyopaque, _: *const u32, _: u32) void {
-    @panic("Io.futexWake not implemented");
-}
+fn futexWake(_: ?*anyopaque, _: *const u32, _: u32) void {}
 
 // ── Operate (Multiplexed I/O) ─────────────────────────────────────────
 
@@ -1143,9 +1140,9 @@ fn now(_: ?*anyopaque, clock: Io.Clock) Io.Timestamp {
             var tick: u64 = 0;
             _ = rtc.sceRtcGetCurrentTick(&tick);
             const tick_i96: i96 = @intCast(tick);
-            // PSP ticks are microseconds since 2000-01-01.
+            // PSP ticks are microseconds since year 1 AD.
             // Convert to nanoseconds since Unix epoch.
-            const ns = tick_i96 * 1000 + psp_epoch_offset_s * 1_000_000_000;
+            const ns = tick_i96 * 1000 - psp_epoch_offset_s * 1_000_000_000;
             return .{ .nanoseconds = ns };
         },
         .cpu_process, .cpu_thread => {
@@ -1180,7 +1177,7 @@ fn sleep(_: ?*anyopaque, timeout: Io.Timeout) Io.Cancelable!void {
         .deadline => |dl| blk: {
             var tick: u64 = 0;
             _ = rtc.sceRtcGetCurrentTick(&tick);
-            const now_ns: i96 = @as(i96, @intCast(tick)) * 1000 + psp_epoch_offset_s * 1_000_000_000;
+            const now_ns: i96 = @as(i96, @intCast(tick)) * 1000 - psp_epoch_offset_s * 1_000_000_000;
             const delta = dl.raw.nanoseconds - now_ns;
             if (delta <= 0) break :blk 0;
             const val = @divTrunc(delta, 1000);
@@ -1229,68 +1226,290 @@ fn randomSecure(_: ?*anyopaque, buf: []u8) Io.RandomSecureError!void {
     fillRandom(buf);
 }
 
-// ── Network (not yet implemented) ─────────────────────────────────────
+// ── Network ───────────────────────────────────────────────────────────
 
-fn netListenIp(_: ?*anyopaque, _: *const net.IpAddress, _: net.IpAddress.ListenOptions) net.IpAddress.ListenError!net.Socket {
-    @panic("Io.netListenIp not implemented");
+fn ipAddressToSockaddr(addr: *const net.IpAddress) c_types.sockaddr_in {
+    switch (addr.*) {
+        .ip4 => |ip4| {
+            return .{
+                .sin_port = @byteSwap(ip4.port), // host→network byte order
+                .sin_addr = .{ .s_addr = @bitCast(ip4.bytes) },
+            };
+        },
+        .ip6 => |ip6| {
+            // Map IPv6-mapped IPv4 to plain IPv4; pure IPv6 not supported on PSP
+            if (net.Ip4Address.fromIp6(ip6)) |ip4| {
+                return .{
+                    .sin_port = @byteSwap(ip4.port),
+                    .sin_addr = .{ .s_addr = @bitCast(ip4.bytes) },
+                };
+            }
+            // No IPv6 on PSP — fall back to unspecified
+            return .{
+                .sin_port = @byteSwap(ip6.port),
+                .sin_addr = .{ .s_addr = 0 },
+            };
+        },
+    }
 }
 
-fn netAccept(_: ?*anyopaque, _: net.Socket.Handle, _: net.Server.AcceptOptions) net.Server.AcceptError!net.Socket {
-    @panic("Io.netAccept not implemented");
+fn sockaddrToIpAddress(sa: *const c_types.sockaddr_in) net.IpAddress {
+    return .{ .ip4 = .{
+        .bytes = @bitCast(sa.sin_addr.s_addr),
+        .port = @byteSwap(sa.sin_port),
+    } };
 }
 
-fn netBindIp(_: ?*anyopaque, _: *const net.IpAddress, _: net.IpAddress.BindOptions) net.IpAddress.BindError!net.Socket {
-    @panic("Io.netBindIp not implemented");
+fn socketModeToType(mode: net.Socket.Mode) c_int {
+    return switch (mode) {
+        .stream => psp_net.SOCK_STREAM,
+        .dgram => psp_net.SOCK_DGRAM,
+        else => psp_net.SOCK_STREAM,
+    };
 }
 
-fn netConnectIp(_: ?*anyopaque, _: *const net.IpAddress, _: net.IpAddress.ConnectOptions) net.IpAddress.ConnectError!net.Socket {
-    @panic("Io.netConnectIp not implemented");
+fn createSocket(sock_type: c_int, protocol: c_int) !c_int {
+    const fd = inet.sceNetInetSocket(psp_net.AF_INET, sock_type, protocol);
+    if (fd < 0) return error.SystemResources;
+    return fd;
+}
+
+fn netListenIp(_: ?*anyopaque, addr: *const net.IpAddress, options: net.IpAddress.ListenOptions) net.IpAddress.ListenError!net.Socket {
+    const sock_type = socketModeToType(options.mode);
+    const fd = inet.sceNetInetSocket(psp_net.AF_INET, sock_type, 0);
+    if (fd < 0) return error.SystemResources;
+
+    if (options.reuse_address) {
+        const one: c_int = 1;
+        _ = inet.sceNetInetSetsockopt(fd, psp_net.SOL_SOCKET, psp_net.SO_REUSEADDR, &one, @sizeOf(c_int));
+    }
+
+    var sa = ipAddressToSockaddr(addr);
+    if (inet.sceNetInetBind(fd, &sa, @sizeOf(c_types.sockaddr_in)) < 0) {
+        _ = inet.sceNetInetClose(fd);
+        return error.AddressInUse;
+    }
+
+    if (inet.sceNetInetListen(fd, @intCast(options.kernel_backlog)) < 0) {
+        _ = inet.sceNetInetClose(fd);
+        return error.AddressInUse;
+    }
+
+    // Read back the bound address (for ephemeral port)
+    var bound_sa: c_types.sockaddr_in = undefined;
+    var sa_len: c_types.socklen_t = @sizeOf(c_types.sockaddr_in);
+    _ = inet.sceNetInetGetsockname(fd, &bound_sa, &sa_len);
+
+    return .{
+        .handle = fd,
+        .address = sockaddrToIpAddress(&bound_sa),
+    };
+}
+
+fn netAccept(_: ?*anyopaque, handle: net.Socket.Handle, _: net.Server.AcceptOptions) net.Server.AcceptError!net.Socket {
+    var client_sa: c_types.sockaddr_in = undefined;
+    var sa_len: c_types.socklen_t = @sizeOf(c_types.sockaddr_in);
+    const client_fd = inet.sceNetInetAccept(handle, &client_sa, &sa_len);
+    if (client_fd < 0) return error.ConnectionAborted;
+    return .{
+        .handle = client_fd,
+        .address = sockaddrToIpAddress(&client_sa),
+    };
+}
+
+fn netBindIp(_: ?*anyopaque, addr: *const net.IpAddress, options: net.IpAddress.BindOptions) net.IpAddress.BindError!net.Socket {
+    const sock_type = socketModeToType(options.mode);
+    const fd = inet.sceNetInetSocket(psp_net.AF_INET, sock_type, 0);
+    if (fd < 0) return error.SystemResources;
+
+    var sa = ipAddressToSockaddr(addr);
+    if (inet.sceNetInetBind(fd, &sa, @sizeOf(c_types.sockaddr_in)) < 0) {
+        _ = inet.sceNetInetClose(fd);
+        return error.AddressInUse;
+    }
+
+    var bound_sa: c_types.sockaddr_in = undefined;
+    var sa_len: c_types.socklen_t = @sizeOf(c_types.sockaddr_in);
+    _ = inet.sceNetInetGetsockname(fd, &bound_sa, &sa_len);
+
+    return .{
+        .handle = fd,
+        .address = sockaddrToIpAddress(&bound_sa),
+    };
+}
+
+fn netConnectIp(_: ?*anyopaque, addr: *const net.IpAddress, options: net.IpAddress.ConnectOptions) net.IpAddress.ConnectError!net.Socket {
+    const sock_type = socketModeToType(options.mode);
+    const fd = inet.sceNetInetSocket(psp_net.AF_INET, sock_type, 0);
+    if (fd < 0) return error.SystemResources;
+
+    var sa = ipAddressToSockaddr(addr);
+    if (inet.sceNetInetConnect(fd, &sa, @sizeOf(c_types.sockaddr_in)) < 0) {
+        _ = inet.sceNetInetClose(fd);
+        return error.ConnectionRefused;
+    }
+
+    return .{
+        .handle = fd,
+        .address = addr.*,
+    };
 }
 
 fn netListenUnix(_: ?*anyopaque, _: *const net.UnixAddress, _: net.UnixAddress.ListenOptions) net.UnixAddress.ListenError!net.Socket.Handle {
-    @panic("Io.netListenUnix not implemented");
+    return error.AddressFamilyUnsupported;
 }
 
 fn netConnectUnix(_: ?*anyopaque, _: *const net.UnixAddress) net.UnixAddress.ConnectError!net.Socket.Handle {
-    @panic("Io.netConnectUnix not implemented");
+    return error.AddressFamilyUnsupported;
 }
 
 fn netSocketCreatePair(_: ?*anyopaque, _: net.Socket.CreatePairOptions) net.Socket.CreatePairError![2]net.Socket {
-    @panic("Io.netSocketCreatePair not implemented");
+    return error.AddressFamilyUnsupported;
 }
 
-fn netSend(_: ?*anyopaque, _: net.Socket.Handle, _: []net.OutgoingMessage, _: net.SendFlags) struct { ?net.Socket.SendError, usize } {
-    @panic("Io.netSend not implemented");
+fn netSend(_: ?*anyopaque, handle: net.Socket.Handle, messages: []net.OutgoingMessage, flags: net.SendFlags) struct { ?net.Socket.SendError, usize } {
+    _ = flags;
+    var total: usize = 0;
+    for (messages) |*msg| {
+        const sa = ipAddressToSockaddr(msg.address);
+        const sent = inet.sceNetInetSendto(
+            handle,
+            msg.data_ptr,
+            msg.data_len,
+            0,
+            &sa,
+            @sizeOf(c_types.sockaddr_in),
+        );
+        if (sent < 0) return .{ error.SystemResources, total };
+        const sent_u: usize = @intCast(sent);
+        msg.data_len = sent_u;
+        total += sent_u;
+    }
+    return .{ null, total };
 }
 
-fn netRead(_: ?*anyopaque, _: net.Socket.Handle, _: [][]u8) net.Stream.Reader.Error!usize {
-    @panic("Io.netRead not implemented");
+fn netRead(_: ?*anyopaque, handle: net.Socket.Handle, bufs: [][]u8) net.Stream.Reader.Error!usize {
+    var total: usize = 0;
+    for (bufs) |buf| {
+        const n = inet.sceNetInetRecv(handle, buf.ptr, buf.len, 0);
+        if (n < 0) return error.ConnectionResetByPeer;
+        if (n == 0) break;
+        total += @intCast(n);
+        if (@as(usize, @intCast(n)) < buf.len) break;
+    }
+    return total;
 }
 
-fn netWrite(_: ?*anyopaque, _: net.Socket.Handle, _: []const u8, _: []const []const u8, _: usize) net.Stream.Writer.Error!usize {
-    @panic("Io.netWrite not implemented");
+fn netWrite(_: ?*anyopaque, handle: net.Socket.Handle, header: []const u8, payload: []const []const u8, splat: usize) net.Stream.Writer.Error!usize {
+    var total: usize = 0;
+    if (header.len > 0) {
+        const n = inet.sceNetInetSend(handle, header.ptr, header.len, 0);
+        if (n < 0) return error.ConnectionResetByPeer;
+        total += @intCast(n);
+    }
+    // Send all but the last element once
+    if (payload.len > 1) {
+        for (payload[0 .. payload.len - 1]) |chunk| {
+            if (chunk.len == 0) continue;
+            const n = inet.sceNetInetSend(handle, chunk.ptr, chunk.len, 0);
+            if (n < 0) return error.ConnectionResetByPeer;
+            total += @intCast(n);
+        }
+    }
+    // Send the last element `splat` times
+    if (payload.len > 0) {
+        const last = payload[payload.len - 1];
+        if (last.len > 0) {
+            for (0..splat) |_| {
+                const n = inet.sceNetInetSend(handle, last.ptr, last.len, 0);
+                if (n < 0) return error.ConnectionResetByPeer;
+                total += @intCast(n);
+            }
+        }
+    }
+    return total;
 }
 
-fn netWriteFile(_: ?*anyopaque, _: net.Socket.Handle, _: []const u8, _: *Io.File.Reader, _: Io.Limit) net.Stream.Writer.WriteFileError!usize {
-    @panic("Io.netWriteFile not implemented");
+fn netWriteFile(_: ?*anyopaque, handle: net.Socket.Handle, header: []const u8, file_reader: *Io.File.Reader, limit: Io.Limit) net.Stream.Writer.WriteFileError!usize {
+    var total: usize = 0;
+    if (header.len > 0) {
+        const n = inet.sceNetInetSend(handle, header.ptr, header.len, 0);
+        if (n < 0) return error.NetworkDown;
+        total += @intCast(n);
+    }
+    const max_bytes = @intFromEnum(limit);
+    var buf: [4096]u8 = undefined;
+    while (max_bytes == 0 or total < max_bytes) {
+        const to_read = if (max_bytes == 0) buf.len else @min(buf.len, max_bytes - total);
+        var read_bufs = [_][]u8{buf[0..to_read]};
+        const got = file_reader.interface.readVec(&read_bufs) catch break;
+        if (got == 0) break;
+        const n = inet.sceNetInetSend(handle, &buf, got, 0);
+        if (n < 0) return error.NetworkDown;
+        total += @intCast(n);
+    }
+    return total;
 }
 
-fn netClose(_: ?*anyopaque, _: []const net.Socket.Handle) void {
-    @panic("Io.netClose not implemented");
+fn netClose(_: ?*anyopaque, handles: []const net.Socket.Handle) void {
+    for (handles) |handle| {
+        _ = inet.sceNetInetClose(handle);
+    }
 }
 
-fn netShutdown(_: ?*anyopaque, _: net.Socket.Handle, _: net.ShutdownHow) net.ShutdownError!void {
-    @panic("Io.netShutdown not implemented");
+fn netShutdown(_: ?*anyopaque, handle: net.Socket.Handle, how: net.ShutdownHow) net.ShutdownError!void {
+    const psp_how: c_int = switch (how) {
+        .recv => psp_net.SHUT_RD,
+        .send => psp_net.SHUT_WR,
+        .both => psp_net.SHUT_RDWR,
+    };
+    if (inet.sceNetInetShutdown(handle, psp_how) < 0)
+        return error.ConnectionResetByPeer;
 }
 
 fn netInterfaceNameResolve(_: ?*anyopaque, _: *const net.Interface.Name) net.Interface.Name.ResolveError!net.Interface {
-    @panic("Io.netInterfaceNameResolve not implemented");
+    // PSP has only one network interface (WiFi)
+    return .{ .index = 1 };
 }
 
 fn netInterfaceName(_: ?*anyopaque, _: net.Interface) net.Interface.NameError!net.Interface.Name {
-    @panic("Io.netInterfaceName not implemented");
+    // PSP IFNAMESIZE is void, so Name.max_len = 0 — return zero-length name
+    return .{ .bytes = .{} };
 }
 
-fn netLookup(_: ?*anyopaque, _: net.HostName, _: *Io.Queue(net.HostName.LookupResult), _: net.HostName.LookupOptions) net.HostName.LookupError!void {
-    @panic("Io.netLookup not implemented");
+fn netLookup(_: ?*anyopaque, host_name: net.HostName, results: *Io.Queue(net.HostName.LookupResult), options: net.HostName.LookupOptions) net.HostName.LookupError!void {
+    // Contract: must close `results` before returning, even on error.
+    defer results.close(psp_io);
+
+    // Try parsing as literal IP first
+    if (net.IpAddress.parseLiteral(host_name.bytes)) |parsed| {
+        var addr = parsed;
+        addr.setPort(options.port);
+        _ = results.put(psp_io, &.{.{ .address = addr }}, 1) catch return error.NameServerFailure;
+        return;
+    } else |_| {}
+
+    // DNS resolve via sceNetResolver
+    var rid: c_int = 0;
+    var resolver_buf: [1024]u8 = undefined;
+    if (resolver.sceNetResolverCreate(&rid, &resolver_buf, resolver_buf.len) < 0)
+        return error.NameServerFailure;
+    defer _ = resolver.sceNetResolverDelete(rid);
+
+    // Null-terminate the hostname
+    var name_buf: [256]u8 = undefined;
+    if (host_name.bytes.len >= name_buf.len) return error.UnknownHostName;
+    @memcpy(name_buf[0..host_name.bytes.len], host_name.bytes);
+    name_buf[host_name.bytes.len] = 0;
+
+    var resolved_addr: c_types.in_addr = undefined;
+    if (resolver.sceNetResolverStartNtoA(rid, @ptrCast(&name_buf), &resolved_addr, 5, 3) < 0)
+        return error.UnknownHostName;
+
+    const ip4_bytes: [4]u8 = @bitCast(resolved_addr.s_addr);
+    const result: net.HostName.LookupResult = .{ .address = .{ .ip4 = .{
+        .bytes = ip4_bytes,
+        .port = options.port,
+    } } };
+    _ = results.put(psp_io, &.{result}, 1) catch return error.NameServerFailure;
 }

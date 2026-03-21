@@ -876,6 +876,7 @@ pub const extra = struct {
     pub const debug = @import("utils/debug.zig");
     pub const Io = @import("utils/Io.zig");
     pub const module = @import("utils/module.zig");
+    pub const net = @import("utils/net.zig");
     pub const utils = @import("utils/utils.zig");
     pub const vram = @import("utils/vram.zig");
 };
