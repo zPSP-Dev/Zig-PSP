@@ -7,6 +7,13 @@ const Terminal = std.Io.Terminal;
 const net = std.Io.net;
 
 const stdio = @import("../c/module/StdioForUser.zig");
+const rtc = @import("../c/module/sceRtc.zig");
+const threadman = @import("../c/module/ThreadManForUser.zig");
+const utils_mod = @import("../c/module/UtilsForUser.zig");
+const io_mgr = @import("../c/module/IoFileMgrForUser.zig");
+const c_types = @import("../c/types.zig");
+
+const SceUID = c_types.SceUID;
 
 /// A stub std.Io backed by this vtable.
 /// Every method panics; fill in the ones you need.
@@ -127,7 +134,7 @@ pub const vtable: Io.VTable = .{
     .netLookup = netLookup,
 };
 
-fn toNullTerminated(path: []const u8, buf: *[1024]u8) ?[*c]const c_char {
+fn toNullTerminated(path: []const u8, buf: *[1024]u8) ?[*c]const i8 {
     if (path.len >= buf.len) return null;
     @memcpy(buf[0..path.len], path);
     buf[path.len] = 0;
@@ -138,10 +145,10 @@ fn crashHandler(_: ?*anyopaque) void {
     @panic("Io.crashHandler not implemented");
 }
 
-// MAGIC GLOBAL STATE BLOCK
+// ── Global State ──────────────────────────────────────────────────────
+
 var cancel_protection: std.Io.CancelProtection = .unblocked;
 var stderr_locked: bool = false;
-const SceUID = @import("../c/types.zig").SceUID;
 var stdin_fd: SceUID = undefined;
 var stdout_fd: SceUID = undefined;
 var stderr_fd: SceUID = undefined;
@@ -159,7 +166,102 @@ pub fn init() void {
     stderr_writer.file = .{ .handle = stderr_fd, .flags = .{ .nonblocking = false } };
 }
 
-// FUNCTION BLOCK
+// ── fd→path tracking table ────────────────────────────────────────────
+
+const MAX_TRACKED_FDS = 32;
+const FdPathEntry = struct {
+    fd: SceUID = -1,
+    path: [1024]u8 = undefined,
+    len: usize = 0,
+};
+var fd_table: [MAX_TRACKED_FDS]FdPathEntry = [_]FdPathEntry{.{}} ** MAX_TRACKED_FDS;
+
+fn trackFd(fd: SceUID, path: []const u8) void {
+    // Find a free slot (fd == -1) or reuse one
+    for (&fd_table) |*entry| {
+        if (entry.fd == -1) {
+            const copy_len = @min(path.len, entry.path.len);
+            @memcpy(entry.path[0..copy_len], path[0..copy_len]);
+            entry.len = copy_len;
+            entry.fd = fd;
+            return;
+        }
+    }
+}
+
+fn untrackFd(fd: SceUID) void {
+    for (&fd_table) |*entry| {
+        if (entry.fd == fd) {
+            entry.fd = -1;
+            entry.len = 0;
+            return;
+        }
+    }
+}
+
+fn lookupFdPath(fd: SceUID) ?[]const u8 {
+    for (&fd_table) |*entry| {
+        if (entry.fd == fd) {
+            return entry.path[0..entry.len];
+        }
+    }
+    return null;
+}
+
+// ── ScePspDateTime ↔ Io.Timestamp helpers ─────────────────────────────
+
+// PSP RTC epoch is 2000-01-01 00:00:00 UTC.
+// Offset from Unix epoch (1970-01-01) to PSP epoch in seconds.
+const psp_epoch_offset_s: i96 = 946684800;
+
+fn pspDateTimeToTimestamp(dt: c_types.ScePspDateTime) Io.Timestamp {
+    var tick: u64 = 0;
+    _ = rtc.sceRtcGetTick(&dt, &tick);
+    // tick = microseconds since PSP epoch (2000-01-01)
+    const tick_i96: i96 = @intCast(tick);
+    const ns = tick_i96 * 1000 + psp_epoch_offset_s * 1_000_000_000;
+    return .{ .nanoseconds = ns };
+}
+
+fn timestampToPspDateTime(ts: Io.Timestamp) c_types.ScePspDateTime {
+    // Convert nanoseconds since Unix epoch → microseconds since PSP epoch
+    const ns = ts.nanoseconds;
+    const us_since_psp: i96 = @divTrunc(ns, 1000) - psp_epoch_offset_s * 1_000_000;
+    var tick: u64 = if (us_since_psp < 0) 0 else @intCast(us_since_psp);
+    var dt: c_types.ScePspDateTime = undefined;
+    _ = rtc.sceRtcSetTick(&dt, &tick);
+    return dt;
+}
+
+fn sceIoStatToFileStat(psp_stat: *const c_types.SceIoStat) File.Stat {
+    return .{
+        .inode = 0,
+        .nlink = 0,
+        .size = if (psp_stat.st_size < 0) 0 else @intCast(psp_stat.st_size),
+        .permissions = @enumFromInt(@as(u32, @bitCast(psp_stat.st_mode))),
+        .kind = if (psp_stat.st_attr & 0x10 != 0) .directory else .file,
+        .atime = pspDateTimeToTimestamp(psp_stat.st_atime),
+        .mtime = pspDateTimeToTimestamp(psp_stat.st_mtime),
+        .ctime = pspDateTimeToTimestamp(psp_stat.st_ctime),
+        .block_size = 0,
+    };
+}
+
+// ── PSP I/O constants ─────────────────────────────────────────────────
+
+const PSP_O_RDONLY = 0x0001;
+const PSP_O_WRONLY = 0x0002;
+const PSP_O_RDWR = PSP_O_RDONLY | PSP_O_WRONLY;
+const PSP_O_CREAT = 0x0200;
+const PSP_O_TRUNC = 0x0400;
+const PSP_O_APPEND = 0x0100;
+const PSP_O_EXCL = 0x0800;
+
+const PSP_SEEK_SET = 0;
+const PSP_SEEK_CUR = 1;
+const PSP_SEEK_END = 2;
+
+// ── Async/Concurrency (N/A on PSP) ───────────────────────────────────
 
 fn async(
     _: ?*anyopaque,
@@ -233,9 +335,11 @@ fn recancel(_: ?*anyopaque) void {
     @panic("Io.recancel not implemented");
 }
 
-fn swapCancelProtection(_: ?*anyopaque, new: Io.CancelProtection) Io.CancelProtection {
+// ── Cancellation/Sync ─────────────────────────────────────────────────
+
+fn swapCancelProtection(_: ?*anyopaque, new_val: Io.CancelProtection) Io.CancelProtection {
     const old = cancel_protection;
-    cancel_protection = new;
+    cancel_protection = new_val;
     return old;
 }
 
@@ -255,15 +359,7 @@ fn futexWake(_: ?*anyopaque, _: *const u32, _: u32) void {
     @panic("Io.futexWake not implemented");
 }
 
-const io_mgr = @import("../c/module/IoFileMgrForUser.zig");
-
-const PSP_O_RDONLY = 0x0001;
-const PSP_O_WRONLY = 0x0002;
-const PSP_O_RDWR = PSP_O_RDONLY | PSP_O_WRONLY;
-const PSP_O_CREAT = 0x0200;
-const PSP_O_TRUNC = 0x0400;
-const PSP_O_APPEND = 0x0100;
-const PSP_O_EXCL = 0x0800;
+// ── Operate (Multiplexed I/O) ─────────────────────────────────────────
 
 fn pspWrite(fd: SceUID, buf: []const u8) error{WriteFailed}!usize {
     const ret = io_mgr.sceIoWrite(fd, buf.ptr, buf.len);
@@ -290,7 +386,6 @@ fn operate(_: ?*anyopaque, op: Io.Operation) Io.Cancelable!Io.Operation.Result {
         },
         .file_write_streaming => |w| {
             const fd = w.file.handle;
-            if (fd == 2) @panic("A!");
             var written: usize = 0;
 
             // Write header
@@ -324,6 +419,8 @@ fn operate(_: ?*anyopaque, op: Io.Operation) Io.Cancelable!Io.Operation.Result {
     }
 }
 
+// ── Batch (N/A on PSP) ───────────────────────────────────────────────
+
 fn batchAwaitAsync(_: ?*anyopaque, _: *Io.Batch) Io.Cancelable!void {
     @panic("Io.batchAwaitAsync not implemented");
 }
@@ -336,6 +433,8 @@ fn batchCancel(_: ?*anyopaque, _: *Io.Batch) void {
     @panic("Io.batchCancel not implemented");
 }
 
+// ── Directory operations ──────────────────────────────────────────────
+
 fn dirCreateDir(_: ?*anyopaque, _: Dir, sub_path: []const u8, _: Dir.Permissions) Dir.CreateDirError!void {
     var path_buf: [1024]u8 = undefined;
     const path_z = toNullTerminated(sub_path, &path_buf) orelse return error.NameTooLong;
@@ -343,12 +442,67 @@ fn dirCreateDir(_: ?*anyopaque, _: Dir, sub_path: []const u8, _: Dir.Permissions
     if (ret < 0) return error.AccessDenied;
 }
 
-fn dirCreateDirPath(_: ?*anyopaque, _: Dir, _: []const u8, _: Dir.Permissions) Dir.CreateDirPathError!Dir.CreatePathStatus {
-    @panic("Io.dirCreateDirPath not implemented");
+fn dirCreateDirPath(_: ?*anyopaque, _: Dir, sub_path: []const u8, _: Dir.Permissions) Dir.CreateDirPathError!Dir.CreatePathStatus {
+    var path_buf: [1024]u8 = undefined;
+    if (sub_path.len >= path_buf.len) return error.NameTooLong;
+    @memcpy(path_buf[0..sub_path.len], sub_path);
+
+    // Create each component incrementally
+    var created_any = false;
+    var i: usize = 0;
+    while (i < sub_path.len) {
+        if (path_buf[i] == '/') {
+            if (i > 0) {
+                path_buf[i] = 0;
+                const ret = io_mgr.sceIoMkdir(@ptrCast(path_buf[0..i :0].ptr), 0o777);
+                if (ret >= 0) created_any = true;
+                // Ignore errors (directory may already exist)
+                path_buf[i] = '/';
+            }
+            i += 1;
+            continue;
+        }
+        i += 1;
+    }
+    // Create the final component
+    path_buf[sub_path.len] = 0;
+    const ret = io_mgr.sceIoMkdir(@ptrCast(path_buf[0..sub_path.len :0].ptr), 0o777);
+    if (ret >= 0) return .created;
+    if (created_any) return .created;
+    // If the final mkdir failed, it might already exist
+    var stat_buf: c_types.SceIoStat = undefined;
+    const stat_ret = io_mgr.sceIoGetstat(@ptrCast(path_buf[0..sub_path.len :0].ptr), &stat_buf);
+    if (stat_ret >= 0 and stat_buf.st_attr & 0x10 != 0) return .existed;
+    return error.AccessDenied;
 }
 
-fn dirCreateDirPathOpen(_: ?*anyopaque, _: Dir, _: []const u8, _: Dir.Permissions, _: Dir.OpenOptions) Dir.CreateDirPathOpenError!Dir {
-    @panic("Io.dirCreateDirPathOpen not implemented");
+fn dirCreateDirPathOpen(_: ?*anyopaque, _: Dir, sub_path: []const u8, _: Dir.Permissions, _: Dir.OpenOptions) Dir.CreateDirPathOpenError!Dir {
+    var path_buf: [1024]u8 = undefined;
+    if (sub_path.len >= path_buf.len) return error.NameTooLong;
+    @memcpy(path_buf[0..sub_path.len], sub_path);
+
+    // Create each component incrementally
+    var i: usize = 0;
+    while (i < sub_path.len) {
+        if (path_buf[i] == '/') {
+            if (i > 0) {
+                path_buf[i] = 0;
+                _ = io_mgr.sceIoMkdir(@ptrCast(path_buf[0..i :0].ptr), 0o777);
+                path_buf[i] = '/';
+            }
+            i += 1;
+            continue;
+        }
+        i += 1;
+    }
+    // Create final component
+    path_buf[sub_path.len] = 0;
+    _ = io_mgr.sceIoMkdir(@ptrCast(path_buf[0..sub_path.len :0].ptr), 0o777);
+
+    // Open it
+    const fd = io_mgr.sceIoDopen(@ptrCast(path_buf[0..sub_path.len :0].ptr));
+    if (fd < 0) return error.FileNotFound;
+    return .{ .handle = fd };
 }
 
 fn dirOpenDir(_: ?*anyopaque, _: Dir, sub_path: []const u8, _: Dir.OpenOptions) Dir.OpenError!Dir {
@@ -359,16 +513,31 @@ fn dirOpenDir(_: ?*anyopaque, _: Dir, sub_path: []const u8, _: Dir.OpenOptions) 
     return .{ .handle = fd };
 }
 
-fn dirStat(_: ?*anyopaque, _: Dir) Dir.StatError!Dir.Stat {
-    @panic("Io.dirStat not implemented");
+fn dirStat(_: ?*anyopaque, d: Dir) Dir.StatError!Dir.Stat {
+    const path = lookupFdPath(d.handle) orelse return error.AccessDenied;
+    var path_buf: [1024]u8 = undefined;
+    const path_z = toNullTerminated(path, &path_buf) orelse return error.AccessDenied;
+    var stat_buf: c_types.SceIoStat = undefined;
+    const ret = io_mgr.sceIoGetstat(path_z, &stat_buf);
+    if (ret < 0) return error.AccessDenied;
+    return sceIoStatToFileStat(&stat_buf);
 }
 
-fn dirStatFile(_: ?*anyopaque, _: Dir, _: []const u8, _: Dir.StatFileOptions) Dir.StatFileError!File.Stat {
-    @panic("Io.dirStatFile not implemented");
+fn dirStatFile(_: ?*anyopaque, _: Dir, sub_path: []const u8, _: Dir.StatFileOptions) Dir.StatFileError!File.Stat {
+    var path_buf: [1024]u8 = undefined;
+    const path_z = toNullTerminated(sub_path, &path_buf) orelse return error.NameTooLong;
+    var stat_buf: c_types.SceIoStat = undefined;
+    const ret = io_mgr.sceIoGetstat(path_z, &stat_buf);
+    if (ret < 0) return error.FileNotFound;
+    return sceIoStatToFileStat(&stat_buf);
 }
 
-fn dirAccess(_: ?*anyopaque, _: Dir, _: []const u8, _: Dir.AccessOptions) Dir.AccessError!void {
-    @panic("Io.dirAccess not implemented");
+fn dirAccess(_: ?*anyopaque, _: Dir, sub_path: []const u8, _: Dir.AccessOptions) Dir.AccessError!void {
+    var path_buf: [1024]u8 = undefined;
+    const path_z = toNullTerminated(sub_path, &path_buf) orelse return error.NameTooLong;
+    var stat_buf: c_types.SceIoStat = undefined;
+    const ret = io_mgr.sceIoGetstat(path_z, &stat_buf);
+    if (ret < 0) return error.FileNotFound;
 }
 
 fn dirCreateFile(_: ?*anyopaque, _: Dir, sub_path: []const u8, flags: File.CreateFlags) File.OpenError!File {
@@ -384,11 +553,12 @@ fn dirCreateFile(_: ?*anyopaque, _: Dir, sub_path: []const u8, flags: File.Creat
     if (flags.exclusive) psp_flags |= PSP_O_EXCL;
     const fd = io_mgr.sceIoOpen(path_z, psp_flags, 0o777);
     if (fd < 0) return error.AccessDenied;
+    trackFd(fd, sub_path);
     return .{ .handle = fd, .flags = .{ .nonblocking = false } };
 }
 
 fn dirCreateFileAtomic(_: ?*anyopaque, _: Dir, _: []const u8, _: Dir.CreateFileAtomicOptions) Dir.CreateFileAtomicError!File.Atomic {
-    @panic("Io.dirCreateFileAtomic not implemented");
+    return error.AccessDenied;
 }
 
 fn dirOpenFile(_: ?*anyopaque, _: Dir, sub_path: []const u8, flags: File.OpenFlags) File.OpenError!File {
@@ -401,6 +571,7 @@ fn dirOpenFile(_: ?*anyopaque, _: Dir, sub_path: []const u8, flags: File.OpenFla
     };
     const fd = io_mgr.sceIoOpen(path_z, psp_flags, 0o777);
     if (fd < 0) return error.FileNotFound;
+    trackFd(fd, sub_path);
     return .{ .handle = fd, .flags = .{ .nonblocking = false } };
 }
 
@@ -411,7 +582,6 @@ fn dirClose(_: ?*anyopaque, dirs: []const Dir) void {
 }
 
 fn dirRead(_: ?*anyopaque, reader: *Dir.Reader, buffer: []Dir.Entry) Dir.Reader.Error!usize {
-    const c_types = @import("../c/types.zig");
     var count: usize = 0;
     while (count < buffer.len) {
         var dirent: c_types.SceIoDirent = undefined;
@@ -434,7 +604,7 @@ fn dirRead(_: ?*anyopaque, reader: *Dir.Reader, buffer: []Dir.Entry) Dir.Reader.
         buffer[count] = .{
             .name = buf[0..name_len],
             .kind = kind,
-            .inode = {},
+            .inode = 0,
         };
         count += 1;
     }
@@ -442,27 +612,38 @@ fn dirRead(_: ?*anyopaque, reader: *Dir.Reader, buffer: []Dir.Entry) Dir.Reader.
 }
 
 fn dirRealPath(_: ?*anyopaque, _: Dir, _: []u8) Dir.RealPathError!usize {
-    @panic("Io.dirRealPath not implemented");
+    return error.OperationUnsupported;
 }
 
 fn dirRealPathFile(_: ?*anyopaque, _: Dir, _: []const u8, _: []u8) Dir.RealPathFileError!usize {
-    @panic("Io.dirRealPathFile not implemented");
+    return error.OperationUnsupported;
 }
 
-fn dirDeleteFile(_: ?*anyopaque, _: Dir, _: []const u8) Dir.DeleteFileError!void {
-    @panic("Io.dirDeleteFile not implemented");
+fn dirDeleteFile(_: ?*anyopaque, _: Dir, sub_path: []const u8) Dir.DeleteFileError!void {
+    var path_buf: [1024]u8 = undefined;
+    const path_z = toNullTerminated(sub_path, &path_buf) orelse return error.NameTooLong;
+    const ret = io_mgr.sceIoRemove(path_z);
+    if (ret < 0) return error.AccessDenied;
 }
 
-fn dirDeleteDir(_: ?*anyopaque, _: Dir, _: []const u8) Dir.DeleteDirError!void {
-    @panic("Io.dirDeleteDir not implemented");
+fn dirDeleteDir(_: ?*anyopaque, _: Dir, sub_path: []const u8) Dir.DeleteDirError!void {
+    var path_buf: [1024]u8 = undefined;
+    const path_z = toNullTerminated(sub_path, &path_buf) orelse return error.NameTooLong;
+    const ret = io_mgr.sceIoRmdir(path_z);
+    if (ret < 0) return error.AccessDenied;
 }
 
-fn dirRename(_: ?*anyopaque, _: Dir, _: []const u8, _: Dir, _: []const u8) Dir.RenameError!void {
-    @panic("Io.dirRename not implemented");
+fn dirRename(_: ?*anyopaque, _: Dir, old_path: []const u8, _: Dir, new_path: []const u8) Dir.RenameError!void {
+    var old_buf: [1024]u8 = undefined;
+    var new_buf: [1024]u8 = undefined;
+    const old_z = toNullTerminated(old_path, &old_buf) orelse return error.NameTooLong;
+    const new_z = toNullTerminated(new_path, &new_buf) orelse return error.NameTooLong;
+    const ret = io_mgr.sceIoRename(old_z, new_z);
+    if (ret < 0) return error.AccessDenied;
 }
 
 fn dirRenamePreserve(_: ?*anyopaque, _: Dir, _: []const u8, _: Dir, _: []const u8) Dir.RenamePreserveError!void {
-    @panic("Io.dirRenamePreserve not implemented");
+    return error.OperationUnsupported;
 }
 
 fn dirSymLink(_: ?*anyopaque, _: Dir, _: []const u8, _: []const u8, _: Dir.SymLinkFlags) Dir.SymLinkError!void {
@@ -482,65 +663,249 @@ fn dirSetFileOwner(_: ?*anyopaque, _: Dir, _: []const u8, _: ?File.Uid, _: ?File
 }
 
 fn dirSetPermissions(_: ?*anyopaque, _: Dir, _: Dir.Permissions) Dir.SetPermissionsError!void {
-    @panic("Io.dirSetPermissions not implemented");
+    // No-op: PSP permissions are simple, and sceIoChstat needs a path.
 }
 
 fn dirSetFilePermissions(_: ?*anyopaque, _: Dir, _: []const u8, _: File.Permissions, _: Dir.SetFilePermissionsOptions) Dir.SetFilePermissionsError!void {
-    @panic("Io.dirSetFilePermissions not implemented");
+    // No-op: PSP doesn't have a meaningful permission model.
 }
 
-fn dirSetTimestamps(_: ?*anyopaque, _: Dir, _: []const u8, _: Dir.SetTimestampsOptions) Dir.SetTimestampsError!void {
-    @panic("Io.dirSetTimestamps not implemented");
+fn dirSetTimestamps(_: ?*anyopaque, _: Dir, sub_path: []const u8, options: Dir.SetTimestampsOptions) Dir.SetTimestampsError!void {
+    var path_buf: [1024]u8 = undefined;
+    const path_z = toNullTerminated(sub_path, &path_buf) orelse return error.AccessDenied;
+
+    // Read current stat so we can update only what's requested
+    var stat_buf: c_types.SceIoStat = undefined;
+    const gret = io_mgr.sceIoGetstat(path_z, &stat_buf);
+    if (gret < 0) return error.AccessDenied;
+
+    var bits: c_int = 0;
+    switch (options.access_timestamp) {
+        .unchanged => {},
+        .now => {
+            stat_buf.st_atime = timestampToPspDateTime(now(null, .real));
+            bits |= 0x04; // PSP_CST_ATIME
+        },
+        .new => |ts| {
+            stat_buf.st_atime = timestampToPspDateTime(ts);
+            bits |= 0x04;
+        },
+    }
+    switch (options.modify_timestamp) {
+        .unchanged => {},
+        .now => {
+            stat_buf.st_mtime = timestampToPspDateTime(now(null, .real));
+            bits |= 0x02; // PSP_CST_MTIME
+        },
+        .new => |ts| {
+            stat_buf.st_mtime = timestampToPspDateTime(ts);
+            bits |= 0x02;
+        },
+    }
+
+    if (bits != 0) {
+        const ret = io_mgr.sceIoChstat(path_z, &stat_buf, bits);
+        if (ret < 0) return error.AccessDenied;
+    }
 }
 
 fn dirHardLink(_: ?*anyopaque, _: Dir, _: []const u8, _: Dir, _: []const u8, _: Dir.HardLinkOptions) Dir.HardLinkError!void {
     @panic("Io.dirHardLink not implemented");
 }
 
-fn fileStat(_: ?*anyopaque, _: File) File.StatError!File.Stat {
-    @panic("Io.fileStat not implemented");
+// ── File operations ───────────────────────────────────────────────────
+
+fn fileStat(_: ?*anyopaque, file: File) File.StatError!File.Stat {
+    const path = lookupFdPath(file.handle) orelse return error.AccessDenied;
+    var path_buf: [1024]u8 = undefined;
+    const path_z = toNullTerminated(path, &path_buf) orelse return error.AccessDenied;
+    var stat_buf: c_types.SceIoStat = undefined;
+    const ret = io_mgr.sceIoGetstat(path_z, &stat_buf);
+    if (ret < 0) return error.AccessDenied;
+    return sceIoStatToFileStat(&stat_buf);
 }
 
-fn fileLength(_: ?*anyopaque, _: File) File.LengthError!u64 {
-    @panic("Io.fileLength not implemented");
+fn fileLength(_: ?*anyopaque, file: File) File.LengthError!u64 {
+    const fd = file.handle;
+    // Save current position
+    const cur = io_mgr.sceIoLseek32(fd, 0, PSP_SEEK_CUR);
+    if (cur < 0) return error.AccessDenied;
+    // Seek to end
+    const end = io_mgr.sceIoLseek32(fd, 0, PSP_SEEK_END);
+    if (end < 0) return error.AccessDenied;
+    // Restore position
+    _ = io_mgr.sceIoLseek32(fd, cur, PSP_SEEK_SET);
+    return @intCast(end);
 }
 
 fn fileClose(_: ?*anyopaque, files: []const File) void {
     for (files) |f| {
+        untrackFd(f.handle);
         _ = io_mgr.sceIoClose(f.handle);
     }
 }
 
-fn fileWritePositional(_: ?*anyopaque, _: File, _: []const u8, _: []const []const u8, _: usize, _: u64) File.WritePositionalError!usize {
-    @panic("Io.fileWritePositional not implemented");
+fn fileWritePositional(_: ?*anyopaque, file: File, header: []const u8, data: []const []const u8, splat: usize, offset: u64) File.WritePositionalError!usize {
+    const fd = file.handle;
+    // Save current position
+    const cur = io_mgr.sceIoLseek32(fd, 0, PSP_SEEK_CUR);
+    if (cur < 0) return error.Unseekable;
+    // Seek to offset
+    const seek_ret = io_mgr.sceIoLseek32(fd, @intCast(offset), PSP_SEEK_SET);
+    if (seek_ret < 0) return error.Unseekable;
+
+    var written: usize = 0;
+
+    // Write header
+    if (header.len > 0) {
+        written += pspWrite(fd, header) catch {
+            _ = io_mgr.sceIoLseek32(fd, cur, PSP_SEEK_SET);
+            return error.InputOutput;
+        };
+    }
+
+    // Write data slices
+    for (data[0..data.len -| 1]) |slice| {
+        if (slice.len > 0) {
+            written += pspWrite(fd, slice) catch {
+                _ = io_mgr.sceIoLseek32(fd, cur, PSP_SEEK_SET);
+                return error.InputOutput;
+            };
+        }
+    }
+
+    // Write last slice repeated `splat` times
+    if (data.len > 0) {
+        const pattern = data[data.len - 1];
+        if (pattern.len > 0) {
+            var i: usize = 0;
+            while (i < splat) : (i += 1) {
+                written += pspWrite(fd, pattern) catch {
+                    _ = io_mgr.sceIoLseek32(fd, cur, PSP_SEEK_SET);
+                    return error.InputOutput;
+                };
+            }
+        }
+    }
+
+    // Restore position
+    _ = io_mgr.sceIoLseek32(fd, cur, PSP_SEEK_SET);
+    return written;
 }
 
-fn fileWriteFileStreaming(_: ?*anyopaque, _: File, _: []const u8, _: *Io.File.Reader, _: Io.Limit) File.Writer.WriteFileError!usize {
-    @panic("Io.fileWriteFileStreaming not implemented");
+fn fileWriteFileStreaming(_: ?*anyopaque, file: File, header: []const u8, reader: *Io.File.Reader, limit: Io.Limit) File.Writer.WriteFileError!usize {
+    const fd = file.handle;
+    var written: usize = 0;
+
+    // Write header
+    if (header.len > 0) {
+        written += pspWrite(fd, header) catch return error.InputOutput;
+    }
+
+    // Copy from reader to fd in chunks
+    var buf: [4096]u8 = undefined;
+    var remaining: usize = @intFromEnum(limit);
+    while (remaining > 0) {
+        const to_read = @min(buf.len, remaining);
+        var bufs = [_][]u8{buf[0..to_read]};
+        const n = reader.interface.readVec(&bufs) catch return error.InputOutput;
+        if (n == 0) break;
+        const w = pspWrite(fd, buf[0..n]) catch return error.InputOutput;
+        written += w;
+        remaining -|= n;
+    }
+    return written;
 }
 
-fn fileWriteFilePositional(_: ?*anyopaque, _: File, _: []const u8, _: *Io.File.Reader, _: Io.Limit, _: u64) File.WriteFilePositionalError!usize {
-    @panic("Io.fileWriteFilePositional not implemented");
+fn fileWriteFilePositional(_: ?*anyopaque, file: File, header: []const u8, reader: *Io.File.Reader, limit: Io.Limit, offset: u64) File.WriteFilePositionalError!usize {
+    const fd = file.handle;
+    // Save current position
+    const cur = io_mgr.sceIoLseek32(fd, 0, PSP_SEEK_CUR);
+    if (cur < 0) return error.Unseekable;
+    // Seek to offset
+    const seek_ret = io_mgr.sceIoLseek32(fd, @intCast(offset), PSP_SEEK_SET);
+    if (seek_ret < 0) return error.Unseekable;
+
+    var written: usize = 0;
+
+    // Write header
+    if (header.len > 0) {
+        written += pspWrite(fd, header) catch {
+            _ = io_mgr.sceIoLseek32(fd, cur, PSP_SEEK_SET);
+            return error.InputOutput;
+        };
+    }
+
+    // Copy from reader to fd in chunks
+    var buf: [4096]u8 = undefined;
+    var remaining: usize = @intFromEnum(limit);
+    while (remaining > 0) {
+        const to_read = @min(buf.len, remaining);
+        var bufs = [_][]u8{buf[0..to_read]};
+        const n = reader.interface.readVec(&bufs) catch {
+            _ = io_mgr.sceIoLseek32(fd, cur, PSP_SEEK_SET);
+            return error.InputOutput;
+        };
+        if (n == 0) break;
+        const w = pspWrite(fd, buf[0..n]) catch {
+            _ = io_mgr.sceIoLseek32(fd, cur, PSP_SEEK_SET);
+            return error.InputOutput;
+        };
+        written += w;
+        remaining -|= n;
+    }
+
+    // Restore position
+    _ = io_mgr.sceIoLseek32(fd, cur, PSP_SEEK_SET);
+    return written;
 }
 
-fn fileReadPositional(_: ?*anyopaque, _: File, _: []const []u8, _: u64) File.ReadPositionalError!usize {
-    @panic("Io.fileReadPositional not implemented");
+fn fileReadPositional(_: ?*anyopaque, file: File, bufs: []const []u8, offset: u64) File.ReadPositionalError!usize {
+    const fd = file.handle;
+    // Save current position
+    const cur = io_mgr.sceIoLseek32(fd, 0, PSP_SEEK_CUR);
+    if (cur < 0) return error.Unseekable;
+    // Seek to offset
+    const seek_ret = io_mgr.sceIoLseek32(fd, @intCast(offset), PSP_SEEK_SET);
+    if (seek_ret < 0) return error.Unseekable;
+
+    var total: usize = 0;
+    for (bufs) |buf| {
+        if (buf.len > 0) {
+            const ret = io_mgr.sceIoRead(fd, buf.ptr, @intCast(buf.len));
+            if (ret < 0) {
+                _ = io_mgr.sceIoLseek32(fd, cur, PSP_SEEK_SET);
+                return error.InputOutput;
+            }
+            total += @intCast(ret);
+            if (@as(usize, @intCast(ret)) < buf.len) break;
+        }
+    }
+
+    // Restore position
+    _ = io_mgr.sceIoLseek32(fd, cur, PSP_SEEK_SET);
+    return total;
 }
 
-fn fileSeekBy(_: ?*anyopaque, _: File, _: i64) File.SeekError!void {
-    @panic("Io.fileSeekBy not implemented");
+fn fileSeekBy(_: ?*anyopaque, file: File, offset: i64) File.SeekError!void {
+    const off32: c_int = @intCast(offset);
+    const ret = io_mgr.sceIoLseek32(file.handle, off32, PSP_SEEK_CUR);
+    if (ret < 0) return error.Unseekable;
 }
 
-fn fileSeekTo(_: ?*anyopaque, _: File, _: u64) File.SeekError!void {
-    @panic("Io.fileSeekTo not implemented");
+fn fileSeekTo(_: ?*anyopaque, file: File, offset: u64) File.SeekError!void {
+    const off32: c_int = @intCast(offset);
+    const ret = io_mgr.sceIoLseek32(file.handle, off32, PSP_SEEK_SET);
+    if (ret < 0) return error.Unseekable;
 }
 
 fn fileSync(_: ?*anyopaque, _: File) File.SyncError!void {
-    @panic("Io.fileSync not implemented");
+    // sceIoSync takes a device name, not an fd. Sync the memory stick.
+    _ = io_mgr.sceIoSync(@ptrCast("ms0:"), 0);
 }
 
-fn fileIsTty(_: ?*anyopaque, _: File) Io.Cancelable!bool {
-    @panic("Io.fileIsTty not implemented");
+fn fileIsTty(_: ?*anyopaque, file: File) Io.Cancelable!bool {
+    return file.handle == stdin_fd or file.handle == stdout_fd or file.handle == stderr_fd;
 }
 
 fn fileEnableAnsiEscapeCodes(_: ?*anyopaque, _: File) File.EnableAnsiEscapeCodesError!void {
@@ -552,7 +917,7 @@ fn fileSupportsAnsiEscapeCodes(_: ?*anyopaque, _: File) Io.Cancelable!bool {
 }
 
 fn fileSetLength(_: ?*anyopaque, _: File, _: u64) File.SetLengthError!void {
-    @panic("Io.fileSetLength not implemented");
+    return error.NonResizable;
 }
 
 fn fileSetOwner(_: ?*anyopaque, _: File, _: ?File.Uid, _: ?File.Gid) File.SetOwnerError!void {
@@ -560,11 +925,46 @@ fn fileSetOwner(_: ?*anyopaque, _: File, _: ?File.Uid, _: ?File.Gid) File.SetOwn
 }
 
 fn fileSetPermissions(_: ?*anyopaque, _: File, _: File.Permissions) File.SetPermissionsError!void {
-    @panic("Io.fileSetPermissions not implemented");
+    // No-op: PSP doesn't have a meaningful per-file permission model.
 }
 
-fn fileSetTimestamps(_: ?*anyopaque, _: File, _: File.SetTimestampsOptions) File.SetTimestampsError!void {
-    @panic("Io.fileSetTimestamps not implemented");
+fn fileSetTimestamps(_: ?*anyopaque, file: File, options: File.SetTimestampsOptions) File.SetTimestampsError!void {
+    const path = lookupFdPath(file.handle) orelse return error.AccessDenied;
+    var path_buf: [1024]u8 = undefined;
+    const path_z = toNullTerminated(path, &path_buf) orelse return error.AccessDenied;
+
+    var stat_buf: c_types.SceIoStat = undefined;
+    const gret = io_mgr.sceIoGetstat(path_z, &stat_buf);
+    if (gret < 0) return error.AccessDenied;
+
+    var bits: c_int = 0;
+    switch (options.access_timestamp) {
+        .unchanged => {},
+        .now => {
+            stat_buf.st_atime = timestampToPspDateTime(now(null, .real));
+            bits |= 0x04;
+        },
+        .new => |ts| {
+            stat_buf.st_atime = timestampToPspDateTime(ts);
+            bits |= 0x04;
+        },
+    }
+    switch (options.modify_timestamp) {
+        .unchanged => {},
+        .now => {
+            stat_buf.st_mtime = timestampToPspDateTime(now(null, .real));
+            bits |= 0x02;
+        },
+        .new => |ts| {
+            stat_buf.st_mtime = timestampToPspDateTime(ts);
+            bits |= 0x02;
+        },
+    }
+
+    if (bits != 0) {
+        const ret = io_mgr.sceIoChstat(path_z, &stat_buf, bits);
+        if (ret < 0) return error.AccessDenied;
+    }
 }
 
 fn fileLock(_: ?*anyopaque, _: File, _: File.Lock) File.LockError!void {
@@ -584,7 +984,7 @@ fn fileDowngradeLock(_: ?*anyopaque, _: File) File.DowngradeLockError!void {
 }
 
 fn fileRealPath(_: ?*anyopaque, _: File, _: []u8) File.RealPathError!usize {
-    @panic("Io.fileRealPath not implemented");
+    return error.OperationUnsupported;
 }
 
 fn fileHardLink(_: ?*anyopaque, _: File, _: Dir, _: []const u8, _: File.HardLinkOptions) File.HardLinkError!void {
@@ -611,6 +1011,8 @@ fn fileMemoryMapWrite(_: ?*anyopaque, _: *File.MemoryMap) File.WritePositionalEr
     @panic("Io.fileMemoryMapWrite not implemented");
 }
 
+// ── Process ───────────────────────────────────────────────────────────
+
 fn processExecutableOpen(_: ?*anyopaque, _: File.OpenFlags) std.process.OpenExecutableError!File {
     @panic("Io.processExecutableOpen not implemented");
 }
@@ -618,6 +1020,8 @@ fn processExecutableOpen(_: ?*anyopaque, _: File.OpenFlags) std.process.OpenExec
 fn processExecutablePath(_: ?*anyopaque, _: []u8) std.process.ExecutablePathError!usize {
     @panic("Io.processExecutablePath not implemented");
 }
+
+// ── Stderr ────────────────────────────────────────────────────────────
 
 fn lockStderr(_: ?*anyopaque, _: ?Terminal.Mode) Io.Cancelable!Io.LockedStderr {
     stderr_locked = true;
@@ -643,16 +1047,43 @@ fn unlockStderr(_: ?*anyopaque) void {
     stderr_locked = false;
 }
 
-fn processCurrentPath(_: ?*anyopaque, _: []u8) std.process.CurrentPathError!usize {
-    @panic("Io.processCurrentPath not implemented");
+// ── CWD ───────────────────────────────────────────────────────────────
+
+// PSP has no getcwd syscall, so we track cwd in a module-level buffer.
+// Defaults to "ms0:/" (memory stick root).
+var cwd_buf: [1024]u8 = undefined;
+var cwd_len: usize = 5;
+var cwd_initialized: bool = false;
+
+fn ensureCwdInit() void {
+    if (!cwd_initialized) {
+        @memcpy(cwd_buf[0..5], "ms0:/");
+        cwd_initialized = true;
+    }
+}
+
+fn processCurrentPath(_: ?*anyopaque, buffer: []u8) std.process.CurrentPathError!usize {
+    ensureCwdInit();
+    if (buffer.len < cwd_len) return error.NameTooLong;
+    @memcpy(buffer[0..cwd_len], cwd_buf[0..cwd_len]);
+    return cwd_len;
 }
 
 fn processSetCurrentDir(_: ?*anyopaque, _: Dir) std.process.SetCurrentDirError!void {
-    @panic("Io.processSetCurrentDir not implemented");
+    // PSP has no fchdir equivalent — cannot set cwd from a directory handle.
+    return error.OperationUnsupported;
 }
 
-fn processSetCurrentPath(_: ?*anyopaque, _: []const u8) std.process.SetCurrentPathError!void {
-    @panic("Io.processSetCurrentPath not implemented");
+fn processSetCurrentPath(_: ?*anyopaque, path: []const u8) std.process.SetCurrentPathError!void {
+    if (path.len >= cwd_buf.len) return error.NameTooLong;
+    var path_z_buf: [1024]u8 = undefined;
+    const path_z = toNullTerminated(path, &path_z_buf) orelse return error.NameTooLong;
+    const ret = io_mgr.sceIoChdir(path_z);
+    if (ret < 0) return error.FileNotFound;
+    // Update tracked cwd
+    @memcpy(cwd_buf[0..path.len], path);
+    cwd_len = path.len;
+    cwd_initialized = true;
 }
 
 fn processReplace(_: ?*anyopaque, _: std.process.ReplaceOptions) std.process.ReplaceError {
@@ -683,25 +1114,101 @@ fn progressParentFile(_: ?*anyopaque) std.Progress.ParentFileError!File {
     @panic("Io.progressParentFile not implemented");
 }
 
-fn now(_: ?*anyopaque, _: Io.Clock) Io.Timestamp {
-    @panic("Io.now not implemented");
+// ── Time/Random ───────────────────────────────────────────────────────
+
+fn now(_: ?*anyopaque, clock: Io.Clock) Io.Timestamp {
+    switch (clock) {
+        .real, .awake, .boot => {
+            var tick: u64 = 0;
+            _ = rtc.sceRtcGetCurrentTick(&tick);
+            const tick_i96: i96 = @intCast(tick);
+            // PSP ticks are microseconds since 2000-01-01.
+            // Convert to nanoseconds since Unix epoch.
+            const ns = tick_i96 * 1000 + psp_epoch_offset_s * 1_000_000_000;
+            return .{ .nanoseconds = ns };
+        },
+        .cpu_process, .cpu_thread => {
+            // No per-process/thread CPU clock on PSP; return zero.
+            return .{ .nanoseconds = 0 };
+        },
+    }
 }
 
-fn clockResolution(_: ?*anyopaque, _: Io.Clock) Io.Clock.ResolutionError!Io.Duration {
-    @panic("Io.clockResolution not implemented");
+fn clockResolution(_: ?*anyopaque, clock: Io.Clock) Io.Clock.ResolutionError!Io.Duration {
+    switch (clock) {
+        .real, .awake, .boot => {
+            // sceRtcGetTickResolution() returns 1_000_000 (microsecond ticks).
+            // Resolution = 1 microsecond = 1000 nanoseconds.
+            return .{ .nanoseconds = 1000 };
+        },
+        .cpu_process, .cpu_thread => {
+            return error.ClockUnavailable;
+        },
+    }
 }
 
-fn sleep(_: ?*anyopaque, _: Io.Timeout) Io.Cancelable!void {
-    @panic("Io.sleep not implemented");
+fn sleep(_: ?*anyopaque, timeout: Io.Timeout) Io.Cancelable!void {
+    const us: u32 = switch (timeout) {
+        .none => return,
+        .duration => |d| blk: {
+            const ns = d.raw.nanoseconds;
+            if (ns <= 0) break :blk 0;
+            const val = @divTrunc(ns, 1000);
+            break :blk if (val > std.math.maxInt(u32)) std.math.maxInt(u32) else @intCast(val);
+        },
+        .deadline => |dl| blk: {
+            var tick: u64 = 0;
+            _ = rtc.sceRtcGetCurrentTick(&tick);
+            const now_ns: i96 = @as(i96, @intCast(tick)) * 1000 + psp_epoch_offset_s * 1_000_000_000;
+            const delta = dl.raw.nanoseconds - now_ns;
+            if (delta <= 0) break :blk 0;
+            const val = @divTrunc(delta, 1000);
+            break :blk if (val > std.math.maxInt(u32)) std.math.maxInt(u32) else @intCast(val);
+        },
+    };
+    if (us > 0) {
+        _ = threadman.sceKernelDelayThread(us);
+    }
 }
 
-fn random(_: ?*anyopaque, _: []u8) void {
-    @panic("Io.random not implemented");
+const SceKernelUtilsMt19937Context = c_types.SceKernelUtilsMt19937Context;
+var mt_ctx: SceKernelUtilsMt19937Context = undefined;
+var mt_initialized: bool = false;
+
+fn fillRandom(buf: []u8) void {
+    if (!mt_initialized) {
+        var tick: u64 = 0;
+        _ = rtc.sceRtcGetCurrentTick(&tick);
+        _ = utils_mod.sceKernelUtilsMt19937Init(&mt_ctx, @truncate(tick));
+        mt_initialized = true;
+    }
+    var i: usize = 0;
+    while (i + 4 <= buf.len) : (i += 4) {
+        const val = utils_mod.sceKernelUtilsMt19937UInt(&mt_ctx);
+        buf[i] = @truncate(val);
+        buf[i + 1] = @truncate(val >> 8);
+        buf[i + 2] = @truncate(val >> 16);
+        buf[i + 3] = @truncate(val >> 24);
+    }
+    if (i < buf.len) {
+        const val = utils_mod.sceKernelUtilsMt19937UInt(&mt_ctx);
+        var shift: u5 = 0;
+        while (i < buf.len) : (i += 1) {
+            buf[i] = @truncate(val >> shift);
+            shift +%= 8;
+        }
+    }
 }
 
-fn randomSecure(_: ?*anyopaque, _: []u8) Io.RandomSecureError!void {
-    @panic("Io.randomSecure not implemented");
+fn random(_: ?*anyopaque, buf: []u8) void {
+    fillRandom(buf);
 }
+
+fn randomSecure(_: ?*anyopaque, buf: []u8) Io.RandomSecureError!void {
+    fillRandom(buf);
+}
+
+// ── Network (not yet implemented) ─────────────────────────────────────
 
 fn netListenIp(_: ?*anyopaque, _: *const net.IpAddress, _: net.IpAddress.ListenOptions) net.IpAddress.ListenError!net.Socket {
     @panic("Io.netListenIp not implemented");
