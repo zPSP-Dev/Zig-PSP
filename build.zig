@@ -81,6 +81,9 @@ pub fn build(b: *std.Build) void {
         PSPBuildInfo{ .name = "panic", .src_file = "examples/panic.zig", .title = "SDK Panic" },
         PSPBuildInfo{ .name = "print", .src_file = "examples/print.zig", .title = "SDK Print" },
         PSPBuildInfo{ .name = "io", .src_file = "examples/io.zig", .title = "SDK IO" },
+        PSPBuildInfo{ .name = "time_random", .src_file = "examples/time_random.zig", .title = "SDK Time Random" },
+        PSPBuildInfo{ .name = "cwd", .src_file = "examples/cwd.zig", .title = "SDK CWD" },
+        PSPBuildInfo{ .name = "dir_file", .src_file = "examples/dir_file.zig", .title = "SDK Dir File" },
     }) |example| {
         const example_exe = b.addExecutable(.{
             .name = "main",
