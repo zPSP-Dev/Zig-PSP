@@ -110,6 +110,8 @@ The repository includes the following examples:
 | `cwd` | Process working directory — get and set CWD via `std.Io` |
 | `dir_file` | Full directory and file operations — create, stat, seek, rename, delete via `std.Io` |
 | `network` | WiFi init, DNS lookup, HTTP GET over TCP via `sdk.extra.net` + `sceNetInet*` |
+| `http` | HTTP HEAD request using `std.http.Client` (TLS disabled, plain HTTP) |
+| `https` | HTTPS HEAD request using `std.http.Client` with embedded root CA certificate |
 
 ## std.Io Integration
 
@@ -138,7 +140,23 @@ defer sdk.extra.net.deinit();
 try sdk.extra.net.connectToApctl(1, 30_000_000); // connect to saved network #1
 ```
 
-After initialization, the `std.Io` network vtable functions (`netConnectIp`, `netRead`, `netWrite`, etc.) and raw `sceNetInet*` socket calls are both available.
+After initialization, the `std.Io` network vtable functions (`netConnectIp`, `netRead`, `netWrite`, etc.) and raw `sceNetInet*` socket calls are both available. `std.http.Client` works out of the box for plain HTTP requests — see `examples/http.zig`.
+
+### HTTPS / TLS
+
+PSP has no system CA certificate store, so `std.http.Client` cannot verify server certificates by default. To use HTTPS, embed the required root CA as a DER file and load it into the client's CA bundle before making requests:
+
+```zig
+const root_ca_der = @embedFile("root_ca.der");
+
+// ...after WiFi init:
+const now = std.Io.Clock.real.now(io);
+try http_client.ca_bundle.bytes.appendSlice(gpa, root_ca_der);
+try http_client.ca_bundle.parseCert(gpa, 0, now.toSeconds());
+http_client.now = now;
+```
+
+TLS crypto requires extra stack space — set `pub const psp_stack_size: u32 = 512 * 1024;` in your app. See `examples/https.zig` for a complete working example.
 
 ## Comparisons To C/C++
 
