@@ -11,7 +11,7 @@ Special thanks is given to the [Rust-PSP team](https://github.com/overdrivenpota
 
 ## Requirements
 
-- **Zig 0.15.2** or newer
+- **Zig 0.16.0-dev** nightly (see `build.zig.zon` for the exact fingerprint)
 
 No legacy PSPSDK or external C toolchain is required. All build tools (`zPRXGen`, `zSFOTool`, `zPBPTool`) are written in Zig and built automatically.
 
@@ -105,6 +105,27 @@ The repository includes the following examples:
 | `error` | `main()` returning an error, exercising the panic handler |
 | `panic` | Integer overflow triggering the panic handler |
 | `print` | Colored text output using the debug screen |
+| `io` | Basic `std.Io` vtable usage — streaming file read/write |
+| `time_random` | Clock resolution, timestamps, sleep, random number generation via `std.Io` |
+| `cwd` | Process working directory — get and set CWD via `std.Io` |
+| `dir_file` | Full directory and file operations — create, stat, seek, rename, delete via `std.Io` |
+
+## std.Io Integration
+
+Zig-PSP implements a PSP-native `std.Io` vtable, allowing standard library I/O to work transparently on the PSP. This includes `std.debug.print`, file and directory operations, process CWD, clocks, sleep, and random number generation — all routed through PSP syscalls (`sceIo*`, `sceRtc*`, `sceKernelDelayThread`, etc.).
+
+To enable `std.Io` in your app, add these declarations:
+
+```zig
+pub const std_options_debug_threaded_io: ?*std.Io.Threaded = null;
+pub const std_options_debug_io: std.Io = sdk.extra.Io.psp_io;
+
+pub fn std_options_cwd() std.Io.Dir {
+    return .{ .handle = -1 };
+}
+```
+
+The vtable currently covers 43 of 56 feasible functions (77%) — full directory, file, time/random, stderr, process CWD, and cancellation support. Network operations (`sceNet*`) are the remaining 13. See `ISSUE_41.md` for detailed status.
 
 ## Comparisons To C/C++
 
