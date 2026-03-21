@@ -6,6 +6,8 @@ const File = std.Io.File;
 const Terminal = std.Io.Terminal;
 const net = std.Io.net;
 
+const stdio = @import("../c/module/StdioForUser.zig");
+
 /// A stub std.Io backed by this vtable.
 /// Every method panics; fill in the ones you need.
 pub const psp_io: Io = .{
@@ -15,9 +17,9 @@ pub const psp_io: Io = .{
 
 pub const vtable: Io.VTable = .{
     .crashHandler = crashHandler,
-    .async = @"async",
+    .async = async,
     .concurrent = concurrent,
-    .await = @"await",
+    .await = await,
     .cancel = cancel,
     .groupAsync = groupAsync,
     .groupConcurrent = groupConcurrent,
@@ -94,6 +96,7 @@ pub const vtable: Io.VTable = .{
     .unlockStderr = unlockStderr,
     .processCurrentPath = processCurrentPath,
     .processSetCurrentDir = processSetCurrentDir,
+    .processSetCurrentPath = processSetCurrentPath,
     .processReplace = processReplace,
     .processReplacePath = processReplacePath,
     .processSpawn = processSpawn,
@@ -114,7 +117,6 @@ pub const vtable: Io.VTable = .{
     .netConnectUnix = netConnectUnix,
     .netSocketCreatePair = netSocketCreatePair,
     .netSend = netSend,
-    .netReceive = netReceive,
     .netRead = netRead,
     .netWrite = netWrite,
     .netWriteFile = netWriteFile,
@@ -129,7 +131,30 @@ fn crashHandler(_: ?*anyopaque) void {
     @panic("Io.crashHandler not implemented");
 }
 
-fn @"async"(
+// MAGIC GLOBAL STATE BLOCK
+var cancel_protection: std.Io.CancelProtection = .unblocked;
+var stderr_locked: bool = false;
+const SceUID = @import("../c/types.zig").SceUID;
+var stdin_fd: SceUID = undefined;
+var stdout_fd: SceUID = undefined;
+var stderr_fd: SceUID = undefined;
+var stderr_writer: File.Writer = .{
+    .io = psp_io,
+    .interface = File.Writer.initInterface(&.{}),
+    .file = undefined,
+    .mode = .streaming,
+};
+
+pub fn init() void {
+    stdin_fd = stdio.sceKernelStdin();
+    stdout_fd = stdio.sceKernelStdout();
+    stderr_fd = stdio.sceKernelStderr();
+    stderr_writer.file = .{ .handle = stderr_fd, .flags = .{ .nonblocking = false } };
+}
+
+// FUNCTION BLOCK
+
+fn async(
     _: ?*anyopaque,
     _: []u8,
     _: std.mem.Alignment,
@@ -151,7 +176,7 @@ fn concurrent(
     @panic("Io.concurrent not implemented");
 }
 
-fn @"await"(
+fn await(
     _: ?*anyopaque,
     _: *Io.AnyFuture,
     _: []u8,
@@ -201,8 +226,10 @@ fn recancel(_: ?*anyopaque) void {
     @panic("Io.recancel not implemented");
 }
 
-fn swapCancelProtection(_: ?*anyopaque, _: Io.CancelProtection) Io.CancelProtection {
-    @panic("Io.swapCancelProtection not implemented");
+fn swapCancelProtection(_: ?*anyopaque, new: Io.CancelProtection) Io.CancelProtection {
+    const old = cancel_protection;
+    cancel_protection = new;
+    return old;
 }
 
 fn checkCancel(_: ?*anyopaque) Io.Cancelable!void {
@@ -221,8 +248,53 @@ fn futexWake(_: ?*anyopaque, _: *const u32, _: u32) void {
     @panic("Io.futexWake not implemented");
 }
 
-fn operate(_: ?*anyopaque, _: Io.Operation) Io.Cancelable!Io.Operation.Result {
-    @panic("Io.operate not implemented");
+const io_mgr = @import("../c/module/IoFileMgrForUser.zig");
+
+fn pspWrite(fd: SceUID, buf: []const u8) error{WriteFailed}!usize {
+    const ret = io_mgr.sceIoWrite(fd, buf.ptr, buf.len);
+    if (ret < 0) return error.WriteFailed;
+    return @intCast(ret);
+}
+
+fn operate(_: ?*anyopaque, op: Io.Operation) Io.Cancelable!Io.Operation.Result {
+    switch (op) {
+        .device_io_control => @panic("Io.operate: Device io_ctl Not Implemented"),
+        .net_receive => @panic("Io.operate: net_receive Not Implemented"),
+        .file_read_streaming => @panic("Io.operate: file_read_streaming Not Implemented"),
+        .file_write_streaming => |w| {
+            const fd = w.file.handle;
+            if (fd == 2) @panic("A!");
+            var written: usize = 0;
+
+            // Write header
+            if (w.header.len > 0) {
+                written += pspWrite(fd, w.header) catch
+                    return .{ .file_write_streaming = error.InputOutput };
+            }
+
+            // Write data slices
+            for (w.data[0..w.data.len -| 1]) |slice| {
+                if (slice.len > 0) {
+                    written += pspWrite(fd, slice) catch
+                        return .{ .file_write_streaming = error.InputOutput };
+                }
+            }
+
+            // Write last slice repeated `splat` times
+            if (w.data.len > 0) {
+                const pattern = w.data[w.data.len - 1];
+                if (pattern.len > 0) {
+                    var i: usize = 0;
+                    while (i < w.splat) : (i += 1) {
+                        written += pspWrite(fd, pattern) catch
+                            return .{ .file_write_streaming = error.InputOutput };
+                    }
+                }
+            }
+
+            return .{ .file_write_streaming = written };
+        },
+    }
 }
 
 fn batchAwaitAsync(_: ?*anyopaque, _: *Io.Batch) Io.Cancelable!void {
@@ -462,15 +534,27 @@ fn processExecutablePath(_: ?*anyopaque, _: []u8) std.process.ExecutablePathErro
 }
 
 fn lockStderr(_: ?*anyopaque, _: ?Terminal.Mode) Io.Cancelable!Io.LockedStderr {
-    @panic("Io.lockStderr not implemented");
+    stderr_locked = true;
+    return .{
+        .file_writer = &stderr_writer,
+        .terminal_mode = .no_color,
+    };
 }
 
 fn tryLockStderr(_: ?*anyopaque, _: ?Terminal.Mode) Io.Cancelable!?Io.LockedStderr {
-    @panic("Io.tryLockStderr not implemented");
+    if (stderr_locked) return null;
+    stderr_locked = true;
+    return .{
+        .file_writer = &stderr_writer,
+        .terminal_mode = .no_color,
+    };
 }
 
 fn unlockStderr(_: ?*anyopaque) void {
-    @panic("Io.unlockStderr not implemented");
+    stderr_writer.interface.flush() catch {};
+    stderr_writer.interface.end = 0;
+    stderr_writer.interface.buffer = &.{};
+    stderr_locked = false;
 }
 
 fn processCurrentPath(_: ?*anyopaque, _: []u8) std.process.CurrentPathError!usize {
@@ -479,6 +563,10 @@ fn processCurrentPath(_: ?*anyopaque, _: []u8) std.process.CurrentPathError!usiz
 
 fn processSetCurrentDir(_: ?*anyopaque, _: Dir) std.process.SetCurrentDirError!void {
     @panic("Io.processSetCurrentDir not implemented");
+}
+
+fn processSetCurrentPath(_: ?*anyopaque, _: []const u8) std.process.SetCurrentPathError!void {
+    @panic("Io.processSetCurrentPath not implemented");
 }
 
 fn processReplace(_: ?*anyopaque, _: std.process.ReplaceOptions) std.process.ReplaceError {
@@ -529,11 +617,11 @@ fn randomSecure(_: ?*anyopaque, _: []u8) Io.RandomSecureError!void {
     @panic("Io.randomSecure not implemented");
 }
 
-fn netListenIp(_: ?*anyopaque, _: net.IpAddress, _: net.IpAddress.ListenOptions) net.IpAddress.ListenError!net.Server {
+fn netListenIp(_: ?*anyopaque, _: *const net.IpAddress, _: net.IpAddress.ListenOptions) net.IpAddress.ListenError!net.Socket {
     @panic("Io.netListenIp not implemented");
 }
 
-fn netAccept(_: ?*anyopaque, _: net.Socket.Handle) net.Server.AcceptError!net.Stream {
+fn netAccept(_: ?*anyopaque, _: net.Socket.Handle, _: net.Server.AcceptOptions) net.Server.AcceptError!net.Socket {
     @panic("Io.netAccept not implemented");
 }
 
@@ -541,7 +629,7 @@ fn netBindIp(_: ?*anyopaque, _: *const net.IpAddress, _: net.IpAddress.BindOptio
     @panic("Io.netBindIp not implemented");
 }
 
-fn netConnectIp(_: ?*anyopaque, _: *const net.IpAddress, _: net.IpAddress.ConnectOptions) net.IpAddress.ConnectError!net.Stream {
+fn netConnectIp(_: ?*anyopaque, _: *const net.IpAddress, _: net.IpAddress.ConnectOptions) net.IpAddress.ConnectError!net.Socket {
     @panic("Io.netConnectIp not implemented");
 }
 
@@ -559,10 +647,6 @@ fn netSocketCreatePair(_: ?*anyopaque, _: net.Socket.CreatePairOptions) net.Sock
 
 fn netSend(_: ?*anyopaque, _: net.Socket.Handle, _: []net.OutgoingMessage, _: net.SendFlags) struct { ?net.Socket.SendError, usize } {
     @panic("Io.netSend not implemented");
-}
-
-fn netReceive(_: ?*anyopaque, _: net.Socket.Handle, _: []net.IncomingMessage, _: []u8, _: net.ReceiveFlags, _: Io.Timeout) struct { ?net.Socket.ReceiveTimeoutError, usize } {
-    @panic("Io.netReceive not implemented");
 }
 
 fn netRead(_: ?*anyopaque, _: net.Socket.Handle, _: [][]u8) net.Stream.Reader.Error!usize {
