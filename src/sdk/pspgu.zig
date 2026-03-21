@@ -443,8 +443,8 @@ pub fn sceGuDepthRange(near: u16, far: u16) void {
     gu_contexts[gu_curr_context].near_plane = near;
     gu_contexts[gu_curr_context].far_plane = far;
 
-    sendCommandf(68, z - (@as(f32, @bitCast(@as(i32, near)))));
-    sendCommandf(71, z + (@as(f32, @bitCast(gu_contexts[gu_curr_context].depth_offset))));
+    sendCommandf(68, z - @as(f32, @floatFromInt(@as(i32, near))));
+    sendCommandf(71, z + @as(f32, @floatFromInt(gu_contexts[gu_curr_context].depth_offset)));
 
     if (near > far) {
         sendCommandi(214, far);
@@ -1285,7 +1285,9 @@ pub fn sceGuTexSync() void {
 }
 
 pub fn sceGuTexWrap(u: types.GuTexWrapMode, v: types.GuTexWrapMode) void {
-    sendCommandi(199, (@intFromEnum(v) << 8) | (@intFromEnum(u)));
+    const u_val: u24 = @intCast(@intFromEnum(u));
+    const v_val: u24 = @intCast(@intFromEnum(v));
+    sendCommandi(199, (v_val << 8) | u_val);
 }
 
 pub fn sceGuViewport(cx: c_int, cy: c_int, width: c_int, height: c_int) void {

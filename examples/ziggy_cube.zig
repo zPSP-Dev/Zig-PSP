@@ -100,25 +100,6 @@ pub fn main(_: std.process.Init) !void {
     gu.finish();
     gu.sync(.Finish, .Wait);
 
-    // Dump init display list
-    {
-        var len: usize = 0;
-        for (&display_list, 0..) |cmd, i| {
-            len = i + 1;
-            if ((cmd >> 24) == 0x0F) {
-                if (i + 1 < display_list.len and (display_list[i + 1] >> 24) == 0x0C) {
-                    len = i + 2;
-                }
-                break;
-            }
-        }
-        const fd = io.sceIoOpen(@ptrCast("ms0:/gu_init_dl.bin"), 0x0602, 0o777);
-        if (fd >= 0) {
-            _ = io.sceIoWrite(fd, @ptrCast(&display_list), @intCast(len * 4));
-            _ = io.sceIoClose(fd);
-        }
-    }
-
     _ = sdk.display.wait_vblank_start();
     gu.display(true);
 
@@ -159,26 +140,6 @@ pub fn main(_: std.process.Init) !void {
 
         gu.finish();
         gu.sync(.Finish, .Wait);
-
-        // Dump display list after first frame
-        if (val == 0) {
-            // Scan for FINISH command (cmd 0x0F) to find end
-            var len: usize = 0;
-            for (&display_list, 0..) |cmd, i| {
-                len = i + 1;
-                if ((cmd >> 24) == 0x0F) {
-                    if (i + 1 < display_list.len and (display_list[i + 1] >> 24) == 0x0C) {
-                        len = i + 2;
-                    }
-                    break;
-                }
-            }
-            const fd = io.sceIoOpen(@ptrCast("ms0:/gu_dl.bin"), 0x0602, 0o777);
-            if (fd >= 0) {
-                _ = io.sceIoWrite(fd, @ptrCast(&display_list), @intCast(len * 4));
-                _ = io.sceIoClose(fd);
-            }
-        }
 
         gu.swap_buffers();
 

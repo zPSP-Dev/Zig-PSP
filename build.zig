@@ -45,14 +45,6 @@ pub fn build(b: *std.Build) void {
         .optimize = psp_optimize,
     });
 
-    // Build zpspgl module (OpenGL compatibility layer on GE)
-    const zpspgl_module = b.addModule("zpspgl", .{
-        .root_source_file = b.path("lib/zpspgl/zgl.zig"),
-        .target = psp_target,
-        .optimize = psp_optimize,
-    });
-    zpspgl_module.addImport("pspsdk", pspsdk_module);
-
     // Docs step
     const docs_obj = b.addObject(.{
         .name = "pspsdk",
@@ -88,7 +80,6 @@ pub fn build(b: *std.Build) void {
         PSPBuildInfo{ .name = "error", .src_file = "examples/error.zig", .title = "SDK Error" },
         PSPBuildInfo{ .name = "panic", .src_file = "examples/panic.zig", .title = "SDK Panic" },
         PSPBuildInfo{ .name = "print", .src_file = "examples/print.zig", .title = "SDK Print" },
-        PSPBuildInfo{ .name = "gl_ziggy_cube", .src_file = "examples/gl_ziggy_cube.zig", .title = "GL Ziggy Cube", .use_zpspgl = true },
     }) |example| {
         const example_exe = b.addExecutable(.{
             .name = "main",
@@ -101,9 +92,6 @@ pub fn build(b: *std.Build) void {
         });
 
         example_exe.root_module.addImport("pspsdk", pspsdk_module);
-        if (example.use_zpspgl) {
-            example_exe.root_module.addImport("zpspgl", zpspgl_module);
-        }
 
         example_exe.link_eh_frame_hdr = true;
         example_exe.link_emit_relocs = true;
@@ -178,5 +166,4 @@ const PSPBuildInfo = struct {
     pic0: ?[]const u8 = null,
     pic1: ?[]const u8 = null,
     snd0: ?[]const u8 = null,
-    use_zpspgl: bool = false,
 };

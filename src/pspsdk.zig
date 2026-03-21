@@ -598,6 +598,8 @@ pub const ctrl = struct {
 
 pub const display = struct {
     const _display = @import("sdk/pspdisplay.zig");
+    pub const PspDisplayPixelFormats = _display.PspDisplayPixelFormats;
+    pub const PspDisplaySetBufSync = _display.PspDisplaySetBufSync;
     pub const set_mode = _display.sceDisplaySetMode;
     pub const get_mode = _display.sceDisplayGetMode;
     pub const get_frame_per_sec = _display.sceDisplayGetFramePerSec;
