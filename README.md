@@ -15,16 +15,47 @@ Special thanks is given to the [Rust-PSP team](https://github.com/overdrivenpota
 
 No legacy PSPSDK or external C toolchain is required. All build tools (`zPRXGen`, `zSFOTool`, `zPBPTool`) are written in Zig and built automatically.
 
-## Usage
+## Getting Started
 
-Add Zig-PSP to your project and import `pspsdk` in your source. Every PSP application needs a `module_info` comptime call, the panic handler import, and the homebrew callback setup:
+### 1. Add pspsdk to your project
+
+```bash
+zig fetch --save=pspsdk git+https://github.com/zPSP-Dev/Zig-PSP
+```
+
+This adds the dependency to your `build.zig.zon` automatically.
+
+### 2. Set up your build.zig
+
+```zig
+const std = @import("std");
+const pspsdk = @import("pspsdk");
+
+pub fn build(b: *std.Build) void {
+    const optimize = b.standardOptimizeOption(.{});
+
+    pspsdk.buildPspEboot(b, .{
+        .name             = "my_app",
+        .root_source_file = b.path("src/main.zig"),
+        .title            = "My App Title",
+        .optimize         = optimize,
+    }, .{});
+}
+```
+
+`buildPspEboot` runs the full pipeline (Zig -> ELF -> PRX -> SFO -> PBP) and installs the output to `zig-out/bin/my_app/`. Run `zig build` to produce `EBOOT.PBP`, `app.prx`, and `app.elf`.
+
+Optional PBP asset fields are available on `PspEbootOptions`: `.icon0`, `.icon1`, `.pic0`, `.pic1`, `.snd0` (all `?std.Build.LazyPath`). The output directory defaults to the app name but can be overridden via `PspOutputOptions.dir`.
+
+### 3. Write your app
+
+Every PSP app needs a `module_info` comptime call and the panic handler override:
 
 ```zig
 const std = @import("std");
 const sdk = @import("pspsdk");
 
-// Required: without this, the default panic handler pulls in std.Io.Threaded
-// which references posix symbols that don't exist on PSP.
+// Required: overrides the default panic handler which pulls in posix symbols.
 pub const panic = sdk.extra.debug.panic;
 
 comptime {
@@ -41,7 +72,7 @@ pub fn main(_: std.process.Init) !void {
 
 ### API Tiers
 
-The SDK exposes PSP functions through three tiers — pick whichever fits your style:
+The SDK exposes PSP functions through three tiers -- pick whichever fits your style:
 
 | Tier | Example | Description |
 |---|---|---|
@@ -49,14 +80,14 @@ The SDK exposes PSP functions through three tiers — pick whichever fits your s
 | Top-level sce-prefix | `sdk.sceKernelExitGame()` | Direct re-exports at the package root |
 | Snake_case sub-namespace | `sdk.kernel.exit_game()` | Idiomatic Zig names grouped by subsystem |
 
-Sub-namespaces include: `sdk.gu`, `sdk.gum`, `sdk.ge`, `sdk.ctrl`, `sdk.display`, `sdk.kernel`, `sdk.audio`, `sdk.atrac3`, `sdk.rtc`, `sdk.power`, `sdk.umd`, `sdk.io`, `sdk.hprm`, `sdk.wlan`, `sdk.utility`.
+Sub-namespaces: `sdk.gu`, `sdk.gum`, `sdk.ge`, `sdk.ctrl`, `sdk.display`, `sdk.kernel`, `sdk.audio`, `sdk.atrac3`, `sdk.rtc`, `sdk.power`, `sdk.umd`, `sdk.io`, `sdk.hprm`, `sdk.wlan`, `sdk.utility`.
 
 The utility layer lives under `sdk.extra`: `sdk.extra.debug`, `sdk.extra.module`, `sdk.extra.utils`, `sdk.extra.allocator`, `sdk.extra.vram`.
 
-### Build Commands
+## Building This Repository
 
 ```bash
-# Build everything (tools + examples) — default
+# Build everything (tools + examples) -- default
 zig build
 
 # Build only the host tools (zPRXGen, zSFOTool, zPBPTool)
@@ -64,22 +95,12 @@ zig build tools
 
 # Build only examples
 zig build examples
+
+# Build examples as a standalone sub-project (exercises the package API)
+cd examples && zig build
 ```
 
-A successful build emits `EBOOT.PBP` and `app.prx` for each example under `zig-out/bin/<name>/`.
-
-### Adding Your App to build.zig
-
-Add a `PSPBuildInfo` entry to the inline loop in `build.zig`:
-
-```zig
-PSPBuildInfo{
-    .name = "my_app",
-    .src_file = "src/main.zig",
-    .title = "My App Title",
-    // Optional: .icon0, .icon1, .pic0, .pic1, .snd0
-},
-```
+Output lands in `zig-out/bin/<name>/` with `EBOOT.PBP`, `app.prx`, and `app.elf` for each example.
 
 ## Running on PSP
 
@@ -89,7 +110,7 @@ Copy the output to your memory stick:
 PSP/GAME/MyAppName/EBOOT.PBP
 ```
 
-The application will appear under **Game → Memory Stick** in the XMB. Custom firmware (CFW) is required.
+The application will appear under **Game -> Memory Stick** in the XMB. Custom firmware (CFW) is required.
 
 ## Examples
 
@@ -156,7 +177,7 @@ try http_client.ca_bundle.parseCert(gpa, 0, now.toSeconds());
 http_client.now = now;
 ```
 
-TLS crypto requires extra stack space — set `pub const psp_stack_size: u32 = 512 * 1024;` in your app. See `examples/https.zig` for a complete working example.
+TLS crypto requires extra stack space — set `pub const psp_stack_size: u32 = 512 * 1024;` in your app. See `examples/https.zig` for a complete working example. *TODO: Needs Verification*
 
 ## Comparisons To C/C++
 

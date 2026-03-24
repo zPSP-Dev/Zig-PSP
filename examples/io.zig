@@ -1,7 +1,7 @@
 // PSP file I/O example using the std.Io vtable.
 //
 // Demonstrates createDir, createFile, writeStreamingAll, readStreaming,
-// and directory iteration — all routed through the PSP Io vtable
+// and directory iteration -- all routed through the PSP Io vtable
 // backed by sceIo* syscalls.
 //
 // Expected output:

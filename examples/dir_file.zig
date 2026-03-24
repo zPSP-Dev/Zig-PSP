@@ -1,7 +1,7 @@
 // PSP directory and file operations example using the std.Io vtable.
 //
 // Demonstrates directory creation, file I/O, stat, seek, rename, delete,
-// and timestamp operations — all routed through the PSP Io vtable.
+// and timestamp operations -- all routed through the PSP Io vtable.
 //
 // Expected output:
 //

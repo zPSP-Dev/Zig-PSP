@@ -7,7 +7,7 @@
 // has no such default and works cleanly.
 //
 // The arena suballocates PSP kernel blocks across many small requests.
-// All memory is freed at once on deinit — useful for frame or request scopes.
+// All memory is freed at once on deinit -- useful for frame or request scopes.
 //
 // Expected output:
 //   [1] baseline:  ~57916672 bytes
@@ -46,7 +46,7 @@ pub fn main(init: std.process.Init) !void {
     }
     const alloc = arena.allocator();
 
-    // Many small allocations — all suballocated within the arena's pages
+    // Many small allocations -- all suballocated within the arena's pages
     // rather than each paying a 256-byte PSP kernel block.
     const greeting = try std.fmt.allocPrint(alloc, "Hello from the Arena!\n", .{});
     sdk.extra.debug.print(greeting);
@@ -61,7 +61,7 @@ pub fn main(init: std.process.Init) !void {
 
     printFree(init.gpa, "[2] mid-arena");
 
-    // Intentionally do NOT free individual arena allocations — that is the
+    // Intentionally do NOT free individual arena allocations -- that is the
     // whole point. arena.deinit() in the defer above frees everything at once.
 
     sdk.extra.debug.print("Done!\n");

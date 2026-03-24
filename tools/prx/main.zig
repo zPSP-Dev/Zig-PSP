@@ -11,7 +11,7 @@
 
 const std = @import("std");
 
-// ── ELF constants ────────────────────────────────────────────────────────────
+// -- ELF constants ------------------------------------------------------------
 
 const ELF_MAGIC: u32 = 0x464C457F;
 const ELF_EXEC_TYPE: u16 = 0x0002;
@@ -43,7 +43,7 @@ const PSP_MODULE_INFO_NAME = ".rodata.sceModuleInfo";
 const PSP_MODULE_REMOVE_REL = ".rel.sceStub.text";
 const ELF_SH_STRTAB = ".shstrtab";
 
-// ── On-disk ELF structures (little-endian) ───────────────────────────────────
+// -- On-disk ELF structures (little-endian) -----------------------------------
 
 const Elf32_Ehdr = extern struct {
     e_magic: u32,
@@ -112,7 +112,7 @@ comptime {
     std.debug.assert(@sizeOf(Elf32_Sym) == SYM_SIZE);
 }
 
-// ── Working data structures ───────────────────────────────────────────────────
+// -- Working data structures ---------------------------------------------------
 
 const ElfSection = struct {
     name_idx: u32,
@@ -171,7 +171,7 @@ const Layout = struct {
     total_size: u32,
 };
 
-// ── Helpers ───────────────────────────────────────────────────────────────────
+// -- Helpers -------------------------------------------------------------------
 
 fn lw(data: []const u8, offset: usize) u32 {
     return std.mem.readInt(u32, data[offset..][0..4], .little);
@@ -201,7 +201,7 @@ fn elfRelType(r_info: u32) u8 {
     return @truncate(r_info & 0xFF);
 }
 
-// ── Load & validate ───────────────────────────────────────────────────────────
+// -- Load & validate -----------------------------------------------------------
 
 fn loadFile(allocator: std.mem.Allocator, io: std.Io, path: []const u8) ![]u8 {
     var file = std.Io.Dir.cwd().openFile(io, path, .{}) catch |err| {
@@ -355,7 +355,7 @@ fn loadSections(
     return .{ .sections = sections, .modinfo_idx = modinfo_idx.? };
 }
 
-// ── Relocation filtering ──────────────────────────────────────────────────────
+// -- Relocation filtering ------------------------------------------------------
 
 fn processRelocs(allocator: std.mem.Allocator, sections: []ElfSection, head: ElfHeader) !void {
     for (0..head.shnum) |i| {
@@ -472,7 +472,7 @@ fn reindexSections(sections: []ElfSection) void {
     }
 }
 
-// ── Layout calculation ────────────────────────────────────────────────────────
+// -- Layout calculation --------------------------------------------------------
 
 fn calculateLayout(sections: []ElfSection, head: ElfHeader) Layout {
     var out_sects: u32 = 2; // NULL + shstrtab
@@ -527,7 +527,7 @@ fn calculateLayout(sections: []ElfSection, head: ElfHeader) Layout {
     };
 }
 
-// ── Output writers ────────────────────────────────────────────────────────────
+// -- Output writers ------------------------------------------------------------
 
 fn writeHeader(out: []u8, src_head: ElfHeader, layout: Layout) void {
     const h = std.mem.bytesAsValue(Elf32_Ehdr, out[0..EHDR_SIZE]);
@@ -686,7 +686,7 @@ fn writeShstrtab(out: []u8, sections: []ElfSection, head: ElfHeader, layout: Lay
     @memcpy(out[ptr..][0..ELF_SH_STRTAB.len], ELF_SH_STRTAB);
 }
 
-// ── Allegrex compatibility patches ───────────────────────────────────────────
+// -- Allegrex compatibility patches -------------------------------------------
 
 // The PSP Allegrex CPU does not implement MIPS trap instructions (TEQ, TGE,
 // TGEU, TLT, TLTU, TNE and their immediate forms), even though they are
@@ -717,7 +717,7 @@ fn patchTrapInstructions(sections: []ElfSection, head: ElfHeader) void {
     }
 }
 
-// ── Main pipeline ─────────────────────────────────────────────────────────────
+// -- Main pipeline -------------------------------------------------------------
 
 fn run(
     allocator: std.mem.Allocator,
