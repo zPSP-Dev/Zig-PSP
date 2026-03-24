@@ -8,7 +8,7 @@ from dataclasses import dataclass
 from typing import List, Dict, Optional, Tuple
 from contextlib import contextmanager
 
-PSPSDK_COMMIT_SHA = "c993d5a"
+PSPSDK_COMMIT_SHA = "19a4658"
 
 
 @dataclass
@@ -251,6 +251,10 @@ def parse_c_type_to_zig(c_type: str) -> str:
         "netData": "types.netData",
         "PspDebugProfilerRegs": "volatile types.PspDebugProfilerRegs",
         "struct msghdr": "types.msghdr",
+        "sockaddr_in": "types.sockaddr_in",
+        "struct sockaddr_in": "types.sockaddr_in",
+        "struct sockaddr": "types.sockaddr_in",
+        "socklen_t": "types.socklen_t",
         "pspUtilityGameSharingParams": "types.pspUtilityGameSharingParams",
         "pspUtilityHtmlViewerParam": "types.pspUtilityHtmlViewerParam",
         "pspUtilityMsgDialogParams": "types.pspUtilityMsgDialogParams",
@@ -288,6 +292,24 @@ def parse_c_type_to_zig(c_type: str) -> str:
         raise KeyError(f"Missing C type '{c_type}' in type_map")
 
 
+ZIG_KEYWORDS = {
+    "addrspace", "align", "allowzero", "and", "anyframe", "anytype", "asm",
+    "async", "await", "break", "callconv", "catch", "comptime", "const",
+    "continue", "defer", "else", "enum", "error", "export", "extern", "fn",
+    "for", "if", "inline", "linksection", "noalias", "noinline", "nosuspend",
+    "opaque", "or", "orelse", "packed", "pub", "resume", "return", "struct",
+    "suspend", "switch", "test", "threadlocal", "try", "type", "union",
+    "unreachable", "usingnamespace", "var", "volatile", "while",
+}
+
+
+def zig_escape_name(name: str) -> str:
+    """Escape a name that is a Zig keyword."""
+    if name in ZIG_KEYWORDS:
+        return f'@"{name}"'
+    return name
+
+
 def parse_c_function_signature(
     line: str,
 ) -> Optional[Tuple[str, List[Tuple[str, str]], str]]:
@@ -296,6 +318,9 @@ def parse_c_function_signature(
     line = re.sub(r"/\*.*?\*/", "", line, flags=re.DOTALL)  # Remove multi-line comments
     line = re.sub(r"//.*$", "", line)  # Remove single-line comments
     line = line.strip()
+
+    # Normalize tabs to spaces before tokenizing
+    line = line.replace("\t", " ")
 
     # Split into words while preserving * as part of the type
     words = []
@@ -354,6 +379,11 @@ def parse_c_function_signature(
                 if param == "?":
                     return None
 
+                # Handle varargs
+                if param == "...":
+                    param_types_and_names.append(("...", "..."))
+                    continue
+
                 # Split into words while preserving * as part of the type
                 words = []
                 current_word = ""
@@ -403,6 +433,10 @@ def parse_c_function_signature(
                             type_words.append(word)
 
                     param_type = " ".join(type_words)
+                    # If param_type is empty, the single word is a type with no name
+                    if not param_type:
+                        param_type = name
+                        name = f"arg{len(param_types_and_names)}"
                     param_types_and_names.append((param_type, name))
                 else:
                     param_types_and_names.append(
@@ -536,7 +570,7 @@ def find_function_signature(
                                         if param_types_and_names[-1][1] == "...":
                                             # For varargs, only include the parameters up to ...
                                             zig_params = [
-                                                f"{name}: {parse_c_type_to_zig(t)}"
+                                                f"{zig_escape_name(name)}: {parse_c_type_to_zig(t)}"
                                                 for t, name in param_types_and_names[
                                                     :-1
                                                 ]
@@ -544,7 +578,7 @@ def find_function_signature(
                                             signature = f"({', '.join(zig_params)}, ...) {zig_return}"
                                         else:
                                             zig_params = [
-                                                f"{name}: {parse_c_type_to_zig(t)}"
+                                                f"{zig_escape_name(name)}: {parse_c_type_to_zig(t)}"
                                                 for t, name in param_types_and_names
                                             ]
                                             signature = f"({', '.join(zig_params)}) {zig_return}"
