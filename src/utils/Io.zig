@@ -746,13 +746,13 @@ fn fileStat(_: ?*anyopaque, file: File) File.StatError!File.Stat {
 fn fileLength(_: ?*anyopaque, file: File) File.LengthError!u64 {
     const fd = file.handle;
     // Save current position
-    const cur = io_mgr.sceIoLseek32(fd, 0, PSP_SEEK_CUR);
+    const cur = io_mgr.sceIoLseek(fd, 0, PSP_SEEK_CUR);
     if (cur < 0) return error.AccessDenied;
     // Seek to end
-    const end = io_mgr.sceIoLseek32(fd, 0, PSP_SEEK_END);
+    const end = io_mgr.sceIoLseek(fd, 0, PSP_SEEK_END);
     if (end < 0) return error.AccessDenied;
     // Restore position
-    _ = io_mgr.sceIoLseek32(fd, cur, PSP_SEEK_SET);
+    _ = io_mgr.sceIoLseek(fd, cur, PSP_SEEK_SET);
     return @intCast(end);
 }
 
@@ -766,10 +766,10 @@ fn fileClose(_: ?*anyopaque, files: []const File) void {
 fn fileWritePositional(_: ?*anyopaque, file: File, header: []const u8, data: []const []const u8, splat: usize, offset: u64) File.WritePositionalError!usize {
     const fd = file.handle;
     // Save current position
-    const cur = io_mgr.sceIoLseek32(fd, 0, PSP_SEEK_CUR);
+    const cur = io_mgr.sceIoLseek(fd, 0, PSP_SEEK_CUR);
     if (cur < 0) return error.Unseekable;
     // Seek to offset
-    const seek_ret = io_mgr.sceIoLseek32(fd, @intCast(offset), PSP_SEEK_SET);
+    const seek_ret = io_mgr.sceIoLseek(fd, @intCast(offset), PSP_SEEK_SET);
     if (seek_ret < 0) return error.Unseekable;
 
     var written: usize = 0;
@@ -777,7 +777,7 @@ fn fileWritePositional(_: ?*anyopaque, file: File, header: []const u8, data: []c
     // Write header
     if (header.len > 0) {
         written += pspWrite(fd, header) catch {
-            _ = io_mgr.sceIoLseek32(fd, cur, PSP_SEEK_SET);
+            _ = io_mgr.sceIoLseek(fd, cur, PSP_SEEK_SET);
             return error.InputOutput;
         };
     }
@@ -786,7 +786,7 @@ fn fileWritePositional(_: ?*anyopaque, file: File, header: []const u8, data: []c
     for (data[0..data.len -| 1]) |slice| {
         if (slice.len > 0) {
             written += pspWrite(fd, slice) catch {
-                _ = io_mgr.sceIoLseek32(fd, cur, PSP_SEEK_SET);
+                _ = io_mgr.sceIoLseek(fd, cur, PSP_SEEK_SET);
                 return error.InputOutput;
             };
         }
@@ -799,7 +799,7 @@ fn fileWritePositional(_: ?*anyopaque, file: File, header: []const u8, data: []c
             var i: usize = 0;
             while (i < splat) : (i += 1) {
                 written += pspWrite(fd, pattern) catch {
-                    _ = io_mgr.sceIoLseek32(fd, cur, PSP_SEEK_SET);
+                    _ = io_mgr.sceIoLseek(fd, cur, PSP_SEEK_SET);
                     return error.InputOutput;
                 };
             }
@@ -807,7 +807,7 @@ fn fileWritePositional(_: ?*anyopaque, file: File, header: []const u8, data: []c
     }
 
     // Restore position
-    _ = io_mgr.sceIoLseek32(fd, cur, PSP_SEEK_SET);
+    _ = io_mgr.sceIoLseek(fd, cur, PSP_SEEK_SET);
     return written;
 }
 
@@ -838,10 +838,10 @@ fn fileWriteFileStreaming(_: ?*anyopaque, file: File, header: []const u8, reader
 fn fileWriteFilePositional(_: ?*anyopaque, file: File, header: []const u8, reader: *Io.File.Reader, limit: Io.Limit, offset: u64) File.WriteFilePositionalError!usize {
     const fd = file.handle;
     // Save current position
-    const cur = io_mgr.sceIoLseek32(fd, 0, PSP_SEEK_CUR);
+    const cur = io_mgr.sceIoLseek(fd, 0, PSP_SEEK_CUR);
     if (cur < 0) return error.Unseekable;
     // Seek to offset
-    const seek_ret = io_mgr.sceIoLseek32(fd, @intCast(offset), PSP_SEEK_SET);
+    const seek_ret = io_mgr.sceIoLseek(fd, @intCast(offset), PSP_SEEK_SET);
     if (seek_ret < 0) return error.Unseekable;
 
     var written: usize = 0;
@@ -849,7 +849,7 @@ fn fileWriteFilePositional(_: ?*anyopaque, file: File, header: []const u8, reade
     // Write header
     if (header.len > 0) {
         written += pspWrite(fd, header) catch {
-            _ = io_mgr.sceIoLseek32(fd, cur, PSP_SEEK_SET);
+            _ = io_mgr.sceIoLseek(fd, cur, PSP_SEEK_SET);
             return error.InputOutput;
         };
     }
@@ -861,12 +861,12 @@ fn fileWriteFilePositional(_: ?*anyopaque, file: File, header: []const u8, reade
         const to_read = @min(buf.len, remaining);
         var bufs = [_][]u8{buf[0..to_read]};
         const n = reader.interface.readVec(&bufs) catch {
-            _ = io_mgr.sceIoLseek32(fd, cur, PSP_SEEK_SET);
+            _ = io_mgr.sceIoLseek(fd, cur, PSP_SEEK_SET);
             return error.InputOutput;
         };
         if (n == 0) break;
         const w = pspWrite(fd, buf[0..n]) catch {
-            _ = io_mgr.sceIoLseek32(fd, cur, PSP_SEEK_SET);
+            _ = io_mgr.sceIoLseek(fd, cur, PSP_SEEK_SET);
             return error.InputOutput;
         };
         written += w;
@@ -874,17 +874,17 @@ fn fileWriteFilePositional(_: ?*anyopaque, file: File, header: []const u8, reade
     }
 
     // Restore position
-    _ = io_mgr.sceIoLseek32(fd, cur, PSP_SEEK_SET);
+    _ = io_mgr.sceIoLseek(fd, cur, PSP_SEEK_SET);
     return written;
 }
 
 fn fileReadPositional(_: ?*anyopaque, file: File, bufs: []const []u8, offset: u64) File.ReadPositionalError!usize {
     const fd = file.handle;
     // Save current position
-    const cur = io_mgr.sceIoLseek32(fd, 0, PSP_SEEK_CUR);
+    const cur = io_mgr.sceIoLseek(fd, 0, PSP_SEEK_CUR);
     if (cur < 0) return error.Unseekable;
     // Seek to offset
-    const seek_ret = io_mgr.sceIoLseek32(fd, @intCast(offset), PSP_SEEK_SET);
+    const seek_ret = io_mgr.sceIoLseek(fd, @intCast(offset), PSP_SEEK_SET);
     if (seek_ret < 0) return error.Unseekable;
 
     var total: usize = 0;
@@ -892,7 +892,7 @@ fn fileReadPositional(_: ?*anyopaque, file: File, bufs: []const []u8, offset: u6
         if (buf.len > 0) {
             const ret = io_mgr.sceIoRead(fd, buf.ptr, @intCast(buf.len));
             if (ret < 0) {
-                _ = io_mgr.sceIoLseek32(fd, cur, PSP_SEEK_SET);
+                _ = io_mgr.sceIoLseek(fd, cur, PSP_SEEK_SET);
                 return error.InputOutput;
             }
             total += @intCast(ret);
@@ -901,19 +901,17 @@ fn fileReadPositional(_: ?*anyopaque, file: File, bufs: []const []u8, offset: u6
     }
 
     // Restore position
-    _ = io_mgr.sceIoLseek32(fd, cur, PSP_SEEK_SET);
+    _ = io_mgr.sceIoLseek(fd, cur, PSP_SEEK_SET);
     return total;
 }
 
 fn fileSeekBy(_: ?*anyopaque, file: File, offset: i64) File.SeekError!void {
-    const off32: c_int = @intCast(offset);
-    const ret = io_mgr.sceIoLseek32(file.handle, off32, PSP_SEEK_CUR);
+    const ret = io_mgr.sceIoLseek(file.handle, offset, PSP_SEEK_CUR);
     if (ret < 0) return error.Unseekable;
 }
 
 fn fileSeekTo(_: ?*anyopaque, file: File, offset: u64) File.SeekError!void {
-    const off32: c_int = @intCast(offset);
-    const ret = io_mgr.sceIoLseek32(file.handle, off32, PSP_SEEK_SET);
+    const ret = io_mgr.sceIoLseek(file.handle, @intCast(offset), PSP_SEEK_SET);
     if (ret < 0) return error.Unseekable;
 }
 

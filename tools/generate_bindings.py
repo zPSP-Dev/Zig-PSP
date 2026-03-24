@@ -676,6 +676,38 @@ def process_s_files(base_dir: str, verbose: bool = False) -> Dict[str, Module]:
     return modules
 
 
+def i64_wrapper_info(signature: str) -> tuple:
+    """Return (needs_wrapper, trailing_args) for i64 MIPS o32 alignment issues.
+
+    On MIPS o32, a 64-bit arg that follows a 32-bit arg gets pushed to an even
+    register pair ($a2:$a3), skipping $a1 as padding.  The PSP kernel expects
+    packed layout (no gap).  Detect this and return the number of args that
+    follow the i64 (0, 1, or 2) so the right i64_abi_wrapper variant is used.
+    """
+    if not signature:
+        return False, 0
+
+    params_str = signature.split("(")[1].split(")")[0]
+    if not params_str or params_str.strip() == "...":
+        return False, 0
+
+    param_types = []
+    for p in params_str.split(","):
+        p = p.strip()
+        param_types.append(p.split(": ", 1)[1] if ": " in p else p)
+
+    reg_pos = 0
+    for i, ptype in enumerate(param_types):
+        if ptype in ("i64", "u64"):
+            if reg_pos % 2 == 1:  # odd register position → alignment gap
+                trailing = len(param_types) - i - 1
+                return True, trailing
+            return False, 0  # even position, no gap
+        reg_pos += 1  # 32-bit arg occupies one register slot
+
+    return False, 0
+
+
 def generate_module_files(modules: Dict[str, Module], output_dir: str):
     """Generate the Zig source files containing extern function declarations and NIDs."""
 
@@ -711,6 +743,17 @@ def generate_module_files(modules: Dict[str, Module], output_dir: str):
             # Add function declarations
             for func in module.functions:
                 if func.signature:
+                    # Check for i64/u64 alignment ABI issue first
+                    needs_i64, trailing = i64_wrapper_info(func.signature)
+                    if needs_i64:
+                        f.write(
+                            f'    asm (macro.import_function("{module.name}", "{func.nid}", "{func.name}_stub"));\n'
+                        )
+                        f.write(
+                            f'    asm (macro.i64_abi_wrapper("{func.name}", {trailing}));\n'
+                        )
+                        continue
+
                     # Count the number of arguments by counting commas in the parameters
                     params = func.signature.split("(")[1].split(")")[0]
                     arg_count = (

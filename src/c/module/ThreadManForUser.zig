@@ -968,11 +968,13 @@ comptime {
     asm (macro.import_function("ThreadManForUser", "0x034A921F", "sceKernelGetVTimerTime"));
     asm (macro.import_function("ThreadManForUser", "0xC0B3FFD2", "sceKernelGetVTimerTimeWide"));
     asm (macro.import_function("ThreadManForUser", "0x542AD630", "sceKernelSetVTimerTime"));
-    asm (macro.import_function("ThreadManForUser", "0xFB6425C3", "sceKernelSetVTimerTimeWide"));
+    asm (macro.import_function("ThreadManForUser", "0xFB6425C3", "sceKernelSetVTimerTimeWide_stub"));
+    asm (macro.i64_abi_wrapper("sceKernelSetVTimerTimeWide", 0));
     asm (macro.import_function("ThreadManForUser", "0xC68D9437", "sceKernelStartVTimer"));
     asm (macro.import_function("ThreadManForUser", "0xD0AEEE87", "sceKernelStopVTimer"));
     asm (macro.import_function("ThreadManForUser", "0xD8B299AE", "sceKernelSetVTimerHandler"));
-    asm (macro.import_function("ThreadManForUser", "0x53B00E9A", "sceKernelSetVTimerHandlerWide"));
+    asm (macro.import_function("ThreadManForUser", "0x53B00E9A", "sceKernelSetVTimerHandlerWide_stub"));
+    asm (macro.i64_abi_wrapper("sceKernelSetVTimerHandlerWide", 2));
     asm (macro.import_function("ThreadManForUser", "0xD2D615EF", "sceKernelCancelVTimerHandler"));
     asm (macro.import_function("ThreadManForUser", "0x5F32BEAA", "sceKernelReferVTimerStatus"));
     asm (macro.import_function("ThreadManForUser", "0x446D8DE6", "sceKernelCreateThread_stub"));
