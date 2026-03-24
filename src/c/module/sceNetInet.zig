@@ -8,35 +8,35 @@ pub extern fn sceNetInetTerm() callconv(.c) c_int;
 
 pub extern fn sceNetInetAccept(s: c_int, addr: [*c]types.sockaddr_in, addrlen: [*c]types.socklen_t) callconv(.c) c_int;
 
-pub extern fn sceNetInetBind(s: c_int, addr: [*c]const types.sockaddr_in, addrlen: types.socklen_t) callconv(.c) c_int;
+pub extern fn sceNetInetBind(s: c_int, my_addr: [*c]const types.sockaddr_in, addrlen: types.socklen_t) callconv(.c) c_int;
 
 pub extern fn sceNetInetClose(s: c_int) callconv(.c) c_int;
 
-pub extern fn sceNetInetCloseWithRST(s: c_int) callconv(.c) c_int;
+pub extern fn sceNetInetCloseWithRST() callconv(.c) void;
 
-pub extern fn sceNetInetConnect(s: c_int, addr: [*c]const types.sockaddr_in, addrlen: types.socklen_t) callconv(.c) c_int;
+pub extern fn sceNetInetConnect(s: c_int, serv_addr: [*c]const types.sockaddr_in, addrlen: types.socklen_t) callconv(.c) c_int;
 
-pub extern fn sceNetInetGetpeername(s: c_int, addr: [*c]types.sockaddr_in, addrlen: [*c]types.socklen_t) callconv(.c) c_int;
+pub extern fn sceNetInetGetpeername(s: c_int, name: [*c]types.sockaddr_in, namelen: [*c]types.socklen_t) callconv(.c) c_int;
 
-pub extern fn sceNetInetGetsockname(s: c_int, addr: [*c]types.sockaddr_in, addrlen: [*c]types.socklen_t) callconv(.c) c_int;
+pub extern fn sceNetInetGetsockname(s: c_int, name: [*c]types.sockaddr_in, namelen: [*c]types.socklen_t) callconv(.c) c_int;
 
 pub extern fn sceNetInetGetsockopt(s: c_int, level: c_int, optname: c_int, optval: ?*anyopaque, optlen: [*c]types.socklen_t) callconv(.c) c_int;
 
 pub extern fn sceNetInetListen(s: c_int, backlog: c_int) callconv(.c) c_int;
 
-pub extern fn sceNetInetPoll(fds: ?*anyopaque, nfds: c_uint, timeout: c_int) callconv(.c) c_int;
+pub extern fn sceNetInetPoll() callconv(.c) void;
 
-pub extern fn sceNetInetRecv(s: c_int, buf: ?*anyopaque, len: usize, flags: c_int) callconv(.c) isize;
+pub extern fn sceNetInetRecv(s: c_int, buf: ?*anyopaque, len: usize, flags: c_int) callconv(.c) usize;
 
-pub extern fn sceNetInetRecvfrom(s: c_int, buf: ?*anyopaque, len: usize, flags: c_int, from: [*c]types.sockaddr_in, fromlen: [*c]types.socklen_t) callconv(.c) isize;
+pub extern fn sceNetInetRecvfrom(s: c_int, buf: ?*anyopaque, flags: usize, arg3: c_int, from: [*c]types.sockaddr_in, fromlen: [*c]types.socklen_t) callconv(.c) usize;
 
 pub extern fn sceNetInetRecvmsg(s: c_int, msg: [*c]types.msghdr, flags: c_int) callconv(.c) isize;
 
 pub extern fn sceNetInetSelect(n: c_int, readfds: [*c]types.fd_set, writefds: [*c]types.fd_set, exceptfds: [*c]types.fd_set, timeout: [*c]types.SceNetInetTimeval) callconv(.c) c_int;
 
-pub extern fn sceNetInetSend(s: c_int, buf: ?*const anyopaque, len: usize, flags: c_int) callconv(.c) isize;
+pub extern fn sceNetInetSend(s: c_int, buf: ?*const anyopaque, len: usize, flags: c_int) callconv(.c) usize;
 
-pub extern fn sceNetInetSendto(s: c_int, buf: ?*const anyopaque, len: usize, flags: c_int, to: [*c]const types.sockaddr_in, tolen: types.socklen_t) callconv(.c) isize;
+pub extern fn sceNetInetSendto(s: c_int, buf: ?*const anyopaque, len: usize, flags: c_int, to: [*c]const types.sockaddr_in, tolen: types.socklen_t) callconv(.c) usize;
 
 pub extern fn sceNetInetSendmsg(s: c_int, msg: [*c]const types.msghdr, flags: c_int) callconv(.c) isize;
 
@@ -46,7 +46,7 @@ pub extern fn sceNetInetShutdown(s: c_int, how: c_int) callconv(.c) c_int;
 
 pub extern fn sceNetInetSocket(domain: c_int, @"type": c_int, protocol: c_int) callconv(.c) c_int;
 
-pub extern fn sceNetInetSocketAbort(s: c_int) callconv(.c) c_int;
+pub extern fn sceNetInetSocketAbort() callconv(.c) void;
 
 pub extern fn sceNetInetGetErrno() callconv(.c) c_int;
 
@@ -54,13 +54,13 @@ pub extern fn sceNetInetGetTcpcbstat() callconv(.c) void;
 
 pub extern fn sceNetInetGetUdpcbstat() callconv(.c) void;
 
-pub extern fn sceNetInetInetAddr(cp: [*c]const u8) callconv(.c) u32;
+pub extern fn sceNetInetInetAddr() callconv(.c) void;
 
-pub extern fn sceNetInetInetAton(cp: [*c]const u8, addr: [*c]types.in_addr) callconv(.c) c_int;
+pub extern fn sceNetInetInetAton() callconv(.c) void;
 
-pub extern fn sceNetInetInetNtop(af: c_int, src: ?*const anyopaque, dst: [*c]u8, size: types.socklen_t) callconv(.c) [*c]const u8;
+pub extern fn sceNetInetInetNtop() callconv(.c) void;
 
-pub extern fn sceNetInetInetPton(af: c_int, src: [*c]const u8, dst: ?*anyopaque) callconv(.c) c_int;
+pub extern fn sceNetInetInetPton() callconv(.c) void;
 
 comptime {
     asm (macro.import_module_start("sceNetInet", "0x00090000", "30"));
@@ -73,18 +73,22 @@ comptime {
     asm (macro.import_function("sceNetInet", "0x410B34AA", "sceNetInetConnect"));
     asm (macro.import_function("sceNetInet", "0xE247B6D6", "sceNetInetGetpeername"));
     asm (macro.import_function("sceNetInet", "0x162E6FD5", "sceNetInetGetsockname"));
-    asm (macro.import_function("sceNetInet", "0x4A114C7C", "sceNetInetGetsockopt"));
+    asm (macro.import_function("sceNetInet", "0x4A114C7C", "sceNetInetGetsockopt_stub"));
+    asm (macro.generic_abi_wrapper("sceNetInetGetsockopt", 5));
     asm (macro.import_function("sceNetInet", "0xD10A1A7A", "sceNetInetListen"));
     asm (macro.import_function("sceNetInet", "0xFAABB1DD", "sceNetInetPoll"));
     asm (macro.import_function("sceNetInet", "0xCDA85C99", "sceNetInetRecv"));
-    asm (macro.import_function("sceNetInet", "0xC91142E4", "sceNetInetRecvfrom"));
+    asm (macro.import_function("sceNetInet", "0xC91142E4", "sceNetInetRecvfrom_stub"));
+    asm (macro.generic_abi_wrapper("sceNetInetRecvfrom", 6));
     asm (macro.import_function("sceNetInet", "0xEECE61D2", "sceNetInetRecvmsg"));
     asm (macro.import_function("sceNetInet", "0x5BE8D595", "sceNetInetSelect_stub"));
     asm (macro.generic_abi_wrapper("sceNetInetSelect", 5));
     asm (macro.import_function("sceNetInet", "0x7AA671BC", "sceNetInetSend"));
-    asm (macro.import_function("sceNetInet", "0x05038FC7", "sceNetInetSendto"));
+    asm (macro.import_function("sceNetInet", "0x05038FC7", "sceNetInetSendto_stub"));
+    asm (macro.generic_abi_wrapper("sceNetInetSendto", 6));
     asm (macro.import_function("sceNetInet", "0x774E36F4", "sceNetInetSendmsg"));
-    asm (macro.import_function("sceNetInet", "0x2FE71FE7", "sceNetInetSetsockopt"));
+    asm (macro.import_function("sceNetInet", "0x2FE71FE7", "sceNetInetSetsockopt_stub"));
+    asm (macro.generic_abi_wrapper("sceNetInetSetsockopt", 5));
     asm (macro.import_function("sceNetInet", "0x4CFE4E56", "sceNetInetShutdown"));
     asm (macro.import_function("sceNetInet", "0x8B7B220F", "sceNetInetSocket"));
     asm (macro.import_function("sceNetInet", "0x80A21ABD", "sceNetInetSocketAbort"));

@@ -12,6 +12,7 @@ pub const ThreadManForUser = @import("module/ThreadManForUser.zig");
 pub const UtilsForUser = @import("module/UtilsForUser.zig");
 pub const sceAtrac3plus = @import("module/sceAtrac3plus.zig");
 pub const sceAudio = @import("module/sceAudio.zig");
+pub const sceAudioRouting = @import("module/sceAudioRouting.zig");
 pub const sceAudiocodec = @import("module/sceAudiocodec.zig");
 pub const sceCtrl = @import("module/sceCtrl.zig");
 pub const sceDisplay = @import("module/sceDisplay.zig");
