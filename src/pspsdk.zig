@@ -383,7 +383,7 @@ pub const sceUtilityNetconfUpdate = _psputility.sceUtilityNetconfUpdate;
 pub const sceUtilityNetconfGetStatus = _psputility.sceUtilityNetconfGetStatus;
 pub const sceUtilityNetconfShutdownStart = _psputility.sceUtilityNetconfShutdownStart;
 
-// psputils — source from UtilsForUser (NID stubs) not psputils.zig (bare extern)
+// psputils -- source from UtilsForUser (NID stubs) not psputils.zig (bare extern)
 const _uu = c.UtilsForUser;
 pub const sceKernelUtilsMt19937Init        = _uu.sceKernelUtilsMt19937Init;
 pub const sceKernelUtilsMt19937UInt        = _uu.sceKernelUtilsMt19937UInt;
@@ -793,7 +793,7 @@ pub const utility = struct {
 };
 
 pub const utils = struct {
-    // Types — sourced from c.types via psputils.zig re-exports
+    // Types -- sourced from c.types via psputils.zig re-exports
     const _t = @import("sdk/psputils.zig");
     pub const SceKernelUtilsMt19937Context = _t.SceKernelUtilsMt19937Context;
     pub const SceKernelUtilsMd5Context     = _t.SceKernelUtilsMd5Context;

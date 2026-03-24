@@ -1,4 +1,4 @@
-/// PSP Page Allocator — analogous to std.heap.page_allocator.
+/// PSP Page Allocator -- analogous to std.heap.page_allocator.
 ///
 /// Each allocation maps directly to one sceKernelAllocPartitionMemory block.
 /// No pooling, no coalescing; free releases the block back to the kernel.
@@ -72,7 +72,7 @@ const vtable = std.mem.Allocator.VTable{
     .free = free,
 };
 
-/// Stateless PSP page allocator. Use this directly — no init needed.
+/// Stateless PSP page allocator. Use this directly -- no init needed.
 pub const psp_page_allocator = std.mem.Allocator{
     .ptr = undefined,
     .vtable = &vtable,

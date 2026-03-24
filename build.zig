@@ -1,11 +1,172 @@
 const std = @import("std");
 const builtin = std.builtin;
 
+// -- Public API ----------------------------------------------------------------
+
+/// Options for building a PSP EBOOT.PBP.
+pub const PspEbootOptions = struct {
+    name: []const u8,
+    root_source_file: std.Build.LazyPath,
+    title: []const u8,
+    optimize: std.builtin.OptimizeMode = .Debug,
+    // Optional PBP assets (pass null to omit)
+    icon0: ?std.Build.LazyPath = null,
+    icon1: ?std.Build.LazyPath = null,
+    pic0: ?std.Build.LazyPath = null,
+    pic1: ?std.Build.LazyPath = null,
+    snd0: ?std.Build.LazyPath = null,
+};
+
+/// The three artifacts produced by buildPspEboot.
+pub const PspEboot = struct {
+    /// MIPS ELF with debug info (useful with PPSSPP/gdb)
+    elf: *std.Build.Step.Compile,
+    /// PSP PRX - stripped, relocatable executable
+    prx: std.Build.LazyPath,
+    /// EBOOT.PBP - the file you copy to ms0:/PSP/GAME/<name>/
+    eboot: std.Build.LazyPath,
+};
+
+/// Controls where buildPspEboot installs its output artifacts.
+pub const PspOutputOptions = struct {
+    /// Subdirectory under zig-out/bin/ for all artifacts.
+    /// Defaults to the app name from PspEbootOptions.
+    dir: ?[]const u8 = null,
+};
+
+/// Build a PSP EBOOT.PBP from a single Zig source file and install the
+/// artifacts under zig-out/bin/<name>/ (or a custom dir via PspOutputOptions).
+/// Call this from your own build.zig after adding pspsdk as a dependency.
+///
+/// Example:
+///   const pspsdk = @import("pspsdk");
+///   pspsdk.buildPspEboot(b, .{
+///       .name             = "my_app",
+///       .root_source_file = b.path("src/main.zig"),
+///       .title            = "My App",
+///       .optimize         = optimize,
+///   }, .{});
+pub fn buildPspEboot(b: *std.Build, options: PspEbootOptions, output: PspOutputOptions) PspEboot {
+    // Reach back into the pspsdk package to get all the resources we need.
+    const self = b.dependencyFromBuildZig(@This(), .{});
+
+    const psp_target = getPspTarget(b);
+
+    // Build the pspsdk module with the caller's optimize level so the SDK
+    // and the app are compiled at the same optimization tier.
+    const pspsdk_mod = b.createModule(.{
+        .root_source_file = self.path("src/pspsdk.zig"),
+        .target = psp_target,
+        .optimize = options.optimize,
+    });
+
+    const prxgen = self.artifact("zPRXGen");
+    const sfo_tool = self.builder.dependency("zSFOTool", .{}).artifact("zSFOTool");
+    const pbp_tool = self.builder.dependency("zPBPTool", .{}).artifact("zPBPTool");
+    const linkfile = self.path("tools/linkfile.ld");
+
+    return buildPspEbootInner(b, pspsdk_mod, prxgen, sfo_tool, pbp_tool, linkfile, options, output);
+}
+
+/// Return the PSP resolved target (mipsel, os=psp, cpu=allegrex).
+/// Exposed so downstream projects can query it if needed.
+pub fn getPspTarget(b: *std.Build) std.Build.ResolvedTarget {
+    return b.resolveTargetQuery(.{
+        .cpu_arch = .mipsel,
+        .os_tag = .psp,
+        .cpu_model = .{ .explicit = &std.Target.mips.cpu.allegrex },
+    });
+}
+
+// -- Internal helper -----------------------------------------------------------
+
+/// Common pipeline: ELF -> PRX -> SFO -> PBP, then install artifacts.
+/// Used by both buildPspEboot (downstream) and build() (root examples).
+fn buildPspEbootInner(
+    b: *std.Build,
+    pspsdk_mod: *std.Build.Module,
+    prxgen: *std.Build.Step.Compile,
+    sfo_tool: *std.Build.Step.Compile,
+    pbp_tool: *std.Build.Step.Compile,
+    linkfile: std.Build.LazyPath,
+    options: PspEbootOptions,
+    output: PspOutputOptions,
+) PspEboot {
+    const psp_target = getPspTarget(b);
+
+    const exe = b.addExecutable(.{
+        .name = "main",
+        .root_module = b.createModule(.{
+            .root_source_file = options.root_source_file,
+            .target = psp_target,
+            .optimize = options.optimize,
+            .strip = false,
+        }),
+    });
+    exe.root_module.addImport("pspsdk", pspsdk_mod);
+    exe.link_eh_frame_hdr = true;
+    exe.link_emit_relocs = true;
+    exe.entry = .{ .symbol_name = "module_start" };
+    exe.setLinkerScript(linkfile);
+
+    // ELF -> PRX
+    const mk_prx = b.addRunArtifact(prxgen);
+    mk_prx.addArtifactArg(exe);
+    const prx_file = mk_prx.addOutputFileArg("app.prx");
+
+    // -> PARAM.SFO
+    const mk_sfo = b.addRunArtifact(sfo_tool);
+    mk_sfo.addArg("write");
+    mk_sfo.addArg(options.title);
+    const sfo_file = mk_sfo.addOutputFileArg("PARAM.SFO");
+
+    // PRX + SFO -> EBOOT.PBP
+    const pack_pbp = b.addRunArtifact(pbp_tool);
+    pack_pbp.addArg("pack");
+    const eboot_file = pack_pbp.addOutputFileArg("EBOOT.PBP");
+    pack_pbp.addFileArg(sfo_file);
+
+    if (options.icon0) |p| pack_pbp.addFileArg(p) else pack_pbp.addArg("NULL");
+    if (options.icon1) |p| pack_pbp.addFileArg(p) else pack_pbp.addArg("NULL");
+    if (options.pic0) |p| pack_pbp.addFileArg(p) else pack_pbp.addArg("NULL");
+    if (options.pic1) |p| pack_pbp.addFileArg(p) else pack_pbp.addArg("NULL");
+    if (options.snd0) |p| pack_pbp.addFileArg(p) else pack_pbp.addArg("NULL");
+    pack_pbp.addFileArg(prx_file);
+    pack_pbp.addArg("NULL"); // DATA.PSAR not needed
+
+    const result = PspEboot{
+        .elf = exe,
+        .prx = prx_file,
+        .eboot = eboot_file,
+    };
+
+    // Install artifacts under zig-out/bin/<dir>/
+    const dir = output.dir orelse options.name;
+    const alloc = b.allocator;
+
+    b.getInstallStep().dependOn(&b.addInstallBinFile(
+        result.eboot,
+        std.mem.concat(alloc, u8, &.{ dir, "/EBOOT.PBP" }) catch @panic("OOM"),
+    ).step);
+    b.getInstallStep().dependOn(&b.addInstallBinFile(
+        result.prx,
+        std.mem.concat(alloc, u8, &.{ dir, "/app.prx" }) catch @panic("OOM"),
+    ).step);
+    b.getInstallStep().dependOn(&b.addInstallArtifact(result.elf, .{
+        .dest_dir = .{ .override = .{ .custom = std.mem.concat(alloc, u8, &.{ "bin/", dir }) catch @panic("OOM") } },
+        .dest_sub_path = "app.elf",
+    }).step);
+
+    return result;
+}
+
+// -- Root build ----------------------------------------------------------------
+
 pub fn build(b: *std.Build) void {
     const host_target = b.standardTargetOptions(.{});
     const host_optimize = b.standardOptimizeOption(.{});
 
-    const psp_target = get_psp_target(b);
+    const psp_target = getPspTarget(b);
     const psp_optimize = host_optimize;
 
     // Build prxgen tool
@@ -38,7 +199,7 @@ pub fn build(b: *std.Build) void {
     const install_pbp = b.addInstallArtifact(pbp_tool, .{});
     b.getInstallStep().dependOn(&install_pbp.step);
 
-    // Buid main pspsdk module
+    // Build main pspsdk module (used by examples + docs)
     const pspsdk_module = b.addModule("pspsdk", .{
         .root_source_file = b.path("src/pspsdk.zig"),
         .target = psp_target,
@@ -70,103 +231,63 @@ pub fn build(b: *std.Build) void {
 
     // Build examples
     const example_step = b.step("examples", "Build examples");
+    const linkfile = b.path("tools/linkfile.ld");
 
-    inline for (.{
-        PSPBuildInfo{ .name = "hello_world", .src_file = "examples/hello_world.zig", .title = "SDK HelloWorld" },
-        PSPBuildInfo{ .name = "allocator", .src_file = "examples/allocator.zig", .title = "SDK Allocator" },
-        PSPBuildInfo{ .name = "arena", .src_file = "examples/arena.zig", .title = "SDK Arena" },
-        PSPBuildInfo{ .name = "ziggy_cube", .src_file = "examples/ziggy_cube.zig", .title = "SDK Ziggy Cube" },
-        PSPBuildInfo{ .name = "clear_screen", .src_file = "examples/clearScreen.zig", .title = "SDK Clear Screen" },
-        PSPBuildInfo{ .name = "error", .src_file = "examples/error.zig", .title = "SDK Error" },
-        PSPBuildInfo{ .name = "panic", .src_file = "examples/panic.zig", .title = "SDK Panic" },
-        PSPBuildInfo{ .name = "print", .src_file = "examples/print.zig", .title = "SDK Print" },
-        PSPBuildInfo{ .name = "io", .src_file = "examples/io.zig", .title = "SDK IO" },
-        PSPBuildInfo{ .name = "time_random", .src_file = "examples/time_random.zig", .title = "SDK Time Random" },
-        PSPBuildInfo{ .name = "cwd", .src_file = "examples/cwd.zig", .title = "SDK CWD" },
-        PSPBuildInfo{ .name = "dir_file", .src_file = "examples/dir_file.zig", .title = "SDK Dir File" },
-        PSPBuildInfo{ .name = "network", .src_file = "examples/network.zig", .title = "SDK Network" },
-        PSPBuildInfo{ .name = "http", .src_file = "examples/http.zig", .title = "SDK HTTP" },
-        PSPBuildInfo{ .name = "https", .src_file = "examples/https.zig", .title = "SDK HTTPS" },
-    }) |example| {
-        const example_exe = b.addExecutable(.{
-            .name = "main",
-            .root_module = b.createModule(.{
+    inline for (example_list) |example| {
+        const result = buildPspEbootInner(
+            b,
+            pspsdk_module,
+            prxgen,
+            sfo_tool,
+            pbp_tool,
+            linkfile,
+            .{
+                .name = example.name,
                 .root_source_file = b.path(example.src_file),
-                .target = psp_target,
+                .title = example.title,
                 .optimize = psp_optimize,
-                .strip = false,
-            }),
-        });
-
-        example_exe.root_module.addImport("pspsdk", pspsdk_module);
-
-        example_exe.link_eh_frame_hdr = true;
-        example_exe.link_emit_relocs = true;
-        example_exe.entry = .{ .symbol_name = "module_start" };
-
-        example_exe.setLinkerScript(b.path("tools/linkfile.ld"));
-
-        // Call prxgen
-        const mk_prx = b.addRunArtifact(prxgen);
-        mk_prx.addArtifactArg(example_exe);
-        const prx_file = mk_prx.addOutputFileArg("app.prx");
-
-        // Call zSFOTool
-        const mk_sfo = b.addRunArtifact(sfo_tool);
-        mk_sfo.addArg("write");
-        mk_sfo.addArg(example.title);
-        const sfo_file = mk_sfo.addOutputFileArg("PARAM.SFO");
-
-        // Call zPBPTool
-        const pack_pbp = b.addRunArtifact(pbp_tool);
-        pack_pbp.addArg("pack");
-        const eboot_file = pack_pbp.addOutputFileArg("EBOOT.PBP");
-        pack_pbp.addFileArg(sfo_file);
-
-        if (example.icon0) |icon0| pack_pbp.addFileArg(b.path(icon0)) else pack_pbp.addArg("NULL");
-        if (example.icon1) |icon1| pack_pbp.addFileArg(b.path(icon1)) else pack_pbp.addArg("NULL");
-        if (example.pic0) |pic0| pack_pbp.addFileArg(b.path(pic0)) else pack_pbp.addArg("NULL");
-        if (example.pic1) |pic1| pack_pbp.addFileArg(b.path(pic1)) else pack_pbp.addArg("NULL");
-        if (example.snd0) |snd0| pack_pbp.addFileArg(b.path(snd0)) else pack_pbp.addArg("NULL");
-        pack_pbp.addFileArg(prx_file);
-        pack_pbp.addArg("NULL"); //DATA.PSAR not necessary.
-
-        const install_file = b.addInstallBinFile(eboot_file, example.name ++ "/EBOOT.PBP");
-        example_step.dependOn(&install_file.step);
-
-        const install_prx = b.addInstallBinFile(prx_file, example.name ++ "/app.prx");
-        example_step.dependOn(&install_prx.step);
-
-        const install_elf = b.addInstallArtifact(example_exe, .{
-            .dest_dir = .{ .override = .{ .custom = "bin/" ++ example.name } },
-            .dest_sub_path = "app.elf",
-        });
-        example_step.dependOn(&install_elf.step);
+                .icon0 = if (example.icon0) |p| b.path(p) else null,
+                .icon1 = if (example.icon1) |p| b.path(p) else null,
+                .pic0 = if (example.pic0) |p| b.path(p) else null,
+                .pic1 = if (example.pic1) |p| b.path(p) else null,
+                .snd0 = if (example.snd0) |p| b.path(p) else null,
+            },
+            .{},
+        );
+        example_step.dependOn(&result.elf.step);
     }
 
     // Always build examples by default
     b.getInstallStep().dependOn(example_step);
 }
 
-fn get_psp_target(b: *std.Build) std.Build.ResolvedTarget {
-    const psp_target = b.resolveTargetQuery(.{
-        .cpu_arch = .mipsel,
-        .os_tag = .psp,
-        .cpu_model = .{ .explicit = &std.Target.mips.cpu.allegrex },
-    });
+// -- Example list --------------------------------------------------------------
 
-    return psp_target;
-}
-
-const PSPBuildInfo = struct {
+const ExampleInfo = struct {
     name: []const u8,
     src_file: []const u8,
-    //Title
     title: []const u8,
-    //Optional customizations
     icon0: ?[]const u8 = null,
     icon1: ?[]const u8 = null,
     pic0: ?[]const u8 = null,
     pic1: ?[]const u8 = null,
     snd0: ?[]const u8 = null,
+};
+
+const example_list = [_]ExampleInfo{
+    .{ .name = "hello_world", .src_file = "examples/hello_world.zig", .title = "SDK HelloWorld" },
+    .{ .name = "allocator", .src_file = "examples/allocator.zig", .title = "SDK Allocator" },
+    .{ .name = "arena", .src_file = "examples/arena.zig", .title = "SDK Arena" },
+    .{ .name = "ziggy_cube", .src_file = "examples/ziggy_cube.zig", .title = "SDK Ziggy Cube" },
+    .{ .name = "clear_screen", .src_file = "examples/clearScreen.zig", .title = "SDK Clear Screen" },
+    .{ .name = "error", .src_file = "examples/error.zig", .title = "SDK Error" },
+    .{ .name = "panic", .src_file = "examples/panic.zig", .title = "SDK Panic" },
+    .{ .name = "print", .src_file = "examples/print.zig", .title = "SDK Print" },
+    .{ .name = "io", .src_file = "examples/io.zig", .title = "SDK IO" },
+    .{ .name = "time_random", .src_file = "examples/time_random.zig", .title = "SDK Time Random" },
+    .{ .name = "cwd", .src_file = "examples/cwd.zig", .title = "SDK CWD" },
+    .{ .name = "dir_file", .src_file = "examples/dir_file.zig", .title = "SDK Dir File" },
+    .{ .name = "network", .src_file = "examples/network.zig", .title = "SDK Network" },
+    .{ .name = "http", .src_file = "examples/http.zig", .title = "SDK HTTP" },
+    .{ .name = "https", .src_file = "examples/https.zig", .title = "SDK HTTPS" },
 };

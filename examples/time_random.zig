@@ -1,7 +1,7 @@
 // PSP time and random example using the std.Io vtable.
 //
 // Demonstrates clock resolution, timestamps, sleep, and random number
-// generation — all routed through the PSP Io vtable backed by sceRtc,
+// generation -- all routed through the PSP Io vtable backed by sceRtc,
 // sceKernelDelayThread, and sceKernelUtilsMt19937.
 //
 // Expected output:

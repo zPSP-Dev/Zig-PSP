@@ -1,4 +1,4 @@
-// Native GU ziggy cube — spinning textured cube using the PSP GU/GUM API
+// Native GU ziggy cube -- spinning textured cube using the PSP GU/GUM API
 const std = @import("std");
 const sdk = @import("pspsdk");
 const gu = sdk.gu;

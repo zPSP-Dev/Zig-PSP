@@ -70,7 +70,7 @@ pub fn main(init: std.process.Init) !void {
     var http_client: std.http.Client = .{ .allocator = gpa, .io = io };
     defer http_client.deinit();
 
-    // PSP has no system CA store — rescan() is a no-op. We must manually
+    // PSP has no system CA store -- rescan() is a no-op. We must manually
     // load root CA certificates into the bundle and set `now` so the
     // http.Client skips its (empty) rescan and uses our pre-loaded bundle.
     const now = std.Io.Clock.real.now(io);
