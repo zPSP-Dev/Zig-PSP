@@ -831,7 +831,7 @@ pub extern fn sceKernelReferSystemStatus(status: [*c]types.SceKernelSystemStatus
 /// `readbufsize` - The size of the buffer in SceUID units.
 /// `idcount` - Pointer to an integer in which to return the number of ids in the list.
 /// Returns < 0 on error. Either 0 or the same as idcount on success.
-pub extern fn sceKernelGetThreadmanIdList(type: types.SceKernelIdListType, readbuf: [*c]types.SceUID, readbufsize: c_int, idcount: [*c]c_int) callconv(.c) c_int;
+pub extern fn sceKernelGetThreadmanIdList(@"type": types.SceKernelIdListType, readbuf: [*c]types.SceUID, readbufsize: c_int, idcount: [*c]c_int) callconv(.c) c_int;
 
 /// Get the type of a threadman uid
 /// `uid` - The uid to get the type from

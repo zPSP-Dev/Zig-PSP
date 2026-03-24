@@ -10,7 +10,7 @@ pub extern fn scePowerGetBacklightMaximum() callconv(.c) void;
 /// powering off and turning off display.
 /// `type` - Either PSP_POWER_TICK_ALL, PSP_POWER_TICK_SUSPEND or PSP_POWER_TICK_DISPLAY
 /// Returns 0 on success, < 0 on error.
-pub extern fn scePowerTick(type: c_int) callconv(.c) c_int;
+pub extern fn scePowerTick(@"type": c_int) callconv(.c) c_int;
 
 /// Get Idle timer
 pub extern fn scePowerGetIdleTimer() callconv(.c) c_int;

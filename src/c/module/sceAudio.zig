@@ -13,7 +13,7 @@ pub extern fn sceAudioOutput(channel: c_int, vol: c_int, buf: ?*anyopaque) callc
 /// `channel` - The channel number.
 /// `vol` - The volume.
 /// `buf` - Pointer to the PCM data to output.
-/// Returns 0 on success, an error if less than 0.
+/// Returns number of queued samples on success, an error if less than 0.
 pub extern fn sceAudioOutputBlocking(channel: c_int, vol: c_int, buf: ?*anyopaque) callconv(.c) c_int;
 
 /// Output panned audio of the specified channel
@@ -29,7 +29,7 @@ pub extern fn sceAudioOutputPanned(channel: c_int, leftvol: c_int, rightvol: c_i
 /// `leftvol` - The left volume.
 /// `rightvol` - The right volume.
 /// `buf` - Pointer to the PCM data to output.
-/// Returns 0 on success, an error if less than 0.
+/// Returns number of queued samples on success, an error if less than 0.
 pub extern fn sceAudioOutputPannedBlocking(channel: c_int, leftvol: c_int, rightvol: c_int, buf: ?*anyopaque) callconv(.c) c_int;
 
 /// Allocate and initialize a hardware output channel.
@@ -88,7 +88,7 @@ pub extern fn sceAudioSRCChRelease() callconv(.c) c_int;
 /// Output audio
 /// `vol` - The volume.
 /// `buf` - Pointer to the PCM data to output.
-/// Returns 0 on success, an error if less than 0.
+/// Returns number of queued samples on success, an error if less than 0.
 pub extern fn sceAudioSRCOutputBlocking(vol: c_int, buf: ?*anyopaque) callconv(.c) c_int;
 
 /// Perform audio input (blocking)
