@@ -24,7 +24,7 @@ pub extern fn sceGeGetCmd(cmd: c_int) callconv(.c) c_uint;
 /// `type` - One of ::PspGeMatrixTypes.
 /// `matrix` - Pointer to a variable to store the matrix.
 /// Returns < 0 on error.
-pub extern fn sceGeGetMtx(type: c_int, matrix: ?*anyopaque) callconv(.c) c_int;
+pub extern fn sceGeGetMtx(@"type": c_int, matrix: ?*anyopaque) callconv(.c) c_int;
 
 /// Retrieve the stack of the display list currently being executed.
 /// `stackId` - The ID of the stack to retrieve.

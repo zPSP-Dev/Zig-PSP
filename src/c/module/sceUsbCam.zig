@@ -2,7 +2,7 @@
 const types = @import("../types.zig");
 const macro = @import("../macro.zig");
 
-pub extern fn sceUsbCamSetupMic() callconv(.c) void;
+pub extern fn sceUsbCamSetupMic(param: ?*anyopaque, workarea: ?*anyopaque, wasize: c_int) callconv(.c) c_int;
 
 pub extern fn sceUsbCamSetMicGain() callconv(.c) void;
 
