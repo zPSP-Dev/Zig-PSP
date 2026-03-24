@@ -124,7 +124,7 @@ pub fn _module_main_thread(argc: usize, argv: ?*anyopaque) callconv(.c) c_int {
 //Modified BSD License
 //====================
 //
-//_Copyright � `2020`, `Hayden Kowalchuk`_
+//_Copyright (c) `2020`, `Hayden Kowalchuk`_
 //_All rights reserved._
 //
 //Redistribution and use in source and binary forms, with or without
@@ -139,7 +139,7 @@ pub fn _module_main_thread(argc: usize, argv: ?*anyopaque) callconv(.c) c_int {
 //   names of its contributors may be used to endorse or promote products
 //   derived from this software without specific prior written permission.
 //
-//THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS �AS IS� AND
+//THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
 //ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 //WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
 //DISCLAIMED. IN NO EVENT SHALL `Hayden Kowalchuk` BE LIABLE FOR ANY

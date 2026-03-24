@@ -148,7 +148,7 @@ fn crashHandler(_: ?*anyopaque) void {
     @panic("Io.crashHandler not implemented");
 }
 
-// ── Global State ──────────────────────────────────────────────────────
+// -- Global State ------------------------------------------------------
 
 var cancel_protection: std.Io.CancelProtection = .unblocked;
 var stderr_locked: bool = false;
@@ -190,7 +190,7 @@ pub fn init(arg0: ?[*:0]const u8) void {
     }
 }
 
-// ── fd→path tracking table ────────────────────────────────────────────
+// -- fd->path tracking table --------------------------------------------
 
 const MAX_TRACKED_FDS = 32;
 const FdPathEntry = struct {
@@ -232,7 +232,7 @@ fn lookupFdPath(fd: SceUID) ?[]const u8 {
     return null;
 }
 
-// ── ScePspDateTime ↔ Io.Timestamp helpers ─────────────────────────────
+// -- ScePspDateTime <-> Io.Timestamp helpers -----------------------------
 
 // PSP RTC tick epoch is January 1, year 1 AD (confirmed by sceRtcGetCurrentTick output).
 // Offset from year 1 AD to Unix epoch (1970-01-01) in seconds.
@@ -248,7 +248,7 @@ fn pspDateTimeToTimestamp(dt: c_types.ScePspDateTime) Io.Timestamp {
 }
 
 fn timestampToPspDateTime(ts: Io.Timestamp) c_types.ScePspDateTime {
-    // Convert nanoseconds since Unix epoch → microseconds since year 1 AD
+    // Convert nanoseconds since Unix epoch -> microseconds since year 1 AD
     const ns = ts.nanoseconds;
     const us_since_year1: i96 = @divTrunc(ns, 1000) + psp_epoch_offset_s * 1_000_000;
     var tick: u64 = if (us_since_year1 < 0) 0 else @intCast(us_since_year1);
@@ -271,7 +271,7 @@ fn sceIoStatToFileStat(psp_stat: *const c_types.SceIoStat) File.Stat {
     };
 }
 
-// ── PSP I/O constants ─────────────────────────────────────────────────
+// -- PSP I/O constants -------------------------------------------------
 
 const PSP_O_RDONLY = 0x0001;
 const PSP_O_WRONLY = 0x0002;
@@ -285,7 +285,7 @@ const PSP_SEEK_SET = 0;
 const PSP_SEEK_CUR = 1;
 const PSP_SEEK_END = 2;
 
-// ── Async/Concurrency (N/A on PSP) ───────────────────────────────────
+// -- Async/Concurrency (N/A on PSP) -----------------------------------
 
 // PSP is single-core with no async runtime. We run the function synchronously
 // and return null, so Future.await/cancel just return the already-written result.
@@ -299,7 +299,7 @@ fn async(
 ) ?*Io.AnyFuture {
     _ = result_align;
     start_fn(args_ptr.ptr, result_ptr.ptr);
-    return null; // result already populated — await/cancel see null and return it
+    return null; // result already populated -- await/cancel see null and return it
 }
 
 fn concurrent(
@@ -319,7 +319,7 @@ fn await(
     _: []u8,
     _: std.mem.Alignment,
 ) void {
-    // Should never be called — async always returns null
+    // Should never be called -- async always returns null
 }
 
 fn cancel(
@@ -328,7 +328,7 @@ fn cancel(
     _: []u8,
     _: std.mem.Alignment,
 ) void {
-    // Should never be called — async always returns null
+    // Should never be called -- async always returns null
 }
 
 // Group operations: run synchronously, leave token null so await/cancel are no-ops.
@@ -358,7 +358,7 @@ fn groupCancel(_: ?*anyopaque, _: *Io.Group, _: *anyopaque) void {}
 
 fn recancel(_: ?*anyopaque) void {}
 
-// ── Cancellation/Sync ─────────────────────────────────────────────────
+// -- Cancellation/Sync -------------------------------------------------
 
 fn swapCancelProtection(_: ?*anyopaque, new_val: Io.CancelProtection) Io.CancelProtection {
     const old = cancel_protection;
@@ -366,7 +366,7 @@ fn swapCancelProtection(_: ?*anyopaque, new_val: Io.CancelProtection) Io.CancelP
     return old;
 }
 
-// PSP is single-threaded from the Io perspective — cancellation is a no-op.
+// PSP is single-threaded from the Io perspective -- cancellation is a no-op.
 fn checkCancel(_: ?*anyopaque) Io.Cancelable!void {}
 
 // Futex operations are no-ops on single-threaded PSP. The mutex fast path
@@ -377,7 +377,7 @@ fn futexWaitUncancelable(_: ?*anyopaque, _: *const u32, _: u32) void {}
 
 fn futexWake(_: ?*anyopaque, _: *const u32, _: u32) void {}
 
-// ── Operate (Multiplexed I/O) ─────────────────────────────────────────
+// -- Operate (Multiplexed I/O) -----------------------------------------
 
 fn pspWrite(fd: SceUID, buf: []const u8) error{WriteFailed}!usize {
     const ret = io_mgr.sceIoWrite(fd, buf.ptr, buf.len);
@@ -437,7 +437,7 @@ fn operate(_: ?*anyopaque, op: Io.Operation) Io.Cancelable!Io.Operation.Result {
     }
 }
 
-// ── Batch (N/A on PSP) ───────────────────────────────────────────────
+// -- Batch (N/A on PSP) -----------------------------------------------
 
 fn batchAwaitAsync(_: ?*anyopaque, _: *Io.Batch) Io.Cancelable!void {
     @panic("Io.batchAwaitAsync not implemented");
@@ -451,7 +451,7 @@ fn batchCancel(_: ?*anyopaque, _: *Io.Batch) void {
     @panic("Io.batchCancel not implemented");
 }
 
-// ── Directory operations ──────────────────────────────────────────────
+// -- Directory operations ----------------------------------------------
 
 fn dirCreateDir(_: ?*anyopaque, _: Dir, sub_path: []const u8, _: Dir.Permissions) Dir.CreateDirError!void {
     var path_buf: [1024]u8 = undefined;
@@ -731,7 +731,7 @@ fn dirHardLink(_: ?*anyopaque, _: Dir, _: []const u8, _: Dir, _: []const u8, _: 
     @panic("Io.dirHardLink not implemented");
 }
 
-// ── File operations ───────────────────────────────────────────────────
+// -- File operations ---------------------------------------------------
 
 fn fileStat(_: ?*anyopaque, file: File) File.StatError!File.Stat {
     const path = lookupFdPath(file.handle) orelse return error.AccessDenied;
@@ -1029,7 +1029,7 @@ fn fileMemoryMapWrite(_: ?*anyopaque, _: *File.MemoryMap) File.WritePositionalEr
     @panic("Io.fileMemoryMapWrite not implemented");
 }
 
-// ── Process ───────────────────────────────────────────────────────────
+// -- Process -----------------------------------------------------------
 
 fn processExecutableOpen(_: ?*anyopaque, _: File.OpenFlags) std.process.OpenExecutableError!File {
     @panic("Io.processExecutableOpen not implemented");
@@ -1039,7 +1039,7 @@ fn processExecutablePath(_: ?*anyopaque, _: []u8) std.process.ExecutablePathErro
     @panic("Io.processExecutablePath not implemented");
 }
 
-// ── Stderr ────────────────────────────────────────────────────────────
+// -- Stderr ------------------------------------------------------------
 
 fn lockStderr(_: ?*anyopaque, _: ?Terminal.Mode) Io.Cancelable!Io.LockedStderr {
     stderr_locked = true;
@@ -1065,7 +1065,7 @@ fn unlockStderr(_: ?*anyopaque) void {
     stderr_locked = false;
 }
 
-// ── CWD ───────────────────────────────────────────────────────────────
+// -- CWD ---------------------------------------------------------------
 
 // PSP has no getcwd syscall, so we track cwd in a module-level buffer.
 // Defaults to "ms0:/" (memory stick root).
@@ -1088,7 +1088,7 @@ fn processCurrentPath(_: ?*anyopaque, buffer: []u8) std.process.CurrentPathError
 }
 
 fn processSetCurrentDir(_: ?*anyopaque, _: Dir) std.process.SetCurrentDirError!void {
-    // PSP has no fchdir equivalent — cannot set cwd from a directory handle.
+    // PSP has no fchdir equivalent -- cannot set cwd from a directory handle.
     return error.OperationUnsupported;
 }
 
@@ -1132,7 +1132,7 @@ fn progressParentFile(_: ?*anyopaque) std.Progress.ParentFileError!File {
     @panic("Io.progressParentFile not implemented");
 }
 
-// ── Time/Random ───────────────────────────────────────────────────────
+// -- Time/Random -------------------------------------------------------
 
 fn now(_: ?*anyopaque, clock: Io.Clock) Io.Timestamp {
     switch (clock) {
@@ -1226,13 +1226,13 @@ fn randomSecure(_: ?*anyopaque, buf: []u8) Io.RandomSecureError!void {
     fillRandom(buf);
 }
 
-// ── Network ───────────────────────────────────────────────────────────
+// -- Network -----------------------------------------------------------
 
 fn ipAddressToSockaddr(addr: *const net.IpAddress) c_types.sockaddr_in {
     switch (addr.*) {
         .ip4 => |ip4| {
             return .{
-                .sin_port = @byteSwap(ip4.port), // host→network byte order
+                .sin_port = @byteSwap(ip4.port), // host->network byte order
                 .sin_addr = .{ .s_addr = @bitCast(ip4.bytes) },
             };
         },
@@ -1244,7 +1244,7 @@ fn ipAddressToSockaddr(addr: *const net.IpAddress) c_types.sockaddr_in {
                     .sin_addr = .{ .s_addr = @bitCast(ip4.bytes) },
                 };
             }
-            // No IPv6 on PSP — fall back to unspecified
+            // No IPv6 on PSP -- fall back to unspecified
             return .{
                 .sin_port = @byteSwap(ip6.port),
                 .sin_addr = .{ .s_addr = 0 },
@@ -1473,7 +1473,7 @@ fn netInterfaceNameResolve(_: ?*anyopaque, _: *const net.Interface.Name) net.Int
 }
 
 fn netInterfaceName(_: ?*anyopaque, _: net.Interface) net.Interface.NameError!net.Interface.Name {
-    // PSP IFNAMESIZE is void, so Name.max_len = 0 — return zero-length name
+    // PSP IFNAMESIZE is void, so Name.max_len = 0 -- return zero-length name
     return .{ .bytes = .{} };
 }
 

@@ -5,7 +5,7 @@
 //   [1] Free mem: XXXXXXXX bytes
 //   [2] After alloc (string): "Hello from Zig!"
 //   [3] Free mem: YYYYYYYY bytes  (should be less than [1])
-//   [4] After free — free mem: XXXXXXXX bytes  (should match [1])
+//   [4] After free -- free mem: XXXXXXXX bytes  (should match [1])
 //   [5] ArrayList test: 0 1 2 3 4 5 6 7 8 9
 //   [6] Free mem: XXXXXXXX bytes  (should match [1] again)
 //   Done!
@@ -46,7 +46,7 @@ pub fn main(init: std.process.Init) !void {
     gpa.free(greeting);
     printFree(gpa, "[4] After free");
 
-    // [5] ArrayList — exercises alloc, resize/remap, and free in a loop.
+    // [5] ArrayList -- exercises alloc, resize/remap, and free in a loop.
     // In Zig 0.15, ArrayList is unmanaged; the allocator is passed per-call.
     {
         var list = std.ArrayList(u32){ .items = &.{}, .capacity = 0 };
