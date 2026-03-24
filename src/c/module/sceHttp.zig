@@ -316,7 +316,8 @@ comptime {
     asm (macro.import_function("sceHttp", "0x3C478044", "sceHttp_3C478044"));
     asm (macro.import_function("sceHttp", "0x3EABA285", "sceHttpAddExtraHeader"));
     asm (macro.import_function("sceHttp", "0x457D221D", "sceHttp_457D221D"));
-    asm (macro.import_function("sceHttp", "0x47347B50", "sceHttpCreateRequest"));
+    asm (macro.import_function("sceHttp", "0x47347B50", "sceHttpCreateRequest_stub"));
+    asm (macro.i64_abi_wrapper("sceHttpCreateRequest", 0));
     asm (macro.import_function("sceHttp", "0x47940436", "sceHttpSetResolveTimeOut"));
     asm (macro.import_function("sceHttp", "0x4CC7D78F", "sceHttpGetStatusCode"));
     asm (macro.import_function("sceHttp", "0x4E4A284A", "sceHttp_4E4A284A"));
@@ -355,7 +356,8 @@ comptime {
     asm (macro.import_function("sceHttp", "0xB0257723", "sceHttp_B0257723"));
     asm (macro.import_function("sceHttp", "0xB0C34B1D", "sceHttpSetCacheContentLengthMaxSize"));
     asm (macro.import_function("sceHttp", "0xB3FAF831", "sceHttpsDisableOption"));
-    asm (macro.import_function("sceHttp", "0xB509B09E", "sceHttpCreateRequestWithURL"));
+    asm (macro.import_function("sceHttp", "0xB509B09E", "sceHttpCreateRequestWithURL_stub"));
+    asm (macro.i64_abi_wrapper("sceHttpCreateRequestWithURL", 0));
     asm (macro.import_function("sceHttp", "0xBAC31BF1", "sceHttpsEnableOption"));
     asm (macro.import_function("sceHttp", "0xBB70706F", "sceHttpSendRequest"));
     asm (macro.import_function("sceHttp", "0xC0E69162", "sceHttp_C0E69162"));

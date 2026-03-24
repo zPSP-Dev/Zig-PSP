@@ -311,8 +311,10 @@ comptime {
     asm (macro.import_function("IoFileMgrForUser", "0xA0B5A7C2", "sceIoReadAsync"));
     asm (macro.import_function("IoFileMgrForUser", "0x42EC03AC", "sceIoWrite"));
     asm (macro.import_function("IoFileMgrForUser", "0x0FACAB19", "sceIoWriteAsync"));
-    asm (macro.import_function("IoFileMgrForUser", "0x27EB27B8", "sceIoLseek"));
-    asm (macro.import_function("IoFileMgrForUser", "0x71B19E77", "sceIoLseekAsync"));
+    asm (macro.import_function("IoFileMgrForUser", "0x27EB27B8", "sceIoLseek_stub"));
+    asm (macro.i64_abi_wrapper("sceIoLseek", 1));
+    asm (macro.import_function("IoFileMgrForUser", "0x71B19E77", "sceIoLseekAsync_stub"));
+    asm (macro.i64_abi_wrapper("sceIoLseekAsync", 1));
     asm (macro.import_function("IoFileMgrForUser", "0x68963324", "sceIoLseek32"));
     asm (macro.import_function("IoFileMgrForUser", "0x1B385D8F", "sceIoLseek32Async"));
     asm (macro.import_function("IoFileMgrForUser", "0x63632449", "sceIoIoctl_stub"));
