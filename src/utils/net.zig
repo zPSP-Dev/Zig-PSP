@@ -1,15 +1,8 @@
 const std = @import("std");
 
-const sceNet = @import("../c/module/sceNet.zig");
-const sceNetInet = @import("../c/module/sceNetInet.zig");
-const sceNetApctl = @import("../c/module/sceNetApctl.zig");
-const sceNetResolver = @import("../c/module/sceNetResolver.zig");
-const sceUtility = @import("../c/module/sceUtility.zig");
-const threadman = @import("../c/module/ThreadManForUser.zig");
-
-pub const PSP_NET_MODULE_COMMON = 1;
-pub const PSP_NET_MODULE_ADHOC = 2;
-pub const PSP_NET_MODULE_INET = 3;
+const net = @import("../sdk/net.zig");
+const utility = @import("../sdk/utility.zig");
+const kernel = @import("../sdk/kernel.zig");
 
 pub const PSP_NET_APCTL_STATE_DISCONNECTED = 0;
 pub const PSP_NET_APCTL_STATE_SCANNING = 1;
@@ -58,22 +51,22 @@ var net_initialized = false;
 pub fn init() InitError!void {
     if (net_initialized) return;
 
-    if (sceUtility.sceUtilityLoadNetModule(PSP_NET_MODULE_COMMON) < 0)
+    utility.load_net_module(.common) catch
         return error.LoadCommonModule;
 
-    if (sceUtility.sceUtilityLoadNetModule(PSP_NET_MODULE_INET) < 0)
+    utility.load_net_module(.inet) catch
         return error.LoadInetModule;
 
-    if (sceNet.sceNetInit(128 * 1024, 42, 4 * 1024, 42, 4 * 1024) < 0)
+    net.init(128 * 1024, 42, 4 * 1024, 42, 4 * 1024) catch
         return error.NetInit;
 
-    if (sceNetInet.sceNetInetInit() < 0)
+    net.inet_init() catch
         return error.InetInit;
 
-    if (sceNetApctl.sceNetApctlInit(0x8000, 48) < 0)
+    net.apctl_init(0x8000, 48) catch
         return error.ApctlInit;
 
-    if (sceNetResolver.sceNetResolverInit() < 0)
+    net.resolver_init() catch
         return error.ResolverInit;
 
     net_initialized = true;
@@ -81,22 +74,22 @@ pub fn init() InitError!void {
 
 /// Connect to a saved WiFi network by connection index (1-based).
 /// Blocks until connected or timeout. `timeout_us` is microseconds (0 = wait forever).
-pub fn connectToApctl(conn_index: c_int, timeout_us: u32) ConnectError!void {
-    if (sceNetApctl.sceNetApctlConnect(conn_index) < 0)
+pub fn connectToApctl(conn_index: i32, timeout_us: u32) ConnectError!void {
+    net.apctl_connect(conn_index) catch
         return error.ApctlConnect;
 
     var elapsed: u32 = 0;
     const poll_interval: u32 = 50_000; // 50ms
 
     while (true) {
-        var state: c_int = 0;
-        if (sceNetApctl.sceNetApctlGetState(&state) < 0)
+        var state: i32 = 0;
+        net.apctl_get_state(&state) catch
             return error.ApctlGetState;
 
         if (state == PSP_NET_APCTL_STATE_GOT_IP)
             return;
 
-        _ = threadman.sceKernelDelayThread(poll_interval);
+        kernel.delay_thread(poll_interval) catch {};
         elapsed += poll_interval;
 
         if (timeout_us > 0 and elapsed >= timeout_us)
@@ -107,9 +100,8 @@ pub fn connectToApctl(conn_index: c_int, timeout_us: u32) ConnectError!void {
 /// Get the local IP address as a string (e.g. "192.168.1.100").
 /// Returns the number of bytes written.
 pub fn getLocalIp(buf: *[16]u8) ?[]const u8 {
-    var info: @import("../c/types.zig").SceNetApctlInfo = undefined;
-    if (sceNetApctl.sceNetApctlGetInfo(PSP_NET_APCTL_INFO_IP, &info) < 0)
-        return null;
+    var info: net.SceNetApctlInfo = undefined;
+    net.apctl_get_info(PSP_NET_APCTL_INFO_IP, &info) catch return null;
     const ip_bytes: []const u8 = &info.ip;
     // Find null terminator
     var len: usize = 0;
@@ -120,17 +112,17 @@ pub fn getLocalIp(buf: *[16]u8) ?[]const u8 {
 
 /// Disconnect from the access point.
 pub fn disconnect() void {
-    _ = sceNetApctl.sceNetApctlDisconnect();
+    net.apctl_disconnect() catch {};
 }
 
 /// Shut down the entire networking stack.
 pub fn deinit() void {
     if (!net_initialized) return;
-    _ = sceNetResolver.sceNetResolverTerm();
-    _ = sceNetApctl.sceNetApctlTerm();
-    _ = sceNetInet.sceNetInetTerm();
-    _ = sceNet.sceNetTerm();
-    _ = sceUtility.sceUtilityUnloadNetModule(PSP_NET_MODULE_INET);
-    _ = sceUtility.sceUtilityUnloadNetModule(PSP_NET_MODULE_COMMON);
+    net.resolver_term() catch {};
+    net.apctl_term() catch {};
+    net.inet_term() catch {};
+    net.term() catch {};
+    utility.unload_net_module(.inet) catch {};
+    utility.unload_net_module(.common) catch {};
     net_initialized = false;
 }

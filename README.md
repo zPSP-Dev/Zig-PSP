@@ -77,15 +77,14 @@ pub fn main(_: std.process.Init) !void {
 
 ### API Tiers
 
-The SDK exposes PSP functions through three tiers -- pick whichever fits your style:
+The SDK exposes PSP functions through two tiers:
 
 | Tier | Example | Description |
 |---|---|---|
-| Raw C stub | `sdk.c.LoadExecForUser.sceKernelExitGame()` | Auto-generated bindings, one namespace per firmware module |
-| Top-level sce-prefix | `sdk.sceKernelExitGame()` | Direct re-exports at the package root |
-| Snake_case sub-namespace | `sdk.kernel.exit_game()` | Idiomatic Zig names grouped by subsystem |
+| Raw C bindings | `sdk.c.LoadExecForUser.sceKernelExitGame()` | Auto-generated stubs, one namespace per firmware module |
+| Zig bindings | `sdk.sceKernelExitGame()` or `sdk.kernel.exit_game()` | Idiomatic wrappers with two access routes: sce-prefixed re-exports at the package root, or snake_case sub-namespaces |
 
-Sub-namespaces: `sdk.gu`, `sdk.gum`, `sdk.ge`, `sdk.ctrl`, `sdk.display`, `sdk.kernel`, `sdk.audio`, `sdk.atrac3`, `sdk.rtc`, `sdk.power`, `sdk.umd`, `sdk.io`, `sdk.hprm`, `sdk.wlan`, `sdk.utility`, `sdk.utils`.
+Sub-namespaces: `sdk.adhoc`, `sdk.atrac3`, `sdk.audio`, `sdk.audiocodec`, `sdk.ctrl`, `sdk.display`, `sdk.dmac`, `sdk.ge`, `sdk.gu`, `sdk.gum`, `sdk.hprm`, `sdk.http`, `sdk.impose`, `sdk.internal`, `sdk.io`, `sdk.jpeg`, `sdk.kermit`, `sdk.kernel`, `sdk.mp3`, `sdk.mpeg`, `sdk.net`, `sdk.openpsid`, `sdk.power`, `sdk.reg`, `sdk.rtc`, `sdk.ssl`, `sdk.umd`, `sdk.usb`, `sdk.usbcam`, `sdk.usbstor`, `sdk.utility`, `sdk.wlan`.
 
 The utility layer lives under `sdk.extra`: `sdk.extra.debug`, `sdk.extra.module`, `sdk.extra.utils`, `sdk.extra.allocator`, `sdk.extra.vram`, `sdk.extra.Io`, `sdk.extra.constants`, `sdk.extra.net`.
 

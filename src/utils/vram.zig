@@ -1,6 +1,6 @@
 //This is probably broken
-const gu = @import("../sdk/pspgu.zig");
-const ge = @import("../sdk/pspge.zig");
+const gu = @import("../gu/pspgu.zig");
+const ge = @import("../sdk/ge.zig");
 
 //This isn't an actual "allocator" per se
 //It allocates static chunks of VRAM
@@ -20,7 +20,7 @@ pub fn allocVramRelative(stride: u32, height: u32, format: gu.types.GuPixelForma
 pub fn allocVramAbsolute(stride: u32, height: u32, format: gu.types.GuPixelFormat) ?*align(16) anyopaque {
     const relative_offset = allocVramRelative(stride, height, format);
 
-    return @ptrFromInt(@intFromPtr(relative_offset) + @intFromPtr(ge.sceGeEdramGetAddr()));
+    return @ptrFromInt(@intFromPtr(relative_offset) + @intFromPtr(ge.edram_get_addr()));
 }
 
 fn texture_buffer_size_bytes(stride_elements: u32, height: u32, format: gu.types.GuPixelFormat) usize {

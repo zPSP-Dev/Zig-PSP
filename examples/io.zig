@@ -46,7 +46,7 @@ pub fn main(init: std.process.Init) !void {
 
     // [1] Create directory
     cwd.createDir(io, base_dir, .default_dir) catch {};
-    std.debug.print("[1] Created directory: " ++ base_dir ++ "\n", .{});
+    sdk.extra.debug.print("[1] Created directory: " ++ base_dir ++ "\n", .{});
 
     // [2] Write hello.txt
     {
@@ -54,7 +54,7 @@ pub fn main(init: std.process.Init) !void {
         defer file.close(io);
 
         try file.writeStreamingAll(io, "Hello from Zig on PSP!");
-        std.debug.print("[2] Wrote hello.txt\n", .{});
+        sdk.extra.debug.print("[2] Wrote hello.txt\n", .{});
     }
 
     // [3] Write numbers.txt
@@ -63,7 +63,7 @@ pub fn main(init: std.process.Init) !void {
         defer file.close(io);
 
         try file.writeStreamingAll(io, "0 1 2 3 4 5 6 7 8 9");
-        std.debug.print("[3] Wrote numbers.txt\n", .{});
+        sdk.extra.debug.print("[3] Wrote numbers.txt\n", .{});
     }
 
     // [4] Read back hello.txt
@@ -73,7 +73,7 @@ pub fn main(init: std.process.Init) !void {
 
         var buf: [256]u8 = undefined;
         const n = try file.readStreaming(io, &.{&buf});
-        std.debug.print("[4] Read hello.txt: {s}\n", .{buf[0..n]});
+        sdk.extra.debug.print("[4] Read hello.txt: {s}\n", .{buf[0..n]});
     }
 
     // [5] Read back numbers.txt
@@ -83,7 +83,7 @@ pub fn main(init: std.process.Init) !void {
 
         var buf: [256]u8 = undefined;
         const n = try file.readStreaming(io, &.{&buf});
-        std.debug.print("[5] Read numbers.txt: {s}\n", .{buf[0..n]});
+        sdk.extra.debug.print("[5] Read numbers.txt: {s}\n", .{buf[0..n]});
     }
 
     // [6] Directory listing
@@ -91,13 +91,13 @@ pub fn main(init: std.process.Init) !void {
         const dir = try cwd.openDir(io, base_dir, .{ .iterate = true });
         defer dir.close(io);
 
-        std.debug.print("[6] Directory listing of " ++ base_dir ++ ":\n", .{});
+        sdk.extra.debug.print("[6] Directory listing of " ++ base_dir ++ ":\n", .{});
 
         var iter = dir.iterate();
         while (try iter.next(io)) |entry| {
-            std.debug.print("  - {s}\n", .{entry.name});
+            sdk.extra.debug.print("  - {s}\n", .{entry.name});
         }
     }
 
-    std.debug.print("Done!\n", .{});
+    sdk.extra.debug.print("Done!\n", .{});
 }

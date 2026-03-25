@@ -9,7 +9,9 @@ pub const panic = sdk.extra.debug.panic;
 
 pub const std_options_debug_threaded_io: ?*std.Io.Threaded = null;
 pub const std_options_debug_io: std.Io = sdk.extra.Io.psp_io;
-pub fn std_options_cwd() std.Io.Dir { return .{ .handle = -1 }; }
+pub fn std_options_cwd() std.Io.Dir {
+    return .{ .handle = -1 };
+}
 
 comptime {
     asm (sdk.extra.module.module_info("SDK Ziggy Cube", .{ .mode = .User }, 1, 0));
@@ -85,7 +87,7 @@ pub fn main(_: std.process.Init) !void {
 
     gu.init();
     gu.start(.Direct, &display_list);
-    gu.draw_buffer(.Format8888, fbp0, SCR_BUF_WIDTH);
+    gu.draw_buffer(.rgba8888, fbp0, SCR_BUF_WIDTH);
     gu.disp_buffer(SCREEN_WIDTH, SCREEN_HEIGHT, fbp1, SCR_BUF_WIDTH);
     gu.depth_buffer(zbp, SCR_BUF_WIDTH);
     gu.offset(2048 - (SCREEN_WIDTH / 2), 2048 - (SCREEN_HEIGHT / 2));
@@ -102,9 +104,9 @@ pub fn main(_: std.process.Init) !void {
     gu.enable(.Texture2D);
 
     gu.finish();
-    gu.sync(.Finish, .Wait);
+    gu.sync(.Finish, .wait);
 
-    _ = sdk.display.wait_vblank_start();
+    try sdk.display.wait_vblank_start();
     gu.display(true);
 
     // Rotation angles (in radians)
@@ -143,11 +145,11 @@ pub fn main(_: std.process.Init) !void {
         gum.draw_array(.Triangles, vertex_type, 12 * 3, null, @as(*anyopaque, @ptrCast(&vertices)));
 
         gu.finish();
-        gu.sync(.Finish, .Wait);
+        gu.sync(.Finish, .wait);
 
         gu.swap_buffers();
 
-        _ = sdk.display.wait_vblank_start();
+        try sdk.display.wait_vblank_start();
 
         val += 0.02;
     }

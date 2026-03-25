@@ -6,17 +6,13 @@ const File = std.Io.File;
 const Terminal = std.Io.Terminal;
 const net = std.Io.net;
 
-const stdio = @import("../c/module/StdioForUser.zig");
-const rtc = @import("../c/module/sceRtc.zig");
-const threadman = @import("../c/module/ThreadManForUser.zig");
-const utils_mod = @import("../c/module/UtilsForUser.zig");
-const io_mgr = @import("../c/module/IoFileMgrForUser.zig");
-const inet = @import("../c/module/sceNetInet.zig");
-const resolver = @import("../c/module/sceNetResolver.zig");
-const psp_net = @import("net.zig");
-const c_types = @import("../c/types.zig");
+const io = @import("../sdk/io.zig");
+const rtc = @import("../sdk/rtc.zig");
+const kernel = @import("../sdk/kernel.zig");
+const psp_net = @import("../sdk/net.zig");
+const net_utils = @import("net.zig");
 
-const SceUID = c_types.SceUID;
+const SceUID = io.SceUID;
 
 /// A stub std.Io backed by this vtable.
 /// Every method panics; fill in the ones you need.
@@ -137,11 +133,11 @@ pub const vtable: Io.VTable = .{
     .netLookup = netLookup,
 };
 
-fn toNullTerminated(path: []const u8, buf: *[1024]u8) ?[*c]const i8 {
+fn toNullTerminated(path: []const u8, buf: *[1024]u8) ?[*:0]const u8 {
     if (path.len >= buf.len) return null;
     @memcpy(buf[0..path.len], path);
     buf[path.len] = 0;
-    return @ptrCast(buf[0..path.len :0].ptr);
+    return buf[0..path.len :0].ptr;
 }
 
 fn crashHandler(_: ?*anyopaque) void {
@@ -163,9 +159,9 @@ var stderr_writer: File.Writer = .{
 };
 
 pub fn init(arg0: ?[*:0]const u8) void {
-    stdin_fd = stdio.sceKernelStdin();
-    stdout_fd = stdio.sceKernelStdout();
-    stderr_fd = stdio.sceKernelStderr();
+    stdin_fd = io.stdin();
+    stdout_fd = io.stdout();
+    stderr_fd = io.stderr();
     stderr_writer.file = .{ .handle = stderr_fd, .flags = .{ .nonblocking = false } };
 
     // Derive initial cwd from arg0 (program path, e.g. "ms0:/PSP/GAME/APP/EBOOT.PBP")
@@ -182,7 +178,7 @@ pub fn init(arg0: ?[*:0]const u8) void {
                     // Also set the PSP kernel's cwd
                     var chdir_buf: [1024]u8 = undefined;
                     if (toNullTerminated(dir, &chdir_buf)) |path_z| {
-                        _ = io_mgr.sceIoChdir(path_z);
+                        io.chdir(path_z) catch {};
                     }
                 }
             }
@@ -238,26 +234,26 @@ fn lookupFdPath(fd: SceUID) ?[]const u8 {
 // Offset from year 1 AD to Unix epoch (1970-01-01) in seconds.
 const psp_epoch_offset_s: i96 = 62135596800;
 
-fn pspDateTimeToTimestamp(dt: c_types.ScePspDateTime) Io.Timestamp {
+fn pspDateTimeToTimestamp(dt: rtc.DateTime) Io.Timestamp {
     var tick: u64 = 0;
-    _ = rtc.sceRtcGetTick(&dt, &tick);
+    rtc.get_tick(&dt, &tick) catch return .{ .nanoseconds = 0 };
     // tick = microseconds since year 1 AD
     const tick_i96: i96 = @intCast(tick);
     const ns = tick_i96 * 1000 - psp_epoch_offset_s * 1_000_000_000;
     return .{ .nanoseconds = ns };
 }
 
-fn timestampToPspDateTime(ts: Io.Timestamp) c_types.ScePspDateTime {
+fn timestampToPspDateTime(ts: Io.Timestamp) rtc.DateTime {
     // Convert nanoseconds since Unix epoch -> microseconds since year 1 AD
     const ns = ts.nanoseconds;
     const us_since_year1: i96 = @divTrunc(ns, 1000) + psp_epoch_offset_s * 1_000_000;
     var tick: u64 = if (us_since_year1 < 0) 0 else @intCast(us_since_year1);
-    var dt: c_types.ScePspDateTime = undefined;
-    _ = rtc.sceRtcSetTick(&dt, &tick);
+    var dt: rtc.DateTime = undefined;
+    rtc.set_tick(&dt, &tick) catch {};
     return dt;
 }
 
-fn sceIoStatToFileStat(psp_stat: *const c_types.SceIoStat) File.Stat {
+fn sceIoStatToFileStat(psp_stat: *const io.SceIoStat) File.Stat {
     return .{
         .inode = 0,
         .nlink = 0,
@@ -270,20 +266,6 @@ fn sceIoStatToFileStat(psp_stat: *const c_types.SceIoStat) File.Stat {
         .block_size = 0,
     };
 }
-
-// -- PSP I/O constants -------------------------------------------------
-
-const PSP_O_RDONLY = 0x0001;
-const PSP_O_WRONLY = 0x0002;
-const PSP_O_RDWR = PSP_O_RDONLY | PSP_O_WRONLY;
-const PSP_O_CREAT = 0x0200;
-const PSP_O_TRUNC = 0x0400;
-const PSP_O_APPEND = 0x0100;
-const PSP_O_EXCL = 0x0800;
-
-const PSP_SEEK_SET = 0;
-const PSP_SEEK_CUR = 1;
-const PSP_SEEK_END = 2;
 
 // -- Async/Concurrency (N/A on PSP) -----------------------------------
 
@@ -380,9 +362,7 @@ fn futexWake(_: ?*anyopaque, _: *const u32, _: u32) void {}
 // -- Operate (Multiplexed I/O) -----------------------------------------
 
 fn pspWrite(fd: SceUID, buf: []const u8) error{WriteFailed}!usize {
-    const ret = io_mgr.sceIoWrite(fd, buf.ptr, buf.len);
-    if (ret < 0) return error.WriteFailed;
-    return @intCast(ret);
+    return io.write(fd, buf) catch return error.WriteFailed;
 }
 
 fn operate(_: ?*anyopaque, op: Io.Operation) Io.Cancelable!Io.Operation.Result {
@@ -394,10 +374,10 @@ fn operate(_: ?*anyopaque, op: Io.Operation) Io.Cancelable!Io.Operation.Result {
             var total: usize = 0;
             for (r.data) |buf| {
                 if (buf.len > 0) {
-                    const ret = io_mgr.sceIoRead(fd, buf.ptr, @intCast(buf.len));
-                    if (ret < 0) return .{ .file_read_streaming = error.InputOutput };
-                    total += @intCast(ret);
-                    if (@as(usize, @intCast(ret)) < buf.len) break;
+                    const n = io.read(fd, buf) catch
+                        return .{ .file_read_streaming = error.InputOutput };
+                    total += n;
+                    if (n < buf.len) break;
                 }
             }
             return .{ .file_read_streaming = total };
@@ -456,8 +436,7 @@ fn batchCancel(_: ?*anyopaque, _: *Io.Batch) void {
 fn dirCreateDir(_: ?*anyopaque, _: Dir, sub_path: []const u8, _: Dir.Permissions) Dir.CreateDirError!void {
     var path_buf: [1024]u8 = undefined;
     const path_z = toNullTerminated(sub_path, &path_buf) orelse return error.NameTooLong;
-    const ret = io_mgr.sceIoMkdir(path_z, 0o777);
-    if (ret < 0) return error.AccessDenied;
+    io.mkdir(path_z, 0o777) catch return error.AccessDenied;
 }
 
 fn dirCreateDirPath(_: ?*anyopaque, _: Dir, sub_path: []const u8, _: Dir.Permissions) Dir.CreateDirPathError!Dir.CreatePathStatus {
@@ -472,9 +451,9 @@ fn dirCreateDirPath(_: ?*anyopaque, _: Dir, sub_path: []const u8, _: Dir.Permiss
         if (path_buf[i] == '/') {
             if (i > 0) {
                 path_buf[i] = 0;
-                const ret = io_mgr.sceIoMkdir(@ptrCast(path_buf[0..i :0].ptr), 0o777);
-                if (ret >= 0) created_any = true;
-                // Ignore errors (directory may already exist)
+                if (io.mkdir(@ptrCast(path_buf[0..i :0].ptr), 0o777)) |_|
+                    created_any = true
+                else |_| {}
                 path_buf[i] = '/';
             }
             i += 1;
@@ -484,13 +463,16 @@ fn dirCreateDirPath(_: ?*anyopaque, _: Dir, sub_path: []const u8, _: Dir.Permiss
     }
     // Create the final component
     path_buf[sub_path.len] = 0;
-    const ret = io_mgr.sceIoMkdir(@ptrCast(path_buf[0..sub_path.len :0].ptr), 0o777);
-    if (ret >= 0) return .created;
+    const final_path: [*:0]const u8 = @ptrCast(path_buf[0..sub_path.len :0].ptr);
+    if (io.mkdir(final_path, 0o777)) |_|
+        return .created
+    else |_| {}
     if (created_any) return .created;
     // If the final mkdir failed, it might already exist
-    var stat_buf: c_types.SceIoStat = undefined;
-    const stat_ret = io_mgr.sceIoGetstat(@ptrCast(path_buf[0..sub_path.len :0].ptr), &stat_buf);
-    if (stat_ret >= 0 and stat_buf.st_attr & 0x10 != 0) return .existed;
+    var stat_buf: io.SceIoStat = undefined;
+    if (io.getstat(final_path, &stat_buf)) |_| {
+        if (stat_buf.st_attr & 0x10 != 0) return .existed;
+    } else |_| {}
     return error.AccessDenied;
 }
 
@@ -505,7 +487,7 @@ fn dirCreateDirPathOpen(_: ?*anyopaque, _: Dir, sub_path: []const u8, _: Dir.Per
         if (path_buf[i] == '/') {
             if (i > 0) {
                 path_buf[i] = 0;
-                _ = io_mgr.sceIoMkdir(@ptrCast(path_buf[0..i :0].ptr), 0o777);
+                io.mkdir(@ptrCast(path_buf[0..i :0].ptr), 0o777) catch {};
                 path_buf[i] = '/';
             }
             i += 1;
@@ -515,19 +497,18 @@ fn dirCreateDirPathOpen(_: ?*anyopaque, _: Dir, sub_path: []const u8, _: Dir.Per
     }
     // Create final component
     path_buf[sub_path.len] = 0;
-    _ = io_mgr.sceIoMkdir(@ptrCast(path_buf[0..sub_path.len :0].ptr), 0o777);
+    const final_path: [*:0]const u8 = @ptrCast(path_buf[0..sub_path.len :0].ptr);
+    io.mkdir(final_path, 0o777) catch {};
 
     // Open it
-    const fd = io_mgr.sceIoDopen(@ptrCast(path_buf[0..sub_path.len :0].ptr));
-    if (fd < 0) return error.FileNotFound;
+    const fd = io.dopen(final_path) catch return error.FileNotFound;
     return .{ .handle = fd };
 }
 
 fn dirOpenDir(_: ?*anyopaque, _: Dir, sub_path: []const u8, _: Dir.OpenOptions) Dir.OpenError!Dir {
     var path_buf: [1024]u8 = undefined;
     const path_z = toNullTerminated(sub_path, &path_buf) orelse return error.NameTooLong;
-    const fd = io_mgr.sceIoDopen(path_z);
-    if (fd < 0) return error.FileNotFound;
+    const fd = io.dopen(path_z) catch return error.FileNotFound;
     return .{ .handle = fd };
 }
 
@@ -535,42 +516,36 @@ fn dirStat(_: ?*anyopaque, d: Dir) Dir.StatError!Dir.Stat {
     const path = lookupFdPath(d.handle) orelse return error.AccessDenied;
     var path_buf: [1024]u8 = undefined;
     const path_z = toNullTerminated(path, &path_buf) orelse return error.AccessDenied;
-    var stat_buf: c_types.SceIoStat = undefined;
-    const ret = io_mgr.sceIoGetstat(path_z, &stat_buf);
-    if (ret < 0) return error.AccessDenied;
+    var stat_buf: io.SceIoStat = undefined;
+    io.getstat(path_z, &stat_buf) catch return error.AccessDenied;
     return sceIoStatToFileStat(&stat_buf);
 }
 
 fn dirStatFile(_: ?*anyopaque, _: Dir, sub_path: []const u8, _: Dir.StatFileOptions) Dir.StatFileError!File.Stat {
     var path_buf: [1024]u8 = undefined;
     const path_z = toNullTerminated(sub_path, &path_buf) orelse return error.NameTooLong;
-    var stat_buf: c_types.SceIoStat = undefined;
-    const ret = io_mgr.sceIoGetstat(path_z, &stat_buf);
-    if (ret < 0) return error.FileNotFound;
+    var stat_buf: io.SceIoStat = undefined;
+    io.getstat(path_z, &stat_buf) catch return error.FileNotFound;
     return sceIoStatToFileStat(&stat_buf);
 }
 
 fn dirAccess(_: ?*anyopaque, _: Dir, sub_path: []const u8, _: Dir.AccessOptions) Dir.AccessError!void {
     var path_buf: [1024]u8 = undefined;
     const path_z = toNullTerminated(sub_path, &path_buf) orelse return error.NameTooLong;
-    var stat_buf: c_types.SceIoStat = undefined;
-    const ret = io_mgr.sceIoGetstat(path_z, &stat_buf);
-    if (ret < 0) return error.FileNotFound;
+    var stat_buf: io.SceIoStat = undefined;
+    io.getstat(path_z, &stat_buf) catch return error.FileNotFound;
 }
 
 fn dirCreateFile(_: ?*anyopaque, _: Dir, sub_path: []const u8, flags: File.CreateFlags) File.OpenError!File {
     var path_buf: [1024]u8 = undefined;
     const path_z = toNullTerminated(sub_path, &path_buf) orelse return error.NameTooLong;
-    var psp_flags: c_int = PSP_O_CREAT;
-    if (flags.read) {
-        psp_flags |= PSP_O_RDWR;
-    } else {
-        psp_flags |= PSP_O_WRONLY;
-    }
-    if (flags.truncate) psp_flags |= PSP_O_TRUNC;
-    if (flags.exclusive) psp_flags |= PSP_O_EXCL;
-    const fd = io_mgr.sceIoOpen(path_z, psp_flags, 0o777);
-    if (fd < 0) return error.AccessDenied;
+    const fd = io.open(path_z, .{
+        .read = flags.read,
+        .write = true,
+        .create = true,
+        .truncate = flags.truncate,
+        .excl = flags.exclusive,
+    }, 0o777) catch return error.AccessDenied;
     trackFd(fd, sub_path);
     return .{ .handle = fd, .flags = .{ .nonblocking = false } };
 }
@@ -582,30 +557,32 @@ fn dirCreateFileAtomic(_: ?*anyopaque, _: Dir, _: []const u8, _: Dir.CreateFileA
 fn dirOpenFile(_: ?*anyopaque, _: Dir, sub_path: []const u8, flags: File.OpenFlags) File.OpenError!File {
     var path_buf: [1024]u8 = undefined;
     const path_z = toNullTerminated(sub_path, &path_buf) orelse return error.NameTooLong;
-    const psp_flags: c_int = switch (flags.mode) {
-        .read_only => PSP_O_RDONLY,
-        .write_only => PSP_O_WRONLY,
-        .read_write => PSP_O_RDWR,
+    const open_flags: io.OpenFlags = switch (flags.mode) {
+        .read_only => .{ .read = true },
+        .write_only => .{ .write = true },
+        .read_write => .{ .read = true, .write = true },
     };
-    const fd = io_mgr.sceIoOpen(path_z, psp_flags, 0o777);
-    if (fd < 0) return error.FileNotFound;
+    const fd = io.open(path_z, open_flags, 0o777) catch return error.FileNotFound;
     trackFd(fd, sub_path);
     return .{ .handle = fd, .flags = .{ .nonblocking = false } };
 }
 
 fn dirClose(_: ?*anyopaque, dirs: []const Dir) void {
     for (dirs) |dir| {
-        _ = io_mgr.sceIoDclose(dir.handle);
+        io.dclose(dir.handle) catch {};
     }
 }
 
 fn dirRead(_: ?*anyopaque, reader: *Dir.Reader, buffer: []Dir.Entry) Dir.Reader.Error!usize {
     var count: usize = 0;
     while (count < buffer.len) {
-        var dirent: c_types.SceIoDirent = undefined;
+        var dirent: io.SceIoDirent = undefined;
         @memset(std.mem.asBytes(&dirent), 0);
-        const ret = io_mgr.sceIoDread(reader.dir.handle, &dirent);
-        if (ret <= 0) {
+        const has_entry = io.dread(reader.dir.handle, &dirent) catch {
+            reader.state = .finished;
+            break;
+        };
+        if (!has_entry) {
             reader.state = .finished;
             break;
         }
@@ -640,15 +617,13 @@ fn dirRealPathFile(_: ?*anyopaque, _: Dir, _: []const u8, _: []u8) Dir.RealPathF
 fn dirDeleteFile(_: ?*anyopaque, _: Dir, sub_path: []const u8) Dir.DeleteFileError!void {
     var path_buf: [1024]u8 = undefined;
     const path_z = toNullTerminated(sub_path, &path_buf) orelse return error.NameTooLong;
-    const ret = io_mgr.sceIoRemove(path_z);
-    if (ret < 0) return error.AccessDenied;
+    io.remove(path_z) catch return error.AccessDenied;
 }
 
 fn dirDeleteDir(_: ?*anyopaque, _: Dir, sub_path: []const u8) Dir.DeleteDirError!void {
     var path_buf: [1024]u8 = undefined;
     const path_z = toNullTerminated(sub_path, &path_buf) orelse return error.NameTooLong;
-    const ret = io_mgr.sceIoRmdir(path_z);
-    if (ret < 0) return error.AccessDenied;
+    io.rmdir(path_z) catch return error.AccessDenied;
 }
 
 fn dirRename(_: ?*anyopaque, _: Dir, old_path: []const u8, _: Dir, new_path: []const u8) Dir.RenameError!void {
@@ -656,8 +631,7 @@ fn dirRename(_: ?*anyopaque, _: Dir, old_path: []const u8, _: Dir, new_path: []c
     var new_buf: [1024]u8 = undefined;
     const old_z = toNullTerminated(old_path, &old_buf) orelse return error.NameTooLong;
     const new_z = toNullTerminated(new_path, &new_buf) orelse return error.NameTooLong;
-    const ret = io_mgr.sceIoRename(old_z, new_z);
-    if (ret < 0) return error.AccessDenied;
+    io.rename(old_z, new_z) catch return error.AccessDenied;
 }
 
 fn dirRenamePreserve(_: ?*anyopaque, _: Dir, _: []const u8, _: Dir, _: []const u8) Dir.RenamePreserveError!void {
@@ -693,9 +667,8 @@ fn dirSetTimestamps(_: ?*anyopaque, _: Dir, sub_path: []const u8, options: Dir.S
     const path_z = toNullTerminated(sub_path, &path_buf) orelse return error.AccessDenied;
 
     // Read current stat so we can update only what's requested
-    var stat_buf: c_types.SceIoStat = undefined;
-    const gret = io_mgr.sceIoGetstat(path_z, &stat_buf);
-    if (gret < 0) return error.AccessDenied;
+    var stat_buf: io.SceIoStat = undefined;
+    io.getstat(path_z, &stat_buf) catch return error.AccessDenied;
 
     var bits: c_int = 0;
     switch (options.access_timestamp) {
@@ -722,8 +695,7 @@ fn dirSetTimestamps(_: ?*anyopaque, _: Dir, sub_path: []const u8, options: Dir.S
     }
 
     if (bits != 0) {
-        const ret = io_mgr.sceIoChstat(path_z, &stat_buf, bits);
-        if (ret < 0) return error.AccessDenied;
+        io.chstat(path_z, &stat_buf, @intCast(bits)) catch return error.AccessDenied;
     }
 }
 
@@ -737,39 +709,38 @@ fn fileStat(_: ?*anyopaque, file: File) File.StatError!File.Stat {
     const path = lookupFdPath(file.handle) orelse return error.AccessDenied;
     var path_buf: [1024]u8 = undefined;
     const path_z = toNullTerminated(path, &path_buf) orelse return error.AccessDenied;
-    var stat_buf: c_types.SceIoStat = undefined;
-    const ret = io_mgr.sceIoGetstat(path_z, &stat_buf);
-    if (ret < 0) return error.AccessDenied;
+    var stat_buf: io.SceIoStat = undefined;
+    io.getstat(path_z, &stat_buf) catch return error.AccessDenied;
     return sceIoStatToFileStat(&stat_buf);
 }
 
 fn fileLength(_: ?*anyopaque, file: File) File.LengthError!u64 {
     const fd = file.handle;
     // Save current position
-    const cur = io_mgr.sceIoLseek(fd, 0, PSP_SEEK_CUR);
+    const cur = io.lseek(fd, 0, .cur);
     if (cur < 0) return error.AccessDenied;
     // Seek to end
-    const end = io_mgr.sceIoLseek(fd, 0, PSP_SEEK_END);
+    const end = io.lseek(fd, 0, .end);
     if (end < 0) return error.AccessDenied;
     // Restore position
-    _ = io_mgr.sceIoLseek(fd, cur, PSP_SEEK_SET);
+    _ = io.lseek(fd, cur, .set);
     return @intCast(end);
 }
 
 fn fileClose(_: ?*anyopaque, files: []const File) void {
     for (files) |f| {
         untrackFd(f.handle);
-        _ = io_mgr.sceIoClose(f.handle);
+        io.close(f.handle) catch {};
     }
 }
 
 fn fileWritePositional(_: ?*anyopaque, file: File, header: []const u8, data: []const []const u8, splat: usize, offset: u64) File.WritePositionalError!usize {
     const fd = file.handle;
     // Save current position
-    const cur = io_mgr.sceIoLseek(fd, 0, PSP_SEEK_CUR);
+    const cur = io.lseek(fd, 0, .cur);
     if (cur < 0) return error.Unseekable;
     // Seek to offset
-    const seek_ret = io_mgr.sceIoLseek(fd, @intCast(offset), PSP_SEEK_SET);
+    const seek_ret = io.lseek(fd, @intCast(offset), .set);
     if (seek_ret < 0) return error.Unseekable;
 
     var written: usize = 0;
@@ -777,7 +748,7 @@ fn fileWritePositional(_: ?*anyopaque, file: File, header: []const u8, data: []c
     // Write header
     if (header.len > 0) {
         written += pspWrite(fd, header) catch {
-            _ = io_mgr.sceIoLseek(fd, cur, PSP_SEEK_SET);
+            _ = io.lseek(fd, cur, .set);
             return error.InputOutput;
         };
     }
@@ -786,7 +757,7 @@ fn fileWritePositional(_: ?*anyopaque, file: File, header: []const u8, data: []c
     for (data[0..data.len -| 1]) |slice| {
         if (slice.len > 0) {
             written += pspWrite(fd, slice) catch {
-                _ = io_mgr.sceIoLseek(fd, cur, PSP_SEEK_SET);
+                _ = io.lseek(fd, cur, .set);
                 return error.InputOutput;
             };
         }
@@ -799,7 +770,7 @@ fn fileWritePositional(_: ?*anyopaque, file: File, header: []const u8, data: []c
             var i: usize = 0;
             while (i < splat) : (i += 1) {
                 written += pspWrite(fd, pattern) catch {
-                    _ = io_mgr.sceIoLseek(fd, cur, PSP_SEEK_SET);
+                    _ = io.lseek(fd, cur, .set);
                     return error.InputOutput;
                 };
             }
@@ -807,7 +778,7 @@ fn fileWritePositional(_: ?*anyopaque, file: File, header: []const u8, data: []c
     }
 
     // Restore position
-    _ = io_mgr.sceIoLseek(fd, cur, PSP_SEEK_SET);
+    _ = io.lseek(fd, cur, .set);
     return written;
 }
 
@@ -838,10 +809,10 @@ fn fileWriteFileStreaming(_: ?*anyopaque, file: File, header: []const u8, reader
 fn fileWriteFilePositional(_: ?*anyopaque, file: File, header: []const u8, reader: *Io.File.Reader, limit: Io.Limit, offset: u64) File.WriteFilePositionalError!usize {
     const fd = file.handle;
     // Save current position
-    const cur = io_mgr.sceIoLseek(fd, 0, PSP_SEEK_CUR);
+    const cur = io.lseek(fd, 0, .cur);
     if (cur < 0) return error.Unseekable;
     // Seek to offset
-    const seek_ret = io_mgr.sceIoLseek(fd, @intCast(offset), PSP_SEEK_SET);
+    const seek_ret = io.lseek(fd, @intCast(offset), .set);
     if (seek_ret < 0) return error.Unseekable;
 
     var written: usize = 0;
@@ -849,7 +820,7 @@ fn fileWriteFilePositional(_: ?*anyopaque, file: File, header: []const u8, reade
     // Write header
     if (header.len > 0) {
         written += pspWrite(fd, header) catch {
-            _ = io_mgr.sceIoLseek(fd, cur, PSP_SEEK_SET);
+            _ = io.lseek(fd, cur, .set);
             return error.InputOutput;
         };
     }
@@ -861,12 +832,12 @@ fn fileWriteFilePositional(_: ?*anyopaque, file: File, header: []const u8, reade
         const to_read = @min(buf.len, remaining);
         var bufs = [_][]u8{buf[0..to_read]};
         const n = reader.interface.readVec(&bufs) catch {
-            _ = io_mgr.sceIoLseek(fd, cur, PSP_SEEK_SET);
+            _ = io.lseek(fd, cur, .set);
             return error.InputOutput;
         };
         if (n == 0) break;
         const w = pspWrite(fd, buf[0..n]) catch {
-            _ = io_mgr.sceIoLseek(fd, cur, PSP_SEEK_SET);
+            _ = io.lseek(fd, cur, .set);
             return error.InputOutput;
         };
         written += w;
@@ -874,50 +845,49 @@ fn fileWriteFilePositional(_: ?*anyopaque, file: File, header: []const u8, reade
     }
 
     // Restore position
-    _ = io_mgr.sceIoLseek(fd, cur, PSP_SEEK_SET);
+    _ = io.lseek(fd, cur, .set);
     return written;
 }
 
 fn fileReadPositional(_: ?*anyopaque, file: File, bufs: []const []u8, offset: u64) File.ReadPositionalError!usize {
     const fd = file.handle;
     // Save current position
-    const cur = io_mgr.sceIoLseek(fd, 0, PSP_SEEK_CUR);
+    const cur = io.lseek(fd, 0, .cur);
     if (cur < 0) return error.Unseekable;
     // Seek to offset
-    const seek_ret = io_mgr.sceIoLseek(fd, @intCast(offset), PSP_SEEK_SET);
+    const seek_ret = io.lseek(fd, @intCast(offset), .set);
     if (seek_ret < 0) return error.Unseekable;
 
     var total: usize = 0;
     for (bufs) |buf| {
         if (buf.len > 0) {
-            const ret = io_mgr.sceIoRead(fd, buf.ptr, @intCast(buf.len));
-            if (ret < 0) {
-                _ = io_mgr.sceIoLseek(fd, cur, PSP_SEEK_SET);
+            const n = io.read(fd, buf) catch {
+                _ = io.lseek(fd, cur, .set);
                 return error.InputOutput;
-            }
-            total += @intCast(ret);
-            if (@as(usize, @intCast(ret)) < buf.len) break;
+            };
+            total += n;
+            if (n < buf.len) break;
         }
     }
 
     // Restore position
-    _ = io_mgr.sceIoLseek(fd, cur, PSP_SEEK_SET);
+    _ = io.lseek(fd, cur, .set);
     return total;
 }
 
 fn fileSeekBy(_: ?*anyopaque, file: File, offset: i64) File.SeekError!void {
-    const ret = io_mgr.sceIoLseek(file.handle, offset, PSP_SEEK_CUR);
+    const ret = io.lseek(file.handle, offset, .cur);
     if (ret < 0) return error.Unseekable;
 }
 
 fn fileSeekTo(_: ?*anyopaque, file: File, offset: u64) File.SeekError!void {
-    const ret = io_mgr.sceIoLseek(file.handle, @intCast(offset), PSP_SEEK_SET);
+    const ret = io.lseek(file.handle, @intCast(offset), .set);
     if (ret < 0) return error.Unseekable;
 }
 
 fn fileSync(_: ?*anyopaque, _: File) File.SyncError!void {
     // sceIoSync takes a device name, not an fd. Sync the memory stick.
-    _ = io_mgr.sceIoSync(@ptrCast("ms0:"), 0);
+    io.sync("ms0:", 0) catch {};
 }
 
 fn fileIsTty(_: ?*anyopaque, file: File) Io.Cancelable!bool {
@@ -949,9 +919,8 @@ fn fileSetTimestamps(_: ?*anyopaque, file: File, options: File.SetTimestampsOpti
     var path_buf: [1024]u8 = undefined;
     const path_z = toNullTerminated(path, &path_buf) orelse return error.AccessDenied;
 
-    var stat_buf: c_types.SceIoStat = undefined;
-    const gret = io_mgr.sceIoGetstat(path_z, &stat_buf);
-    if (gret < 0) return error.AccessDenied;
+    var stat_buf: io.SceIoStat = undefined;
+    io.getstat(path_z, &stat_buf) catch return error.AccessDenied;
 
     var bits: c_int = 0;
     switch (options.access_timestamp) {
@@ -978,8 +947,7 @@ fn fileSetTimestamps(_: ?*anyopaque, file: File, options: File.SetTimestampsOpti
     }
 
     if (bits != 0) {
-        const ret = io_mgr.sceIoChstat(path_z, &stat_buf, bits);
-        if (ret < 0) return error.AccessDenied;
+        io.chstat(path_z, &stat_buf, @intCast(bits)) catch return error.AccessDenied;
     }
 }
 
@@ -1094,8 +1062,7 @@ fn processSetCurrentPath(_: ?*anyopaque, path: []const u8) std.process.SetCurren
     if (path.len >= cwd_buf.len) return error.NameTooLong;
     var path_z_buf: [1024]u8 = undefined;
     const path_z = toNullTerminated(path, &path_z_buf) orelse return error.NameTooLong;
-    const ret = io_mgr.sceIoChdir(path_z);
-    if (ret < 0) return error.FileNotFound;
+    io.chdir(path_z) catch return error.FileNotFound;
     // Update tracked cwd
     @memcpy(cwd_buf[0..path.len], path);
     cwd_len = path.len;
@@ -1136,7 +1103,7 @@ fn now(_: ?*anyopaque, clock: Io.Clock) Io.Timestamp {
     switch (clock) {
         .real, .awake, .boot => {
             var tick: u64 = 0;
-            _ = rtc.sceRtcGetCurrentTick(&tick);
+            rtc.get_current_tick(&tick) catch {};
             const tick_i96: i96 = @intCast(tick);
             // PSP ticks are microseconds since year 1 AD.
             // Convert to nanoseconds since Unix epoch.
@@ -1174,7 +1141,7 @@ fn sleep(_: ?*anyopaque, timeout: Io.Timeout) Io.Cancelable!void {
         },
         .deadline => |dl| blk: {
             var tick: u64 = 0;
-            _ = rtc.sceRtcGetCurrentTick(&tick);
+            rtc.get_current_tick(&tick) catch {};
             const now_ns: i96 = @as(i96, @intCast(tick)) * 1000 - psp_epoch_offset_s * 1_000_000_000;
             const delta = dl.raw.nanoseconds - now_ns;
             if (delta <= 0) break :blk 0;
@@ -1183,31 +1150,30 @@ fn sleep(_: ?*anyopaque, timeout: Io.Timeout) Io.Cancelable!void {
         },
     };
     if (us > 0) {
-        _ = threadman.sceKernelDelayThread(us);
+        kernel.delay_thread(us) catch {};
     }
 }
 
-const SceKernelUtilsMt19937Context = c_types.SceKernelUtilsMt19937Context;
-var mt_ctx: SceKernelUtilsMt19937Context = undefined;
+var mt_ctx: kernel.Mt19937Context = undefined;
 var mt_initialized: bool = false;
 
 fn fillRandom(buf: []u8) void {
     if (!mt_initialized) {
         var tick: u64 = 0;
-        _ = rtc.sceRtcGetCurrentTick(&tick);
-        _ = utils_mod.sceKernelUtilsMt19937Init(&mt_ctx, @truncate(tick));
+        rtc.get_current_tick(&tick) catch {};
+        kernel.mt19937_init(&mt_ctx, @truncate(tick)) catch {};
         mt_initialized = true;
     }
     var i: usize = 0;
     while (i + 4 <= buf.len) : (i += 4) {
-        const val = utils_mod.sceKernelUtilsMt19937UInt(&mt_ctx);
+        const val = kernel.mt19937_uint(&mt_ctx);
         buf[i] = @truncate(val);
         buf[i + 1] = @truncate(val >> 8);
         buf[i + 2] = @truncate(val >> 16);
         buf[i + 3] = @truncate(val >> 24);
     }
     if (i < buf.len) {
-        const val = utils_mod.sceKernelUtilsMt19937UInt(&mt_ctx);
+        const val = kernel.mt19937_uint(&mt_ctx);
         var shift: u5 = 0;
         while (i < buf.len) : (i += 1) {
             buf[i] = @truncate(val >> shift);
@@ -1226,7 +1192,7 @@ fn randomSecure(_: ?*anyopaque, buf: []u8) Io.RandomSecureError!void {
 
 // -- Network -----------------------------------------------------------
 
-fn ipAddressToSockaddr(addr: *const net.IpAddress) c_types.sockaddr_in {
+fn ipAddressToSockaddr(addr: *const net.IpAddress) psp_net.sockaddr_in {
     switch (addr.*) {
         .ip4 => |ip4| {
             return .{
@@ -1251,52 +1217,46 @@ fn ipAddressToSockaddr(addr: *const net.IpAddress) c_types.sockaddr_in {
     }
 }
 
-fn sockaddrToIpAddress(sa: *const c_types.sockaddr_in) net.IpAddress {
+fn sockaddrToIpAddress(sa: *const psp_net.sockaddr_in) net.IpAddress {
     return .{ .ip4 = .{
         .bytes = @bitCast(sa.sin_addr.s_addr),
         .port = @byteSwap(sa.sin_port),
     } };
 }
 
-fn socketModeToType(mode: net.Socket.Mode) c_int {
+fn socketModeToType(mode: net.Socket.Mode) i32 {
     return switch (mode) {
-        .stream => psp_net.SOCK_STREAM,
-        .dgram => psp_net.SOCK_DGRAM,
-        else => psp_net.SOCK_STREAM,
+        .stream => net_utils.SOCK_STREAM,
+        .dgram => net_utils.SOCK_DGRAM,
+        else => net_utils.SOCK_STREAM,
     };
-}
-
-fn createSocket(sock_type: c_int, protocol: c_int) !c_int {
-    const fd = inet.sceNetInetSocket(psp_net.AF_INET, sock_type, protocol);
-    if (fd < 0) return error.SystemResources;
-    return fd;
 }
 
 fn netListenIp(_: ?*anyopaque, addr: *const net.IpAddress, options: net.IpAddress.ListenOptions) net.IpAddress.ListenError!net.Socket {
     const sock_type = socketModeToType(options.mode);
-    const fd = inet.sceNetInetSocket(psp_net.AF_INET, sock_type, 0);
-    if (fd < 0) return error.SystemResources;
+    const fd = psp_net.inet_socket(net_utils.AF_INET, sock_type, 0) catch
+        return error.SystemResources;
 
     if (options.reuse_address) {
         const one: c_int = 1;
-        _ = inet.sceNetInetSetsockopt(fd, psp_net.SOL_SOCKET, psp_net.SO_REUSEADDR, &one, @sizeOf(c_int));
+        psp_net.inet_setsockopt(fd, net_utils.SOL_SOCKET, net_utils.SO_REUSEADDR, &one, @sizeOf(c_int)) catch {};
     }
 
     var sa = ipAddressToSockaddr(addr);
-    if (inet.sceNetInetBind(fd, &sa, @sizeOf(c_types.sockaddr_in)) < 0) {
-        _ = inet.sceNetInetClose(fd);
+    psp_net.inet_bind(fd, &sa, @sizeOf(psp_net.sockaddr_in)) catch {
+        psp_net.inet_close(fd) catch {};
         return error.AddressInUse;
-    }
+    };
 
-    if (inet.sceNetInetListen(fd, @intCast(options.kernel_backlog)) < 0) {
-        _ = inet.sceNetInetClose(fd);
+    psp_net.inet_listen(fd, @intCast(options.kernel_backlog)) catch {
+        psp_net.inet_close(fd) catch {};
         return error.AddressInUse;
-    }
+    };
 
     // Read back the bound address (for ephemeral port)
-    var bound_sa: c_types.sockaddr_in = undefined;
-    var sa_len: c_types.socklen_t = @sizeOf(c_types.sockaddr_in);
-    _ = inet.sceNetInetGetsockname(fd, &bound_sa, &sa_len);
+    var bound_sa: psp_net.sockaddr_in = undefined;
+    var sa_len: psp_net.socklen_t = @sizeOf(psp_net.sockaddr_in);
+    psp_net.inet_getsockname(fd, &bound_sa, &sa_len) catch {};
 
     return .{
         .handle = fd,
@@ -1305,10 +1265,10 @@ fn netListenIp(_: ?*anyopaque, addr: *const net.IpAddress, options: net.IpAddres
 }
 
 fn netAccept(_: ?*anyopaque, handle: net.Socket.Handle, _: net.Server.AcceptOptions) net.Server.AcceptError!net.Socket {
-    var client_sa: c_types.sockaddr_in = undefined;
-    var sa_len: c_types.socklen_t = @sizeOf(c_types.sockaddr_in);
-    const client_fd = inet.sceNetInetAccept(handle, &client_sa, &sa_len);
-    if (client_fd < 0) return error.ConnectionAborted;
+    var client_sa: psp_net.sockaddr_in = undefined;
+    var sa_len: psp_net.socklen_t = @sizeOf(psp_net.sockaddr_in);
+    const client_fd = psp_net.inet_accept(handle, &client_sa, &sa_len) catch
+        return error.ConnectionAborted;
     return .{
         .handle = client_fd,
         .address = sockaddrToIpAddress(&client_sa),
@@ -1317,18 +1277,18 @@ fn netAccept(_: ?*anyopaque, handle: net.Socket.Handle, _: net.Server.AcceptOpti
 
 fn netBindIp(_: ?*anyopaque, addr: *const net.IpAddress, options: net.IpAddress.BindOptions) net.IpAddress.BindError!net.Socket {
     const sock_type = socketModeToType(options.mode);
-    const fd = inet.sceNetInetSocket(psp_net.AF_INET, sock_type, 0);
-    if (fd < 0) return error.SystemResources;
+    const fd = psp_net.inet_socket(net_utils.AF_INET, sock_type, 0) catch
+        return error.SystemResources;
 
     var sa = ipAddressToSockaddr(addr);
-    if (inet.sceNetInetBind(fd, &sa, @sizeOf(c_types.sockaddr_in)) < 0) {
-        _ = inet.sceNetInetClose(fd);
+    psp_net.inet_bind(fd, &sa, @sizeOf(psp_net.sockaddr_in)) catch {
+        psp_net.inet_close(fd) catch {};
         return error.AddressInUse;
-    }
+    };
 
-    var bound_sa: c_types.sockaddr_in = undefined;
-    var sa_len: c_types.socklen_t = @sizeOf(c_types.sockaddr_in);
-    _ = inet.sceNetInetGetsockname(fd, &bound_sa, &sa_len);
+    var bound_sa: psp_net.sockaddr_in = undefined;
+    var sa_len: psp_net.socklen_t = @sizeOf(psp_net.sockaddr_in);
+    psp_net.inet_getsockname(fd, &bound_sa, &sa_len) catch {};
 
     return .{
         .handle = fd,
@@ -1338,14 +1298,14 @@ fn netBindIp(_: ?*anyopaque, addr: *const net.IpAddress, options: net.IpAddress.
 
 fn netConnectIp(_: ?*anyopaque, addr: *const net.IpAddress, options: net.IpAddress.ConnectOptions) net.IpAddress.ConnectError!net.Socket {
     const sock_type = socketModeToType(options.mode);
-    const fd = inet.sceNetInetSocket(psp_net.AF_INET, sock_type, 0);
-    if (fd < 0) return error.SystemResources;
+    const fd = psp_net.inet_socket(net_utils.AF_INET, sock_type, 0) catch
+        return error.SystemResources;
 
     var sa = ipAddressToSockaddr(addr);
-    if (inet.sceNetInetConnect(fd, &sa, @sizeOf(c_types.sockaddr_in)) < 0) {
-        _ = inet.sceNetInetClose(fd);
+    psp_net.inet_connect(fd, &sa, @sizeOf(psp_net.sockaddr_in)) catch {
+        psp_net.inet_close(fd) catch {};
         return error.ConnectionRefused;
-    }
+    };
 
     return .{
         .handle = fd,
@@ -1370,13 +1330,13 @@ fn netSend(_: ?*anyopaque, handle: net.Socket.Handle, messages: []net.OutgoingMe
     var total: usize = 0;
     for (messages) |*msg| {
         const sa = ipAddressToSockaddr(msg.address);
-        const sent: isize = @bitCast(inet.sceNetInetSendto(
+        const sent: isize = @bitCast(psp_net.inet_sendto(
             handle,
             msg.data_ptr,
             msg.data_len,
             0,
             &sa,
-            @sizeOf(c_types.sockaddr_in),
+            @sizeOf(psp_net.sockaddr_in),
         ));
         if (sent < 0) return .{ error.SystemResources, total };
         const sent_u: usize = @intCast(sent);
@@ -1389,7 +1349,7 @@ fn netSend(_: ?*anyopaque, handle: net.Socket.Handle, messages: []net.OutgoingMe
 fn netRead(_: ?*anyopaque, handle: net.Socket.Handle, bufs: [][]u8) net.Stream.Reader.Error!usize {
     var total: usize = 0;
     for (bufs) |buf| {
-        const n: isize = @bitCast(inet.sceNetInetRecv(handle, buf.ptr, buf.len, 0));
+        const n: isize = @bitCast(psp_net.inet_recv(handle, buf.ptr, buf.len, 0));
         if (n < 0) return error.ConnectionResetByPeer;
         if (n == 0) break;
         total += @as(usize, @intCast(n));
@@ -1401,7 +1361,7 @@ fn netRead(_: ?*anyopaque, handle: net.Socket.Handle, bufs: [][]u8) net.Stream.R
 fn netWrite(_: ?*anyopaque, handle: net.Socket.Handle, header: []const u8, payload: []const []const u8, splat: usize) net.Stream.Writer.Error!usize {
     var total: usize = 0;
     if (header.len > 0) {
-        const n: isize = @bitCast(inet.sceNetInetSend(handle, header.ptr, header.len, 0));
+        const n: isize = @bitCast(psp_net.inet_send(handle, header.ptr, header.len, 0));
         if (n < 0) return error.ConnectionResetByPeer;
         total += @as(usize, @intCast(n));
     }
@@ -1409,7 +1369,7 @@ fn netWrite(_: ?*anyopaque, handle: net.Socket.Handle, header: []const u8, paylo
     if (payload.len > 1) {
         for (payload[0 .. payload.len - 1]) |chunk| {
             if (chunk.len == 0) continue;
-            const n: isize = @bitCast(inet.sceNetInetSend(handle, chunk.ptr, chunk.len, 0));
+            const n: isize = @bitCast(psp_net.inet_send(handle, chunk.ptr, chunk.len, 0));
             if (n < 0) return error.ConnectionResetByPeer;
             total += @as(usize, @intCast(n));
         }
@@ -1419,7 +1379,7 @@ fn netWrite(_: ?*anyopaque, handle: net.Socket.Handle, header: []const u8, paylo
         const last = payload[payload.len - 1];
         if (last.len > 0) {
             for (0..splat) |_| {
-                const n: isize = @bitCast(inet.sceNetInetSend(handle, last.ptr, last.len, 0));
+                const n: isize = @bitCast(psp_net.inet_send(handle, last.ptr, last.len, 0));
                 if (n < 0) return error.ConnectionResetByPeer;
                 total += @as(usize, @intCast(n));
             }
@@ -1431,7 +1391,7 @@ fn netWrite(_: ?*anyopaque, handle: net.Socket.Handle, header: []const u8, paylo
 fn netWriteFile(_: ?*anyopaque, handle: net.Socket.Handle, header: []const u8, file_reader: *Io.File.Reader, limit: Io.Limit) net.Stream.Writer.WriteFileError!usize {
     var total: usize = 0;
     if (header.len > 0) {
-        const n: isize = @bitCast(inet.sceNetInetSend(handle, header.ptr, header.len, 0));
+        const n: isize = @bitCast(psp_net.inet_send(handle, header.ptr, header.len, 0));
         if (n < 0) return error.NetworkDown;
         total += @as(usize, @intCast(n));
     }
@@ -1442,7 +1402,7 @@ fn netWriteFile(_: ?*anyopaque, handle: net.Socket.Handle, header: []const u8, f
         var read_bufs = [_][]u8{buf[0..to_read]};
         const got = file_reader.interface.readVec(&read_bufs) catch break;
         if (got == 0) break;
-        const n: isize = @bitCast(inet.sceNetInetSend(handle, &buf, got, 0));
+        const n: isize = @bitCast(psp_net.inet_send(handle, &buf, got, 0));
         if (n < 0) return error.NetworkDown;
         total += @as(usize, @intCast(n));
     }
@@ -1451,17 +1411,17 @@ fn netWriteFile(_: ?*anyopaque, handle: net.Socket.Handle, header: []const u8, f
 
 fn netClose(_: ?*anyopaque, handles: []const net.Socket.Handle) void {
     for (handles) |handle| {
-        _ = inet.sceNetInetClose(handle);
+        psp_net.inet_close(handle) catch {};
     }
 }
 
 fn netShutdown(_: ?*anyopaque, handle: net.Socket.Handle, how: net.ShutdownHow) net.ShutdownError!void {
-    const psp_how: c_int = switch (how) {
-        .recv => psp_net.SHUT_RD,
-        .send => psp_net.SHUT_WR,
-        .both => psp_net.SHUT_RDWR,
+    const psp_how: i32 = switch (how) {
+        .recv => net_utils.SHUT_RD,
+        .send => net_utils.SHUT_WR,
+        .both => net_utils.SHUT_RDWR,
     };
-    if (inet.sceNetInetShutdown(handle, psp_how) < 0)
+    psp_net.inet_shutdown(handle, psp_how) catch
         return error.ConnectionResetByPeer;
 }
 
@@ -1488,11 +1448,11 @@ fn netLookup(_: ?*anyopaque, host_name: net.HostName, results: *Io.Queue(net.Hos
     } else |_| {}
 
     // DNS resolve via sceNetResolver
-    var rid: c_int = 0;
+    var rid: i32 = 0;
     var resolver_buf: [1024]u8 = undefined;
-    if (resolver.sceNetResolverCreate(&rid, &resolver_buf, resolver_buf.len) < 0)
+    psp_net.resolver_create(&rid, &resolver_buf, resolver_buf.len) catch
         return error.NameServerFailure;
-    defer _ = resolver.sceNetResolverDelete(rid);
+    defer psp_net.resolver_delete(rid) catch {};
 
     // Null-terminate the hostname
     var name_buf: [256]u8 = undefined;
@@ -1500,8 +1460,8 @@ fn netLookup(_: ?*anyopaque, host_name: net.HostName, results: *Io.Queue(net.Hos
     @memcpy(name_buf[0..host_name.bytes.len], host_name.bytes);
     name_buf[host_name.bytes.len] = 0;
 
-    var resolved_addr: c_types.in_addr = undefined;
-    if (resolver.sceNetResolverStartNtoA(rid, @ptrCast(&name_buf), &resolved_addr, 5, 3) < 0)
+    var resolved_addr: psp_net.in_addr = undefined;
+    psp_net.resolver_start_ntoa(rid, @ptrCast(&name_buf), &resolved_addr, 5, 3) catch
         return error.UnknownHostName;
 
     const ip4_bytes: [4]u8 = @bitCast(resolved_addr.s_addr);

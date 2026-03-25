@@ -7,9 +7,9 @@ pub const ScePspFVector3 = c.types.ScePspFVector3;
 pub const ScePspIMatrix4 = c.types.ScePspIMatrix4;
 pub const ScePspFMatrix4 = c.types.ScePspFMatrix4;
 
-const ge = @import("pspge.zig");
-const display = @import("pspdisplay.zig");
-const threadman = @import("pspthreadman.zig");
+const ge = @import("../sdk/ge.zig");
+const display = @import("../sdk/display.zig");
+const kernel = @import("../sdk/kernel.zig");
 
 pub const GuSwapBuffersCallback = *const fn ([*c]?*anyopaque, [*c]?*anyopaque) void;
 pub const GuCallback = *const fn (c_int) void;
@@ -23,7 +23,7 @@ const GuSettings = struct {
     ge_callback_id: i32,
 
     swapBuffersCallback: ?GuSwapBuffersCallback,
-    swapBuffersBehaviour: display.PspDisplaySetBufSync,
+    swapBuffersBehaviour: display.BufSync,
 };
 
 const GupspList = struct {
@@ -52,7 +52,7 @@ const GuContext = struct {
 };
 
 const GuDrawBuffer = struct {
-    pixel_format: display.PspDisplayPixelFormats,
+    pixel_format: display.PixelFormat,
     frame_width: u24,
     frame_buffer: ?*anyopaque,
     disp_buffer: ?*anyopaque,
@@ -184,7 +184,7 @@ pub export fn callbackSig(id: c_int, arg: ?*anyopaque) void {
         signal_cb(id & 0xffff);
     }
 
-    _ = threadman.sceKernelSetEventFlag(settings.?.kernel_event_flag, 1);
+    kernel.set_event_flag(settings.?.kernel_event_flag, 1) catch {};
 }
 
 pub export fn callbackFin(id: c_int, arg: ?*anyopaque) void {
@@ -206,7 +206,7 @@ pub fn resetValues() void {
     gu_psp_on = 0;
     gu_call_mode = 0;
 
-    gu_draw_buffer.pixel_format = .Format5551;
+    gu_draw_buffer.pixel_format = .rgba5551;
     gu_draw_buffer.frame_width = 0;
     gu_draw_buffer.frame_buffer = null;
     gu_draw_buffer.disp_buffer = null;
@@ -251,7 +251,7 @@ pub fn sendCommandiStall(cmd: u8, argument: u24) void {
     sendCommandi(cmd, argument);
 
     if (gu_object_stack_depth == 0 and gu_curr_context == 0) {
-        _ = ge.sceGeListUpdateStallAddr(ge_list_executed[0], gu_list.?.current);
+        ge.list_update_stall_addr(ge_list_executed[0], gu_list.?.current) catch {};
     }
 }
 
@@ -549,17 +549,17 @@ pub fn sceGuDispBuffer(width: u24, height: u24, dispbp: ?*anyopaque, dispbw: u24
         gu_draw_buffer.frame_width = dispbw;
 
     drawRegion(0, 0, gu_draw_buffer.width, gu_draw_buffer.height);
-    _ = display.sceDisplaySetMode(.LCD, gu_draw_buffer.width, gu_draw_buffer.height);
+    display.set_mode(.lcd, gu_draw_buffer.width, gu_draw_buffer.height) catch {};
 
     if (gu_psp_on != 0)
-        _ = display.sceDisplaySetFrameBuf(@as(?*anyopaque, @ptrFromInt(@intFromPtr(ge_edram_address) + @intFromPtr(gu_draw_buffer.disp_buffer))), dispbw, gu_draw_buffer.pixel_format, .NextVSync);
+        display.set_frame_buf(@as(?*anyopaque, @ptrFromInt(@intFromPtr(ge_edram_address) + @intFromPtr(gu_draw_buffer.disp_buffer))), dispbw, gu_draw_buffer.pixel_format, .next_vblank) catch {};
 }
 
 pub fn sceGuDisplay(state: bool) void {
     if (state) {
-        _ = display.sceDisplaySetFrameBuf(@as(?*anyopaque, @ptrFromInt(@intFromPtr(ge_edram_address) + @intFromPtr(gu_draw_buffer.disp_buffer))), gu_draw_buffer.frame_width, gu_draw_buffer.pixel_format, .NextVSync);
+        display.set_frame_buf(@as(?*anyopaque, @ptrFromInt(@intFromPtr(ge_edram_address) + @intFromPtr(gu_draw_buffer.disp_buffer))), gu_draw_buffer.frame_width, gu_draw_buffer.pixel_format, .next_vblank) catch {};
     } else {
-        _ = display.sceDisplaySetFrameBuf(null, 0, .Format565, .NextVSync);
+        display.set_frame_buf(null, 0, .rgb565, .next_vblank) catch {};
     }
 
     gu_psp_on = @intFromBool(state);
@@ -624,7 +624,7 @@ pub fn sceGuDrawBezier(vtype: u24, ucount: c_int, vcount: c_int, indices: ?*cons
     sendCommandi(5, (vcount << 8) | ucount);
 }
 
-pub fn sceGuDrawBuffer(pixel_format: display.PspDisplayPixelFormats, fbp: ?*anyopaque, fbw: u24) void {
+pub fn sceGuDrawBuffer(pixel_format: display.PixelFormat, fbp: ?*anyopaque, fbw: u24) void {
     gu_draw_buffer.pixel_format = pixel_format;
     gu_draw_buffer.frame_width = fbw;
     gu_draw_buffer.frame_buffer = fbp;
@@ -640,17 +640,17 @@ pub fn sceGuDrawBuffer(pixel_format: display.PspDisplayPixelFormats, fbp: ?*anyo
     const buffer_color_offset_u32: u32 = @intFromPtr(gu_draw_buffer.frame_buffer);
     const buffer_depth_offset_u32: u32 = @intFromPtr(gu_draw_buffer.depth_buffer);
 
-    sendCommandi(210, @intFromEnum(pixel_format));
+    sendCommandi(210, @truncate(@intFromEnum(pixel_format)));
     sendCommandi(156, @truncate(buffer_color_offset_u32));
     sendCommandi(157, @truncate(((buffer_color_offset_u32 & 0xff000000) >> 8) | gu_draw_buffer.frame_width));
     sendCommandi(158, @truncate(buffer_depth_offset_u32));
     sendCommandi(159, @truncate(((buffer_depth_offset_u32 & 0xff000000) >> 8) | gu_draw_buffer.depth_width));
 }
 
-pub fn sceGuDrawBufferList(pixel_format: display.PspDisplayPixelFormats, fbp: ?*anyopaque, fbw: u32) void {
+pub fn sceGuDrawBufferList(pixel_format: display.PixelFormat, fbp: ?*anyopaque, fbw: u32) void {
     const fbp_u32: u32 = @intFromPtr(fbp);
 
-    sendCommandi(210, @intFromEnum(pixel_format));
+    sendCommandi(210, @truncate(@intFromEnum(pixel_format)));
     sendCommandi(156, @truncate(fbp_u32));
     sendCommandi(157, @truncate(((fbp_u32 & 0xff000000) >> 8) | fbw));
 }
@@ -1006,10 +1006,10 @@ pub fn sceGuSendList(mode: c_int, list: ?*const anyopaque, context: [*c]types.ps
 
     switch (@as(types.GuQueueMode, @enumFromInt(mode))) {
         .Head => {
-            list_id = ge.sceGeListEnQueueHead(list, null, callback, &args);
+            list_id = ge.list_enqueue_head(list, null, callback, &args) catch 0;
         },
         .Tail => {
-            list_id = ge.sceGeListEnQueue(list, null, callback, &args);
+            list_id = ge.list_enqueue(list, null, callback, &args) catch 0;
         },
     }
 
@@ -1153,7 +1153,7 @@ pub fn sceGuSwapBuffers() ?*anyopaque {
     }
 
     if (gu_psp_on != 0) {
-        _ = display.sceDisplaySetFrameBuf(@as(?*anyopaque, @ptrFromInt(@intFromPtr(ge_edram_address) + @intFromPtr(gu_draw_buffer.disp_buffer))), gu_draw_buffer.frame_width, gu_draw_buffer.pixel_format, gu_settings.swapBuffersBehaviour);
+        display.set_frame_buf(@as(?*anyopaque, @ptrFromInt(@intFromPtr(ge_edram_address) + @intFromPtr(gu_draw_buffer.disp_buffer))), gu_draw_buffer.frame_width, gu_draw_buffer.pixel_format, gu_settings.swapBuffersBehaviour) catch {};
     }
 
     gu_current_frame ^= 1;
@@ -1164,7 +1164,7 @@ pub fn guSwapBuffers() void {
     _ = sceGuSwapBuffers();
 }
 
-pub fn guSwapBuffersBehaviour(behaviour: display.PspDisplaySetBufSync) void {
+pub fn guSwapBuffersBehaviour(behaviour: display.BufSync) void {
     gu_settings.swapBuffersBehaviour = behaviour;
 }
 
@@ -1172,30 +1172,30 @@ pub fn guSwapBuffersCallback(callback: GuSwapBuffersCallback) void {
     gu_settings.swapBuffersCallback = callback;
 }
 
-pub fn sceGuSync(mode: types.GuSyncMode, sync_type: ge.PspGeSyncBehavior) ge.PspGeListState {
+pub fn sceGuSync(mode: types.GuSyncMode, sync_type: ge.SyncBehavior) ge.ListState {
     switch (mode) {
         .Finish => {
-            return ge.sceGeDrawSync(sync_type);
+            return ge.draw_sync(sync_type);
         },
         .Signal, .Done => {
-            return .Done;
+            return .done;
         },
         .List => {
-            return ge.sceGeListSync(ge_list_executed[0], sync_type);
+            return ge.list_sync(ge_list_executed[0], sync_type);
         },
         .Send => {
-            return ge.sceGeListSync(ge_list_executed[1], sync_type);
+            return ge.list_sync(ge_list_executed[1], sync_type);
         },
     }
 }
 
-pub fn guSync(mode: types.GuSyncMode, sync_type: ge.PspGeSyncBehavior) void {
+pub fn guSync(mode: types.GuSyncMode, sync_type: ge.SyncBehavior) void {
     _ = sceGuSync(mode, sync_type);
 }
 
 pub fn sceGuTerm() void {
-    _ = threadman.sceKernelDeleteEventFlag(gu_settings.kernel_event_flag);
-    _ = ge.sceGeUnsetCallback(gu_settings.ge_callback_id);
+    kernel.delete_event_flag(gu_settings.kernel_event_flag) catch {};
+    ge.unset_callback(gu_settings.ge_callback_id) catch {};
 }
 
 pub fn sceGuTexEnvColor(color: c_int) void {
@@ -1329,25 +1329,25 @@ const ge_init_list = [_]c_uint{
 };
 
 pub fn sceGuInit() void {
-    const callback_data = ge.PspGeCallbackData{
+    const callback_data = ge.CallbackData{
         .signal_func = callbackSig,
         .signal_arg = &gu_settings,
         .finish_func = callbackFin,
         .finish_arg = &gu_settings,
     };
 
-    gu_settings.ge_callback_id = ge.sceGeSetCallback(callback_data);
+    gu_settings.ge_callback_id = ge.set_callback(callback_data) catch 0;
     gu_settings.swapBuffersCallback = null;
-    gu_settings.swapBuffersBehaviour = .NextVSync;
+    gu_settings.swapBuffersBehaviour = .next_vblank;
 
-    ge_edram_address = ge.sceGeEdramGetAddr();
+    ge_edram_address = ge.edram_get_addr();
 
-    ge_list_executed[0] = ge.sceGeListEnQueue((@as(?*anyopaque, @ptrFromInt(@intFromPtr(&ge_init_list) & 0x1f_ff_ff_ff))), null, gu_settings.ge_callback_id, 0);
+    ge_list_executed[0] = ge.list_enqueue((@as(?*anyopaque, @ptrFromInt(@intFromPtr(&ge_init_list) & 0x1f_ff_ff_ff))), null, gu_settings.ge_callback_id, null) catch 0;
 
     resetValues();
-    gu_settings.kernel_event_flag = threadman.sceKernelCreateEventFlag("SceGuSignal", .WaitMultiple, 3, null);
+    gu_settings.kernel_event_flag = kernel.create_event_flag("SceGuSignal", .wait_multiple, 3, null) catch 0;
 
-    _ = ge.sceGeListSync(ge_list_executed[0], .Wait);
+    _ = ge.list_sync(ge_list_executed[0], .wait);
 }
 
 pub fn sceGuStart(context_type: types.GuContextType, list: [*]align(16) u32) void {
@@ -1362,7 +1362,7 @@ pub fn sceGuStart(context_type: types.GuContextType, list: [*]align(16) u32) voi
     gu_curr_context = context_index;
 
     if (context_index == 0) {
-        ge_list_executed[0] = ge.sceGeListEnQueue(local_list, local_list, gu_settings.ge_callback_id, 0);
+        ge_list_executed[0] = ge.list_enqueue(local_list, local_list, gu_settings.ge_callback_id, null) catch 0;
         gu_settings.signal_offset = 0;
     }
 
@@ -1405,16 +1405,16 @@ pub fn sceGuClear(flags: u24) void {
 
     var filter: u32 = 0;
     switch (gu_draw_buffer.pixel_format) {
-        .Format565 => {
+        .rgb565 => {
             filter = @as(u32, context.clear_color);
         },
-        .Format5551 => {
+        .rgba5551 => {
             filter = @as(u32, context.clear_color) | (context.clear_stencil << 31);
         },
-        .Format4444 => {
+        .rgba4444 => {
             filter = @as(u32, context.clear_color) | (context.clear_stencil << 28);
         },
-        .Format8888 => {
+        .rgba8888 => {
             filter = @as(u32, context.clear_color) | (context.clear_stencil << 24);
         },
     }
@@ -1463,7 +1463,7 @@ pub fn sceGuGetMemory(size: u32) *anyopaque {
     gu_list.?.current = new_ptr;
 
     if (gu_curr_context == 0) {
-        _ = ge.sceGeListUpdateStallAddr(ge_list_executed[0], new_ptr);
+        ge.list_update_stall_addr(ge_list_executed[0], new_ptr) catch {};
     }
     return @as(*anyopaque, @ptrFromInt(@intFromPtr(orig_ptr + 2)));
 }
