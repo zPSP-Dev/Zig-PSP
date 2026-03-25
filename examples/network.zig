@@ -41,25 +41,25 @@ pub fn main(_: std.process.Init) !void {
 
     // [1] Initialize networking
     sdk.extra.net.init() catch |err| {
-        std.debug.print("Net init failed: {s}\n", .{@errorName(err)});
+        sdk.extra.debug.print("Net init failed: {s}\n", .{@errorName(err)});
         return;
     };
     defer sdk.extra.net.deinit();
-    std.debug.print("[1] Network modules loaded\n", .{});
+    sdk.extra.debug.print("[1] Network modules loaded\n", .{});
 
     // [2] Connect to first saved WiFi network (30 second timeout)
     sdk.extra.net.connectToApctl(1, 30_000_000) catch |err| {
-        std.debug.print("WiFi connect failed: {s}\n", .{@errorName(err)});
+        sdk.extra.debug.print("WiFi connect failed: {s}\n", .{@errorName(err)});
         return;
     };
-    std.debug.print("[2] Connected to WiFi\n", .{});
+    sdk.extra.debug.print("[2] Connected to WiFi\n", .{});
 
     // [3] Show local IP
     var ip_buf: [16]u8 = undefined;
     if (sdk.extra.net.getLocalIp(&ip_buf)) |ip| {
-        std.debug.print("[3] Local IP: {s}\n", .{ip});
+        sdk.extra.debug.print("[3] Local IP: {s}\n", .{ip});
     } else {
-        std.debug.print("[3] Could not get local IP\n", .{});
+        sdk.extra.debug.print("[3] Could not get local IP\n", .{});
     }
 
     // [4] DNS lookup for example.com using the resolver
@@ -70,17 +70,17 @@ pub fn main(_: std.process.Init) !void {
     var rid: c_int = 0;
     var resolver_buf: [1024]u8 = undefined;
     if (resolver.sceNetResolverCreate(&rid, &resolver_buf, resolver_buf.len) < 0) {
-        std.debug.print("Resolver create failed\n", .{});
+        sdk.extra.debug.print("Resolver create failed\n", .{});
         return;
     }
     defer _ = resolver.sceNetResolverDelete(rid);
 
     var resolved_addr: c_types.in_addr = undefined;
     if (resolver.sceNetResolverStartNtoA(rid, @ptrCast("example.com"), &resolved_addr, 5, 3) < 0) {
-        std.debug.print("DNS resolve failed\n", .{});
+        sdk.extra.debug.print("DNS resolve failed\n", .{});
         return;
     }
-    std.debug.print("[4] Resolved example.com\n", .{});
+    sdk.extra.debug.print("[4] Resolved example.com\n", .{});
 
     // [5] Connect via TCP
     var sa: c_types.sockaddr_in = .{
@@ -89,25 +89,25 @@ pub fn main(_: std.process.Init) !void {
     };
     const sock = inet.sceNetInetSocket(sdk.extra.net.AF_INET, sdk.extra.net.SOCK_STREAM, 0);
     if (sock < 0) {
-        std.debug.print("Socket create failed\n", .{});
+        sdk.extra.debug.print("Socket create failed\n", .{});
         return;
     }
     defer _ = inet.sceNetInetClose(sock);
 
     if (inet.sceNetInetConnect(sock, &sa, @sizeOf(c_types.sockaddr_in)) < 0) {
-        std.debug.print("Connect failed\n", .{});
+        sdk.extra.debug.print("Connect failed\n", .{});
         return;
     }
-    std.debug.print("[5] Connected to server\n", .{});
+    sdk.extra.debug.print("[5] Connected to server\n", .{});
 
     // [6] Send HTTP GET request
     const request = "GET / HTTP/1.0\r\nHost: example.com\r\nConnection: close\r\n\r\n";
     const sent = inet.sceNetInetSend(sock, request.ptr, request.len, 0);
     if (sent < 0) {
-        std.debug.print("Send failed\n", .{});
+        sdk.extra.debug.print("Send failed\n", .{});
         return;
     }
-    std.debug.print("[6] Sent HTTP request\n", .{});
+    sdk.extra.debug.print("[6] Sent HTTP request\n", .{});
 
     // [7] Read and display response
     var buf: [512]u8 = undefined;
@@ -115,10 +115,10 @@ pub fn main(_: std.process.Init) !void {
     if (received > 0) {
         const n: usize = @intCast(received);
         buf[n] = 0;
-        std.debug.print("[7] Response (first {} bytes):\n{s}\n", .{ n, buf[0..n] });
+        sdk.extra.debug.print("[7] Response (first {} bytes):\n{s}\n", .{ n, buf[0..n] });
     } else {
-        std.debug.print("[7] No response received\n", .{});
+        sdk.extra.debug.print("[7] No response received\n", .{});
     }
 
-    std.debug.print("[8] Connection closed\nDone!\n", .{});
+    sdk.extra.debug.print("[8] Connection closed\nDone!\n", .{});
 }

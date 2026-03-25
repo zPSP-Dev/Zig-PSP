@@ -36,23 +36,23 @@ pub fn main(init: std.process.Init) !void {
     // [1] Get initial cwd
     var buf: [256]u8 = undefined;
     const len1 = try std.process.currentPath(io, &buf);
-    std.debug.print("[1] Initial cwd: {s}\n", .{buf[0..len1]});
+    sdk.extra.debug.print("[1] Initial cwd: {s}\n", .{buf[0..len1]});
 
     // [2] Change cwd to ms0:/PSP
     try std.process.setCurrentPath(io, "ms0:/PSP");
-    std.debug.print("[2] Changed cwd to: ms0:/PSP\n", .{});
+    sdk.extra.debug.print("[2] Changed cwd to: ms0:/PSP\n", .{});
 
     // [3] Verify new cwd
     const len2 = try std.process.currentPath(io, &buf);
-    std.debug.print("[3] Current cwd: {s}\n", .{buf[0..len2]});
+    sdk.extra.debug.print("[3] Current cwd: {s}\n", .{buf[0..len2]});
 
     // [4] Change back to root
     try std.process.setCurrentPath(io, "ms0:/");
-    std.debug.print("[4] Changed cwd back to: ms0:/\n", .{});
+    sdk.extra.debug.print("[4] Changed cwd back to: ms0:/\n", .{});
 
     // [5] Verify restored cwd
     const len3 = try std.process.currentPath(io, &buf);
-    std.debug.print("[5] Current cwd: {s}\n", .{buf[0..len3]});
+    sdk.extra.debug.print("[5] Current cwd: {s}\n", .{buf[0..len3]});
 
-    std.debug.print("Done!\n", .{});
+    sdk.extra.debug.print("Done!\n", .{});
 }

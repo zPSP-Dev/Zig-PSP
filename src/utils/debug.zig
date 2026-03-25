@@ -1,6 +1,6 @@
 const std = @import("std");
-const pspdisplay = @import("../sdk/pspdisplay.zig");
-const pspge = @import("../sdk/pspge.zig");
+const display = @import("../sdk/display.zig");
+const pspge = @import("../sdk/ge.zig");
 const constants = @import("constants.zig");
 const module = @import("module.zig");
 
@@ -70,10 +70,10 @@ pub fn screenInit() void {
     x = 0;
     y = 0;
 
-    vram_base = @as(?[*]u32, @ptrFromInt(0x40000000 | @intFromPtr(pspge.sceGeEdramGetAddr())));
+    vram_base = @as(?[*]u32, @ptrFromInt(0x40000000 | @intFromPtr(pspge.edram_get_addr())));
 
-    _ = pspdisplay.sceDisplaySetMode(.LCD, constants.SCREEN_WIDTH, constants.SCREEN_HEIGHT);
-    _ = pspdisplay.sceDisplaySetFrameBuf(vram_base, constants.SCR_BUF_WIDTH, .Format8888, .NextVSync);
+    display.set_mode(.lcd, constants.SCREEN_WIDTH, constants.SCREEN_HEIGHT) catch {};
+    display.set_frame_buf(vram_base, constants.SCR_BUF_WIDTH, .rgba8888, .next_vblank) catch {};
 
     screenClear();
 }

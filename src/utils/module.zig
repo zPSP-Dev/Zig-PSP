@@ -1,7 +1,6 @@
 const std = @import("std");
 
-const threadman = @import("../sdk/pspthreadman.zig");
-const loadexec = @import("../sdk/psploadexec.zig");
+const kernel = @import("../sdk/kernel.zig");
 
 const debug = @import("debug.zig");
 const psp_allocator = @import("allocator.zig");
@@ -12,10 +11,9 @@ const root = @import("root");
 //If there's an issue this is the internal exit (wait 10 seconds and exit).
 pub fn exitErr() void {
     //Hang for 10 seconds for error reporting
-    const stat = threadman.sceKernelDelayThread(10 * 1000 * 1000);
-    _ = stat;
+    kernel.delay_thread(10 * 1000 * 1000) catch {};
     //Exit out.
-    loadexec.sceKernelExitGame();
+    kernel.exit_game();
 }
 
 // const has_std_os = if (@hasDecl(root, "os")) true else false;
@@ -111,7 +109,7 @@ pub fn _module_main_thread(argc: usize, argv: ?*anyopaque) callconv(.c) c_int {
     }
 
     if (debug.exitOnEnd) {
-        loadexec.sceKernelExitGame();
+        kernel.exit_game();
     }
     return 0;
 }
@@ -248,6 +246,7 @@ pub fn module_info(comptime name: []const u8, comptime module_attributes: Module
 //Entry point - launches main through the thread above.
 pub export fn module_start(argc: c_uint, argv: ?*anyopaque) c_int {
     const stack_size: u32 = if (@hasDecl(root, "psp_stack_size")) root.psp_stack_size else 256 * 1024;
-    const thid = threadman.sceKernelCreateThread("zig_user_main", _module_main_thread, 0x20, stack_size, .{ .vfpu = true, .user = true }, null);
-    return threadman.sceKernelStartThread(thid, argc, argv);
+    const thid = kernel.create_thread("zig_user_main", _module_main_thread, 0x20, @intCast(stack_size), .{ .vfpu = true, .user = true }, null) catch return -1;
+    kernel.start_thread(thid, argc, argv) catch return -1;
+    return 0;
 }

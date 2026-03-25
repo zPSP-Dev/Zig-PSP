@@ -12,8 +12,8 @@
 ///
 /// Use `psp_page_allocator` directly (stateless, no init required).
 const std = @import("std");
-const sysmem = @import("../sdk/pspsysmem.zig");
-const SceUID = sysmem.SceUID;
+const kernel = @import("../sdk/kernel.zig");
+const SceUID = kernel.SceUID;
 
 const Header = extern struct {
     uid: SceUID,
@@ -28,11 +28,10 @@ fn alloc(_: *anyopaque, len: usize, alignment: std.mem.Alignment, _: usize) ?[*]
     const overhead = @sizeOf(Header) + align_bytes - 1;
     const total = overhead + len;
 
-    const uid = sysmem.sceKernelAllocPartitionMemory(.User, "psp_page", .MemLow, total, null);
-    if (uid < 0) return null;
+    const uid = kernel.alloc_partition_memory(.user, "psp_page", .mem_low, total, null) catch return null;
 
-    const base = @as([*]u8, @ptrCast(sysmem.sceKernelGetBlockHeadAddr(uid) orelse {
-        _ = sysmem.sceKernelFreePartitionMemory(uid);
+    const base = @as([*]u8, @ptrCast(kernel.get_block_head_addr(uid) orelse {
+        kernel.free_partition_memory(uid) catch {};
         return null;
     }));
 
@@ -62,7 +61,7 @@ fn remap(_: *anyopaque, _: []u8, _: std.mem.Alignment, _: usize, _: usize) ?[*]u
 fn free(_: *anyopaque, memory: []u8, _: std.mem.Alignment, _: usize) void {
     const user_addr = @intFromPtr(memory.ptr);
     const header: *Header = @ptrFromInt(user_addr - @sizeOf(Header));
-    _ = sysmem.sceKernelFreePartitionMemory(header.uid);
+    kernel.free_partition_memory(header.uid) catch {};
 }
 
 const vtable = std.mem.Allocator.VTable{

@@ -1,5 +1,4 @@
-const loadexec = @import("../sdk/psploadexec.zig");
-const threadman = @import("../sdk/pspthreadman.zig");
+const kernel = @import("../sdk/kernel.zig");
 
 var requestedExit: bool = false;
 
@@ -14,7 +13,7 @@ export fn exit_callback(arg1: c_int, arg2: c_int, common: ?*anyopaque) callconv(
     _ = arg2;
     _ = common;
     requestedExit = true;
-    loadexec.sceKernelExitGame();
+    kernel.exit_game();
     return 0;
 }
 
@@ -23,25 +22,19 @@ export fn exit_callback_thread(args: usize, argp: ?*anyopaque) callconv(.c) c_in
     _ = args;
     _ = argp;
 
-    const cbID = threadman.sceKernelCreateCallback("zig_exit_callback", exit_callback, null);
-    var status = loadexec.sceKernelRegisterExitCallback(cbID);
-
-    if (status < 0) {
+    const cbID = kernel.create_callback("zig_exit_callback", exit_callback, null) catch
         @panic("Could not setup a home button callback!");
-    }
+    kernel.register_exit_callback(cbID) catch
+        @panic("Could not setup a home button callback!");
 
-    status = threadman.sceKernelSleepThreadCB();
+    kernel.sleep_thread_cb() catch {};
 
     return 0;
 }
 
 // This enables the home button exit callback above
 pub fn enableHBCB() void {
-    const threadID: i32 = threadman.sceKernelCreateThread("zig_exit_callback_thread", exit_callback_thread, 0x11, 0xFA0, .{ .user = true }, null);
-    if (threadID >= 0) {
-        const stat: i32 = threadman.sceKernelStartThread(threadID, 0, null); //We don't know what stat does.
-        _ = stat;
-    } else {
+    const threadID = kernel.create_thread("zig_exit_callback_thread", exit_callback_thread, 0x11, 0xFA0, .{ .user = true }, null) catch
         @panic("Could not setup the exit callback thread!");
-    }
+    kernel.start_thread(threadID, 0, null) catch {};
 }

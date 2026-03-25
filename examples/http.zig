@@ -37,19 +37,19 @@ pub fn main(init: std.process.Init) !void {
 
     // Initialize networking
     sdk.extra.net.init() catch |err| {
-        std.debug.print("Net init failed: {s}\n", .{@errorName(err)});
+        sdk.extra.debug.print("Net init failed: {s}\n", .{@errorName(err)});
         return;
     };
     defer sdk.extra.net.deinit();
 
     sdk.extra.net.connectToApctl(1, 30_000_000) catch |err| {
-        std.debug.print("WiFi failed: {s}\n", .{@errorName(err)});
+        sdk.extra.debug.print("WiFi failed: {s}\n", .{@errorName(err)});
         return;
     };
 
     var ip_buf: [16]u8 = undefined;
     const ip = sdk.extra.net.getLocalIp(&ip_buf) orelse "unknown";
-    std.debug.print("[1] Network initialized, IP: {s}\n", .{ip});
+    sdk.extra.debug.print("[1] Network initialized, IP: {s}\n", .{ip});
 
     // Use std.http.Client
     var arena = std.heap.ArenaAllocator.init(sdk.extra.allocator.psp_page_allocator);
@@ -59,7 +59,7 @@ pub fn main(init: std.process.Init) !void {
     var http_client: std.http.Client = .{ .allocator = gpa, .io = io };
     defer http_client.deinit();
 
-    std.debug.print("[2] Sending HEAD http://example.com/ ...\n", .{});
+    sdk.extra.debug.print("[2] Sending HEAD http://example.com/ ...\n", .{});
 
     var request = try http_client.request(.HEAD, .{
         .scheme = "http",
@@ -70,11 +70,11 @@ pub fn main(init: std.process.Init) !void {
     defer request.deinit();
 
     try request.sendBodiless();
-    std.debug.print("[3] Sent\n", .{});
+    sdk.extra.debug.print("[3] Sent\n", .{});
 
     var redirect_buffer: [1024]u8 = undefined;
     const response = try request.receiveHead(&redirect_buffer);
-    std.debug.print("[4] received {d} {s}\n", .{ response.head.status, response.head.reason });
+    sdk.extra.debug.print("[4] received {d} {s}\n", .{ response.head.status, response.head.reason });
 
-    std.debug.print("Done!\n", .{});
+    sdk.extra.debug.print("Done!\n", .{});
 }

@@ -1,8 +1,781 @@
 // Tier 1: Raw C stub bindings
 pub const c = @import("c/modules.zig");
 
-// GU types promoted to top level
-const _pspgutypes = @import("sdk/pspgutypes.zig");
+// Tier 2: Zig Wrapped bindings offered as both modules and sce-prefixed names
+// e.g. sceDisplayWaitVblankStart and display.wait_vblank_start()
+
+// Shared PSP types promoted to top level
+const _types = @import("c/types.zig");
+pub const SceBool = _types.SceBool;
+pub const SceUID = _types.SceUID;
+pub const SceMode = _types.SceMode;
+pub const SceIores = _types.SceIores;
+pub const ScePspFVector2 = _types.ScePspFVector2;
+pub const ScePspFVector3 = _types.ScePspFVector3;
+pub const ScePspFVector4 = _types.ScePspFVector4;
+pub const ScePspIVector2 = _types.ScePspIVector2;
+pub const ScePspIVector3 = _types.ScePspIVector3;
+pub const ScePspIVector4 = _types.ScePspIVector4;
+pub const ScePspFMatrix4 = _types.ScePspFMatrix4;
+pub const ScePspIMatrix4 = _types.ScePspIMatrix4;
+pub const ScePspDateTime = _types.ScePspDateTime;
+
+// -- adhoc (sceNetAdhoc, sceNetAdhocctl, sceNetAdhocMatching) --
+pub const adhoc = @import("sdk/adhoc.zig");
+pub const sceNetAdhocGameModeCreateMaster = adhoc.game_mode_create_master;
+pub const sceNetAdhocGameModeCreateReplica = adhoc.game_mode_create_replica;
+pub const sceNetAdhocGameModeDeleteMaster = adhoc.game_mode_delete_master;
+pub const sceNetAdhocGameModeDeleteReplica = adhoc.game_mode_delete_replica;
+pub const sceNetAdhocGameModeUpdateMaster = adhoc.game_mode_update_master;
+pub const sceNetAdhocGameModeUpdateReplica = adhoc.game_mode_update_replica;
+pub const sceNetAdhocGetPdpStat = adhoc.get_pdp_stat;
+pub const sceNetAdhocGetPtpStat = adhoc.get_ptp_stat;
+pub const sceNetAdhocInit = adhoc.init;
+pub const sceNetAdhocMatchingAbortSendData = adhoc.matching_abort_send_data;
+pub const sceNetAdhocMatchingCancelTarget = adhoc.matching_cancel_target;
+pub const sceNetAdhocMatchingCancelTargetWithOpt = adhoc.matching_cancel_target_with_opt;
+pub const sceNetAdhocMatchingCreate = adhoc.matching_create;
+pub const sceNetAdhocMatchingDelete = adhoc.matching_delete;
+pub const sceNetAdhocMatchingGetHelloOpt = adhoc.matching_get_hello_opt;
+pub const sceNetAdhocMatchingGetMembers = adhoc.matching_get_members;
+pub const sceNetAdhocMatchingGetPoolMaxAlloc = adhoc.matching_get_pool_max_alloc;
+pub const sceNetAdhocMatchingGetPoolStat = adhoc.matching_get_pool_stat;
+pub const sceNetAdhocMatchingInit = adhoc.matching_init;
+pub const sceNetAdhocMatchingSelectTarget = adhoc.matching_select_target;
+pub const sceNetAdhocMatchingSendData = adhoc.matching_send_data;
+pub const sceNetAdhocMatchingSetHelloOpt = adhoc.matching_set_hello_opt;
+pub const sceNetAdhocMatchingStart = adhoc.matching_start;
+pub const sceNetAdhocMatchingStop = adhoc.matching_stop;
+pub const sceNetAdhocMatchingTerm = adhoc.matching_term;
+pub const sceNetAdhocPdpCreate = adhoc.pdp_create;
+pub const sceNetAdhocPdpDelete = adhoc.pdp_delete;
+pub const sceNetAdhocPdpRecv = adhoc.pdp_recv;
+pub const sceNetAdhocPdpSend = adhoc.pdp_send;
+pub const sceNetAdhocPtpAccept = adhoc.ptp_accept;
+pub const sceNetAdhocPtpClose = adhoc.ptp_close;
+pub const sceNetAdhocPtpConnect = adhoc.ptp_connect;
+pub const sceNetAdhocPtpFlush = adhoc.ptp_flush;
+pub const sceNetAdhocPtpListen = adhoc.ptp_listen;
+pub const sceNetAdhocPtpOpen = adhoc.ptp_open;
+pub const sceNetAdhocPtpRecv = adhoc.ptp_recv;
+pub const sceNetAdhocPtpSend = adhoc.ptp_send;
+pub const sceNetAdhocTerm = adhoc.term;
+pub const sceNetAdhocctlAddHandler = adhoc.ctl_add_handler;
+pub const sceNetAdhocctlConnect = adhoc.ctl_connect;
+pub const sceNetAdhocctlCreate = adhoc.ctl_create;
+pub const sceNetAdhocctlCreateEnterGameMode = adhoc.ctl_create_enter_game_mode;
+pub const sceNetAdhocctlDelHandler = adhoc.ctl_del_handler;
+pub const sceNetAdhocctlDisconnect = adhoc.ctl_disconnect;
+pub const sceNetAdhocctlExitGameMode = adhoc.ctl_exit_game_mode;
+pub const sceNetAdhocctlGetAdhocId = adhoc.ctl_get_adhoc_id;
+pub const sceNetAdhocctlGetGameModeInfo = adhoc.ctl_get_game_mode_info;
+pub const sceNetAdhocctlGetAddrByName = adhoc.ctl_get_addr_by_name;
+pub const sceNetAdhocctlGetNameByAddr = adhoc.ctl_get_name_by_addr;
+pub const sceNetAdhocctlGetParameter = adhoc.ctl_get_parameter;
+pub const sceNetAdhocctlGetPeerInfo = adhoc.ctl_get_peer_info;
+pub const sceNetAdhocctlGetPeerList = adhoc.ctl_get_peer_list;
+pub const sceNetAdhocctlGetScanInfo = adhoc.ctl_get_scan_info;
+pub const sceNetAdhocctlGetState = adhoc.ctl_get_state;
+pub const sceNetAdhocctlInit = adhoc.ctl_init;
+pub const sceNetAdhocctlJoin = adhoc.ctl_join;
+pub const sceNetAdhocctlJoinEnterGameMode = adhoc.ctl_join_enter_game_mode;
+pub const sceNetAdhocctlScan = adhoc.ctl_scan;
+pub const sceNetAdhocctlTerm = adhoc.ctl_term;
+
+// -- atrac3 (sceAtrac3plus) --
+pub const atrac3 = @import("sdk/atrac3.zig");
+pub const sceAtracAddStreamData = atrac3.add_stream_data;
+pub const sceAtracDecodeData = atrac3.decode_data;
+pub const sceAtracEndEntry = atrac3.end_entry;
+pub const sceAtracGetBitrate = atrac3.get_bitrate;
+pub const sceAtracGetBufferInfoForReseting = atrac3.get_buffer_info_for_reseting;
+pub const sceAtracGetChannel = atrac3.get_channel;
+pub const sceAtracGetInternalErrorInfo = atrac3.get_internal_error_info;
+pub const sceAtracGetLoopStatus = atrac3.get_loop_status;
+pub const sceAtracGetMaxSample = atrac3.get_max_sample;
+pub const sceAtracGetNextDecodePosition = atrac3.get_next_decode_position;
+pub const sceAtracGetNextSample = atrac3.get_next_sample;
+pub const sceAtracGetRemainFrame = atrac3.get_remain_frame;
+pub const sceAtracGetSecondBufferInfo = atrac3.get_second_buffer_info;
+pub const sceAtracGetSoundSample = atrac3.get_sound_sample;
+pub const sceAtracGetStreamDataInfo = atrac3.get_stream_data_info;
+pub const sceAtracReleaseAtracID = atrac3.release_atrac_id;
+pub const sceAtracResetPlayPosition = atrac3.reset_play_position;
+pub const sceAtracSetData = atrac3.set_data;
+pub const sceAtracSetDataAndGetID = atrac3.set_data_and_get_id;
+pub const sceAtracSetHalfwayBuffer = atrac3.set_halfway_buffer;
+pub const sceAtracSetHalfwayBufferAndGetID = atrac3.set_halfway_buffer_and_get_id;
+pub const sceAtracSetLoopNum = atrac3.set_loop_num;
+pub const sceAtracSetSecondBuffer = atrac3.set_second_buffer;
+pub const sceAtracStartEntry = atrac3.start_entry;
+
+// -- audio (sceAudio, sceAudioRouting, sceVaudio) --
+pub const audio = @import("sdk/audio.zig");
+pub const sceAudioChangeChannelConfig = audio.change_channel_config;
+pub const sceAudioChangeChannelVolume = audio.change_channel_volume;
+pub const sceAudioChRelease = audio.ch_release;
+pub const sceAudioChReserve = audio.ch_reserve;
+pub const sceAudioGetChannelRestLen = audio.get_channel_rest_len;
+pub const sceAudioGetChannelRestLength = audio.get_channel_rest_length;
+pub const sceAudioGetInputLength = audio.get_input_length;
+pub const sceAudioInput = audio.input;
+pub const sceAudioInputBlocking = audio.input_blocking;
+pub const sceAudioInputInit = audio.input_init;
+pub const sceAudioInputInitEx = audio.input_init_ex;
+pub const sceAudioOutput = audio.output;
+pub const sceAudioOutput2ChangeLength = audio.output2_change_length;
+pub const sceAudioOutput2GetRestSample = audio.output2_get_rest_sample;
+pub const sceAudioOutput2OutputBlocking = audio.output2_output_blocking;
+pub const sceAudioOutput2Release = audio.output2_release;
+pub const sceAudioOutput2Reserve = audio.output2_reserve;
+pub const sceAudioOutputBlocking = audio.output_blocking;
+pub const sceAudioOutputPanned = audio.output_panned;
+pub const sceAudioOutputPannedBlocking = audio.output_panned_blocking;
+pub const sceAudioPollInputEnd = audio.poll_input_end;
+pub const sceAudioRoutingGetMode = audio.routing_get_mode;
+pub const sceAudioRoutingGetVolumeMode = audio.routing_get_volume_mode;
+pub const sceAudioRoutingSetMode = audio.routing_set_mode;
+pub const sceAudioRoutingSetVolumeMode = audio.routing_set_volume_mode;
+pub const sceAudioSRCChRelease = audio.src_ch_release;
+pub const sceAudioSRCChReserve = audio.src_ch_reserve;
+pub const sceAudioSRCOutputBlocking = audio.src_output_blocking;
+pub const sceAudioSetChannelDataLen = audio.set_channel_data_len;
+pub const sceAudioWaitInputEnd = audio.wait_input_end;
+pub const sceVaudioChRelease = audio.vaudio_ch_release;
+pub const sceVaudioChReserve = audio.vaudio_ch_reserve;
+pub const sceVaudioOutputBlocking = audio.vaudio_output_blocking;
+pub const sceVaudioSetAlcMode = audio.vaudio_set_alc_mode;
+pub const sceVaudioSetEffectType = audio.vaudio_set_effect_type;
+
+// -- audiocodec (sceAudiocodec) --
+pub const audiocodec = @import("sdk/audiocodec.zig");
+pub const sceAudiocodecCheckNeedMem = audiocodec.check_need_mem;
+pub const sceAudiocodecDecode = audiocodec.decode;
+pub const sceAudiocodecGetEDRAM = audiocodec.get_edram;
+pub const sceAudiocodecGetInfo = audiocodec.get_info;
+pub const sceAudiocodecInit = audiocodec.init;
+pub const sceAudiocodecReleaseEDRAM = audiocodec.release_edram;
+
+// -- ctrl (sceCtrl) --
+pub const ctrl = @import("sdk/ctrl.zig");
+pub const sceCtrlClearRapidFire = ctrl.clear_rapid_fire;
+pub const sceCtrlGetIdleCancelThreshold = ctrl.get_idle_cancel_threshold;
+pub const sceCtrlGetSamplingCycle = ctrl.get_sampling_cycle;
+pub const sceCtrlGetSamplingMode = ctrl.get_sampling_mode;
+pub const sceCtrlGetSuspendingExtraSamples = ctrl.get_suspending_extra_samples;
+pub const sceCtrlPeekBufferNegative = ctrl.peek_buffer_negative;
+pub const sceCtrlPeekBufferPositive = ctrl.peek_buffer_positive;
+pub const sceCtrlPeekLatch = ctrl.peek_latch;
+pub const sceCtrlReadBufferNegative = ctrl.read_buffer_negative;
+pub const sceCtrlReadBufferPositive = ctrl.read_buffer_positive;
+pub const sceCtrlReadLatch = ctrl.read_latch;
+pub const sceCtrlSetIdleCancelThreshold = ctrl.set_idle_cancel_threshold;
+pub const sceCtrlSetRapidFire = ctrl.set_rapid_fire;
+pub const sceCtrlSetSamplingCycle = ctrl.set_sampling_cycle;
+pub const sceCtrlSetSamplingMode = ctrl.set_sampling_mode;
+pub const sceCtrlSetSuspendingExtraSamples = ctrl.set_suspending_extra_samples;
+
+// -- display (sceDisplay) --
+pub const display = @import("sdk/display.zig");
+pub const sceDisplayGetAccumulatedHcount = display.get_accumulated_hcount;
+pub const sceDisplayGetCurrentHcount = display.get_current_hcount;
+pub const sceDisplayGetFrameBuf = display.get_frame_buf;
+pub const sceDisplayGetFramePerSec = display.get_frame_per_sec;
+pub const sceDisplayGetMode = display.get_mode;
+pub const sceDisplayGetVcount = display.get_vcount;
+pub const sceDisplayIsForeground = display.is_foreground;
+pub const sceDisplayIsVblank = display.is_vblank;
+pub const sceDisplaySetFrameBuf = display.set_frame_buf;
+pub const sceDisplaySetHoldMode = display.set_hold_mode;
+pub const sceDisplaySetMode = display.set_mode;
+pub const sceDisplaySetResumeMode = display.set_resume_mode;
+pub const sceDisplayWaitVblank = display.wait_vblank;
+pub const sceDisplayWaitVblankCB = display.wait_vblank_cb;
+pub const sceDisplayWaitVblankStart = display.wait_vblank_start;
+pub const sceDisplayWaitVblankStartCB = display.wait_vblank_start_cb;
+
+// -- dmac (sceDmac) --
+pub const dmac = @import("sdk/dmac.zig");
+pub const sceDmacMemcpy = dmac.memcpy;
+pub const sceDmacTryMemcpy = dmac.try_memcpy;
+
+// -- ge (sceGe_user) --
+pub const ge = @import("sdk/ge.zig");
+pub const sceGeBreak = ge.@"break";
+pub const sceGeContinue = ge.@"continue";
+pub const sceGeDrawSync = ge.draw_sync;
+pub const sceGeEdramGetAddr = ge.edram_get_addr;
+pub const sceGeEdramGetSize = ge.edram_get_size;
+pub const sceGeEdramSetAddrTranslation = ge.edram_set_addr_translation;
+pub const sceGeEdramSetSize = ge.edram_set_size;
+pub const sceGeGetCmd = ge.get_cmd;
+pub const sceGeGetMtx = ge.get_mtx;
+pub const sceGeGetStack = ge.get_stack;
+pub const sceGeListDeQueue = ge.list_dequeue;
+pub const sceGeListEnQueue = ge.list_enqueue;
+pub const sceGeListEnQueueHead = ge.list_enqueue_head;
+pub const sceGeListSync = ge.list_sync;
+pub const sceGeListUpdateStallAddr = ge.list_update_stall_addr;
+pub const sceGeRestoreContext = ge.restore_context;
+pub const sceGeSaveContext = ge.save_context;
+pub const sceGeSetCallback = ge.set_callback;
+pub const sceGeUnsetCallback = ge.unset_callback;
+
+// -- hprm (sceHprm) --
+pub const hprm = @import("sdk/hprm.zig");
+pub const sceHprmIsHeadphoneExist = hprm.is_headphone_exist;
+pub const sceHprmIsMicrophoneExist = hprm.is_microphone_exist;
+pub const sceHprmIsRemoteExist = hprm.is_remote_exist;
+pub const sceHprmPeekCurrentKey = hprm.peek_current_key;
+pub const sceHprmPeekLatch = hprm.peek_latch;
+pub const sceHprmReadLatch = hprm.read_latch;
+pub const sceHprmRegisterCallback = hprm.register_callback;
+pub const sceHprmUnregisterCallback = hprm.unregister_callback;
+
+// -- http (sceHttp) --
+pub const http = @import("sdk/http.zig");
+pub const sceHttpAbortRequest = http.abort_request;
+pub const sceHttpAddExtraHeader = http.add_extra_header;
+pub const sceHttpCreateConnection = http.create_connection;
+pub const sceHttpCreateConnectionWithURL = http.create_connection_with_url;
+pub const sceHttpCreateRequest = http.create_request;
+pub const sceHttpCreateRequestWithURL = http.create_request_with_url;
+pub const sceHttpCreateTemplate = http.create_template;
+pub const sceHttpDeleteConnection = http.delete_connection;
+pub const sceHttpDeleteHeader = http.delete_header;
+pub const sceHttpDeleteRequest = http.delete_request;
+pub const sceHttpDeleteTemplate = http.delete_template;
+pub const sceHttpDisableAuth = http.disable_auth;
+pub const sceHttpDisableCache = http.disable_cache;
+pub const sceHttpDisableCookie = http.disable_cookie;
+pub const sceHttpDisableKeepAlive = http.disable_keep_alive;
+pub const sceHttpDisableRedirect = http.disable_redirect;
+pub const sceHttpEnableAuth = http.enable_auth;
+pub const sceHttpEnableCache = http.enable_cache;
+pub const sceHttpEnableCookie = http.enable_cookie;
+pub const sceHttpEnableKeepAlive = http.enable_keep_alive;
+pub const sceHttpEnableRedirect = http.enable_redirect;
+pub const sceHttpEnd = http.end;
+pub const sceHttpEndCache = http.end_cache;
+pub const sceHttpGetAllHeader = http.get_all_header;
+pub const sceHttpGetContentLength = http.get_content_length;
+pub const sceHttpGetNetworkErrno = http.get_network_errno;
+pub const sceHttpGetProxy = http.get_proxy;
+pub const sceHttpGetStatusCode = http.get_status_code;
+pub const sceHttpInit = http.init;
+pub const sceHttpInitCache = http.init_cache;
+pub const sceHttpLoadSystemCookie = http.load_system_cookie;
+pub const sceHttpReadData = http.read_data;
+pub const sceHttpSaveSystemCookie = http.save_system_cookie;
+pub const sceHttpSendRequest = http.send_request;
+pub const sceHttpSetAuthInfoCB = http.set_auth_info_cb;
+pub const sceHttpSetConnectTimeOut = http.set_connect_timeout;
+pub const sceHttpSetMallocFunction = http.set_malloc_function;
+pub const sceHttpSetProxy = http.set_proxy;
+pub const sceHttpSetRecvTimeOut = http.set_recv_timeout;
+pub const sceHttpSetResHeaderMaxSize = http.set_res_header_max_size;
+pub const sceHttpSetResolveRetry = http.set_resolve_retry;
+pub const sceHttpSetResolveTimeOut = http.set_resolve_timeout;
+pub const sceHttpSetSendTimeOut = http.set_send_timeout;
+pub const sceHttpsEnd = http.https_end;
+pub const sceHttpsInit = http.https_init;
+pub const sceHttpsLoadDefaultCert = http.https_load_default_cert;
+
+// -- impose (sceImpose) --
+pub const impose = @import("sdk/impose.zig");
+
+// -- io (IoFileMgrForUser, StdioForUser) --
+pub const io = @import("sdk/io.zig");
+pub const sceIoAssign = io.assign;
+pub const sceIoCancel = io.cancel;
+pub const sceIoChangeAsyncPriority = io.change_async_priority;
+pub const sceIoChdir = io.chdir;
+pub const sceIoChstat = io.chstat;
+pub const sceIoClose = io.close;
+pub const sceIoCloseAsync = io.close_async;
+pub const sceIoDclose = io.dclose;
+pub const sceIoDevctl = io.devctl;
+pub const sceIoDopen = io.dopen;
+pub const sceIoDread = io.dread;
+pub const sceIoGetAsyncStat = io.get_async_stat;
+pub const sceIoGetDevType = io.get_dev_type;
+pub const sceIoGetstat = io.getstat;
+pub const sceIoIoctl = io.ioctl;
+pub const sceIoIoctlAsync = io.ioctl_async;
+pub const sceIoLseek = io.lseek;
+pub const sceIoLseek32 = io.lseek32;
+pub const sceIoLseek32Async = io.lseek32_async;
+pub const sceIoLseekAsync = io.lseek_async;
+pub const sceIoMkdir = io.mkdir;
+pub const sceIoOpen = io.open;
+pub const sceIoOpenAsync = io.open_async;
+pub const sceIoPollAsync = io.poll_async;
+pub const sceIoRead = io.read;
+pub const sceIoReadAsync = io.read_async;
+pub const sceIoRemove = io.remove;
+pub const sceIoRename = io.rename;
+pub const sceIoRmdir = io.rmdir;
+pub const sceIoSetAsyncCallback = io.set_async_callback;
+pub const sceIoSync = io.sync;
+pub const sceIoUnassign = io.unassign;
+pub const sceIoWaitAsync = io.wait_async;
+pub const sceIoWaitAsyncCB = io.wait_async_cb;
+pub const sceIoWrite = io.write;
+pub const sceIoWriteAsync = io.write_async;
+pub const sceKernelStderr = io.stderr;
+pub const sceKernelStdin = io.stdin;
+pub const sceKernelStdout = io.stdout;
+
+// -- jpeg (sceJpeg) --
+pub const jpeg = @import("sdk/jpeg.zig");
+pub const sceJpegCreateMJpeg = jpeg.create_mjpeg;
+pub const sceJpegCsc = jpeg.csc;
+pub const sceJpegDecodeMJpeg = jpeg.decode_mjpeg;
+pub const sceJpegDecodeMJpegYCbCr = jpeg.decode_mjpeg_ycbcr;
+pub const sceJpegDeleteMJpeg = jpeg.delete_mjpeg;
+pub const sceJpegFinishMJpeg = jpeg.finish_mjpeg;
+pub const sceJpegGetOutputInfo = jpeg.get_output_info;
+pub const sceJpegInitMJpeg = jpeg.init_mjpeg;
+
+// -- kermit (sceKermitPeripheral) --
+pub const kermit = @import("sdk/kermit.zig");
+
+// -- kernel (LoadExecForUser, ThreadManForUser, SysMemUserForUser, ModuleMgrForUser, etc.) --
+pub const kernel = @import("sdk/kernel.zig");
+pub const sceKernelAllocPartitionMemory = kernel.alloc_partition_memory;
+pub const sceKernelCancelCallback = kernel.cancel_callback;
+pub const sceKernelCancelWakeupThread = kernel.cancel_wakeup_thread;
+pub const sceKernelCheckCallback = kernel.check_callback;
+pub const sceKernelCreateCallback = kernel.create_callback;
+pub const sceKernelCreateEventFlag = kernel.create_event_flag;
+pub const sceKernelCreateSema = kernel.create_sema;
+pub const sceKernelDcacheInvalidateRange = kernel.dcache_invalidate_range;
+pub const sceKernelDcacheWritebackAll = kernel.dcache_writeback_all;
+pub const sceKernelDcacheWritebackInvalidateAll = kernel.dcache_writeback_invalidate_all;
+pub const sceKernelDcacheWritebackInvalidateRange = kernel.dcache_writeback_invalidate_range;
+pub const sceKernelDcacheWritebackRange = kernel.dcache_writeback_range;
+pub const sceKernelDelayThread = kernel.delay_thread;
+pub const sceKernelDelayThreadCB = kernel.delay_thread_cb;
+pub const sceKernelDeleteCallback = kernel.delete_callback;
+pub const sceKernelDeleteEventFlag = kernel.delete_event_flag;
+pub const sceKernelDeleteSema = kernel.delete_sema;
+pub const sceKernelDevkitVersion = kernel.devkit_version;
+pub const sceKernelExitGame = kernel.exit_game;
+pub const sceKernelExitGameWithStatus = kernel.exit_game_with_status;
+pub const sceKernelFreePartitionMemory = kernel.free_partition_memory;
+pub const sceKernelGetBlockHeadAddr = kernel.get_block_head_addr;
+pub const sceKernelGetCallbackCount = kernel.get_callback_count;
+pub const sceKernelGetModuleIdByAddress = kernel.get_module_id_by_address;
+pub const sceKernelGetModuleIdList = kernel.get_module_id_list;
+pub const sceKernelIcacheInvalidateAll = kernel.icache_invalidate_all;
+pub const sceKernelIcacheInvalidateRange = kernel.icache_invalidate_range;
+pub const sceKernelLibcClock = kernel.libc_clock;
+pub const sceKernelLibcGettimeofday = kernel.libc_gettimeofday;
+pub const sceKernelLibcTime = kernel.libc_time;
+pub const sceKernelLoadExec = kernel.load_exec;
+pub const sceKernelLoadModule = kernel.load_module;
+pub const sceKernelLoadModuleByID = kernel.load_module_by_id;
+pub const sceKernelLoadModuleMs = kernel.load_module_ms;
+pub const sceKernelMaxFreeMemSize = kernel.max_free_mem_size;
+pub const sceKernelNotifyCallback = kernel.notify_callback;
+pub const sceKernelPollEventFlag = kernel.poll_event_flag;
+pub const sceKernelPollSema = kernel.poll_sema;
+pub const sceKernelQueryModuleInfo = kernel.query_module_info;
+pub const sceKernelReferCallbackStatus = kernel.refer_callback_status;
+pub const sceKernelRegisterExitCallback = kernel.register_exit_callback;
+pub const sceKernelResumeThread = kernel.resume_thread;
+pub const sceKernelSelfStopUnloadModule = kernel.self_stop_unload_module;
+pub const sceKernelSetEventFlag = kernel.set_event_flag;
+pub const sceKernelClearEventFlag = kernel.clear_event_flag;
+pub const sceKernelSignalSema = kernel.signal_sema;
+pub const sceKernelSleepThread = kernel.sleep_thread;
+pub const sceKernelSleepThreadCB = kernel.sleep_thread_cb;
+pub const sceKernelStartModule = kernel.start_module;
+pub const sceKernelStopModule = kernel.stop_module;
+pub const sceKernelStopUnloadSelfModule = kernel.stop_unload_self_module;
+pub const sceKernelSuspendThread = kernel.suspend_thread;
+pub const sceKernelTotalFreeMemSize = kernel.total_free_mem_size;
+pub const sceKernelUnloadModule = kernel.unload_module;
+pub const sceKernelUtilsMd5BlockInit = kernel.md5_block_init;
+pub const sceKernelUtilsMd5BlockResult = kernel.md5_block_result;
+pub const sceKernelUtilsMd5BlockUpdate = kernel.md5_block_update;
+pub const sceKernelUtilsMd5Digest = kernel.md5_digest;
+pub const sceKernelUtilsMt19937Init = kernel.mt19937_init;
+pub const sceKernelUtilsMt19937UInt = kernel.mt19937_uint;
+pub const sceKernelUtilsSha1BlockInit = kernel.sha1_block_init;
+pub const sceKernelUtilsSha1BlockResult = kernel.sha1_block_result;
+pub const sceKernelUtilsSha1BlockUpdate = kernel.sha1_block_update;
+pub const sceKernelUtilsSha1Digest = kernel.sha1_digest;
+pub const sceKernelWaitEventFlag = kernel.wait_event_flag;
+pub const sceKernelWaitEventFlagCB = kernel.wait_event_flag_cb;
+pub const sceKernelWaitSema = kernel.wait_sema;
+pub const sceKernelWaitSemaCB = kernel.wait_sema_cb;
+pub const sceKernelWaitThreadEnd = kernel.wait_thread_end;
+pub const sceKernelWaitThreadEndCB = kernel.wait_thread_end_cb;
+pub const sceKernelWakeupThread = kernel.wakeup_thread;
+
+// -- mp3 (sceMp3) --
+pub const mp3 = @import("sdk/mp3.zig");
+pub const sceMp3CheckStreamDataNeeded = mp3.check_stream_data_needed;
+pub const sceMp3Decode = mp3.decode;
+pub const sceMp3GetBitRate = mp3.get_bit_rate;
+pub const sceMp3GetFrameNum = mp3.get_frame_num;
+pub const sceMp3GetInfoToAddStreamData = mp3.get_info_to_add_stream_data;
+pub const sceMp3GetLoopNum = mp3.get_loop_num;
+pub const sceMp3GetMPEGVersion = mp3.get_mpeg_version;
+pub const sceMp3GetMaxOutputSample = mp3.get_max_output_sample;
+pub const sceMp3GetMp3ChannelNum = mp3.get_channel_num;
+pub const sceMp3GetSamplingRate = mp3.get_sampling_rate;
+pub const sceMp3GetSumDecodedSample = mp3.get_sum_decoded_sample;
+pub const sceMp3Init = mp3.init;
+pub const sceMp3InitResource = mp3.init_resource;
+pub const sceMp3LowLevelDecode = mp3.low_level_decode;
+pub const sceMp3LowLevelInit = mp3.low_level_init;
+pub const sceMp3NotifyAddStreamData = mp3.notify_add_stream_data;
+pub const sceMp3ReleaseMp3Handle = mp3.release_handle;
+pub const sceMp3ReserveMp3Handle = mp3.reserve_handle;
+pub const sceMp3ResetPlayPosition = mp3.reset_play_position;
+pub const sceMp3ResetPlayPositionByFrame = mp3.reset_play_position_by_frame;
+pub const sceMp3SetLoopNum = mp3.set_loop_num;
+pub const sceMp3TermResource = mp3.term_resource;
+
+// -- mpeg (sceMpeg, sceMpegbase) --
+pub const mpeg = @import("sdk/mpeg.zig");
+pub const sceMpegAtracDecode = mpeg.atrac_decode;
+pub const sceMpegAvcDecode = mpeg.avc_decode;
+pub const sceMpegAvcDecodeMode = mpeg.avc_decode_mode;
+pub const sceMpegAvcDecodeStop = mpeg.avc_decode_stop;
+pub const sceMpegBaseCscInit = mpeg.base_csc_init;
+pub const sceMpegBaseCscVme = mpeg.base_csc_vme;
+pub const sceMpegBaseYCrCbCopyVme = mpeg.base_ycrcb_copy_vme;
+pub const sceMpegCreate = mpeg.create;
+pub const sceMpegDelete = mpeg.delete;
+pub const sceMpegFinish = mpeg.finish;
+pub const sceMpegFlushAllStream = mpeg.flush_all_stream;
+pub const sceMpegFreeAvcEsBuf = mpeg.free_avc_es_buf;
+pub const sceMpegGetAtracAu = mpeg.get_atrac_au;
+pub const sceMpegGetAvcAu = mpeg.get_avc_au;
+pub const sceMpegInit = mpeg.init;
+pub const sceMpegInitAu = mpeg.init_au;
+pub const sceMpegMallocAvcEsBuf = mpeg.malloc_avc_es_buf;
+pub const sceMpegQueryAtracEsSize = mpeg.query_atrac_es_size;
+pub const sceMpegQueryMemSize = mpeg.query_mem_size;
+pub const sceMpegQueryStreamOffset = mpeg.query_stream_offset;
+pub const sceMpegQueryStreamSize = mpeg.query_stream_size;
+pub const sceMpegRegistStream = mpeg.regist_stream;
+pub const sceMpegRingbufferAvailableSize = mpeg.ringbuffer_available_size;
+pub const sceMpegRingbufferConstruct = mpeg.ringbuffer_construct;
+pub const sceMpegRingbufferDestruct = mpeg.ringbuffer_destruct;
+pub const sceMpegRingbufferPut = mpeg.ringbuffer_put;
+pub const sceMpegRingbufferQueryMemSize = mpeg.ringbuffer_query_mem_size;
+pub const sceMpegUnRegistStream = mpeg.unregist_stream;
+
+// -- net (sceNet, sceNetInet, sceNetApctl, sceNetResolver) --
+pub const net = @import("sdk/net.zig");
+pub const sceNetApctlAddHandler = net.apctl_add_handler;
+pub const sceNetApctlConnect = net.apctl_connect;
+pub const sceNetApctlDelHandler = net.apctl_del_handler;
+pub const sceNetApctlDisconnect = net.apctl_disconnect;
+pub const sceNetApctlGetInfo = net.apctl_get_info;
+pub const sceNetApctlGetState = net.apctl_get_state;
+pub const sceNetApctlInit = net.apctl_init;
+pub const sceNetApctlTerm = net.apctl_term;
+pub const sceNetEtherNtostr = net.ether_ntostr;
+pub const sceNetEtherStrton = net.ether_strton;
+pub const sceNetFreeThreadinfo = net.free_threadinfo;
+pub const sceNetGetLocalEtherAddr = net.get_local_ether_addr;
+pub const sceNetGetMallocStat = net.get_malloc_stat;
+pub const sceNetInetAccept = net.inet_accept;
+pub const sceNetInetBind = net.inet_bind;
+pub const sceNetInetClose = net.inet_close;
+pub const sceNetInetConnect = net.inet_connect;
+pub const sceNetInetGetErrno = net.inet_get_errno;
+pub const sceNetInetGetTcpcbstat = net.inet_get_tcpcb_stat;
+pub const sceNetInetGetUdpcbstat = net.inet_get_udpcb_stat;
+pub const sceNetInetGetpeername = net.inet_getpeername;
+pub const sceNetInetGetsockname = net.inet_getsockname;
+pub const sceNetInetGetsockopt = net.inet_getsockopt;
+pub const sceNetInetInetAddr = net.inet_addr;
+pub const sceNetInetInetAton = net.inet_aton;
+pub const sceNetInetInetNtop = net.inet_ntop;
+pub const sceNetInetInetPton = net.inet_pton;
+pub const sceNetInetListen = net.inet_listen;
+pub const sceNetInetPoll = net.inet_poll;
+pub const sceNetInetRecv = net.inet_recv;
+pub const sceNetInetRecvfrom = net.inet_recvfrom;
+pub const sceNetInetRecvmsg = net.inet_recvmsg;
+pub const sceNetInetSelect = net.inet_select;
+pub const sceNetInetSend = net.inet_send;
+pub const sceNetInetSendmsg = net.inet_sendmsg;
+pub const sceNetInetSendto = net.inet_sendto;
+pub const sceNetInetSetsockopt = net.inet_setsockopt;
+pub const sceNetInetShutdown = net.inet_shutdown;
+pub const sceNetInetSocket = net.inet_socket;
+pub const sceNetInetSocketAbort = net.inet_socket_abort;
+pub const sceNetInetInit = net.inet_init;
+pub const sceNetInetTerm = net.inet_term;
+pub const sceNetInit = net.init;
+pub const sceNetResolverCreate = net.resolver_create;
+pub const sceNetResolverDelete = net.resolver_delete;
+pub const sceNetResolverInit = net.resolver_init;
+pub const sceNetResolverStartAtoN = net.resolver_start_aton;
+pub const sceNetResolverStartNtoA = net.resolver_start_ntoa;
+pub const sceNetResolverStop = net.resolver_stop;
+pub const sceNetResolverTerm = net.resolver_term;
+pub const sceNetTerm = net.term;
+pub const sceNetThreadAbort = net.thread_abort;
+
+// -- openpsid (sceOpenPSID) --
+pub const openpsid = @import("sdk/openpsid.zig");
+pub const sceOpenPSIDGetOpenPSID = openpsid.get_open_psid;
+
+// -- power (scePower) --
+pub const power = @import("sdk/power.zig");
+pub const scePowerGetBatteryChargingStatus = power.get_battery_charging_status;
+pub const scePowerGetBatteryFullCapacity = power.get_battery_full_capacity;
+pub const scePowerGetBatteryLifePercent = power.get_battery_life_percent;
+pub const scePowerGetBatteryLifeTime = power.get_battery_life_time;
+pub const scePowerGetBatteryRemainCapacity = power.get_battery_remain_capacity;
+pub const scePowerGetBatteryTemp = power.get_battery_temp;
+pub const scePowerGetBatteryVolt = power.get_battery_volt;
+pub const scePowerGetBusClockFrequency = power.get_bus_clock_frequency;
+pub const scePowerGetBusClockFrequencyFloat = power.get_bus_clock_frequency_float;
+pub const scePowerGetCpuClockFrequency = power.get_cpu_clock_frequency;
+pub const scePowerGetCpuClockFrequencyFloat = power.get_cpu_clock_frequency_float;
+pub const scePowerGetIdleTimer = power.get_idle_timer;
+pub const scePowerIdleTimerDisable = power.idle_timer_disable;
+pub const scePowerIdleTimerEnable = power.idle_timer_enable;
+pub const scePowerIsBatteryCharging = power.is_battery_charging;
+pub const scePowerIsBatteryExist = power.is_battery_exist;
+pub const scePowerIsLowBattery = power.is_low_battery;
+pub const scePowerIsPowerOnline = power.is_power_online;
+pub const scePowerIsSuspendRequired = power.is_suspend_required;
+pub const scePowerLock = power.lock;
+pub const scePowerRegisterCallback = power.register_callback;
+pub const scePowerRequestColdReset = power.request_cold_reset;
+pub const scePowerRequestStandby = power.request_standby;
+pub const scePowerRequestSuspend = power.request_suspend;
+pub const scePowerSetBusClockFrequency = power.set_bus_clock_frequency;
+pub const scePowerSetClockFrequency = power.set_clock_frequency;
+pub const scePowerSetCpuClockFrequency = power.set_cpu_clock_frequency;
+pub const scePowerTick = power.tick;
+pub const scePowerUnlock = power.unlock;
+pub const scePowerUnregisterCallback = power.unregister_callback;
+
+// -- reg (sceReg) --
+pub const reg = @import("sdk/reg.zig");
+pub const sceRegCloseCategory = reg.close_category;
+pub const sceRegCloseRegistry = reg.close_registry;
+pub const sceRegCreateKey = reg.create_key;
+pub const sceRegFlushCategory = reg.flush_category;
+pub const sceRegFlushRegistry = reg.flush_registry;
+pub const sceRegGetKeyInfo = reg.get_key_info;
+pub const sceRegGetKeyInfoByName = reg.get_key_info_by_name;
+pub const sceRegGetKeyValue = reg.get_key_value;
+pub const sceRegGetKeyValueByName = reg.get_key_value_by_name;
+pub const sceRegGetKeys = reg.get_keys;
+pub const sceRegGetKeysNum = reg.get_keys_num;
+pub const sceRegOpenCategory = reg.open_category;
+pub const sceRegOpenRegistry = reg.open_registry;
+pub const sceRegRemoveCategory = reg.remove_category;
+pub const sceRegRemoveRegistry = reg.remove_registry;
+pub const sceRegSetKeyValue = reg.set_key_value;
+
+// -- rtc (sceRtc) --
+pub const rtc = @import("sdk/rtc.zig");
+pub const sceRtcCheckValid = rtc.check_valid;
+pub const sceRtcCompareTick = rtc.compare_tick;
+pub const sceRtcConvertLocalTimeToUtc = rtc.convert_local_time_to_utc;
+pub const sceRtcConvertUtcToLocalTime = rtc.convert_utc_to_local_time;
+pub const sceRtcFormatRFC2822 = rtc.format_rfc2822;
+pub const sceRtcFormatRFC2822LocalTime = rtc.format_rfc2822_local_time;
+pub const sceRtcFormatRFC3339 = rtc.format_rfc3339;
+pub const sceRtcFormatRFC3339LocalTime = rtc.format_rfc3339_local_time;
+pub const sceRtcGetCurrentClock = rtc.get_current_clock;
+pub const sceRtcGetCurrentClockLocalTime = rtc.get_current_clock_local_time;
+pub const sceRtcGetCurrentTick = rtc.get_current_tick;
+pub const sceRtcGetDayOfWeek = rtc.get_day_of_week;
+pub const sceRtcGetDaysInMonth = rtc.get_days_in_month;
+pub const sceRtcGetDosTime = rtc.get_dos_time;
+pub const sceRtcGetTick = rtc.get_tick;
+pub const sceRtcGetTickResolution = rtc.get_tick_resolution;
+pub const sceRtcGetTime_t = rtc.get_time_t;
+pub const sceRtcGetWin32FileTime = rtc.get_win32_file_time;
+pub const sceRtcIsLeapYear = rtc.is_leap_year;
+pub const sceRtcParseDateTime = rtc.parse_date_time;
+pub const sceRtcParseRFC3339 = rtc.parse_rfc3339;
+pub const sceRtcSetDosTime = rtc.set_dos_time;
+pub const sceRtcSetTick = rtc.set_tick;
+pub const sceRtcSetTime_t = rtc.set_time_t;
+pub const sceRtcSetWin32FileTime = rtc.set_win32_file_time;
+pub const sceRtcTickAddDays = rtc.tick_add_days;
+pub const sceRtcTickAddHours = rtc.tick_add_hours;
+pub const sceRtcTickAddMicroseconds = rtc.tick_add_microseconds;
+pub const sceRtcTickAddMinutes = rtc.tick_add_minutes;
+pub const sceRtcTickAddMonths = rtc.tick_add_months;
+pub const sceRtcTickAddSeconds = rtc.tick_add_seconds;
+pub const sceRtcTickAddTicks = rtc.tick_add_ticks;
+pub const sceRtcTickAddWeeks = rtc.tick_add_weeks;
+pub const sceRtcTickAddYears = rtc.tick_add_years;
+
+// -- ssl (sceSsl) --
+pub const ssl = @import("sdk/ssl.zig");
+pub const sceSslEnd = ssl.end;
+pub const sceSslGetUsedMemoryCurrent = ssl.get_used_memory_current;
+pub const sceSslGetUsedMemoryMax = ssl.get_used_memory_max;
+pub const sceSslInit = ssl.init;
+
+// -- umd (sceUmd) --
+pub const umd = @import("sdk/umd.zig");
+pub const sceUmdActivate = umd.activate;
+pub const sceUmdCancelWaitDriveStat = umd.cancel_wait_drive_stat;
+pub const sceUmdCheckMedium = umd.check_medium;
+pub const sceUmdDeactivate = umd.deactivate;
+pub const sceUmdGetDiscInfo = umd.get_disc_info;
+pub const sceUmdGetDriveStat = umd.get_drive_stat;
+pub const sceUmdGetErrorStat = umd.get_error_stat;
+pub const sceUmdRegisterUMDCallBack = umd.register_umd_callback;
+pub const sceUmdReplacePermit = umd.replace_permit;
+pub const sceUmdReplaceProhibit = umd.replace_prohibit;
+pub const sceUmdUnRegisterUMDCallBack = umd.unregister_umd_callback;
+pub const sceUmdWaitDriveStat = umd.wait_drive_stat;
+pub const sceUmdWaitDriveStatCB = umd.wait_drive_stat_cb;
+pub const sceUmdWaitDriveStatWithTimer = umd.wait_drive_stat_with_timer;
+
+// -- usb (sceUsb) --
+pub const usb = @import("sdk/usb.zig");
+pub const sceUsbActivate = usb.activate;
+pub const sceUsbDeactivate = usb.deactivate;
+pub const sceUsbGetDrvState = usb.get_drv_state;
+pub const sceUsbGetState = usb.get_state;
+pub const sceUsbStart = usb.start;
+pub const sceUsbStop = usb.stop;
+pub const sceUsbWaitCancel = usb.wait_cancel;
+pub const sceUsbWaitState = usb.wait_state;
+
+// -- usbcam (sceUsbCam) --
+pub const usbcam = @import("sdk/usbcam.zig");
+pub const sceUsbCamAutoImageReverseSW = usbcam.auto_image_reverse_sw;
+pub const sceUsbCamGetAutoImageReverseState = usbcam.get_auto_image_reverse_state;
+pub const sceUsbCamGetBrightness = usbcam.get_brightness;
+pub const sceUsbCamGetContrast = usbcam.get_contrast;
+pub const sceUsbCamGetEvLevel = usbcam.get_ev_level;
+pub const sceUsbCamGetImageEffectMode = usbcam.get_image_effect_mode;
+pub const sceUsbCamGetLensDirection = usbcam.get_lensDirection;
+pub const sceUsbCamGetMicDataLength = usbcam.get_mic_data_length;
+pub const sceUsbCamGetReadVideoFrameSize = usbcam.get_read_video_frame_size;
+pub const sceUsbCamGetReverseMode = usbcam.get_reverse_mode;
+pub const sceUsbCamGetSaturation = usbcam.get_saturation;
+pub const sceUsbCamGetSharpness = usbcam.get_sharpness;
+pub const sceUsbCamGetZoom = usbcam.get_zoom;
+pub const sceUsbCamPollReadMicEnd = usbcam.poll_read_mic_end;
+pub const sceUsbCamPollReadVideoFrameEnd = usbcam.poll_read_video_frame_end;
+pub const sceUsbCamReadMic = usbcam.read_mic;
+pub const sceUsbCamReadMicBlocking = usbcam.read_mic_blocking;
+pub const sceUsbCamReadVideoFrame = usbcam.read_video_frame;
+pub const sceUsbCamReadVideoFrameBlocking = usbcam.read_video_frame_blocking;
+pub const sceUsbCamSetBrightness = usbcam.set_brightness;
+pub const sceUsbCamSetContrast = usbcam.set_contrast;
+pub const sceUsbCamSetEvLevel = usbcam.set_ev_level;
+pub const sceUsbCamSetImageEffectMode = usbcam.set_image_effect_mode;
+pub const sceUsbCamSetMicGain = usbcam.set_mic_gain;
+pub const sceUsbCamSetReverseMode = usbcam.set_reverse_mode;
+pub const sceUsbCamSetSaturation = usbcam.set_saturation;
+pub const sceUsbCamSetSharpness = usbcam.set_sharpness;
+pub const sceUsbCamSetZoom = usbcam.set_zoom;
+pub const sceUsbCamSetupMic = usbcam.setup_mic;
+pub const sceUsbCamSetupStill = usbcam.setup_still;
+pub const sceUsbCamSetupStillEx = usbcam.setup_still_ex;
+pub const sceUsbCamSetupVideo = usbcam.setup_video;
+pub const sceUsbCamSetupVideoEx = usbcam.setup_video_ex;
+pub const sceUsbCamStartMic = usbcam.start_mic;
+pub const sceUsbCamStartVideo = usbcam.start_video;
+pub const sceUsbCamStillCancelInput = usbcam.still_cancel_input;
+pub const sceUsbCamStillGetInputLength = usbcam.still_get_input_length;
+pub const sceUsbCamStillInput = usbcam.still_input;
+pub const sceUsbCamStillInputBlocking = usbcam.still_input_blocking;
+pub const sceUsbCamStillPollInputEnd = usbcam.still_poll_input_end;
+pub const sceUsbCamStillWaitInputEnd = usbcam.still_wait_input_end;
+pub const sceUsbCamStopMic = usbcam.stop_mic;
+pub const sceUsbCamStopVideo = usbcam.stop_video;
+pub const sceUsbCamWaitReadMicEnd = usbcam.wait_read_mic_end;
+pub const sceUsbCamWaitReadVideoFrameEnd = usbcam.wait_read_video_frame_end;
+
+// -- usbstor (sceUsbstor, sceUsbstorBoot) --
+pub const usbstor = @import("sdk/usbstor.zig");
+pub const sceUsbstorBootGetDataSize = usbstor.get_data_size;
+pub const sceUsbstorBootRegisterNotify = usbstor.register_notify;
+pub const sceUsbstorBootSetCapacity = usbstor.set_capacity;
+pub const sceUsbstorBootSetLoadAddr = usbstor.set_load_addr;
+pub const sceUsbstorBootSetStatus = usbstor.set_status;
+pub const sceUsbstorBootUnregisterNotify = usbstor.unregister_notify;
+pub const sceUsbstorGetStatus = usbstor.get_status;
+
+// -- utility (sceUtility) --
+pub const utility = @import("sdk/utility.zig");
+pub const sceUtilityCheckNetParam = utility.check_net_param;
+pub const sceUtilityGameSharingGetStatus = utility.game_sharing_get_status;
+pub const sceUtilityGameSharingInitStart = utility.game_sharing_init_start;
+pub const sceUtilityGameSharingShutdownStart = utility.game_sharing_shutdown_start;
+pub const sceUtilityGameSharingUpdate = utility.game_sharing_update;
+pub const sceUtilityGetNetParam = utility.get_net_param;
+pub const sceUtilityGetSystemParamInt = utility.get_system_param_int;
+pub const sceUtilityGetSystemParamString = utility.get_system_param_string;
+pub const sceUtilityHtmlViewerGetStatus = utility.html_viewer_get_status;
+pub const sceUtilityHtmlViewerInitStart = utility.html_viewer_init_start;
+pub const sceUtilityHtmlViewerShutdownStart = utility.html_viewer_shutdown_start;
+pub const sceUtilityHtmlViewerUpdate = utility.html_viewer_update;
+pub const sceUtilityLoadAvModule = utility.load_av_module;
+pub const sceUtilityLoadModule = utility.load_module;
+pub const sceUtilityLoadNetModule = utility.load_net_module;
+pub const sceUtilityLoadUsbModule = utility.load_usb_module;
+pub const sceUtilityMsgDialogAbort = utility.msg_dialog_abort;
+pub const sceUtilityMsgDialogGetStatus = utility.msg_dialog_get_status;
+pub const sceUtilityMsgDialogInitStart = utility.msg_dialog_init_start;
+pub const sceUtilityMsgDialogShutdownStart = utility.msg_dialog_shutdown_start;
+pub const sceUtilityMsgDialogUpdate = utility.msg_dialog_update;
+pub const sceUtilityNetconfGetStatus = utility.netconf_get_status;
+pub const sceUtilityNetconfInitStart = utility.netconf_init_start;
+pub const sceUtilityNetconfShutdownStart = utility.netconf_shutdown_start;
+pub const sceUtilityNetconfUpdate = utility.netconf_update;
+pub const sceUtilityOskGetStatus = utility.osk_get_status;
+pub const sceUtilityOskInitStart = utility.osk_init_start;
+pub const sceUtilityOskShutdownStart = utility.osk_shutdown_start;
+pub const sceUtilityOskUpdate = utility.osk_update;
+pub const sceUtilitySavedataGetStatus = utility.savedata_get_status;
+pub const sceUtilitySavedataInitStart = utility.savedata_init_start;
+pub const sceUtilitySavedataShutdownStart = utility.savedata_shutdown_start;
+pub const sceUtilitySavedataUpdate = utility.savedata_update;
+pub const sceUtilitySetSystemParamInt = utility.set_system_param_int;
+pub const sceUtilitySetSystemParamString = utility.set_system_param_string;
+pub const sceUtilityUnloadAvModule = utility.unload_av_module;
+pub const sceUtilityUnloadModule = utility.unload_module;
+pub const sceUtilityUnloadNetModule = utility.unload_net_module;
+pub const sceUtilityUnloadUsbModule = utility.unload_usb_module;
+
+// -- wlan (sceWlanDrv, sceWlanDrv_lib) --
+pub const wlan = @import("sdk/wlan.zig");
+pub const sceWlanDevAttach = wlan.dev_attach;
+pub const sceWlanDevDetach = wlan.dev_detach;
+pub const sceWlanDevIsPowerOn = wlan.is_power_on;
+pub const sceWlanGetEtherAddr = wlan.get_ether_addr;
+pub const sceWlanGetSwitchState = wlan.get_switch_state;
+
+// Utility layer
+pub const extra = struct {
+    pub const allocator = @import("utils/allocator.zig");
+    pub const constants = @import("utils/constants.zig");
+    pub const debug = @import("utils/debug.zig");
+    pub const Io = @import("utils/Io.zig");
+    pub const module = @import("utils/module.zig");
+    pub const net = @import("utils/net.zig");
+    pub const utils = @import("utils/utils.zig");
+    pub const vram = @import("utils/vram.zig");
+};
+
+// -- GU types promoted to top level --
+// TODO: GU upgrade
+const _pspgutypes = @import("gu/pspgutypes.zig");
 pub const GuPixelFormat = _pspgutypes.GuPixelFormat;
 pub const GuPrimitive = _pspgutypes.GuPrimitive;
 pub const GuClutMode = _pspgutypes.GuClutMode;
@@ -40,377 +813,134 @@ pub const ClearBitFlags = _pspgutypes.ClearBitFlags;
 pub const GuLightBitFlags = _pspgutypes.GuLightBitFlags;
 pub const VertexType = _pspgutypes.VertexType;
 
-// Shared PSP types promoted to top level
-const _types = @import("c/types.zig");
-pub const SceBool = _types.SceBool;
-pub const SceUID = _types.SceUID;
-pub const SceMode = _types.SceMode;
-pub const SceIores = _types.SceIores;
-pub const ScePspFVector2 = _types.ScePspFVector2;
-pub const ScePspFVector3 = _types.ScePspFVector3;
-pub const ScePspFVector4 = _types.ScePspFVector4;
-pub const ScePspIVector2 = _types.ScePspIVector2;
-pub const ScePspIVector3 = _types.ScePspIVector3;
-pub const ScePspIVector4 = _types.ScePspIVector4;
-pub const ScePspFMatrix4 = _types.ScePspFMatrix4;
-pub const ScePspIMatrix4 = _types.ScePspIMatrix4;
-pub const ScePspDateTime = _types.ScePspDateTime;
-
-// Tier 2: Top-level sce-prefix re-exports
-const _pspgu = @import("sdk/pspgu.zig");
-pub const sceGuInit = _pspgu.sceGuInit;
-pub const sceGuTerm = _pspgu.sceGuTerm;
-pub const sceGuStart = _pspgu.sceGuStart;
-pub const sceGuFinish = _pspgu.sceGuFinish;
-pub const sceGuFinishId = _pspgu.sceGuFinishId;
-pub const sceGuSync = _pspgu.sceGuSync;
+// -- GU top-level sce-prefix re-exports --
+// TODO: GU upgrade
+const _pspgu = @import("gu/pspgu.zig");
 pub const guFinish = _pspgu.guFinish;
-pub const guSync = _pspgu.guSync;
 pub const guSwapBuffers = _pspgu.guSwapBuffers;
 pub const guSwapBuffersBehaviour = _pspgu.guSwapBuffersBehaviour;
 pub const guSwapBuffersCallback = _pspgu.guSwapBuffersCallback;
-pub const sceGuSendList = _pspgu.sceGuSendList;
+pub const guSync = _pspgu.guSync;
+pub const sceGuAlphaFunc = _pspgu.sceGuAlphaFunc;
+pub const sceGuAmbient = _pspgu.sceGuAmbient;
+pub const sceGuAmbientColor = _pspgu.sceGuAmbientColor;
+pub const sceGuBeginObject = _pspgu.sceGuBeginObject;
+pub const sceGuBlendFunc = _pspgu.sceGuBlendFunc;
+pub const sceGuBreak = _pspgu.sceGuBreak;
 pub const sceGuCallList = _pspgu.sceGuCallList;
 pub const sceGuCallMode = _pspgu.sceGuCallMode;
 pub const sceGuCheckList = _pspgu.sceGuCheckList;
-pub const sceGuGetMemory = _pspgu.sceGuGetMemory;
-pub const sceGuDrawBuffer = _pspgu.sceGuDrawBuffer;
-pub const sceGuDrawBufferList = _pspgu.sceGuDrawBufferList;
-pub const sceGuDispBuffer = _pspgu.sceGuDispBuffer;
-pub const sceGuDepthBuffer = _pspgu.sceGuDepthBuffer;
-pub const sceGuDisplay = _pspgu.sceGuDisplay;
-pub const sceGuSwapBuffers = _pspgu.sceGuSwapBuffers;
-pub const sceGuSetCallback = _pspgu.sceGuSetCallback;
-pub const sceGuOffset = _pspgu.sceGuOffset;
-pub const sceGuViewport = _pspgu.sceGuViewport;
-pub const sceGuScissor = _pspgu.sceGuScissor;
-pub const sceGuDepthRange = _pspgu.sceGuDepthRange;
-pub const sceGuDepthOffset = _pspgu.sceGuDepthOffset;
-pub const sceGuEnable = _pspgu.sceGuEnable;
-pub const sceGuDisable = _pspgu.sceGuDisable;
-pub const sceGuSetStatus = _pspgu.sceGuSetStatus;
-pub const sceGuGetStatus = _pspgu.sceGuGetStatus;
-pub const sceGuSetAllStatus = _pspgu.sceGuSetAllStatus;
-pub const sceGuGetAllStatus = _pspgu.sceGuGetAllStatus;
 pub const sceGuClear = _pspgu.sceGuClear;
 pub const sceGuClearColor = _pspgu.sceGuClearColor;
 pub const sceGuClearDepth = _pspgu.sceGuClearDepth;
 pub const sceGuClearStencil = _pspgu.sceGuClearStencil;
+pub const sceGuClutLoad = _pspgu.sceGuClutLoad;
+pub const sceGuClutMode = _pspgu.sceGuClutMode;
+pub const sceGuColor = _pspgu.sceGuColor;
+pub const sceGuColorFunc = _pspgu.sceGuColorFunc;
+pub const sceGuColorMaterial = _pspgu.sceGuColorMaterial;
+pub const sceGuContinue = _pspgu.sceGuContinue;
+pub const sceGuCopyImage = _pspgu.sceGuCopyImage;
+pub const sceGuDepthBuffer = _pspgu.sceGuDepthBuffer;
+pub const sceGuDepthFunc = _pspgu.sceGuDepthFunc;
+pub const sceGuDepthMask = _pspgu.sceGuDepthMask;
+pub const sceGuDepthOffset = _pspgu.sceGuDepthOffset;
+pub const sceGuDepthRange = _pspgu.sceGuDepthRange;
+pub const sceGuDisable = _pspgu.sceGuDisable;
+pub const sceGuDispBuffer = _pspgu.sceGuDispBuffer;
+pub const sceGuDisplay = _pspgu.sceGuDisplay;
 pub const sceGuDrawArray = _pspgu.sceGuDrawArray;
 pub const sceGuDrawArrayN = _pspgu.sceGuDrawArrayN;
 pub const sceGuDrawBezier = _pspgu.sceGuDrawBezier;
+pub const sceGuDrawBuffer = _pspgu.sceGuDrawBuffer;
+pub const sceGuDrawBufferList = _pspgu.sceGuDrawBufferList;
 pub const sceGuDrawSpline = _pspgu.sceGuDrawSpline;
-pub const sceGuBeginObject = _pspgu.sceGuBeginObject;
+pub const sceGuEnable = _pspgu.sceGuEnable;
 pub const sceGuEndObject = _pspgu.sceGuEndObject;
-pub const sceGuDepthFunc = _pspgu.sceGuDepthFunc;
-pub const sceGuDepthMask = _pspgu.sceGuDepthMask;
-pub const sceGuFrontFace = _pspgu.sceGuFrontFace;
-pub const sceGuShadeModel = _pspgu.sceGuShadeModel;
+pub const sceGuFinish = _pspgu.sceGuFinish;
+pub const sceGuFinishId = _pspgu.sceGuFinishId;
 pub const sceGuFog = _pspgu.sceGuFog;
-pub const sceGuPixelMask = _pspgu.sceGuPixelMask;
-pub const sceGuLogicalOp = _pspgu.sceGuLogicalOp;
-pub const sceGuAlphaFunc = _pspgu.sceGuAlphaFunc;
-pub const sceGuStencilFunc = _pspgu.sceGuStencilFunc;
-pub const sceGuStencilOp = _pspgu.sceGuStencilOp;
-pub const sceGuBlendFunc = _pspgu.sceGuBlendFunc;
-pub const sceGuColorFunc = _pspgu.sceGuColorFunc;
-pub const sceGuColorMaterial = _pspgu.sceGuColorMaterial;
-pub const sceGuColor = _pspgu.sceGuColor;
-pub const sceGuAmbient = _pspgu.sceGuAmbient;
-pub const sceGuAmbientColor = _pspgu.sceGuAmbientColor;
-pub const sceGuMaterial = _pspgu.sceGuMaterial;
-pub const sceGuModelColor = _pspgu.sceGuModelColor;
-pub const sceGuSpecular = _pspgu.sceGuSpecular;
+pub const sceGuFrontFace = _pspgu.sceGuFrontFace;
+pub const sceGuGetAllStatus = _pspgu.sceGuGetAllStatus;
+pub const sceGuGetMemory = _pspgu.sceGuGetMemory;
+pub const sceGuGetStatus = _pspgu.sceGuGetStatus;
+pub const sceGuInit = _pspgu.sceGuInit;
 pub const sceGuLight = _pspgu.sceGuLight;
 pub const sceGuLightAtt = _pspgu.sceGuLightAtt;
 pub const sceGuLightColor = _pspgu.sceGuLightColor;
 pub const sceGuLightMode = _pspgu.sceGuLightMode;
 pub const sceGuLightSpot = _pspgu.sceGuLightSpot;
+pub const sceGuLogicalOp = _pspgu.sceGuLogicalOp;
+pub const sceGuMaterial = _pspgu.sceGuMaterial;
+pub const sceGuModelColor = _pspgu.sceGuModelColor;
 pub const sceGuMorphWeight = _pspgu.sceGuMorphWeight;
-pub const sceGuTexMode = _pspgu.sceGuTexMode;
-pub const sceGuTexImage = _pspgu.sceGuTexImage;
-pub const sceGuTexFunc = _pspgu.sceGuTexFunc;
-pub const sceGuTexFilter = _pspgu.sceGuTexFilter;
-pub const sceGuTexScale = _pspgu.sceGuTexScale;
-pub const sceGuTexOffset = _pspgu.sceGuTexOffset;
-pub const sceGuTexWrap = _pspgu.sceGuTexWrap;
-pub const sceGuTexFlush = _pspgu.sceGuTexFlush;
-pub const sceGuTexSync = _pspgu.sceGuTexSync;
-pub const sceGuTexEnvColor = _pspgu.sceGuTexEnvColor;
-pub const sceGuTexLevelMode = _pspgu.sceGuTexLevelMode;
-pub const sceGuTexMapMode = _pspgu.sceGuTexMapMode;
-pub const sceGuTexProjMapMode = _pspgu.sceGuTexProjMapMode;
-pub const sceGuTexSlope = _pspgu.sceGuTexSlope;
-pub const sceGuClutLoad = _pspgu.sceGuClutLoad;
-pub const sceGuClutMode = _pspgu.sceGuClutMode;
-pub const sceGuCopyImage = _pspgu.sceGuCopyImage;
-pub const sceGuSetDither = _pspgu.sceGuSetDither;
-pub const sceGuSetMatrix = _pspgu.sceGuSetMatrix;
+pub const sceGuOffset = _pspgu.sceGuOffset;
 pub const sceGuPatchDivide = _pspgu.sceGuPatchDivide;
 pub const sceGuPatchFrontFace = _pspgu.sceGuPatchFrontFace;
 pub const sceGuPatchPrim = _pspgu.sceGuPatchPrim;
+pub const sceGuPixelMask = _pspgu.sceGuPixelMask;
+pub const sceGuScissor = _pspgu.sceGuScissor;
+pub const sceGuSendList = _pspgu.sceGuSendList;
+pub const sceGuSetAllStatus = _pspgu.sceGuSetAllStatus;
+pub const sceGuSetCallback = _pspgu.sceGuSetCallback;
+pub const sceGuSetDither = _pspgu.sceGuSetDither;
+pub const sceGuSetMatrix = _pspgu.sceGuSetMatrix;
+pub const sceGuSetStatus = _pspgu.sceGuSetStatus;
+pub const sceGuShadeModel = _pspgu.sceGuShadeModel;
 pub const sceGuSignal = _pspgu.sceGuSignal;
-pub const sceGuBreak = _pspgu.sceGuBreak;
-pub const sceGuContinue = _pspgu.sceGuContinue;
+pub const sceGuSpecular = _pspgu.sceGuSpecular;
+pub const sceGuStart = _pspgu.sceGuStart;
+pub const sceGuStencilFunc = _pspgu.sceGuStencilFunc;
+pub const sceGuStencilOp = _pspgu.sceGuStencilOp;
+pub const sceGuSwapBuffers = _pspgu.sceGuSwapBuffers;
+pub const sceGuSync = _pspgu.sceGuSync;
+pub const sceGuTerm = _pspgu.sceGuTerm;
+pub const sceGuTexEnvColor = _pspgu.sceGuTexEnvColor;
+pub const sceGuTexFilter = _pspgu.sceGuTexFilter;
+pub const sceGuTexFlush = _pspgu.sceGuTexFlush;
+pub const sceGuTexFunc = _pspgu.sceGuTexFunc;
+pub const sceGuTexImage = _pspgu.sceGuTexImage;
+pub const sceGuTexLevelMode = _pspgu.sceGuTexLevelMode;
+pub const sceGuTexMapMode = _pspgu.sceGuTexMapMode;
+pub const sceGuTexMode = _pspgu.sceGuTexMode;
+pub const sceGuTexOffset = _pspgu.sceGuTexOffset;
+pub const sceGuTexProjMapMode = _pspgu.sceGuTexProjMapMode;
+pub const sceGuTexScale = _pspgu.sceGuTexScale;
+pub const sceGuTexSlope = _pspgu.sceGuTexSlope;
+pub const sceGuTexSync = _pspgu.sceGuTexSync;
+pub const sceGuTexWrap = _pspgu.sceGuTexWrap;
+pub const sceGuViewport = _pspgu.sceGuViewport;
 
-const _pspgum = @import("sdk/pspgum.zig");
-pub const sceGumMatrixMode = _pspgum.sceGumMatrixMode;
-pub const sceGumLoadIdentity = _pspgum.sceGumLoadIdentity;
-pub const sceGumLoadMatrix = _pspgum.sceGumLoadMatrix;
-pub const sceGumStoreMatrix = _pspgum.sceGumStoreMatrix;
-pub const sceGumPushMatrix = _pspgum.sceGumPushMatrix;
-pub const sceGumPopMatrix = _pspgum.sceGumPopMatrix;
-pub const sceGumMultMatrix = _pspgum.sceGumMultMatrix;
-pub const sceGumUpdateMatrix = _pspgum.sceGumUpdateMatrix;
-pub const sceGumRotateX = _pspgum.sceGumRotateX;
-pub const sceGumRotateY = _pspgum.sceGumRotateY;
-pub const sceGumRotateZ = _pspgum.sceGumRotateZ;
-pub const sceGumRotateXYZ = _pspgum.sceGumRotateXYZ;
-pub const sceGumRotateZYX = _pspgum.sceGumRotateZYX;
-pub const sceGumScale = _pspgum.sceGumScale;
-pub const sceGumTranslate = _pspgum.sceGumTranslate;
-pub const sceGumOrtho = _pspgum.sceGumOrtho;
-pub const sceGumPerspective = _pspgum.sceGumPerspective;
-pub const sceGumFullInverse = _pspgum.sceGumFullInverse;
-pub const sceGumFastInverse = _pspgum.sceGumFastInverse;
+const _pspgum = @import("gu/pspgum.zig");
 pub const sceGumDrawArray = _pspgum.sceGumDrawArray;
 pub const sceGumDrawArrayN = _pspgum.sceGumDrawArrayN;
 pub const sceGumDrawBezier = _pspgum.sceGumDrawBezier;
 pub const sceGumDrawSpline = _pspgum.sceGumDrawSpline;
+pub const sceGumFastInverse = _pspgum.sceGumFastInverse;
+pub const sceGumFullInverse = _pspgum.sceGumFullInverse;
+pub const sceGumLoadIdentity = _pspgum.sceGumLoadIdentity;
+pub const sceGumLoadMatrix = _pspgum.sceGumLoadMatrix;
+pub const sceGumMatrixMode = _pspgum.sceGumMatrixMode;
+pub const sceGumMultMatrix = _pspgum.sceGumMultMatrix;
+pub const sceGumOrtho = _pspgum.sceGumOrtho;
+pub const sceGumPerspective = _pspgum.sceGumPerspective;
+pub const sceGumPopMatrix = _pspgum.sceGumPopMatrix;
+pub const sceGumPushMatrix = _pspgum.sceGumPushMatrix;
+pub const sceGumRotateX = _pspgum.sceGumRotateX;
+pub const sceGumRotateXYZ = _pspgum.sceGumRotateXYZ;
+pub const sceGumRotateY = _pspgum.sceGumRotateY;
+pub const sceGumRotateZ = _pspgum.sceGumRotateZ;
+pub const sceGumRotateZYX = _pspgum.sceGumRotateZYX;
+pub const sceGumScale = _pspgum.sceGumScale;
+pub const sceGumStoreMatrix = _pspgum.sceGumStoreMatrix;
+pub const sceGumTranslate = _pspgum.sceGumTranslate;
+pub const sceGumUpdateMatrix = _pspgum.sceGumUpdateMatrix;
 
-const _pspge = @import("sdk/pspge.zig");
-pub const sceGeEdramGetSize = _pspge.sceGeEdramGetSize;
-pub const sceGeEdramGetAddr = _pspge.sceGeEdramGetAddr;
-pub const sceGeEdramSetAddrTranslation = _pspge.sceGeEdramSetAddrTranslation;
-pub const sceGeGetCmd = _pspge.sceGeGetCmd;
-pub const sceGeGetMtx = _pspge.sceGeGetMtx;
-pub const sceGeGetStack = _pspge.sceGeGetStack;
-pub const sceGeSaveContext = _pspge.sceGeSaveContext;
-pub const sceGeRestoreContext = _pspge.sceGeRestoreContext;
-pub const sceGeListEnQueue = _pspge.sceGeListEnQueue;
-pub const sceGeListEnQueueHead = _pspge.sceGeListEnQueueHead;
-pub const sceGeListDeQueue = _pspge.sceGeListDeQueue;
-pub const sceGeListUpdateStallAddr = _pspge.sceGeListUpdateStallAddr;
-pub const sceGeListSync = _pspge.sceGeListSync;
-pub const sceGeDrawSync = _pspge.sceGeDrawSync;
-pub const sceGeBreak = _pspge.sceGeBreak;
-pub const sceGeContinue = _pspge.sceGeContinue;
-pub const sceGeSetCallback = _pspge.sceGeSetCallback;
-pub const sceGeUnsetCallback = _pspge.sceGeUnsetCallback;
-
-const _pspctrl = @import("sdk/pspctrl.zig");
-pub const sceCtrlSetSamplingCycle = _pspctrl.sceCtrlSetSamplingCycle;
-pub const sceCtrlGetSamplingCycle = _pspctrl.sceCtrlGetSamplingCycle;
-pub const sceCtrlSetSamplingMode = _pspctrl.sceCtrlSetSamplingMode;
-pub const sceCtrlGetSamplingMode = _pspctrl.sceCtrlGetSamplingMode;
-pub const sceCtrlPeekBufferPositive = _pspctrl.sceCtrlPeekBufferPositive;
-pub const sceCtrlPeekBufferNegative = _pspctrl.sceCtrlPeekBufferNegative;
-pub const sceCtrlReadBufferPositive = _pspctrl.sceCtrlReadBufferPositive;
-pub const sceCtrlReadBufferNegative = _pspctrl.sceCtrlReadBufferNegative;
-pub const sceCtrlPeekLatch = _pspctrl.sceCtrlPeekLatch;
-pub const sceCtrlReadLatch = _pspctrl.sceCtrlReadLatch;
-pub const sceCtrlSetIdleCancelThreshold = _pspctrl.sceCtrlSetIdleCancelThreshold;
-pub const sceCtrlGetIdleCancelThreshold = _pspctrl.sceCtrlGetIdleCancelThreshold;
-
-const _pspdisplay = @import("sdk/pspdisplay.zig");
-pub const sceDisplaySetMode = _pspdisplay.sceDisplaySetMode;
-pub const sceDisplayGetMode = _pspdisplay.sceDisplayGetMode;
-pub const sceDisplayGetFramePerSec = _pspdisplay.sceDisplayGetFramePerSec;
-pub const sceDisplaySetHoldMode = _pspdisplay.sceDisplaySetHoldMode;
-pub const sceDisplaySetResumeMode = _pspdisplay.sceDisplaySetResumeMode;
-pub const sceDisplaySetFrameBuf = _pspdisplay.sceDisplaySetFrameBuf;
-pub const sceDisplayGetFrameBuf = _pspdisplay.sceDisplayGetFrameBuf;
-pub const sceDisplayIsForeground = _pspdisplay.sceDisplayIsForeground;
-pub const sceDisplayGetVcount = _pspdisplay.sceDisplayGetVcount;
-pub const sceDisplayIsVblank = _pspdisplay.sceDisplayIsVblank;
-pub const sceDisplayWaitVblank = _pspdisplay.sceDisplayWaitVblank;
-pub const sceDisplayWaitVblankCB = _pspdisplay.sceDisplayWaitVblankCB;
-pub const sceDisplayWaitVblankStart = _pspdisplay.sceDisplayWaitVblankStart;
-pub const sceDisplayWaitVblankStartCB = _pspdisplay.sceDisplayWaitVblankStartCB;
-pub const sceDisplayGetCurrentHcount = _pspdisplay.sceDisplayGetCurrentHcount;
-pub const sceDisplayGetAccumulatedHcount = _pspdisplay.sceDisplayGetAccumulatedHcount;
-
-const _psploadexec = @import("sdk/psploadexec.zig");
-pub const sceKernelLoadExec = _psploadexec.sceKernelLoadExec;
-pub const sceKernelExitGame = _psploadexec.sceKernelExitGame;
-pub const sceKernelExitGameWithStatus = _psploadexec.sceKernelExitGameWithStatus;
-pub const sceKernelRegisterExitCallback = _psploadexec.sceKernelRegisterExitCallback;
-
-const _pspthreadman = @import("sdk/pspthreadman.zig");
-pub const sceKernelCreateCallback = _pspthreadman.sceKernelCreateCallback;
-pub const sceKernelDeleteCallback = _pspthreadman.sceKernelDeleteCallback;
-pub const sceKernelNotifyCallback = _pspthreadman.sceKernelNotifyCallback;
-pub const sceKernelCancelCallback = _pspthreadman.sceKernelCancelCallback;
-pub const sceKernelGetCallbackCount = _pspthreadman.sceKernelGetCallbackCount;
-pub const sceKernelCheckCallback = _pspthreadman.sceKernelCheckCallback;
-pub const sceKernelReferCallbackStatus = _pspthreadman.sceKernelReferCallbackStatus;
-pub const sceKernelSleepThread = _pspthreadman.sceKernelSleepThread;
-pub const sceKernelSleepThreadCB = _pspthreadman.sceKernelSleepThreadCB;
-pub const sceKernelWakeupThread = _pspthreadman.sceKernelWakeupThread;
-pub const sceKernelCancelWakeupThread = _pspthreadman.sceKernelCancelWakeupThread;
-pub const sceKernelSuspendThread = _pspthreadman.sceKernelSuspendThread;
-pub const sceKernelResumeThread = _pspthreadman.sceKernelResumeThread;
-pub const sceKernelWaitThreadEnd = _pspthreadman.sceKernelWaitThreadEnd;
-pub const sceKernelWaitThreadEndCB = _pspthreadman.sceKernelWaitThreadEndCB;
-pub const sceKernelDelayThread = _pspthreadman.sceKernelDelayThread;
-pub const sceKernelDelayThreadCB = _pspthreadman.sceKernelDelayThreadCB;
-pub const sceKernelCreateSema = _pspthreadman.sceKernelCreateSema;
-pub const sceKernelDeleteSema = _pspthreadman.sceKernelDeleteSema;
-pub const sceKernelSignalSema = _pspthreadman.sceKernelSignalSema;
-pub const sceKernelWaitSema = _pspthreadman.sceKernelWaitSema;
-pub const sceKernelWaitSemaCB = _pspthreadman.sceKernelWaitSemaCB;
-pub const sceKernelPollSema = _pspthreadman.sceKernelPollSema;
-pub const sceKernelCreateEventFlag = _pspthreadman.sceKernelCreateEventFlag;
-pub const sceKernelDeleteEventFlag = _pspthreadman.sceKernelDeleteEventFlag;
-pub const sceKernelSetEventFlag = _pspthreadman.sceKernelSetEventFlag;
-pub const sceKernelClearEventFlag = _pspthreadman.sceKernelClearEventFlag;
-pub const sceKernelWaitEventFlag = _pspthreadman.sceKernelWaitEventFlag;
-pub const sceKernelWaitEventFlagCB = _pspthreadman.sceKernelWaitEventFlagCB;
-pub const sceKernelPollEventFlag = _pspthreadman.sceKernelPollEventFlag;
-
-const _pspsysmem = @import("sdk/pspsysmem.zig");
-pub const sceKernelMaxFreeMemSize = _pspsysmem.sceKernelMaxFreeMemSize;
-pub const sceKernelTotalFreeMemSize = _pspsysmem.sceKernelTotalFreeMemSize;
-pub const sceKernelAllocPartitionMemory = _pspsysmem.sceKernelAllocPartitionMemory;
-pub const sceKernelFreePartitionMemory = _pspsysmem.sceKernelFreePartitionMemory;
-pub const sceKernelGetBlockHeadAddr = _pspsysmem.sceKernelGetBlockHeadAddr;
-pub const sceKernelDevkitVersion = _pspsysmem.sceKernelDevkitVersion;
-pub const sceKernelPrintf = _pspsysmem.sceKernelPrintf;
-
-const _pspmodulemgr = @import("sdk/pspmodulemgr.zig");
-pub const sceKernelLoadModule = _pspmodulemgr.sceKernelLoadModule;
-pub const sceKernelLoadModuleMs = _pspmodulemgr.sceKernelLoadModuleMs;
-pub const sceKernelLoadModuleByID = _pspmodulemgr.sceKernelLoadModuleByID;
-pub const sceKernelStartModule = _pspmodulemgr.sceKernelStartModule;
-pub const sceKernelStopModule = _pspmodulemgr.sceKernelStopModule;
-pub const sceKernelUnloadModule = _pspmodulemgr.sceKernelUnloadModule;
-pub const sceKernelSelfStopUnloadModule = _pspmodulemgr.sceKernelSelfStopUnloadModule;
-pub const sceKernelStopUnloadSelfModule = _pspmodulemgr.sceKernelStopUnloadSelfModule;
-pub const sceKernelQueryModuleInfo = _pspmodulemgr.sceKernelQueryModuleInfo;
-pub const sceKernelGetModuleIdList = _pspmodulemgr.sceKernelGetModuleIdList;
-pub const sceKernelGetModuleIdByAddress = _pspmodulemgr.sceKernelGetModuleIdByAddress;
-
-const _pspaudio = @import("sdk/pspaudio.zig");
-pub const sceAudioChReserve = _pspaudio.sceAudioChReserve;
-pub const sceAudioChRelease = _pspaudio.sceAudioChRelease;
-pub const sceAudioOutput = _pspaudio.sceAudioOutput;
-pub const sceAudioOutputBlocking = _pspaudio.sceAudioOutputBlocking;
-
-const _pspatrac3 = @import("sdk/pspatrac3.zig");
-pub const sceAtracGetAtracID = _pspatrac3.sceAtracGetAtracID;
-pub const sceAtracSetDataAndGetID = _pspatrac3.sceAtracSetDataAndGetID;
-
-const _psprtc = @import("sdk/psprtc.zig");
-pub const sceRtcGetTickResolution = _psprtc.sceRtcGetTickResolution;
-pub const sceRtcGetCurrentTick = _psprtc.sceRtcGetCurrentTick;
-pub const sceRtcGetCurrentClock = _psprtc.sceRtcGetCurrentClock;
-pub const sceRtcGetCurrentClockLocalTime = _psprtc.sceRtcGetCurrentClockLocalTime;
-pub const sceRtcConvertUtcToLocalTime = _psprtc.sceRtcConvertUtcToLocalTime;
-pub const sceRtcConvertLocalTimeToUtc = _psprtc.sceRtcConvertLocalTimeToUtc;
-
-const _psppower = @import("sdk/psppower.zig");
-pub const scePowerIsPowerOnline = _psppower.scePowerIsPowerOnline;
-pub const scePowerIsBatteryExist = _psppower.scePowerIsBatteryExist;
-pub const scePowerIsBatteryCharging = _psppower.scePowerIsBatteryCharging;
-pub const scePowerGetBatteryChargingStatus = _psppower.scePowerGetBatteryChargingStatus;
-pub const scePowerIsLowBattery = _psppower.scePowerIsLowBattery;
-pub const scePowerGetBatteryLifePercent = _psppower.scePowerGetBatteryLifePercent;
-pub const scePowerGetBatteryLifeTime = _psppower.scePowerGetBatteryLifeTime;
-pub const scePowerGetBatteryTemp = _psppower.scePowerGetBatteryTemp;
-pub const scePowerGetCpuClockFrequency = _psppower.scePowerGetCpuClockFrequency;
-pub const scePowerGetBusClockFrequency = _psppower.scePowerGetBusClockFrequency;
-pub const scePowerSetClockFrequency = _psppower.scePowerSetClockFrequency;
-pub const scePowerLock = _psppower.scePowerLock;
-pub const scePowerUnlock = _psppower.scePowerUnlock;
-pub const scePowerRebootDevice = _psppower.scePowerRebootDevice;
-pub const scePowerRegisterCallback = _psppower.scePowerRegisterCallback;
-pub const scePowerUnregisterCallback = _psppower.scePowerUnregisterCallback;
-
-const _pspumd = @import("sdk/pspumd.zig");
-pub const sceUmdCheckMedium = _pspumd.sceUmdCheckMedium;
-pub const sceUmdGetDiscInfo = _pspumd.sceUmdGetDiscInfo;
-pub const sceUmdActivate = _pspumd.sceUmdActivate;
-pub const sceUmdDeactivate = _pspumd.sceUmdDeactivate;
-pub const sceUmdWaitDriveStat = _pspumd.sceUmdWaitDriveStat;
-pub const sceUmdWaitDriveStatCB = _pspumd.sceUmdWaitDriveStatCB;
-pub const sceUmdCancelWaitDriveStat = _pspumd.sceUmdCancelWaitDriveStat;
-pub const sceUmdGetDriveStat = _pspumd.sceUmdGetDriveStat;
-pub const sceUmdGetErrorStat = _pspumd.sceUmdGetErrorStat;
-pub const sceUmdRegisterUMDCallBack = _pspumd.sceUmdRegisterUMDCallBack;
-pub const sceUmdUnRegisterUMDCallBack = _pspumd.sceUmdUnRegisterUMDCallBack;
-
-const _pspio = @import("sdk/pspiofilemgr.zig");
-pub const sceIoOpen = _pspio.sceIoOpen;
-pub const sceIoOpenAsync = _pspio.sceIoOpenAsync;
-pub const sceIoClose = _pspio.sceIoClose;
-pub const sceIoCloseAsync = _pspio.sceIoCloseAsync;
-pub const sceIoRead = _pspio.sceIoRead;
-pub const sceIoReadAsync = _pspio.sceIoReadAsync;
-pub const sceIoWrite = _pspio.sceIoWrite;
-pub const sceIoWriteAsync = _pspio.sceIoWriteAsync;
-pub const sceIoLseek = _pspio.sceIoLseek;
-pub const sceIoLseekAsync = _pspio.sceIoLseekAsync;
-pub const sceIoLseek32 = _pspio.sceIoLseek32;
-pub const sceIoLseek32Async = _pspio.sceIoLseek32Async;
-pub const sceIoRemove = _pspio.sceIoRemove;
-pub const sceIoMkdir = _pspio.sceIoMkdir;
-pub const sceIoRmdir = _pspio.sceIoRmdir;
-pub const sceIoChdir = _pspio.sceIoChdir;
-pub const sceIoRename = _pspio.sceIoRename;
-pub const sceIoDopen = _pspio.sceIoDopen;
-pub const sceIoDread = _pspio.sceIoDread;
-pub const sceIoDclose = _pspio.sceIoDclose;
-
-const _psphprm = @import("sdk/psphprm.zig");
-pub const sceHprmPeekCurrentKey = _psphprm.sceHprmPeekCurrentKey;
-pub const sceHprmPeekLatch = _psphprm.sceHprmPeekLatch;
-pub const sceHprmReadLatch = _psphprm.sceHprmReadLatch;
-pub const sceHprmIsHeadphoneExist = _psphprm.sceHprmIsHeadphoneExist;
-pub const sceHprmIsRemoteExist = _psphprm.sceHprmIsRemoteExist;
-
-const _pspwlan = @import("sdk/pspwlan.zig");
-pub const sceWlanDevIsPowerOn = _pspwlan.sceWlanDevIsPowerOn;
-pub const sceWlanGetSwitchState = _pspwlan.sceWlanGetSwitchState;
-pub const sceWlanGetEtherAddr = _pspwlan.sceWlanGetEtherAddr;
-
-const _psputility = @import("sdk/psputility.zig");
-pub const sceUtilityLoadNetModule = _psputility.sceUtilityLoadNetModule;
-pub const sceUtilityUnloadNetModule = _psputility.sceUtilityUnloadNetModule;
-pub const sceUtilityLoadModule = _psputility.sceUtilityLoadModule;
-pub const sceUtilityUnloadModule = _psputility.sceUtilityUnloadModule;
-pub const sceUtilityNetconfInitStart = _psputility.sceUtilityNetconfInitStart;
-pub const sceUtilityNetconfUpdate = _psputility.sceUtilityNetconfUpdate;
-pub const sceUtilityNetconfGetStatus = _psputility.sceUtilityNetconfGetStatus;
-pub const sceUtilityNetconfShutdownStart = _psputility.sceUtilityNetconfShutdownStart;
-
-// psputils -- source from UtilsForUser (NID stubs) not psputils.zig (bare extern)
-const _uu = c.UtilsForUser;
-pub const sceKernelUtilsMt19937Init        = _uu.sceKernelUtilsMt19937Init;
-pub const sceKernelUtilsMt19937UInt        = _uu.sceKernelUtilsMt19937UInt;
-pub const sceKernelUtilsMd5Digest          = _uu.sceKernelUtilsMd5Digest;
-pub const sceKernelUtilsMd5BlockInit       = _uu.sceKernelUtilsMd5BlockInit;
-pub const sceKernelUtilsMd5BlockUpdate     = _uu.sceKernelUtilsMd5BlockUpdate;
-pub const sceKernelUtilsMd5BlockResult     = _uu.sceKernelUtilsMd5BlockResult;
-pub const sceKernelUtilsSha1Digest         = _uu.sceKernelUtilsSha1Digest;
-pub const sceKernelUtilsSha1BlockInit      = _uu.sceKernelUtilsSha1BlockInit;
-pub const sceKernelUtilsSha1BlockUpdate    = _uu.sceKernelUtilsSha1BlockUpdate;
-pub const sceKernelUtilsSha1BlockResult    = _uu.sceKernelUtilsSha1BlockResult;
-pub const sceKernelLibcTime                = _uu.sceKernelLibcTime;
-pub const sceKernelLibcClock               = _uu.sceKernelLibcClock;
-pub const sceKernelLibcGettimeofday        = _uu.sceKernelLibcGettimeofday;
-pub const sceKernelDcacheWritebackAll              = _uu.sceKernelDcacheWritebackAll;
-pub const sceKernelDcacheWritebackInvalidateAll    = _uu.sceKernelDcacheWritebackInvalidateAll;
-pub const sceKernelDcacheWritebackRange            = _uu.sceKernelDcacheWritebackRange;
-pub const sceKernelDcacheWritebackInvalidateRange  = _uu.sceKernelDcacheWritebackInvalidateRange;
-pub const sceKernelDcacheInvalidateRange           = _uu.sceKernelDcacheInvalidateRange;
-pub const sceKernelIcacheInvalidateAll             = _uu.sceKernelIcacheInvalidateAll;
-pub const sceKernelIcacheInvalidateRange           = _uu.sceKernelIcacheInvalidateRange;
-
-// Tier 3: Snake_case sub-namespaces
-
+// -- GU snake_case sub-namespaces --
+// TODO: GU upgrade
 pub const gu = struct {
-    pub const types = @import("sdk/pspgutypes.zig");
-    const _gu = @import("sdk/pspgu.zig");
+    pub const types = @import("gu/pspgutypes.zig");
+    const _gu = @import("gu/pspgu.zig");
     // Init / term
     pub const init = _gu.sceGuInit;
     pub const term = _gu.sceGuTerm;
@@ -532,351 +1062,28 @@ pub const gu = struct {
 };
 
 pub const gum = struct {
-    const _gum = @import("sdk/pspgum.zig");
-    pub const matrix_mode = _gum.sceGumMatrixMode;
-    pub const load_identity = _gum.sceGumLoadIdentity;
-    pub const load_matrix = _gum.sceGumLoadMatrix;
-    pub const store_matrix = _gum.sceGumStoreMatrix;
-    pub const push_matrix = _gum.sceGumPushMatrix;
-    pub const pop_matrix = _gum.sceGumPopMatrix;
-    pub const mult_matrix = _gum.sceGumMultMatrix;
-    pub const update_matrix = _gum.sceGumUpdateMatrix;
-    pub const rotate_x = _gum.sceGumRotateX;
-    pub const rotate_y = _gum.sceGumRotateY;
-    pub const rotate_z = _gum.sceGumRotateZ;
-    pub const rotate_xyz = _gum.sceGumRotateXYZ;
-    pub const rotate_zyx = _gum.sceGumRotateZYX;
-    pub const scale = _gum.sceGumScale;
-    pub const translate = _gum.sceGumTranslate;
-    pub const ortho = _gum.sceGumOrtho;
-    pub const perspective = _gum.sceGumPerspective;
-    pub const full_inverse = _gum.sceGumFullInverse;
-    pub const fast_inverse = _gum.sceGumFastInverse;
+    const _gum = @import("gu/pspgum.zig");
     pub const draw_array = _gum.sceGumDrawArray;
     pub const draw_array_n = _gum.sceGumDrawArrayN;
     pub const draw_bezier = _gum.sceGumDrawBezier;
     pub const draw_spline = _gum.sceGumDrawSpline;
-};
-
-pub const ge = struct {
-    const _ge = @import("sdk/pspge.zig");
-    pub const edram_get_size = _ge.sceGeEdramGetSize;
-    pub const edram_get_addr = _ge.sceGeEdramGetAddr;
-    pub const edram_set_addr_translation = _ge.sceGeEdramSetAddrTranslation;
-    pub const get_cmd = _ge.sceGeGetCmd;
-    pub const get_mtx = _ge.sceGeGetMtx;
-    pub const get_stack = _ge.sceGeGetStack;
-    pub const save_context = _ge.sceGeSaveContext;
-    pub const restore_context = _ge.sceGeRestoreContext;
-    pub const list_en_queue = _ge.sceGeListEnQueue;
-    pub const list_en_queue_head = _ge.sceGeListEnQueueHead;
-    pub const list_de_queue = _ge.sceGeListDeQueue;
-    pub const list_update_stall_addr = _ge.sceGeListUpdateStallAddr;
-    pub const list_sync = _ge.sceGeListSync;
-    pub const draw_sync = _ge.sceGeDrawSync;
-    pub const @"break" = _ge.sceGeBreak;
-    pub const @"continue" = _ge.sceGeContinue;
-    pub const set_callback = _ge.sceGeSetCallback;
-    pub const unset_callback = _ge.sceGeUnsetCallback;
-};
-
-pub const ctrl = struct {
-    const _ctrl = @import("sdk/pspctrl.zig");
-    pub const set_sampling_cycle = _ctrl.sceCtrlSetSamplingCycle;
-    pub const get_sampling_cycle = _ctrl.sceCtrlGetSamplingCycle;
-    pub const set_sampling_mode = _ctrl.sceCtrlSetSamplingMode;
-    pub const get_sampling_mode = _ctrl.sceCtrlGetSamplingMode;
-    pub const peek_buffer_positive = _ctrl.sceCtrlPeekBufferPositive;
-    pub const peek_buffer_negative = _ctrl.sceCtrlPeekBufferNegative;
-    pub const read_buffer_positive = _ctrl.sceCtrlReadBufferPositive;
-    pub const read_buffer_negative = _ctrl.sceCtrlReadBufferNegative;
-    pub const peek_latch = _ctrl.sceCtrlPeekLatch;
-    pub const read_latch = _ctrl.sceCtrlReadLatch;
-    pub const set_idle_cancel_threshold = _ctrl.sceCtrlSetIdleCancelThreshold;
-    pub const get_idle_cancel_threshold = _ctrl.sceCtrlGetIdleCancelThreshold;
-};
-
-pub const display = struct {
-    const _display = @import("sdk/pspdisplay.zig");
-    pub const PspDisplayPixelFormats = _display.PspDisplayPixelFormats;
-    pub const PspDisplaySetBufSync = _display.PspDisplaySetBufSync;
-    pub const set_mode = _display.sceDisplaySetMode;
-    pub const get_mode = _display.sceDisplayGetMode;
-    pub const get_frame_per_sec = _display.sceDisplayGetFramePerSec;
-    pub const set_hold_mode = _display.sceDisplaySetHoldMode;
-    pub const set_resume_mode = _display.sceDisplaySetResumeMode;
-    pub const set_frame_buf = _display.sceDisplaySetFrameBuf;
-    pub const get_frame_buf = _display.sceDisplayGetFrameBuf;
-    pub const is_foreground = _display.sceDisplayIsForeground;
-    pub const get_vcount = _display.sceDisplayGetVcount;
-    pub const is_vblank = _display.sceDisplayIsVblank;
-    pub const wait_vblank = _display.sceDisplayWaitVblank;
-    pub const wait_vblank_cb = _display.sceDisplayWaitVblankCB;
-    pub const wait_vblank_start = _display.sceDisplayWaitVblankStart;
-    pub const wait_vblank_start_cb = _display.sceDisplayWaitVblankStartCB;
-    pub const get_current_hcount = _display.sceDisplayGetCurrentHcount;
-    pub const get_accumulated_hcount = _display.sceDisplayGetAccumulatedHcount;
-};
-
-pub const kernel = struct {
-    // From psploadexec
-    const _loadexec = @import("sdk/psploadexec.zig");
-    pub const load_exec = _loadexec.sceKernelLoadExec;
-    pub const exit_game = _loadexec.sceKernelExitGame;
-    pub const exit_game_with_status = _loadexec.sceKernelExitGameWithStatus;
-    pub const register_exit_callback = _loadexec.sceKernelRegisterExitCallback;
-    // From pspthreadman
-    const _threadman = @import("sdk/pspthreadman.zig");
-    pub const create_callback = _threadman.sceKernelCreateCallback;
-    pub const delete_callback = _threadman.sceKernelDeleteCallback;
-    pub const notify_callback = _threadman.sceKernelNotifyCallback;
-    pub const cancel_callback = _threadman.sceKernelCancelCallback;
-    pub const get_callback_count = _threadman.sceKernelGetCallbackCount;
-    pub const check_callback = _threadman.sceKernelCheckCallback;
-    pub const refer_callback_status = _threadman.sceKernelReferCallbackStatus;
-    pub const sleep_thread = _threadman.sceKernelSleepThread;
-    pub const sleep_thread_cb = _threadman.sceKernelSleepThreadCB;
-    pub const wakeup_thread = _threadman.sceKernelWakeupThread;
-    pub const cancel_wakeup_thread = _threadman.sceKernelCancelWakeupThread;
-    pub const suspend_thread = _threadman.sceKernelSuspendThread;
-    pub const resume_thread = _threadman.sceKernelResumeThread;
-    pub const wait_thread_end = _threadman.sceKernelWaitThreadEnd;
-    pub const wait_thread_end_cb = _threadman.sceKernelWaitThreadEndCB;
-    pub const delay_thread = _threadman.sceKernelDelayThread;
-    pub const delay_thread_cb = _threadman.sceKernelDelayThreadCB;
-    pub const create_sema = _threadman.sceKernelCreateSema;
-    pub const delete_sema = _threadman.sceKernelDeleteSema;
-    pub const signal_sema = _threadman.sceKernelSignalSema;
-    pub const wait_sema = _threadman.sceKernelWaitSema;
-    pub const wait_sema_cb = _threadman.sceKernelWaitSemaCB;
-    pub const poll_sema = _threadman.sceKernelPollSema;
-    pub const create_event_flag = _threadman.sceKernelCreateEventFlag;
-    pub const delete_event_flag = _threadman.sceKernelDeleteEventFlag;
-    pub const set_event_flag = _threadman.sceKernelSetEventFlag;
-    pub const clear_event_flag = _threadman.sceKernelClearEventFlag;
-    pub const wait_event_flag = _threadman.sceKernelWaitEventFlag;
-    pub const wait_event_flag_cb = _threadman.sceKernelWaitEventFlagCB;
-    pub const poll_event_flag = _threadman.sceKernelPollEventFlag;
-    // From pspsysmem
-    const _sysmem = @import("sdk/pspsysmem.zig");
-    pub const max_free_mem_size = _sysmem.sceKernelMaxFreeMemSize;
-    pub const total_free_mem_size = _sysmem.sceKernelTotalFreeMemSize;
-    pub const alloc_partition_memory = _sysmem.sceKernelAllocPartitionMemory;
-    pub const free_partition_memory = _sysmem.sceKernelFreePartitionMemory;
-    pub const get_block_head_addr = _sysmem.sceKernelGetBlockHeadAddr;
-    pub const devkit_version = _sysmem.sceKernelDevkitVersion;
-    pub const printf = _sysmem.sceKernelPrintf;
-    // From pspmodulemgr
-    const _modulemgr = @import("sdk/pspmodulemgr.zig");
-    pub const load_module = _modulemgr.sceKernelLoadModule;
-    pub const load_module_ms = _modulemgr.sceKernelLoadModuleMs;
-    pub const load_module_by_id = _modulemgr.sceKernelLoadModuleByID;
-    pub const start_module = _modulemgr.sceKernelStartModule;
-    pub const stop_module = _modulemgr.sceKernelStopModule;
-    pub const unload_module = _modulemgr.sceKernelUnloadModule;
-    pub const self_stop_unload_module = _modulemgr.sceKernelSelfStopUnloadModule;
-    pub const stop_unload_self_module = _modulemgr.sceKernelStopUnloadSelfModule;
-    pub const query_module_info = _modulemgr.sceKernelQueryModuleInfo;
-    pub const get_module_id_list = _modulemgr.sceKernelGetModuleIdList;
-    pub const get_module_id_by_address = _modulemgr.sceKernelGetModuleIdByAddress;
-};
-
-pub const audio = struct {
-    const _audio = @import("sdk/pspaudio.zig");
-    pub const ch_reserve = _audio.sceAudioChReserve;
-    pub const ch_release = _audio.sceAudioChRelease;
-    pub const output = _audio.sceAudioOutput;
-    pub const output_blocking = _audio.sceAudioOutputBlocking;
-};
-
-pub const atrac3 = struct {
-    const _atrac3 = @import("sdk/pspatrac3.zig");
-    pub const get_atrac_id = _atrac3.sceAtracGetAtracID;
-    pub const set_data_and_get_id = _atrac3.sceAtracSetDataAndGetID;
-};
-
-pub const rtc = struct {
-    const _rtc = @import("sdk/psprtc.zig");
-    pub const get_tick_resolution = _rtc.sceRtcGetTickResolution;
-    pub const get_current_tick = _rtc.sceRtcGetCurrentTick;
-    pub const get_current_clock = _rtc.sceRtcGetCurrentClock;
-    pub const get_current_clock_local_time = _rtc.sceRtcGetCurrentClockLocalTime;
-    pub const convert_utc_to_local_time = _rtc.sceRtcConvertUtcToLocalTime;
-    pub const convert_local_time_to_utc = _rtc.sceRtcConvertLocalTimeToUtc;
-};
-
-pub const power = struct {
-    const _power = @import("sdk/psppower.zig");
-    pub const is_power_online = _power.scePowerIsPowerOnline;
-    pub const is_battery_exist = _power.scePowerIsBatteryExist;
-    pub const is_battery_charging = _power.scePowerIsBatteryCharging;
-    pub const get_battery_charging_status = _power.scePowerGetBatteryChargingStatus;
-    pub const is_low_battery = _power.scePowerIsLowBattery;
-    pub const get_battery_life_percent = _power.scePowerGetBatteryLifePercent;
-    pub const get_battery_life_time = _power.scePowerGetBatteryLifeTime;
-    pub const get_battery_temp = _power.scePowerGetBatteryTemp;
-    pub const get_cpu_clock_frequency = _power.scePowerGetCpuClockFrequency;
-    pub const get_bus_clock_frequency = _power.scePowerGetBusClockFrequency;
-    pub const set_clock_frequency = _power.scePowerSetClockFrequency;
-    pub const lock = _power.scePowerLock;
-    pub const unlock = _power.scePowerUnlock;
-    pub const reboot_device = _power.scePowerRebootDevice;
-    pub const register_callback = _power.scePowerRegisterCallback;
-    pub const unregister_callback = _power.scePowerUnregisterCallback;
-};
-
-pub const umd = struct {
-    const _umd = @import("sdk/pspumd.zig");
-    pub const check_medium = _umd.sceUmdCheckMedium;
-    pub const get_disc_info = _umd.sceUmdGetDiscInfo;
-    pub const activate = _umd.sceUmdActivate;
-    pub const deactivate = _umd.sceUmdDeactivate;
-    pub const wait_drive_stat = _umd.sceUmdWaitDriveStat;
-    pub const wait_drive_stat_cb = _umd.sceUmdWaitDriveStatCB;
-    pub const cancel_wait_drive_stat = _umd.sceUmdCancelWaitDriveStat;
-    pub const get_drive_stat = _umd.sceUmdGetDriveStat;
-    pub const get_error_stat = _umd.sceUmdGetErrorStat;
-    pub const register_umd_callback = _umd.sceUmdRegisterUMDCallBack;
-    pub const unregister_umd_callback = _umd.sceUmdUnRegisterUMDCallBack;
-};
-
-pub const io = struct {
-    const _io = @import("sdk/pspiofilemgr.zig");
-    pub const open = _io.sceIoOpen;
-    pub const open_async = _io.sceIoOpenAsync;
-    pub const close = _io.sceIoClose;
-    pub const close_async = _io.sceIoCloseAsync;
-    pub const read = _io.sceIoRead;
-    pub const read_async = _io.sceIoReadAsync;
-    pub const write = _io.sceIoWrite;
-    pub const write_async = _io.sceIoWriteAsync;
-    pub const lseek = _io.sceIoLseek;
-    pub const lseek_async = _io.sceIoLseekAsync;
-    pub const lseek32 = _io.sceIoLseek32;
-    pub const lseek32_async = _io.sceIoLseek32Async;
-    pub const remove = _io.sceIoRemove;
-    pub const mkdir = _io.sceIoMkdir;
-    pub const rmdir = _io.sceIoRmdir;
-    pub const chdir = _io.sceIoChdir;
-    pub const rename = _io.sceIoRename;
-    pub const dopen = _io.sceIoDopen;
-    pub const dread = _io.sceIoDread;
-    pub const dclose = _io.sceIoDclose;
-};
-
-pub const hprm = struct {
-    const _hprm = @import("sdk/psphprm.zig");
-    pub const peek_current_key = _hprm.sceHprmPeekCurrentKey;
-    pub const peek_latch = _hprm.sceHprmPeekLatch;
-    pub const read_latch = _hprm.sceHprmReadLatch;
-    pub const is_headphone_exist = _hprm.sceHprmIsHeadphoneExist;
-    pub const is_remote_exist = _hprm.sceHprmIsRemoteExist;
-};
-
-pub const wlan = struct {
-    const _wlan = @import("sdk/pspwlan.zig");
-    pub const dev_is_power_on = _wlan.sceWlanDevIsPowerOn;
-    pub const get_switch_state = _wlan.sceWlanGetSwitchState;
-    pub const get_ether_addr = _wlan.sceWlanGetEtherAddr;
-};
-
-pub const utility = struct {
-    const _utility = @import("sdk/psputility.zig");
-    pub const load_net_module = _utility.sceUtilityLoadNetModule;
-    pub const unload_net_module = _utility.sceUtilityUnloadNetModule;
-    pub const load_module = _utility.sceUtilityLoadModule;
-    pub const unload_module = _utility.sceUtilityUnloadModule;
-    pub const net_conf_init_start = _utility.sceUtilityNetconfInitStart;
-    pub const net_conf_update = _utility.sceUtilityNetconfUpdate;
-    pub const net_conf_get_status = _utility.sceUtilityNetconfGetStatus;
-    pub const net_conf_shutdown_start = _utility.sceUtilityNetconfShutdownStart;
-};
-
-pub const utils = struct {
-    // Types -- sourced from c.types via psputils.zig re-exports
-    const _t = @import("sdk/psputils.zig");
-    pub const SceKernelUtilsMt19937Context = _t.SceKernelUtilsMt19937Context;
-    pub const SceKernelUtilsMd5Context     = _t.SceKernelUtilsMd5Context;
-    pub const SceKernelUtilsSha1Context    = _t.SceKernelUtilsSha1Context;
-    pub const time_t     = _t.time_t;
-    pub const clock_t    = _t.clock_t;
-    pub const timezone   = _t.timezone;
-    pub const timeval    = _t.timeval;
-
-    // All function calls go through c.UtilsForUser so NID stubs are always emitted.
-    const _u = c.UtilsForUser;
-
-    // Mersenne Twister PRNG
-    pub fn mt19937_init(ctx: *SceKernelUtilsMt19937Context, seed: u32) !i32 {
-        const res = _u.sceKernelUtilsMt19937Init(ctx, seed);
-        if (res < 0) return error.Unexpected;
-        return res;
-    }
-    pub const mt19937_uint = _u.sceKernelUtilsMt19937UInt;
-    // MD5
-    pub fn md5_digest(data: [*]u8, size: u32, digest: [*]u8) !i32 {
-        const res = _u.sceKernelUtilsMd5Digest(data, size, digest);
-        if (res < 0) return error.Unexpected;
-        return res;
-    }
-    pub fn md5_block_init(ctx: *SceKernelUtilsMd5Context) !i32 {
-        const res = _u.sceKernelUtilsMd5BlockInit(ctx);
-        if (res < 0) return error.Unexpected;
-        return res;
-    }
-    pub fn md5_block_update(ctx: *SceKernelUtilsMd5Context, data: [*]u8, size: u32) !i32 {
-        const res = _u.sceKernelUtilsMd5BlockUpdate(ctx, data, size);
-        if (res < 0) return error.Unexpected;
-        return res;
-    }
-    pub fn md5_block_result(ctx: *SceKernelUtilsMd5Context, digest: [*]u8) !i32 {
-        const res = _u.sceKernelUtilsMd5BlockResult(ctx, digest);
-        if (res < 0) return error.Unexpected;
-        return res;
-    }
-    // SHA1
-    pub fn sha1_digest(data: [*]u8, size: u32, digest: [*]u8) !i32 {
-        const res = _u.sceKernelUtilsSha1Digest(data, size, digest);
-        if (res < 0) return error.Unexpected;
-        return res;
-    }
-    pub fn sha1_block_init(ctx: *SceKernelUtilsSha1Context) !i32 {
-        const res = _u.sceKernelUtilsSha1BlockInit(ctx);
-        if (res < 0) return error.Unexpected;
-        return res;
-    }
-    pub fn sha1_block_update(ctx: *SceKernelUtilsSha1Context, data: [*]u8, size: u32) !i32 {
-        const res = _u.sceKernelUtilsSha1BlockUpdate(ctx, data, size);
-        if (res < 0) return error.Unexpected;
-        return res;
-    }
-    pub fn sha1_block_result(ctx: *SceKernelUtilsSha1Context, digest: [*]u8) !i32 {
-        const res = _u.sceKernelUtilsSha1BlockResult(ctx, digest);
-        if (res < 0) return error.Unexpected;
-        return res;
-    }
-    // libc-style time
-    pub const libc_time         = _u.sceKernelLibcTime;
-    pub const libc_clock        = _u.sceKernelLibcClock;
-    pub const libc_gettimeofday = _u.sceKernelLibcGettimeofday;
-    // Cache maintenance
-    pub const dcache_writeback_all              = _u.sceKernelDcacheWritebackAll;
-    pub const dcache_writeback_invalidate_all   = _u.sceKernelDcacheWritebackInvalidateAll;
-    pub const dcache_writeback_range            = _u.sceKernelDcacheWritebackRange;
-    pub const dcache_writeback_invalidate_range = _u.sceKernelDcacheWritebackInvalidateRange;
-    pub const dcache_invalidate_range           = _u.sceKernelDcacheInvalidateRange;
-    pub const icache_invalidate_all             = _u.sceKernelIcacheInvalidateAll;
-    pub const icache_invalidate_range           = _u.sceKernelIcacheInvalidateRange;
-};
-
-// Utility layer (unchanged)
-pub const extra = struct {
-    pub const allocator = @import("utils/allocator.zig");
-    pub const constants = @import("utils/constants.zig");
-    pub const debug = @import("utils/debug.zig");
-    pub const Io = @import("utils/Io.zig");
-    pub const module = @import("utils/module.zig");
-    pub const net = @import("utils/net.zig");
-    pub const utils = @import("utils/utils.zig");
-    pub const vram = @import("utils/vram.zig");
+    pub const fast_inverse = _gum.sceGumFastInverse;
+    pub const full_inverse = _gum.sceGumFullInverse;
+    pub const load_identity = _gum.sceGumLoadIdentity;
+    pub const load_matrix = _gum.sceGumLoadMatrix;
+    pub const matrix_mode = _gum.sceGumMatrixMode;
+    pub const mult_matrix = _gum.sceGumMultMatrix;
+    pub const ortho = _gum.sceGumOrtho;
+    pub const perspective = _gum.sceGumPerspective;
+    pub const pop_matrix = _gum.sceGumPopMatrix;
+    pub const push_matrix = _gum.sceGumPushMatrix;
+    pub const rotate_x = _gum.sceGumRotateX;
+    pub const rotate_xyz = _gum.sceGumRotateXYZ;
+    pub const rotate_y = _gum.sceGumRotateY;
+    pub const rotate_z = _gum.sceGumRotateZ;
+    pub const rotate_zyx = _gum.sceGumRotateZYX;
+    pub const scale = _gum.sceGumScale;
+    pub const store_matrix = _gum.sceGumStoreMatrix;
+    pub const translate = _gum.sceGumTranslate;
+    pub const update_matrix = _gum.sceGumUpdateMatrix;
 };
