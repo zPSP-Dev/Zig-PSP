@@ -58,6 +58,11 @@ const sdk = @import("pspsdk");
 // Required: overrides the default panic handler which pulls in posix symbols.
 pub const panic = sdk.extra.debug.panic;
 
+// Required: routes std.debug.print through PSP I/O instead of posix.
+pub const std_options_debug_threaded_io: ?*std.Io.Threaded = null;
+pub const std_options_debug_io: std.Io = sdk.extra.Io.psp_io;
+pub fn std_options_cwd() std.Io.Dir { return .{ .handle = -1 }; }
+
 comptime {
     asm (sdk.extra.module.module_info("My App Name", .{ .mode = .User }, 1, 0));
 }
@@ -66,7 +71,7 @@ pub fn main(_: std.process.Init) !void {
     sdk.extra.utils.enableHBCB();
     sdk.extra.debug.screenInit();
 
-    sdk.extra.debug.print("Hello from Zig!");
+    sdk.extra.debug.print("Hello from Zig!", .{});
 }
 ```
 
@@ -80,9 +85,9 @@ The SDK exposes PSP functions through three tiers -- pick whichever fits your st
 | Top-level sce-prefix | `sdk.sceKernelExitGame()` | Direct re-exports at the package root |
 | Snake_case sub-namespace | `sdk.kernel.exit_game()` | Idiomatic Zig names grouped by subsystem |
 
-Sub-namespaces: `sdk.gu`, `sdk.gum`, `sdk.ge`, `sdk.ctrl`, `sdk.display`, `sdk.kernel`, `sdk.audio`, `sdk.atrac3`, `sdk.rtc`, `sdk.power`, `sdk.umd`, `sdk.io`, `sdk.hprm`, `sdk.wlan`, `sdk.utility`.
+Sub-namespaces: `sdk.gu`, `sdk.gum`, `sdk.ge`, `sdk.ctrl`, `sdk.display`, `sdk.kernel`, `sdk.audio`, `sdk.atrac3`, `sdk.rtc`, `sdk.power`, `sdk.umd`, `sdk.io`, `sdk.hprm`, `sdk.wlan`, `sdk.utility`, `sdk.utils`.
 
-The utility layer lives under `sdk.extra`: `sdk.extra.debug`, `sdk.extra.module`, `sdk.extra.utils`, `sdk.extra.allocator`, `sdk.extra.vram`.
+The utility layer lives under `sdk.extra`: `sdk.extra.debug`, `sdk.extra.module`, `sdk.extra.utils`, `sdk.extra.allocator`, `sdk.extra.vram`, `sdk.extra.Io`, `sdk.extra.constants`, `sdk.extra.net`.
 
 ## Building This Repository
 
@@ -177,7 +182,7 @@ try http_client.ca_bundle.parseCert(gpa, 0, now.toSeconds());
 http_client.now = now;
 ```
 
-TLS crypto requires extra stack space — set `pub const psp_stack_size: u32 = 512 * 1024;` in your app. See `examples/https.zig` for a complete working example. *TODO: Needs Verification*
+TLS crypto requires extra stack space — set `pub const psp_stack_size: u32 = 512 * 1024;` in your app. See `examples/https.zig` for a complete working example.
 
 ## Comparisons To C/C++
 
