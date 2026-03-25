@@ -1,8 +1,8 @@
+const std = @import("std");
 const pspdisplay = @import("../sdk/pspdisplay.zig");
 const pspge = @import("../sdk/pspge.zig");
 const constants = @import("constants.zig");
-
-const builtin = @import("builtin");
+const module = @import("module.zig");
 
 //Internal variables for the screen
 var x: u8 = 0;
@@ -78,8 +78,8 @@ pub fn screenInit() void {
     screenClear();
 }
 
-//Print out a constant string
-pub fn print(text: []const u8) void {
+// Print a string directly to screen only (no formatting, no std.debug.print).
+pub fn screenPrint(text: []const u8) void {
     var i: usize = 0;
     while (i < text.len) : (i += 1) {
         if (text[i] == '\n') {
@@ -103,6 +103,15 @@ pub fn print(text: []const u8) void {
     }
 }
 
+// Format and print to both screen and std.debug.print. No allocation — uses a
+// 512-byte stack buffer; output is truncated if the formatted string exceeds it.
+pub fn print(comptime fmt: []const u8, args: anytype) void {
+    std.debug.print(fmt, args);
+    var buf: [512]u8 = undefined;
+    const text = std.fmt.bufPrint(&buf, fmt, args) catch &buf;
+    screenPrint(text);
+}
+
 export fn pspDebugScreenInit() void {
     screenInit();
 }
@@ -113,24 +122,11 @@ export fn pspDebugScreenClear(color: u32) void {
 }
 
 export fn pspDebugScreenPrint(text: [*c]const u8) void {
-    print(std.mem.span(text));
-}
-
-const std = @import("std");
-
-//Print with formatting via the default PSP allocator
-pub fn printFormat(comptime fmt: []const u8, args: anytype) !void {
-    const alloc = @import("allocator.zig");
-    var psp_allocator = alloc.psp_page_allocator;
-
-    const string = try std.fmt.allocPrint(psp_allocator, fmt, args);
-    defer psp_allocator.free(string);
-
-    print(string);
+    screenPrint(std.mem.span(text));
 }
 
 //Our font
-pub const msxFont = @embedFile("./msxfont2.bin");
+pub const msxFont = @embedFile("./msxfont.bin");
 
 //Puts a character to screen
 fn internal_putchar(cx: u32, cy: u32, ch: u8) void {
@@ -146,7 +142,7 @@ fn internal_putchar(cx: u32, cy: u32, ch: u8) void {
             const idx: u32 = @as(u32, ch - 32) * 8 + i;
             const glyph: u8 = msxFont[idx];
 
-            if ((glyph & (mask >> @as(@import("std").math.Log2Int(c_int), @intCast(j)))) != 0) {
+            if ((glyph & (mask >> @as(std.math.Log2Int(c_int), @intCast(j)))) != 0) {
                 vram_base.?[j + i * constants.SCR_BUF_WIDTH + off] = fg_col;
             } else if (back_col_enable) {
                 vram_base.?[j + i * constants.SCR_BUF_WIDTH + off] = bg_col;
@@ -155,60 +151,34 @@ fn internal_putchar(cx: u32, cy: u32, ch: u8) void {
     }
 }
 
-const module = @import("module.zig");
-
-// Print a usize as a hex address (e.g. "0x8804000a") without allocating.
-fn printHex(value: usize) void {
-    const hex_chars = "0123456789abcdef";
-    // "0x" + 8 hex digits for 32-bit MIPS addresses
-    var buf = [_]u8{ '0', 'x', 0, 0, 0, 0, 0, 0, 0, 0 };
-    var v = value;
-    var i: usize = 9;
-    while (true) {
-        buf[i] = hex_chars[v & 0xF];
-        v >>= 4;
-        if (i == 2) break;
-        i -= 1;
-    }
-    print(&buf);
-}
-
 pub fn printTrace(trace: *std.builtin.StackTrace) void {
     if (trace.index == 0) return;
-    print("Stack trace:\n");
+    print("Stack trace:\n", .{});
     const addrs = trace.instruction_addresses;
     const count = @min(trace.index, addrs.len);
     var i: usize = 0;
     while (i < count) : (i += 1) {
-        print("  [");
-        printHex(i);
-        print("] ");
-        printHex(addrs[i]);
-        print("\n");
+        print("  [{d}] 0x{x:0>8}\n", .{ i, addrs[i] });
     }
 }
 
-//Panic handler
-//Import this in main to use!
+// Panic handler — import in main via: pub const panic = sdk.extra.debug.panic;
 pub fn panic(message: []const u8, stack_trace: ?*std.builtin.StackTrace, size: ?usize) noreturn {
     _ = size;
     screenInit();
 
-    print("!!! PSP HAS PANICKED !!!\n");
-
-    print("REASON: ");
-    print(message);
-    print("\n");
+    print("!!! PSP HAS PANICKED !!!\n", .{});
+    print("REASON: {s}\n", .{message});
 
     if (stack_trace) |trace| {
         printTrace(trace);
     } else if (@errorReturnTrace()) |trace| {
         printTrace(trace);
     } else {
-        print("(no return trace available)\n");
+        print("(no return trace available)\n", .{});
     }
 
-    print("Exiting...");
+    print("Exiting...", .{});
 
     module.exitErr();
     while (true) {}

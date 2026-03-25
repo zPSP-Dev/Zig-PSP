@@ -36,8 +36,7 @@ pub fn _module_main_thread(argc: usize, argv: ?*anyopaque) callconv(.c) c_int {
     psp_io.init(arg0);
 
     // PSP is freestanding: Args.vector is void, Environ.block is GlobalBlock.
-    // arena and gpa are backed by psp_page_allocator; io/environ_map are
-    // unused on freestanding and left undefined.
+    // arena and gpa are backed by psp_page_allocator;
     var arena_allocator = std.heap.ArenaAllocator.init(psp_allocator.psp_page_allocator);
     defer arena_allocator.deinit();
 
@@ -89,15 +88,13 @@ pub fn _module_main_thread(argc: usize, argv: ?*anyopaque) callconv(.c) c_int {
                 root.main(init);
 
             const result = main_result catch |err| {
-                debug.print("ERROR CAUGHT: ");
-                debug.print(@errorName(err));
-                debug.print("\n");
+                debug.print("ERROR CAUGHT: {s}\n", .{@errorName(err)});
                 if (@errorReturnTrace()) |trace| {
                     debug.printTrace(trace);
                 } else {
-                    debug.print("(no return trace available)\n");
+                    debug.print("(no return trace available)\n", .{});
                 }
-                debug.print("Exiting in 10 seconds...");
+                debug.print("Exiting in 10 seconds...", .{});
                 exitErr();
                 return 1;
             };

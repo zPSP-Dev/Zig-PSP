@@ -21,48 +21,50 @@ const sdk = @import("pspsdk");
 
 pub const panic = sdk.extra.debug.panic;
 
+pub const std_options_debug_threaded_io: ?*std.Io.Threaded = null;
+pub const std_options_debug_io: std.Io = sdk.extra.Io.psp_io;
+pub fn std_options_cwd() std.Io.Dir { return .{ .handle = -1 }; }
+
 comptime {
     asm(sdk.extra.module.module_info("PSP Arena", .{ .mode = .User }, 1, 0));
 }
 
-fn printFree(gpa: std.mem.Allocator, label: []const u8) void {
+fn printFree(label: []const u8) void {
     const free_bytes = sdk.kernel.total_free_mem_size();
-    const msg = std.fmt.allocPrint(gpa, "{s}: {d} bytes\n", .{ label, free_bytes }) catch unreachable;
-    defer gpa.free(msg);
-    sdk.extra.debug.print(msg);
+    sdk.extra.debug.print("{s}: {d} bytes\n", .{ label, free_bytes });
 }
 
 pub fn main(init: std.process.Init) !void {
     sdk.extra.utils.enableHBCB();
     sdk.extra.debug.screenInit();
 
-    printFree(init.gpa, "[1] baseline");
+    printFree("[1] baseline");
 
     var arena = std.heap.ArenaAllocator.init(init.gpa);
     defer {
         arena.deinit();
         // All memory returned to init.gpa here; [3] should match [1].
-        printFree(init.gpa, "[3] after deinit");
+        printFree("[3] after deinit");
     }
     const alloc = arena.allocator();
 
     // Many small allocations -- all suballocated within the arena's pages
     // rather than each paying a 256-byte PSP kernel block.
     const greeting = try std.fmt.allocPrint(alloc, "Hello from the Arena!\n", .{});
-    sdk.extra.debug.print(greeting);
+    sdk.extra.debug.print("{s}", .{greeting});
 
-    sdk.extra.debug.print("Squares:");
+    sdk.extra.debug.print("Squares:", .{});
     for (0..15) |i| {
         const n: u32 = @intCast(i);
         const s = try std.fmt.allocPrint(alloc, " {d}", .{n * n});
-        sdk.extra.debug.print(s);
+        sdk.extra.debug.print("{s}", .{s});
     }
-    sdk.extra.debug.print("\n");
+    sdk.extra.debug.print("\n", .{});
 
-    printFree(init.gpa, "[2] mid-arena");
+    printFree("[2] mid-arena");
 
     // Intentionally do NOT free individual arena allocations -- that is the
     // whole point. arena.deinit() in the defer above frees everything at once.
 
-    sdk.extra.debug.print("Done!\n");
+    sdk.extra.debug.print("Done!\n", .{});
 }

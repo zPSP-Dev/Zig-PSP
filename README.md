@@ -149,7 +149,7 @@ pub fn std_options_cwd() std.Io.Dir {
 }
 ```
 
-The vtable covers all 56 feasible functions (100%) — directory, file, time/random, stderr, process CWD, cancellation, and network support. See `ISSUE_41.md` for detailed status.
+The vtable covers all 56 feasible functions (100%) — directory, file, time/random, stderr, process CWD, cancellation, and network support.
 
 ### Networking
 

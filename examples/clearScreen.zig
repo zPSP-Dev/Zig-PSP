@@ -3,7 +3,11 @@ const std = @import("std");
 const sdk = @import("pspsdk");
 const gu = sdk.gu;
 
-pub const panic = sdk.extra.debug.panic; // Import panic handler
+pub const panic = sdk.extra.debug.panic;
+
+pub const std_options_debug_threaded_io: ?*std.Io.Threaded = null;
+pub const std_options_debug_io: std.Io = sdk.extra.Io.psp_io;
+pub fn std_options_cwd() std.Io.Dir { return .{ .handle = -1 }; }
 
 comptime {
     asm (sdk.extra.module.module_info("SDK Clear Screen", .{ .mode = .User }, 1, 0));

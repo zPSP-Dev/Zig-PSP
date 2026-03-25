@@ -14,15 +14,17 @@ const sdk = @import("pspsdk");
 
 pub const panic = sdk.extra.debug.panic;
 
+pub const std_options_debug_threaded_io: ?*std.Io.Threaded = null;
+pub const std_options_debug_io: std.Io = sdk.extra.Io.psp_io;
+pub fn std_options_cwd() std.Io.Dir { return .{ .handle = -1 }; }
+
 comptime {
     asm (sdk.extra.module.module_info("PSP Page Alloc", .{ .mode = .User }, 1, 0));
 }
 
-fn printFree(gpa: std.mem.Allocator, label: []const u8) void {
+fn printFree(label: []const u8) void {
     const free_bytes = sdk.kernel.total_free_mem_size();
-    const msg = std.fmt.allocPrint(gpa, "{s}: {d} bytes free\n", .{ label, free_bytes }) catch unreachable;
-    defer gpa.free(msg);
-    sdk.extra.debug.print(msg);
+    sdk.extra.debug.print("{s}: {d} bytes free\n", .{ label, free_bytes });
 }
 
 pub fn main(init: std.process.Init) !void {
@@ -32,19 +34,18 @@ pub fn main(init: std.process.Init) !void {
     sdk.extra.debug.screenInit();
 
     // [1] Baseline
-    printFree(gpa, "[1] Free mem");
+    printFree("[1] Free mem");
 
     // [2] Allocate a formatted string and print it.
     const greeting = try std.fmt.allocPrint(gpa, "Hello from Zig!\n", .{});
-    sdk.extra.debug.print("[2] Alloc'd: ");
-    sdk.extra.debug.print(greeting);
+    sdk.extra.debug.print("[2] Alloc'd: {s}", .{greeting});
 
     // [3] Memory should be reduced.
-    printFree(gpa, "[3] After alloc");
+    printFree("[3] After alloc");
 
     // [4] Free the string; memory should return to baseline.
     gpa.free(greeting);
-    printFree(gpa, "[4] After free");
+    printFree("[4] After free");
 
     // [5] ArrayList -- exercises alloc, resize/remap, and free in a loop.
     // In Zig 0.15, ArrayList is unmanaged; the allocator is passed per-call.
@@ -54,17 +55,15 @@ pub fn main(init: std.process.Init) !void {
 
         for (0..10) |i| try list.append(gpa, @intCast(i));
 
-        sdk.extra.debug.print("[5] ArrayList:");
+        sdk.extra.debug.print("[5] ArrayList:", .{});
         for (list.items) |v| {
-            const s = std.fmt.allocPrint(gpa, " {d}", .{v}) catch unreachable;
-            defer gpa.free(s);
-            sdk.extra.debug.print(s);
+            sdk.extra.debug.print(" {d}", .{v});
         }
-        sdk.extra.debug.print("\n");
+        sdk.extra.debug.print("\n", .{});
     }
 
     // [6] After ArrayList is deinit'd, memory should be back to baseline.
-    printFree(gpa, "[6] After ArrayList deinit");
+    printFree("[6] After ArrayList deinit");
 
-    sdk.extra.debug.print("Done!\n");
+    sdk.extra.debug.print("Done!\n", .{});
 }
