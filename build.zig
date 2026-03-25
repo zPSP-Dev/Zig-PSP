@@ -61,8 +61,8 @@ pub fn buildPspEboot(b: *std.Build, options: PspEbootOptions, output: PspOutputO
     });
 
     const prxgen = self.artifact("zPRXGen");
-    const sfo_tool = self.builder.dependency("zSFOTool", .{}).artifact("zSFOTool");
-    const pbp_tool = self.builder.dependency("zPBPTool", .{}).artifact("zPBPTool");
+    const sfo_tool = self.artifact("zSFOTool");
+    const pbp_tool = self.artifact("zPBPTool");
     const linkfile = self.path("tools/linkfile.ld");
 
     return buildPspEbootInner(b, pspsdk_mod, prxgen, sfo_tool, pbp_tool, linkfile, options, output);
@@ -182,20 +182,26 @@ pub fn build(b: *std.Build) void {
     b.getInstallStep().dependOn(&install_prxgen.step);
 
     // Build SFO tool
-    const sfo_dependency = b.dependency("zSFOTool", .{
-        .target = host_target,
-        .optimize = host_optimize,
+    const sfo_tool = b.addExecutable(.{
+        .name = "zSFOTool",
+        .root_module = b.createModule(.{
+            .root_source_file = b.path("tools/sfo/src/main.zig"),
+            .target = host_target,
+            .optimize = host_optimize,
+        }),
     });
-    const sfo_tool = sfo_dependency.artifact("zSFOTool");
     const install_sfo = b.addInstallArtifact(sfo_tool, .{});
     b.getInstallStep().dependOn(&install_sfo.step);
 
     // Build PBP tool
-    const pbp_dependency = b.dependency("zPBPTool", .{
-        .target = host_target,
-        .optimize = host_optimize,
+    const pbp_tool = b.addExecutable(.{
+        .name = "zPBPTool",
+        .root_module = b.createModule(.{
+            .root_source_file = b.path("tools/pbp/src/main.zig"),
+            .target = host_target,
+            .optimize = host_optimize,
+        }),
     });
-    const pbp_tool = pbp_dependency.artifact("zPBPTool");
     const install_pbp = b.addInstallArtifact(pbp_tool, .{});
     b.getInstallStep().dependOn(&install_pbp.step);
 
