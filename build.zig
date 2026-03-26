@@ -17,7 +17,7 @@ pub const PspEbootOptions = struct {
     snd0: ?std.Build.LazyPath = null,
 };
 
-/// The three artifacts produced by buildPspEboot.
+/// The three artifacts produced by the eboot pipeline.
 pub const PspEboot = struct {
     /// MIPS ELF with debug info (useful with PPSSPP/gdb)
     elf: *std.Build.Step.Compile,
@@ -34,9 +34,26 @@ pub const PspOutputOptions = struct {
     dir: ?[]const u8 = null,
 };
 
+/// Options for `addEbootSteps` — the ELF -> PRX -> SFO -> PBP pipeline.
+pub const EbootOptions = struct {
+    title: []const u8,
+    icon0: ?std.Build.LazyPath = null,
+    icon1: ?std.Build.LazyPath = null,
+    pic0: ?std.Build.LazyPath = null,
+    pic1: ?std.Build.LazyPath = null,
+    snd0: ?std.Build.LazyPath = null,
+    /// Subdirectory under zig-out/bin/ for installed artifacts.
+    /// When null, artifacts are added to the pipeline but not installed.
+    output_dir: ?[]const u8 = null,
+};
+
 /// Build a PSP EBOOT.PBP from a single Zig source file and install the
 /// artifacts under zig-out/bin/<name>/ (or a custom dir via PspOutputOptions).
 /// Call this from your own build.zig after adding pspsdk as a dependency.
+///
+/// This is a convenience wrapper around `configurePspExecutable` +
+/// `addEbootSteps`. Use those directly if you need to create and configure
+/// the executable yourself (e.g. in an engine or framework).
 ///
 /// Example:
 ///   const pspsdk = @import("pspsdk");
@@ -47,25 +64,79 @@ pub const PspOutputOptions = struct {
 ///       .optimize         = optimize,
 ///   }, .{});
 pub fn buildPspEboot(b: *std.Build, options: PspEbootOptions, output: PspOutputOptions) PspEboot {
-    // Reach back into the pspsdk package to get all the resources we need.
-    const self = b.dependencyFromBuildZig(@This(), .{});
-
     const psp_target = getPspTarget(b);
 
-    // Build the pspsdk module with the caller's optimize level so the SDK
-    // and the app are compiled at the same optimization tier.
-    const pspsdk_mod = b.createModule(.{
-        .root_source_file = self.path("src/pspsdk.zig"),
-        .target = psp_target,
-        .optimize = options.optimize,
+    const exe = b.addExecutable(.{
+        .name = "main",
+        .root_module = b.createModule(.{
+            .root_source_file = options.root_source_file,
+            .target = psp_target,
+            .optimize = options.optimize,
+            .strip = false,
+        }),
     });
 
-    const prxgen = self.artifact("zPRXGen");
-    const sfo_tool = self.artifact("zSFOTool");
-    const pbp_tool = self.artifact("zPBPTool");
-    const linkfile = self.path("tools/linkfile.ld");
+    configurePspExecutable(exe);
 
-    return buildPspEbootInner(b, pspsdk_mod, prxgen, sfo_tool, pbp_tool, linkfile, options, output);
+    return addEbootSteps(b, exe, .{
+        .title = options.title,
+        .icon0 = options.icon0,
+        .icon1 = options.icon1,
+        .pic0 = options.pic0,
+        .pic1 = options.pic1,
+        .snd0 = options.snd0,
+        .output_dir = output.dir orelse options.name,
+    });
+}
+
+/// Applies PSP-specific settings to an existing executable:
+/// linker script, entry point, relocation emission, and the pspsdk module import.
+///
+/// Use this when your build system (e.g. an engine) creates its own executable
+/// and needs to configure it for PSP. Pair with `addEbootSteps` to run the
+/// ELF -> PRX -> SFO -> PBP packaging pipeline afterwards.
+///
+/// Example (engine integration):
+///   const pspsdk = @import("pspsdk");
+///
+///   const exe = b.addExecutable(.{ ... });
+///   if (targeting_psp) {
+///       pspsdk.configurePspExecutable(exe);
+///   }
+pub fn configurePspExecutable(exe: *std.Build.Step.Compile) void {
+    const self = exe.step.owner.dependencyFromBuildZig(@This(), .{});
+    configureExe(exe, self.path("tools/linkfile.ld"), exe.step.owner.createModule(.{
+        .root_source_file = self.path("src/pspsdk.zig"),
+        .target = getPspTarget(exe.step.owner),
+        .optimize = exe.root_module.optimize orelse .Debug,
+    }));
+}
+
+/// Runs the ELF -> PRX -> SFO -> PBP pipeline on an existing PSP executable
+/// and installs the artifacts under zig-out/bin/<dir>/.
+///
+/// The executable must already be configured for PSP (via `configurePspExecutable`
+/// or equivalent manual setup). Returns handles to all three output artifacts.
+///
+/// Example:
+///   const pspsdk = @import("pspsdk");
+///
+///   const exe = b.addExecutable(.{ ... });
+///   pspsdk.configurePspExecutable(exe);
+///   const eboot = pspsdk.addEbootSteps(b, exe, .{
+///       .title = "My App",
+///       .output_dir = "my_app",
+///   });
+pub fn addEbootSteps(b: *std.Build, exe: *std.Build.Step.Compile, options: EbootOptions) PspEboot {
+    const self = b.dependencyFromBuildZig(@This(), .{});
+    return ebootPipeline(
+        b,
+        exe,
+        self.artifact("zPRXGen"),
+        self.artifact("zSFOTool"),
+        self.artifact("zPBPTool"),
+        options,
+    );
 }
 
 /// Return the PSP resolved target (mipsel, os=psp, cpu=allegrex).
@@ -78,37 +149,30 @@ pub fn getPspTarget(b: *std.Build) std.Build.ResolvedTarget {
     });
 }
 
-// -- Internal helper -----------------------------------------------------------
+// -- Internal helpers ----------------------------------------------------------
 
-/// Common pipeline: ELF -> PRX -> SFO -> PBP, then install artifacts.
-/// Used by both buildPspEboot (downstream) and build() (root examples).
-fn buildPspEbootInner(
-    b: *std.Build,
-    pspsdk_mod: *std.Build.Module,
-    prxgen: *std.Build.Step.Compile,
-    sfo_tool: *std.Build.Step.Compile,
-    pbp_tool: *std.Build.Step.Compile,
+/// Applies PSP linker/entry settings and adds the pspsdk module import.
+fn configureExe(
+    exe: *std.Build.Step.Compile,
     linkfile: std.Build.LazyPath,
-    options: PspEbootOptions,
-    output: PspOutputOptions,
-) PspEboot {
-    const psp_target = getPspTarget(b);
-
-    const exe = b.addExecutable(.{
-        .name = "main",
-        .root_module = b.createModule(.{
-            .root_source_file = options.root_source_file,
-            .target = psp_target,
-            .optimize = options.optimize,
-            .strip = false,
-        }),
-    });
+    pspsdk_mod: *std.Build.Module,
+) void {
     exe.root_module.addImport("pspsdk", pspsdk_mod);
     exe.link_eh_frame_hdr = true;
     exe.link_emit_relocs = true;
     exe.entry = .{ .symbol_name = "module_start" };
     exe.setLinkerScript(linkfile);
+}
 
+/// Runs the PRX/SFO/PBP pipeline and optionally installs artifacts.
+fn ebootPipeline(
+    b: *std.Build,
+    exe: *std.Build.Step.Compile,
+    prxgen: *std.Build.Step.Compile,
+    sfo_tool: *std.Build.Step.Compile,
+    pbp_tool: *std.Build.Step.Compile,
+    options: EbootOptions,
+) PspEboot {
     // ELF -> PRX
     const mk_prx = b.addRunArtifact(prxgen);
     mk_prx.addArtifactArg(exe);
@@ -140,22 +204,23 @@ fn buildPspEbootInner(
         .eboot = eboot_file,
     };
 
-    // Install artifacts under zig-out/bin/<dir>/
-    const dir = output.dir orelse options.name;
-    const alloc = b.allocator;
+    // Install artifacts under zig-out/bin/<dir>/ if a directory was specified
+    if (options.output_dir) |dir| {
+        const alloc = b.allocator;
 
-    b.getInstallStep().dependOn(&b.addInstallBinFile(
-        result.eboot,
-        std.mem.concat(alloc, u8, &.{ dir, "/EBOOT.PBP" }) catch @panic("OOM"),
-    ).step);
-    b.getInstallStep().dependOn(&b.addInstallBinFile(
-        result.prx,
-        std.mem.concat(alloc, u8, &.{ dir, "/app.prx" }) catch @panic("OOM"),
-    ).step);
-    b.getInstallStep().dependOn(&b.addInstallArtifact(result.elf, .{
-        .dest_dir = .{ .override = .{ .custom = std.mem.concat(alloc, u8, &.{ "bin/", dir }) catch @panic("OOM") } },
-        .dest_sub_path = "app.elf",
-    }).step);
+        b.getInstallStep().dependOn(&b.addInstallBinFile(
+            result.eboot,
+            std.mem.concat(alloc, u8, &.{ dir, "/EBOOT.PBP" }) catch @panic("OOM"),
+        ).step);
+        b.getInstallStep().dependOn(&b.addInstallBinFile(
+            result.prx,
+            std.mem.concat(alloc, u8, &.{ dir, "/app.prx" }) catch @panic("OOM"),
+        ).step);
+        b.getInstallStep().dependOn(&b.addInstallArtifact(result.elf, .{
+            .dest_dir = .{ .override = .{ .custom = std.mem.concat(alloc, u8, &.{ "bin/", dir }) catch @panic("OOM") } },
+            .dest_sub_path = "app.elf",
+        }).step);
+    }
 
     return result;
 }
@@ -240,26 +305,26 @@ pub fn build(b: *std.Build) void {
     const linkfile = b.path("tools/linkfile.ld");
 
     inline for (example_list) |example| {
-        const result = buildPspEbootInner(
-            b,
-            pspsdk_module,
-            prxgen,
-            sfo_tool,
-            pbp_tool,
-            linkfile,
-            .{
-                .name = example.name,
+        const exe = b.addExecutable(.{
+            .name = "main",
+            .root_module = b.createModule(.{
                 .root_source_file = b.path(example.src_file),
-                .title = example.title,
+                .target = psp_target,
                 .optimize = psp_optimize,
-                .icon0 = if (example.icon0) |p| b.path(p) else null,
-                .icon1 = if (example.icon1) |p| b.path(p) else null,
-                .pic0 = if (example.pic0) |p| b.path(p) else null,
-                .pic1 = if (example.pic1) |p| b.path(p) else null,
-                .snd0 = if (example.snd0) |p| b.path(p) else null,
-            },
-            .{},
-        );
+                .strip = false,
+            }),
+        });
+        configureExe(exe, linkfile, pspsdk_module);
+
+        const result = ebootPipeline(b, exe, prxgen, sfo_tool, pbp_tool, .{
+            .title = example.title,
+            .icon0 = if (example.icon0) |p| b.path(p) else null,
+            .icon1 = if (example.icon1) |p| b.path(p) else null,
+            .pic0 = if (example.pic0) |p| b.path(p) else null,
+            .pic1 = if (example.pic1) |p| b.path(p) else null,
+            .snd0 = if (example.snd0) |p| b.path(p) else null,
+            .output_dir = example.name,
+        });
         example_step.dependOn(&result.elf.step);
     }
 

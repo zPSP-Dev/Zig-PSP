@@ -47,6 +47,47 @@ pub fn build(b: *std.Build) void {
 
 Optional PBP asset fields are available on `PspEbootOptions`: `.icon0`, `.icon1`, `.pic0`, `.pic1`, `.snd0` (all `?std.Build.LazyPath`). The output directory defaults to the app name but can be overridden via `PspOutputOptions.dir`.
 
+### Lower-level API for engine/framework integration
+
+If your build system needs to create and configure the executable itself (e.g. to attach engine modules or link additional dependencies), two lower-level functions are available:
+
+- **`configurePspExecutable(exe)`** — applies PSP-specific settings (linker script, entry point, relocation emission) and adds the `pspsdk` module import to an existing executable.
+- **`addEbootSteps(b, exe, options)`** — runs the ELF -> PRX -> SFO -> PBP pipeline on an existing PSP executable and optionally installs artifacts.
+
+```zig
+const std = @import("std");
+const pspsdk = @import("pspsdk");
+
+pub fn build(b: *std.Build) void {
+    const optimize = b.standardOptimizeOption(.{});
+    const psp_target = pspsdk.getPspTarget(b);
+
+    const exe = b.addExecutable(.{
+        .name = "main",
+        .root_module = b.createModule(.{
+            .root_source_file = b.path("src/main.zig"),
+            .target = psp_target,
+            .optimize = optimize,
+            .strip = false,
+            .imports = &.{
+                .{ .name = "engine", .module = engine_mod },
+            },
+        }),
+    });
+
+    // Apply PSP build settings (linker script, entry point, pspsdk import)
+    pspsdk.configurePspExecutable(exe);
+
+    // Run the packaging pipeline and install artifacts
+    _ = pspsdk.addEbootSteps(b, exe, .{
+        .title = "My App",
+        .output_dir = "my_app",
+    });
+}
+```
+
+`buildPspEboot` is implemented as a thin wrapper around these two functions and remains the recommended API for simple projects.
+
 ### 3. Write your app
 
 Every PSP app needs a `module_info` comptime call and the panic handler override:
