@@ -104,12 +104,50 @@ pub fn buildPspEboot(b: *std.Build, options: PspEbootOptions, output: PspOutputO
 ///       pspsdk.configurePspExecutable(exe);
 ///   }
 pub fn configurePspExecutable(exe: *std.Build.Step.Compile) void {
-    const self = exe.step.owner.dependencyFromBuildZig(@This(), .{});
-    configureExe(exe, self.path("tools/linkfile.ld"), exe.step.owner.createModule(.{
-        .root_source_file = self.path("src/pspsdk.zig"),
-        .target = getPspTarget(exe.step.owner),
-        .optimize = exe.root_module.optimize orelse .Debug,
-    }));
+    const b = exe.step.owner;
+    const self = b.dependencyFromBuildZig(@This(), .{});
+
+    // Reuse an existing pspsdk module if one is reachable (directly or
+    // transitively, e.g. via an engine dependency).  If found only
+    // transitively, also add it as a direct import so the exe's own
+    // source files can @import("pspsdk").
+    if (exe.root_module.import_table.get("pspsdk") == null) {
+        const pspsdk_mod = findTransitiveImport(exe.root_module, "pspsdk") orelse
+            b.createModule(.{
+            .root_source_file = self.path("src/pspsdk.zig"),
+            .target = getPspTarget(b),
+            .optimize = exe.root_module.optimize orelse .Debug,
+        });
+        exe.root_module.addImport("pspsdk", pspsdk_mod);
+    }
+
+    exe.link_eh_frame_hdr = true;
+    exe.link_emit_relocs = true;
+    exe.entry = .{ .symbol_name = "module_start" };
+    exe.setLinkerScript(self.path("tools/linkfile.ld"));
+}
+
+/// Walk the import graph breadth-first looking for a module imported as `name`.
+fn findTransitiveImport(root: *std.Build.Module, name: []const u8) ?*std.Build.Module {
+    const Set = std.AutoArrayHashMapUnmanaged(*std.Build.Module, void);
+    var visited: Set = .empty;
+    defer visited.deinit(root.owner.allocator);
+    // Seed with root's direct imports
+    var queue: std.ArrayListUnmanaged(*std.Build.Module) = .empty;
+    defer queue.deinit(root.owner.allocator);
+    queue.appendSlice(root.owner.allocator, root.import_table.values()) catch @panic("OOM");
+    while (queue.items.len > 0) {
+        const mod = queue.orderedRemove(0);
+        if (visited.contains(mod)) continue;
+        visited.put(root.owner.allocator, mod, {}) catch @panic("OOM");
+        // Check this module's imports for the target name
+        for (mod.import_table.keys(), mod.import_table.values()) |k, v| {
+            if (std.mem.eql(u8, k, name)) return v;
+            queue.append(root.owner.allocator, v) catch @panic("OOM");
+        }
+    }
+    // Also check root itself (direct import)
+    return root.import_table.get(name);
 }
 
 /// Runs the ELF -> PRX -> SFO -> PBP pipeline on an existing PSP executable
