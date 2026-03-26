@@ -94,6 +94,7 @@ var gu_call_mode: i32 = 0;
 var gu_states: u32 = 0;
 var gu_draw_buffer: GuDrawBuffer = undefined;
 
+var first_mode: bool = false;
 var gu_object_stack: [256]u32 = undefined;
 var gu_object_stack_depth: i32 = 0;
 
@@ -549,7 +550,10 @@ pub fn sceGuDispBuffer(width: u24, height: u24, dispbp: ?*anyopaque, dispbw: u24
         gu_draw_buffer.frame_width = dispbw;
 
     drawRegion(0, 0, gu_draw_buffer.width, gu_draw_buffer.height);
-    display.set_mode(.lcd, gu_draw_buffer.width, gu_draw_buffer.height) catch {};
+    if (!first_mode) {
+        display.set_mode(.lcd, gu_draw_buffer.width, gu_draw_buffer.height) catch {};
+        first_mode = true;
+    }
 
     if (gu_psp_on != 0)
         display.set_frame_buf(@as(?*anyopaque, @ptrFromInt(@intFromPtr(ge_edram_address) + @intFromPtr(gu_draw_buffer.disp_buffer))), dispbw, gu_draw_buffer.pixel_format, .next_vblank) catch {};
