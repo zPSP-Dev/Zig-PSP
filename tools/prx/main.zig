@@ -3,7 +3,7 @@
 //
 // PRX output layout:
 //   ELF Header (52 bytes)
-//   Program Header (1x PT_LOAD, 32 bytes)
+//   Program Headers (PT_LOAD + PT_PRX_RELOC, 2x 32 bytes)
 //   Allocated section data  (16-byte aligned from end of PH)
 //   Section Headers
 //   Relocation data
@@ -24,9 +24,12 @@ const SHT_SYMTAB: u32 = 2;
 const SHT_STRTAB: u32 = 3;
 const SHT_REL: u32 = 9;
 const SHT_PRXRELOC: u32 = 0x700000A0;
+const PT_PRX_RELOC: u32 = 0x700000A0;
 
 const SHF_ALLOC: u32 = 2;
 const SHF_EXECINSTR: u32 = 4;
+const SHF_MERGE: u32 = 0x10;
+const SHF_STRINGS: u32 = 0x20;
 
 const R_MIPS_HI16: u8 = 5;
 const R_MIPS_LO16: u8 = 6;
@@ -506,7 +509,7 @@ fn calculateLayout(sections: []ElfSection, head: ElfHeader) Layout {
     str_size += @intCast(ELF_SH_STRTAB.len + 1);
 
     const ph_base: u32 = EHDR_SIZE;
-    const alloc_base: u32 = alignUp(ph_base + PHDR_SIZE, 0x10);
+    const alloc_base: u32 = alignUp(ph_base + 2 * PHDR_SIZE, 0x10);
     const sh_base: u32 = alloc_base + alloc_size;
     const reloc_base: u32 = sh_base + out_sects * SHDR_SIZE;
     const shstr_base: u32 = reloc_base + reloc_size;
@@ -545,13 +548,13 @@ fn writeHeader(out: []u8, src_head: ElfHeader, layout: Layout) void {
     h.e_flags = std.mem.nativeToLittle(u32, src_head.flags);
     h.e_ehsize = std.mem.nativeToLittle(u16, EHDR_SIZE);
     h.e_phentsize = std.mem.nativeToLittle(u16, PHDR_SIZE);
-    h.e_phnum = std.mem.nativeToLittle(u16, 1);
+    h.e_phnum = std.mem.nativeToLittle(u16, 2);
     h.e_shentsize = std.mem.nativeToLittle(u16, SHDR_SIZE);
     h.e_shnum = std.mem.nativeToLittle(u16, @intCast(layout.out_sects));
     h.e_shstrndx = std.mem.nativeToLittle(u16, @intCast(layout.out_sects - 1));
 }
 
-fn writeProgramHeader(
+fn writeProgramHeaders(
     out: []u8,
     sections: []ElfSection,
     modinfo_idx: usize,
@@ -567,15 +570,31 @@ fn writeProgramHeader(
         break :blk base;
     };
 
-    const ph = std.mem.bytesAsValue(Elf32_Phdr, out[layout.ph_base..][0..PHDR_SIZE]);
-    ph.p_type = std.mem.nativeToLittle(u32, 1); // PT_LOAD
-    ph.p_offset = std.mem.nativeToLittle(u32, layout.alloc_base);
-    ph.p_vaddr = 0;
-    ph.p_paddr = std.mem.nativeToLittle(u32, paddr);
-    ph.p_filesz = std.mem.nativeToLittle(u32, layout.alloc_size);
-    ph.p_memsz = std.mem.nativeToLittle(u32, layout.mem_size);
-    ph.p_flags = std.mem.nativeToLittle(u32, 5); // R + X
-    ph.p_align = std.mem.nativeToLittle(u32, 0x10);
+    // PT_LOAD — loadable segment
+    const ph0 = std.mem.bytesAsValue(Elf32_Phdr, out[layout.ph_base..][0..PHDR_SIZE]);
+    ph0.p_type = std.mem.nativeToLittle(u32, 1); // PT_LOAD
+    ph0.p_offset = std.mem.nativeToLittle(u32, layout.alloc_base);
+    ph0.p_vaddr = 0;
+    ph0.p_paddr = std.mem.nativeToLittle(u32, paddr);
+    ph0.p_filesz = std.mem.nativeToLittle(u32, layout.alloc_size);
+    ph0.p_memsz = std.mem.nativeToLittle(u32, layout.mem_size);
+    ph0.p_flags = std.mem.nativeToLittle(u32, 5); // R + X
+    ph0.p_align = std.mem.nativeToLittle(u32, 0x10);
+
+    // PT_PRX_RELOC — tells the PSP kernel where relocation data lives.
+    // This bypasses the buggy section-header relocation path which uses an
+    // equality check (sh_flags == SHF_ALLOC) that skips sections with
+    // additional flags like SHF_EXECINSTR, SHF_MERGE, or SHF_STRINGS.
+    const ph1_base = layout.ph_base + PHDR_SIZE;
+    const ph1 = std.mem.bytesAsValue(Elf32_Phdr, out[ph1_base..][0..PHDR_SIZE]);
+    ph1.p_type = std.mem.nativeToLittle(u32, PT_PRX_RELOC);
+    ph1.p_offset = std.mem.nativeToLittle(u32, layout.reloc_base);
+    ph1.p_vaddr = 0;
+    ph1.p_paddr = 0;
+    ph1.p_filesz = std.mem.nativeToLittle(u32, layout.reloc_size);
+    ph1.p_memsz = 0;
+    ph1.p_flags = 0;
+    ph1.p_align = std.mem.nativeToLittle(u32, 4);
 }
 
 fn writeAllocData(out: []u8, sections: []ElfSection, head: ElfHeader, layout: Layout) void {
@@ -610,7 +629,10 @@ fn writeSectionHeaders(
         const base = shdr_ptr;
         sw(out, base + 0, str_ofs); // sh_name
         str_ofs += @intCast(s.name.len + 1);
-        sw(out, base + 8, s.flags); // sh_flags
+        // Strip SHF_MERGE and SHF_STRINGS from allocated sections so the PSP
+        // kernel's equality check (sh_flags == SHF_ALLOC) passes for .rodata.
+        // These flags are linker hints with no meaning at load time.
+        sw(out, base + 8, s.flags & ~(SHF_MERGE | SHF_STRINGS)); // sh_flags
         sw(out, base + 12, s.addr); // sh_addr
         sw(out, base + 20, s.size); // sh_size
         sw(out, base + 24, 0); // sh_link
@@ -758,7 +780,7 @@ fn run(
 
     // Write each region
     writeHeader(out_buf, head, layout);
-    writeProgramHeader(out_buf, sections, modinfo_idx, layout);
+    writeProgramHeaders(out_buf, sections, modinfo_idx, layout);
     writeAllocData(out_buf, sections, head, layout);
     writeSectionHeaders(out_buf, sections, head, layout);
     writeRelocs(out_buf, sections, head, layout);
