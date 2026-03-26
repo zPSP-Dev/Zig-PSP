@@ -717,13 +717,11 @@ fn fileStat(_: ?*anyopaque, file: File) File.StatError!File.Stat {
 fn fileLength(_: ?*anyopaque, file: File) File.LengthError!u64 {
     const fd = file.handle;
     // Save current position
-    const cur = io.lseek(fd, 0, .cur);
-    if (cur < 0) return error.AccessDenied;
+    const cur = io.lseek32(fd, 0, .cur) catch return error.AccessDenied;
     // Seek to end
-    const end = io.lseek(fd, 0, .end);
-    if (end < 0) return error.AccessDenied;
+    const end = io.lseek32(fd, 0, .end) catch return error.AccessDenied;
     // Restore position
-    _ = io.lseek(fd, cur, .set);
+    _ = io.lseek32(fd, cur, .set) catch {};
     return @intCast(end);
 }
 
@@ -737,18 +735,16 @@ fn fileClose(_: ?*anyopaque, files: []const File) void {
 fn fileWritePositional(_: ?*anyopaque, file: File, header: []const u8, data: []const []const u8, splat: usize, offset: u64) File.WritePositionalError!usize {
     const fd = file.handle;
     // Save current position
-    const cur = io.lseek(fd, 0, .cur);
-    if (cur < 0) return error.Unseekable;
+    const cur = io.lseek32(fd, 0, .cur) catch return error.Unseekable;
     // Seek to offset
-    const seek_ret = io.lseek(fd, @intCast(offset), .set);
-    if (seek_ret < 0) return error.Unseekable;
+    _ = io.lseek32(fd, @intCast(offset), .set) catch return error.Unseekable;
 
     var written: usize = 0;
 
     // Write header
     if (header.len > 0) {
         written += pspWrite(fd, header) catch {
-            _ = io.lseek(fd, cur, .set);
+            _ = io.lseek32(fd, cur, .set) catch {};
             return error.InputOutput;
         };
     }
@@ -757,7 +753,7 @@ fn fileWritePositional(_: ?*anyopaque, file: File, header: []const u8, data: []c
     for (data[0..data.len -| 1]) |slice| {
         if (slice.len > 0) {
             written += pspWrite(fd, slice) catch {
-                _ = io.lseek(fd, cur, .set);
+                _ = io.lseek32(fd, cur, .set) catch {};
                 return error.InputOutput;
             };
         }
@@ -770,7 +766,7 @@ fn fileWritePositional(_: ?*anyopaque, file: File, header: []const u8, data: []c
             var i: usize = 0;
             while (i < splat) : (i += 1) {
                 written += pspWrite(fd, pattern) catch {
-                    _ = io.lseek(fd, cur, .set);
+                    _ = io.lseek32(fd, cur, .set) catch {};
                     return error.InputOutput;
                 };
             }
@@ -778,7 +774,7 @@ fn fileWritePositional(_: ?*anyopaque, file: File, header: []const u8, data: []c
     }
 
     // Restore position
-    _ = io.lseek(fd, cur, .set);
+    _ = io.lseek32(fd, cur, .set) catch {};
     return written;
 }
 
@@ -809,18 +805,16 @@ fn fileWriteFileStreaming(_: ?*anyopaque, file: File, header: []const u8, reader
 fn fileWriteFilePositional(_: ?*anyopaque, file: File, header: []const u8, reader: *Io.File.Reader, limit: Io.Limit, offset: u64) File.WriteFilePositionalError!usize {
     const fd = file.handle;
     // Save current position
-    const cur = io.lseek(fd, 0, .cur);
-    if (cur < 0) return error.Unseekable;
+    const cur = io.lseek32(fd, 0, .cur) catch return error.Unseekable;
     // Seek to offset
-    const seek_ret = io.lseek(fd, @intCast(offset), .set);
-    if (seek_ret < 0) return error.Unseekable;
+    _ = io.lseek32(fd, @intCast(offset), .set) catch return error.Unseekable;
 
     var written: usize = 0;
 
     // Write header
     if (header.len > 0) {
         written += pspWrite(fd, header) catch {
-            _ = io.lseek(fd, cur, .set);
+            _ = io.lseek32(fd, cur, .set) catch {};
             return error.InputOutput;
         };
     }
@@ -832,12 +826,12 @@ fn fileWriteFilePositional(_: ?*anyopaque, file: File, header: []const u8, reade
         const to_read = @min(buf.len, remaining);
         var bufs = [_][]u8{buf[0..to_read]};
         const n = reader.interface.readVec(&bufs) catch {
-            _ = io.lseek(fd, cur, .set);
+            _ = io.lseek32(fd, cur, .set) catch {};
             return error.InputOutput;
         };
         if (n == 0) break;
         const w = pspWrite(fd, buf[0..n]) catch {
-            _ = io.lseek(fd, cur, .set);
+            _ = io.lseek32(fd, cur, .set) catch {};
             return error.InputOutput;
         };
         written += w;
@@ -845,24 +839,22 @@ fn fileWriteFilePositional(_: ?*anyopaque, file: File, header: []const u8, reade
     }
 
     // Restore position
-    _ = io.lseek(fd, cur, .set);
+    _ = io.lseek32(fd, cur, .set) catch {};
     return written;
 }
 
 fn fileReadPositional(_: ?*anyopaque, file: File, bufs: []const []u8, offset: u64) File.ReadPositionalError!usize {
     const fd = file.handle;
     // Save current position
-    const cur = io.lseek(fd, 0, .cur);
-    if (cur < 0) return error.Unseekable;
+    const cur = io.lseek32(fd, 0, .cur) catch return error.Unseekable;
     // Seek to offset
-    const seek_ret = io.lseek(fd, @intCast(offset), .set);
-    if (seek_ret < 0) return error.Unseekable;
+    _ = io.lseek32(fd, @intCast(offset), .set) catch return error.Unseekable;
 
     var total: usize = 0;
     for (bufs) |buf| {
         if (buf.len > 0) {
             const n = io.read(fd, buf) catch {
-                _ = io.lseek(fd, cur, .set);
+                _ = io.lseek32(fd, cur, .set) catch {};
                 return error.InputOutput;
             };
             total += n;
@@ -871,18 +863,16 @@ fn fileReadPositional(_: ?*anyopaque, file: File, bufs: []const []u8, offset: u6
     }
 
     // Restore position
-    _ = io.lseek(fd, cur, .set);
+    _ = io.lseek32(fd, cur, .set) catch {};
     return total;
 }
 
 fn fileSeekBy(_: ?*anyopaque, file: File, offset: i64) File.SeekError!void {
-    const ret = io.lseek(file.handle, offset, .cur);
-    if (ret < 0) return error.Unseekable;
+    _ = io.lseek32(file.handle, @intCast(offset), .cur) catch return error.Unseekable;
 }
 
 fn fileSeekTo(_: ?*anyopaque, file: File, offset: u64) File.SeekError!void {
-    const ret = io.lseek(file.handle, @intCast(offset), .set);
-    if (ret < 0) return error.Unseekable;
+    _ = io.lseek32(file.handle, @intCast(offset), .set) catch return error.Unseekable;
 }
 
 fn fileSync(_: ?*anyopaque, _: File) File.SyncError!void {
