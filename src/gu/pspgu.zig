@@ -825,7 +825,7 @@ pub fn guFinish() void {
 pub fn sceGuFinishId(id: c_int) c_int {
     switch (@as(types.GuContextType, @enumFromInt(gu_curr_context))) {
         .Direct, .Send => {
-            sendCommandi(15, id & 0xffff);
+            sendCommandi(15, @truncate(@as(u32, @bitCast(id)) & 0xffff));
             sendCommandiStall(12, 0);
         },
 
