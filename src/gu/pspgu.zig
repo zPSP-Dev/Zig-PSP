@@ -549,7 +549,10 @@ pub fn sceGuDispBuffer(width: u24, height: u24, dispbp: ?*anyopaque, dispbw: u24
     if ((gu_draw_buffer.frame_width != 0) or (gu_draw_buffer.frame_width != dispbw))
         gu_draw_buffer.frame_width = dispbw;
 
-    drawRegion(0, 0, gu_draw_buffer.width, gu_draw_buffer.height);
+    if (gu_list != null and @intFromPtr(gu_list.?.current) != 0) {
+        drawRegion(0, 0, gu_draw_buffer.width, gu_draw_buffer.height);
+    }
+
     if (!first_mode) {
         display.set_mode(.lcd, gu_draw_buffer.width, gu_draw_buffer.height) catch {};
         first_mode = true;
