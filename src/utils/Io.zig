@@ -146,7 +146,50 @@ fn crashHandler(_: ?*anyopaque) void {
 
 // -- Global State ------------------------------------------------------
 
-var cancel_protection: std.Io.CancelProtection = .unblocked;
+const allocator = @import("allocator.zig");
+const psp_alloc = allocator.psp_page_allocator;
+
+// -- Per-thread cancellation state table ----------------------------------
+
+const MAX_PSP_THREADS = 64;
+
+const ThreadState = struct {
+    thread_id: i32 = -1, // SceUID; -1 = unused slot
+    cancel_protection: Io.CancelProtection = .unblocked,
+    canceled: bool = false,
+    cancel_acknowledged: bool = false,
+};
+
+var thread_states: [MAX_PSP_THREADS]ThreadState = [_]ThreadState{.{}} ** MAX_PSP_THREADS;
+
+fn getThreadState() ?*ThreadState {
+    const tid = kernel.get_thread_id();
+    for (&thread_states) |*s| {
+        if (s.thread_id == tid) return s;
+    }
+    return null;
+}
+
+fn registerThreadState() usize {
+    const tid = kernel.get_thread_id();
+    const dispatch_state = kernel.suspend_dispatch_thread() catch 0;
+    defer kernel.resume_dispatch_thread(dispatch_state) catch {};
+    for (&thread_states, 0..) |*s, i| {
+        if (s.thread_id == -1) {
+            s.* = .{ .thread_id = tid };
+            return i;
+        }
+    }
+    // All slots full -- should not happen with <= 64 PSP threads.
+    // Fall back to slot 0 (main thread) which is always registered.
+    return 0;
+}
+
+fn unregisterThreadState(slot: usize) void {
+    const dispatch_state = kernel.suspend_dispatch_thread() catch 0;
+    defer kernel.resume_dispatch_thread(dispatch_state) catch {};
+    thread_states[slot] = .{};
+}
 var stderr_locked: bool = false;
 var stdin_fd: SceUID = undefined;
 var stdout_fd: SceUID = undefined;
@@ -163,6 +206,9 @@ pub fn init(arg0: ?[*:0]const u8) void {
     stdout_fd = io.stdout();
     stderr_fd = io.stderr();
     stderr_writer.file = .{ .handle = stderr_fd, .flags = .{ .nonblocking = false } };
+
+    // Register main thread in the per-thread state table.
+    thread_states[0] = .{ .thread_id = kernel.get_thread_id() };
 
     // Derive initial cwd from arg0 (program path, e.g. "ms0:/PSP/GAME/APP/EBOOT.PBP")
     if (arg0) |path_ptr| {
@@ -267,97 +313,598 @@ fn sceIoStatToFileStat(psp_stat: *const io.SceIoStat) File.Stat {
     };
 }
 
-// -- Async/Concurrency (N/A on PSP) -----------------------------------
+// -- Async/Concurrency -------------------------------------------------
+//
+// PSP is single-core but has real kernel threads. We spawn a dedicated PSP
+// thread per async/concurrent call and use a semaphore for completion
+// signaling. Cancellation is tracked in the per-thread state table above.
 
-// PSP is single-core with no async runtime. We run the function synchronously
-// and return null, so Future.await/cancel just return the already-written result.
+const ASYNC_STACK_SIZE: i32 = 16 * 1024; // 16KB per worker thread
+var thread_name_counter: u32 = 0;
+
+// -- PspFuture: single-alloc header + context + result --------------------
+
+const PspFuture = struct {
+    func: *const fn (*const anyopaque, *anyopaque) void,
+    thread_id: SceUID,
+    completion_sema: SceUID,
+    canceled: bool,
+    done: bool,
+    context_offset: usize,
+    context_len: usize,
+    result_offset: usize,
+    result_len: usize,
+    alloc_len: usize,
+
+    fn contextPointer(self: *PspFuture) *const anyopaque {
+        return @ptrFromInt(@intFromPtr(self) + self.context_offset);
+    }
+
+    fn resultPointer(self: *PspFuture) *anyopaque {
+        return @ptrFromInt(@intFromPtr(self) + self.result_offset);
+    }
+
+    fn resultSlice(self: *PspFuture) []u8 {
+        const ptr: [*]u8 = @ptrFromInt(@intFromPtr(self) + self.result_offset);
+        return ptr[0..self.result_len];
+    }
+
+    fn create(
+        result_len: usize,
+        result_alignment: std.mem.Alignment,
+        context: []const u8,
+        context_alignment: std.mem.Alignment,
+        func: *const fn (*const anyopaque, *anyopaque) void,
+    ) ?*PspFuture {
+        const header_size = @sizeOf(PspFuture);
+        // Compute aligned offsets for context and result after the header.
+        const ctx_offset = context_alignment.forward(header_size);
+        const res_offset = result_alignment.forward(ctx_offset + context.len);
+        const total = res_offset + result_len;
+
+        const mem = psp_alloc.rawAlloc(total, .@"8", 0) orelse return null;
+        const self: *PspFuture = @ptrCast(@alignCast(mem));
+        self.* = .{
+            .func = func,
+            .thread_id = 0,
+            .completion_sema = 0,
+            .canceled = false,
+            .done = false,
+            .context_offset = ctx_offset,
+            .context_len = context.len,
+            .result_offset = res_offset,
+            .result_len = result_len,
+            .alloc_len = total,
+        };
+        // Copy context bytes.
+        const ctx_dst: [*]u8 = @ptrFromInt(@intFromPtr(self) + ctx_offset);
+        @memcpy(ctx_dst[0..context.len], context);
+        return self;
+    }
+
+    fn destroy(self: *PspFuture) void {
+        kernel.delete_sema(self.completion_sema) catch {};
+        const ptr: [*]u8 = @ptrCast(self);
+        psp_alloc.rawFree(ptr[0..self.alloc_len], .@"8", 0);
+    }
+};
+
+// -- PspGroupState / PspGroupTask -----------------------------------------
+
+const PspGroupState = struct {
+    num_running: u32 = 0,
+    canceled: bool = false,
+    completion_sema: SceUID,
+};
+
+const PspGroupTask = struct {
+    func: *const fn (*const anyopaque) void,
+    group_state: *PspGroupState,
+    context_offset: usize,
+    context_len: usize,
+    alloc_len: usize,
+
+    fn contextPointer(self: *PspGroupTask) *const anyopaque {
+        return @ptrFromInt(@intFromPtr(self) + self.context_offset);
+    }
+
+    fn create(
+        context: []const u8,
+        context_alignment: std.mem.Alignment,
+        func: *const fn (*const anyopaque) void,
+        gs: *PspGroupState,
+    ) ?*PspGroupTask {
+        const header_size = @sizeOf(PspGroupTask);
+        const ctx_offset = context_alignment.forward(header_size);
+        const total = ctx_offset + context.len;
+
+        const mem = psp_alloc.rawAlloc(total, .@"8", 0) orelse return null;
+        const self: *PspGroupTask = @ptrCast(@alignCast(mem));
+        self.* = .{
+            .func = func,
+            .group_state = gs,
+            .context_offset = ctx_offset,
+            .context_len = context.len,
+            .alloc_len = total,
+        };
+        const ctx_dst: [*]u8 = @ptrFromInt(@intFromPtr(self) + ctx_offset);
+        @memcpy(ctx_dst[0..context.len], context);
+        return self;
+    }
+
+    fn destroy(self: *PspGroupTask) void {
+        const ptr: [*]u8 = @ptrCast(self);
+        psp_alloc.rawFree(ptr[0..self.alloc_len], .@"8", 0);
+    }
+};
+
+// -- Thread name helper ---------------------------------------------------
+
+fn makeThreadName(buf: *[32]u8) [:0]const u8 {
+    const n = thread_name_counter;
+    thread_name_counter +%= 1;
+    // Format "io_N\0" into buf.
+    const prefix = "io_";
+    @memcpy(buf[0..prefix.len], prefix);
+    var pos: usize = prefix.len;
+    var val = n;
+    if (val == 0) {
+        buf[pos] = '0';
+        pos += 1;
+    } else {
+        var digits: [10]u8 = undefined;
+        var dlen: usize = 0;
+        while (val > 0) {
+            digits[dlen] = @intCast(val % 10 + '0');
+            dlen += 1;
+            val /= 10;
+        }
+        var i: usize = 0;
+        while (i < dlen) : (i += 1) {
+            buf[pos] = digits[dlen - 1 - i];
+            pos += 1;
+        }
+    }
+    buf[pos] = 0;
+    return buf[0..pos :0];
+}
+
+// -- Dispatch suspend helper for critical sections ------------------------
+
+fn atomicDecrementRunning(gs: *PspGroupState) bool {
+    const state = kernel.suspend_dispatch_thread() catch 0;
+    gs.num_running -= 1;
+    const is_last = (gs.num_running == 0);
+    kernel.resume_dispatch_thread(state) catch {};
+    return is_last;
+}
+
+fn atomicIncrementRunning(gs: *PspGroupState) void {
+    const state = kernel.suspend_dispatch_thread() catch 0;
+    gs.num_running += 1;
+    kernel.resume_dispatch_thread(state) catch {};
+}
+
+fn atomicDecrementRunningOnFail(gs: *PspGroupState) void {
+    const state = kernel.suspend_dispatch_thread() catch 0;
+    gs.num_running -= 1;
+    kernel.resume_dispatch_thread(state) catch {};
+}
+
+// -- Thread entry points --------------------------------------------------
+
+fn futureThreadEntry(_: usize, argp: ?*anyopaque) callconv(.c) c_int {
+    // argp points to a kernel-copied buffer containing our *PspFuture pointer.
+    const future: *PspFuture = @as(*const *PspFuture, @ptrCast(@alignCast(argp.?))).*;
+    const slot = registerThreadState();
+
+    if (future.canceled) {
+        thread_states[slot].canceled = true;
+    }
+
+    future.func(future.contextPointer(), future.resultPointer());
+
+    future.done = true;
+    unregisterThreadState(slot);
+    kernel.signal_sema(future.completion_sema, 1) catch {};
+    kernel.exit_delete_thread(0) catch {};
+    unreachable;
+}
+
+fn groupThreadEntry(_: usize, argp: ?*anyopaque) callconv(.c) c_int {
+    // argp points to a kernel-copied buffer containing our *PspGroupTask pointer.
+    const task: *PspGroupTask = @as(*const *PspGroupTask, @ptrCast(@alignCast(argp.?))).*;
+    const gs = task.group_state;
+    const slot = registerThreadState();
+
+    if (gs.canceled) {
+        thread_states[slot].canceled = true;
+    }
+
+    task.func(task.contextPointer());
+
+    unregisterThreadState(slot);
+    const is_last = atomicDecrementRunning(gs);
+    task.destroy();
+    if (is_last) {
+        kernel.signal_sema(gs.completion_sema, 1) catch {};
+    }
+    kernel.exit_delete_thread(0) catch {};
+    unreachable;
+}
+
+// -- Spawn helper (shared by async and concurrent) ------------------------
+
+fn spawnFuture(
+    result_ptr: []u8,
+    result_alignment: std.mem.Alignment,
+    args_ptr: []const u8,
+    context_alignment: std.mem.Alignment,
+    start_fn: *const fn (*const anyopaque, *anyopaque) void,
+) ?*PspFuture {
+    const future = PspFuture.create(
+        result_ptr.len,
+        result_alignment,
+        args_ptr,
+        context_alignment,
+        start_fn,
+    ) orelse return null;
+
+    const sema = kernel.create_sema("ioas", 0, 0, 1, null) catch {
+        future.destroy();
+        return null;
+    };
+    future.completion_sema = sema;
+
+    var name_buf: [32]u8 = undefined;
+    const name = makeThreadName(&name_buf);
+    const priority = kernel.get_thread_current_priority();
+
+    const thid = kernel.create_thread(name, &futureThreadEntry, priority, ASYNC_STACK_SIZE, .{ .user = true }, null) catch {
+        future.destroy();
+        return null;
+    };
+    future.thread_id = thid;
+
+    // Pass pointer to future as the thread argument.
+    var arg: *PspFuture = future;
+    kernel.start_thread(thid, @sizeOf(@TypeOf(arg)), @ptrCast(&arg)) catch {
+        kernel.delete_thread(thid) catch {};
+        future.destroy();
+        return null;
+    };
+
+    return future;
+}
+
+// -- VTable: async --------------------------------------------------------
+
 fn async(
     _: ?*anyopaque,
     result_ptr: []u8,
-    result_align: std.mem.Alignment,
+    result_alignment: std.mem.Alignment,
     args_ptr: []const u8,
-    _: std.mem.Alignment,
+    context_alignment: std.mem.Alignment,
     start_fn: *const fn (*const anyopaque, *anyopaque) void,
 ) ?*Io.AnyFuture {
-    _ = result_align;
+    if (spawnFuture(result_ptr, result_alignment, args_ptr, context_alignment, start_fn)) |future| {
+        return @ptrCast(future);
+    }
+    // Eager fallback: run synchronously and return null.
     start_fn(args_ptr.ptr, result_ptr.ptr);
-    return null; // result already populated -- await/cancel see null and return it
+    return null;
 }
+
+// -- VTable: concurrent ---------------------------------------------------
 
 fn concurrent(
     _: ?*anyopaque,
-    _: usize,
-    _: std.mem.Alignment,
-    _: []const u8,
-    _: std.mem.Alignment,
-    _: *const fn (*const anyopaque, *anyopaque) void,
+    result_len: usize,
+    result_alignment: std.mem.Alignment,
+    args_ptr: []const u8,
+    context_alignment: std.mem.Alignment,
+    start_fn: *const fn (*const anyopaque, *anyopaque) void,
 ) Io.ConcurrentError!*Io.AnyFuture {
-    return error.ConcurrencyUnavailable;
+    const future = PspFuture.create(
+        result_len,
+        result_alignment,
+        args_ptr,
+        context_alignment,
+        start_fn,
+    ) orelse return error.ConcurrencyUnavailable;
+
+    const sema = kernel.create_sema("iocs", 0, 0, 1, null) catch {
+        future.destroy();
+        return error.ConcurrencyUnavailable;
+    };
+    future.completion_sema = sema;
+
+    var name_buf: [32]u8 = undefined;
+    const name = makeThreadName(&name_buf);
+    const priority = kernel.get_thread_current_priority();
+
+    const thid = kernel.create_thread(name, &futureThreadEntry, priority, ASYNC_STACK_SIZE, .{ .user = true }, null) catch {
+        future.destroy();
+        return error.ConcurrencyUnavailable;
+    };
+    future.thread_id = thid;
+
+    var arg: *PspFuture = future;
+    kernel.start_thread(thid, @sizeOf(@TypeOf(arg)), @ptrCast(&arg)) catch {
+        kernel.delete_thread(thid) catch {};
+        future.destroy();
+        return error.ConcurrencyUnavailable;
+    };
+
+    return @ptrCast(future);
 }
+
+// -- VTable: await --------------------------------------------------------
 
 fn await(
     _: ?*anyopaque,
-    _: *Io.AnyFuture,
-    _: []u8,
+    any_future: *Io.AnyFuture,
+    result: []u8,
     _: std.mem.Alignment,
 ) void {
-    // Should never be called -- async always returns null
+    const future: *PspFuture = @ptrCast(@alignCast(any_future));
+    if (!future.done) {
+        kernel.wait_sema(future.completion_sema, 1, null) catch {};
+    }
+    @memcpy(result, future.resultSlice());
+    future.destroy();
 }
+
+// -- VTable: cancel -------------------------------------------------------
 
 fn cancel(
     _: ?*anyopaque,
-    _: *Io.AnyFuture,
-    _: []u8,
+    any_future: *Io.AnyFuture,
+    result: []u8,
     _: std.mem.Alignment,
 ) void {
-    // Should never be called -- async always returns null
+    const future: *PspFuture = @ptrCast(@alignCast(any_future));
+    // Request cancellation.
+    future.canceled = true;
+    // Also set the worker thread's cancel flag in the state table.
+    for (&thread_states) |*s| {
+        if (s.thread_id == future.thread_id) {
+            s.canceled = true;
+            break;
+        }
+    }
+    // Block until the task finishes.
+    if (!future.done) {
+        kernel.wait_sema(future.completion_sema, 1, null) catch {};
+    }
+    @memcpy(result, future.resultSlice());
+    future.destroy();
 }
 
-// Group operations: run synchronously, leave token null so await/cancel are no-ops.
+// -- VTable: groupAsync ---------------------------------------------------
+
+fn getOrCreateGroupState(group: *Io.Group) ?*PspGroupState {
+    if (group.token.load(.acquire)) |tok| {
+        return @ptrCast(@alignCast(tok));
+    }
+    // Allocate new group state.
+    const mem = psp_alloc.rawAlloc(@sizeOf(PspGroupState), .@"8", 0) orelse return null;
+    const gs: *PspGroupState = @ptrCast(@alignCast(mem));
+    const sema = kernel.create_sema("iogs", 0, 0, 1, null) catch {
+        psp_alloc.rawFree(mem[0..@sizeOf(PspGroupState)], .@"8", 0);
+        return null;
+    };
+    gs.* = .{ .completion_sema = sema };
+    group.token.store(@ptrCast(gs), .release);
+    return gs;
+}
+
 fn groupAsync(
     _: ?*anyopaque,
-    _: *Io.Group,
+    group: *Io.Group,
     args_ptr: []const u8,
-    _: std.mem.Alignment,
+    context_alignment: std.mem.Alignment,
     start_fn: *const fn (*const anyopaque) void,
 ) void {
-    start_fn(args_ptr.ptr);
+    const gs = getOrCreateGroupState(group) orelse {
+        // Cannot allocate group state -- run eagerly.
+        start_fn(args_ptr.ptr);
+        return;
+    };
+
+    const task = PspGroupTask.create(args_ptr, context_alignment, start_fn, gs) orelse {
+        start_fn(args_ptr.ptr);
+        return;
+    };
+
+    atomicIncrementRunning(gs);
+
+    var name_buf: [32]u8 = undefined;
+    const name = makeThreadName(&name_buf);
+    const priority = kernel.get_thread_current_priority();
+
+    const thid = kernel.create_thread(name, &groupThreadEntry, priority, ASYNC_STACK_SIZE, .{ .user = true }, null) catch {
+        atomicDecrementRunningOnFail(gs);
+        task.destroy();
+        start_fn(args_ptr.ptr);
+        return;
+    };
+
+    var arg: *PspGroupTask = task;
+    kernel.start_thread(thid, @sizeOf(@TypeOf(arg)), @ptrCast(&arg)) catch {
+        kernel.delete_thread(thid) catch {};
+        atomicDecrementRunningOnFail(gs);
+        task.destroy();
+        start_fn(args_ptr.ptr);
+        return;
+    };
 }
+
+// -- VTable: groupConcurrent ----------------------------------------------
 
 fn groupConcurrent(
     _: ?*anyopaque,
-    _: *Io.Group,
-    _: []const u8,
-    _: std.mem.Alignment,
-    _: *const fn (*const anyopaque) void,
+    group: *Io.Group,
+    args_ptr: []const u8,
+    context_alignment: std.mem.Alignment,
+    start_fn: *const fn (*const anyopaque) void,
 ) Io.ConcurrentError!void {
-    return error.ConcurrencyUnavailable;
+    const gs = getOrCreateGroupState(group) orelse return error.ConcurrencyUnavailable;
+
+    const task = PspGroupTask.create(args_ptr, context_alignment, start_fn, gs) orelse
+        return error.ConcurrencyUnavailable;
+
+    atomicIncrementRunning(gs);
+
+    var name_buf: [32]u8 = undefined;
+    const name = makeThreadName(&name_buf);
+    const priority = kernel.get_thread_current_priority();
+
+    const thid = kernel.create_thread(name, &groupThreadEntry, priority, ASYNC_STACK_SIZE, .{ .user = true }, null) catch {
+        atomicDecrementRunningOnFail(gs);
+        task.destroy();
+        return error.ConcurrencyUnavailable;
+    };
+
+    var arg: *PspGroupTask = task;
+    kernel.start_thread(thid, @sizeOf(@TypeOf(arg)), @ptrCast(&arg)) catch {
+        kernel.delete_thread(thid) catch {};
+        atomicDecrementRunningOnFail(gs);
+        task.destroy();
+        return error.ConcurrencyUnavailable;
+    };
 }
 
-fn groupAwait(_: ?*anyopaque, _: *Io.Group, _: *anyopaque) Io.Cancelable!void {}
+// -- VTable: groupAwait ---------------------------------------------------
 
-fn groupCancel(_: ?*anyopaque, _: *Io.Group, _: *anyopaque) void {}
+fn groupAwait(_: ?*anyopaque, group: *Io.Group, _: *anyopaque) Io.Cancelable!void {
+    const gs: *PspGroupState = @ptrCast(@alignCast(group.token.load(.acquire) orelse return));
 
-fn recancel(_: ?*anyopaque) void {}
+    // Propagate caller's cancellation to the group.
+    if (getThreadState()) |s| {
+        if (s.cancel_protection == .unblocked and s.canceled) {
+            gs.canceled = true;
+        }
+    }
+
+    if (gs.num_running > 0) {
+        kernel.wait_sema(gs.completion_sema, 1, null) catch {};
+    }
+
+    const was_canceled = gs.canceled;
+    // Clean up group state.
+    kernel.delete_sema(gs.completion_sema) catch {};
+    const mem: [*]u8 = @ptrCast(gs);
+    psp_alloc.rawFree(mem[0..@sizeOf(PspGroupState)], .@"8", 0);
+    group.token.store(null, .release);
+
+    if (was_canceled) {
+        if (getThreadState()) |s| {
+            s.canceled = false;
+            s.cancel_acknowledged = true;
+        }
+        return error.Canceled;
+    }
+}
+
+// -- VTable: groupCancel --------------------------------------------------
+
+fn groupCancel(_: ?*anyopaque, group: *Io.Group, _: *anyopaque) void {
+    const gs: *PspGroupState = @ptrCast(@alignCast(group.token.load(.acquire) orelse return));
+
+    gs.canceled = true;
+
+    if (gs.num_running > 0) {
+        kernel.wait_sema(gs.completion_sema, 1, null) catch {};
+    }
+
+    kernel.delete_sema(gs.completion_sema) catch {};
+    const mem: [*]u8 = @ptrCast(gs);
+    psp_alloc.rawFree(mem[0..@sizeOf(PspGroupState)], .@"8", 0);
+    group.token.store(null, .release);
+}
+
+// -- VTable: recancel -----------------------------------------------------
+
+fn recancel(_: ?*anyopaque) void {
+    if (getThreadState()) |s| {
+        s.canceled = true;
+        s.cancel_acknowledged = false;
+    }
+}
 
 // -- Cancellation/Sync -------------------------------------------------
 
 fn swapCancelProtection(_: ?*anyopaque, new_val: Io.CancelProtection) Io.CancelProtection {
-    const old = cancel_protection;
-    cancel_protection = new_val;
+    const state = getThreadState() orelse return .unblocked;
+    const old = state.cancel_protection;
+    state.cancel_protection = new_val;
     return old;
 }
 
-// PSP is single-threaded from the Io perspective -- cancellation is a no-op.
-fn checkCancel(_: ?*anyopaque) Io.Cancelable!void {}
+fn checkCancel(_: ?*anyopaque) Io.Cancelable!void {
+    const state = getThreadState() orelse return;
+    if (state.cancel_protection == .blocked) return;
+    if (state.canceled) {
+        state.canceled = false;
+        state.cancel_acknowledged = true;
+        return error.Canceled;
+    }
+}
 
-// Futex operations are no-ops on single-threaded PSP. The mutex fast path
-// (cmpxchgStrong) always succeeds, so these should never actually be reached.
-fn futexWait(_: ?*anyopaque, _: *const u32, _: u32, _: Io.Timeout) Io.Cancelable!void {}
+fn futexWait(_: ?*anyopaque, ptr: *const u32, expected: u32, timeout: Io.Timeout) Io.Cancelable!void {
+    // Spin-yield: on single-core PSP, the value can only change when we yield.
+    const atomic_ptr: *const std.atomic.Value(u32) = @ptrCast(ptr);
+    if (atomic_ptr.load(.acquire) != expected) return;
 
-fn futexWaitUncancelable(_: ?*anyopaque, _: *const u32, _: u32) void {}
+    // Compute a deadline in PSP RTC ticks (microseconds since epoch).
+    const deadline_tick: ?u64 = switch (timeout) {
+        .none => null,
+        .duration => |d| blk: {
+            var tick: u64 = undefined;
+            rtc.get_current_tick(&tick) catch return;
+            const us: i64 = d.raw.toMicroseconds();
+            break :blk if (us > 0) tick +| @as(u64, @intCast(us)) else tick;
+        },
+        .deadline => |d| blk: {
+            // Convert absolute nanosecond timestamp to PSP tick.
+            const ns = d.raw.toNanoseconds();
+            const us: i96 = @divTrunc(ns, 1000);
+            break :blk if (us > 0) @as(u64, @intCast(us)) else 0;
+        },
+    };
 
-fn futexWake(_: ?*anyopaque, _: *const u32, _: u32) void {}
+    while (atomic_ptr.load(.acquire) == expected) {
+        // Cancellation point.
+        if (getThreadState()) |s| {
+            if (s.cancel_protection == .unblocked and s.canceled) {
+                s.canceled = false;
+                s.cancel_acknowledged = true;
+                return error.Canceled;
+            }
+        }
+        // Check timeout.
+        if (deadline_tick) |dl| {
+            var current_tick: u64 = undefined;
+            rtc.get_current_tick(&current_tick) catch break;
+            if (current_tick >= dl) break;
+        }
+        // Yield to other threads.
+        kernel.delay_thread(100) catch {};
+    }
+}
+
+fn futexWaitUncancelable(_: ?*anyopaque, ptr: *const u32, expected: u32) void {
+    const atomic_ptr: *const std.atomic.Value(u32) = @ptrCast(ptr);
+    while (atomic_ptr.load(.acquire) == expected) {
+        kernel.delay_thread(100) catch {};
+    }
+}
+
+fn futexWake(_: ?*anyopaque, _: *const u32, _: u32) void {
+    // No-op: spin-yield waiters will observe the value change on their next
+    // iteration after a delay_thread yield.
+}
 
 // -- Operate (Multiplexed I/O) -----------------------------------------
 

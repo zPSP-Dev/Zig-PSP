@@ -399,4 +399,5 @@ const example_list = [_]ExampleInfo{
     .{ .name = "network", .src_file = "examples/network.zig", .title = "SDK Network" },
     .{ .name = "http", .src_file = "examples/http.zig", .title = "SDK HTTP" },
     .{ .name = "https", .src_file = "examples/https.zig", .title = "SDK HTTPS" },
+    .{ .name = "async_demo", .src_file = "examples/async.zig", .title = "SDK Async" },
 };
