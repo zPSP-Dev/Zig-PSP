@@ -319,7 +319,7 @@ fn sceIoStatToFileStat(psp_stat: *const io.SceIoStat) File.Stat {
 // thread per async/concurrent call and use a semaphore for completion
 // signaling. Cancellation is tracked in the per-thread state table above.
 
-const ASYNC_STACK_SIZE: i32 = 64 * 1024; // 64KB per worker thread
+const ASYNC_STACK_SIZE: i32 = 128 * 1024; // 128KB per worker thread
 var thread_name_counter: u32 = 0;
 
 // -- PspFuture: single-alloc header + context + result --------------------
