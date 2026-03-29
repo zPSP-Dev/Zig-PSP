@@ -319,7 +319,7 @@ fn sceIoStatToFileStat(psp_stat: *const io.SceIoStat) File.Stat {
 // thread per async/concurrent call and use a semaphore for completion
 // signaling. Cancellation is tracked in the per-thread state table above.
 
-const ASYNC_STACK_SIZE: i32 = 16 * 1024; // 16KB per worker thread
+const ASYNC_STACK_SIZE: i32 = 64 * 1024; // 64KB per worker thread
 var thread_name_counter: u32 = 0;
 
 // -- PspFuture: single-alloc header + context + result --------------------
@@ -493,10 +493,19 @@ fn atomicDecrementRunningOnFail(gs: *PspGroupState) void {
 
 // -- Thread entry points --------------------------------------------------
 
+fn inheritCwd() void {
+    ensureCwdInit();
+    var chdir_buf: [1024]u8 = undefined;
+    if (toNullTerminated(cwd_buf[0..cwd_len], &chdir_buf)) |path_z| {
+        io.chdir(path_z) catch {};
+    }
+}
+
 fn futureThreadEntry(_: usize, argp: ?*anyopaque) callconv(.c) c_int {
     // argp points to a kernel-copied buffer containing our *PspFuture pointer.
     const future: *PspFuture = @as(*const *PspFuture, @ptrCast(@alignCast(argp.?))).*;
     const slot = registerThreadState();
+    inheritCwd();
 
     if (future.canceled) {
         thread_states[slot].canceled = true;
@@ -516,6 +525,7 @@ fn groupThreadEntry(_: usize, argp: ?*anyopaque) callconv(.c) c_int {
     const task: *PspGroupTask = @as(*const *PspGroupTask, @ptrCast(@alignCast(argp.?))).*;
     const gs = task.group_state;
     const slot = registerThreadState();
+    inheritCwd();
 
     if (gs.canceled) {
         thread_states[slot].canceled = true;
