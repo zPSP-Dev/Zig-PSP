@@ -1,4 +1,5 @@
 const std = @import("std");
+const root = @import("root");
 
 const Io = std.Io;
 const Dir = std.Io.Dir;
@@ -319,7 +320,7 @@ fn sceIoStatToFileStat(psp_stat: *const io.SceIoStat) File.Stat {
 // thread per async/concurrent call and use a semaphore for completion
 // signaling. Cancellation is tracked in the per-thread state table above.
 
-const ASYNC_STACK_SIZE: i32 = 128 * 1024; // 128KB per worker thread
+const ASYNC_STACK_SIZE: i32 = if (@hasDecl(root, "psp_async_stack_size")) root.psp_async_stack_size else 128 * 1024;
 var thread_name_counter: u32 = 0;
 
 // -- PspFuture: single-alloc header + context + result --------------------

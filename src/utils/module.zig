@@ -36,10 +36,11 @@ pub fn _module_main_thread(argc: usize, argv: ?*anyopaque) callconv(.c) c_int {
     // via `pub const psp_heap_kb_size: u32 = N;` in the root source file, or
     // defaults to all available memory minus a 512 KB reserve.
     const heap_kb: u32 = if (@hasDecl(root, "psp_heap_kb_size")) root.psp_heap_kb_size else 0;
+    const heap_reserve: u32 = if (@hasDecl(root, "psp_heap_reserve_kb_size")) root.psp_heap_reserve_kb_size else 512;
     const heap_size: usize = if (heap_kb > 0)
         @as(usize, heap_kb) * 1024
     else
-        kernel.max_free_mem_size() -| (512 * 1024);
+        kernel.max_free_mem_size() -| (@as(usize, heap_reserve) * 1024);
 
     const heap_uid = kernel.alloc_partition_memory(.user, "psp_heap", .mem_low, heap_size, null) catch return 1;
     defer kernel.free_partition_memory(heap_uid) catch {};

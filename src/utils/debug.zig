@@ -165,24 +165,40 @@ pub fn printTrace(trace: *std.builtin.StackTrace) void {
     }
 }
 
-// Panic handler — import in main via: pub const panic = sdk.extra.debug.panic;
-pub fn panic(message: []const u8, stack_trace: ?*std.builtin.StackTrace, size: ?usize) noreturn {
-    _ = size;
-    screenInit();
+// Mostly from: https://github.com/ZigEmbeddedGroup/microzig/blob/zig-master/core/src/microzig.zig
+pub const panic = std.debug.FullPanic(struct {
+    pub fn panic_fn(message: []const u8, first_trace_address: ?usize) noreturn {
+        // Use PSP GDB Here!
+        // @breakpoint();
+        screenInit();
+        print("!!! PSP HAS PANICKED !!!\n", .{});
+        print("REASON: {s}\n", .{message});
 
-    print("!!! PSP HAS PANICKED !!!\n", .{});
-    print("REASON: {s}\n", .{message});
+        var error_trace_count: usize = 0;
+        if (@errorReturnTrace()) |trace| error_trace_count = dump_stack_trace(trace, 0);
 
-    if (stack_trace) |trace| {
-        printTrace(trace);
-    } else if (@errorReturnTrace()) |trace| {
-        printTrace(trace);
-    } else {
-        print("(no return trace available)\n", .{});
+        const BASE = 0x08804000;
+        if (first_trace_address) |fta|
+            print("First Trace Address: 0x{X}\n", .{fta - BASE});
+
+        print("Exiting...", .{});
+        module.exitErr();
+        while (true) {}
+    }
+}.panic_fn);
+
+pub fn dump_stack_trace(trace: *std.builtin.StackTrace, start_index: usize) usize {
+    const frame_count = @min(trace.index, trace.instruction_addresses.len);
+
+    var frame_index: usize = 0;
+    var frames_left: usize = frame_count;
+    while (frames_left != 0) : ({
+        frames_left -= 1;
+        frame_index = (frame_index + 1) % trace.instruction_addresses.len;
+    }) {
+        const address = trace.instruction_addresses[frame_index];
+        print("{d: >3}: 0x{X:0>8}", .{ start_index + frame_index, address });
     }
 
-    print("Exiting...", .{});
-
-    module.exitErr();
-    while (true) {}
+    return frame_count;
 }
