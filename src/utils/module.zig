@@ -32,8 +32,6 @@ pub fn _module_main_thread(argc: usize, argv: ?*anyopaque) callconv(.c) c_int {
     else
         null;
 
-    psp_io.init(arg0);
-
     // Allocate a large heap block from the PSP kernel. Size is user-configurable
     // via `pub const psp_heap_kb_size: u32 = N;` in the root source file, or
     // defaults to all available memory minus a 512 KB reserve.
@@ -48,6 +46,8 @@ pub fn _module_main_thread(argc: usize, argv: ?*anyopaque) callconv(.c) c_int {
 
     const heap_base: [*]u8 = @ptrCast(kernel.get_block_head_addr(heap_uid) orelse return 1);
     var pool = pool_allocator.PoolAlloc.init(heap_base[0..heap_size], "psp_heap");
+
+    psp_io.init(arg0, pool.allocator());
 
     // PSP is freestanding: Args.vector is void, Environ.block is GlobalBlock.
     var arena_allocator = std.heap.ArenaAllocator.init(psp_allocator.psp_page_allocator);

@@ -146,8 +146,7 @@ fn crashHandler(_: ?*anyopaque) void {
 
 // -- Global State ------------------------------------------------------
 
-const allocator = @import("allocator.zig");
-const psp_alloc = allocator.psp_page_allocator;
+var alloc: std.mem.Allocator = undefined;
 
 // -- Per-thread cancellation state table ----------------------------------
 
@@ -201,7 +200,8 @@ var stderr_writer: File.Writer = .{
     .mode = .streaming,
 };
 
-pub fn init(arg0: ?[*:0]const u8) void {
+pub fn init(arg0: ?[*:0]const u8, allocator: std.mem.Allocator) void {
+    alloc = allocator;
     stdin_fd = io.stdin();
     stdout_fd = io.stdout();
     stderr_fd = io.stderr();
@@ -362,7 +362,7 @@ const PspFuture = struct {
         const res_offset = result_alignment.forward(ctx_offset + context.len);
         const total = res_offset + result_len;
 
-        const mem = psp_alloc.rawAlloc(total, .@"8", 0) orelse return null;
+        const mem = alloc.rawAlloc(total, .@"8", 0) orelse return null;
         const self: *PspFuture = @ptrCast(@alignCast(mem));
         self.* = .{
             .func = func,
@@ -385,7 +385,7 @@ const PspFuture = struct {
     fn destroy(self: *PspFuture) void {
         kernel.delete_sema(self.completion_sema) catch {};
         const ptr: [*]u8 = @ptrCast(self);
-        psp_alloc.rawFree(ptr[0..self.alloc_len], .@"8", 0);
+        alloc.rawFree(ptr[0..self.alloc_len], .@"8", 0);
     }
 };
 
@@ -418,7 +418,7 @@ const PspGroupTask = struct {
         const ctx_offset = context_alignment.forward(header_size);
         const total = ctx_offset + context.len;
 
-        const mem = psp_alloc.rawAlloc(total, .@"8", 0) orelse return null;
+        const mem = alloc.rawAlloc(total, .@"8", 0) orelse return null;
         const self: *PspGroupTask = @ptrCast(@alignCast(mem));
         self.* = .{
             .func = func,
@@ -434,7 +434,7 @@ const PspGroupTask = struct {
 
     fn destroy(self: *PspGroupTask) void {
         const ptr: [*]u8 = @ptrCast(self);
-        psp_alloc.rawFree(ptr[0..self.alloc_len], .@"8", 0);
+        alloc.rawFree(ptr[0..self.alloc_len], .@"8", 0);
     }
 };
 
@@ -698,10 +698,10 @@ fn getOrCreateGroupState(group: *Io.Group) ?*PspGroupState {
         return @ptrCast(@alignCast(tok));
     }
     // Allocate new group state.
-    const mem = psp_alloc.rawAlloc(@sizeOf(PspGroupState), .@"8", 0) orelse return null;
+    const mem = alloc.rawAlloc(@sizeOf(PspGroupState), .@"8", 0) orelse return null;
     const gs: *PspGroupState = @ptrCast(@alignCast(mem));
     const sema = kernel.create_sema("iogs", 0, 0, 1, null) catch {
-        psp_alloc.rawFree(mem[0..@sizeOf(PspGroupState)], .@"8", 0);
+        alloc.rawFree(mem[0..@sizeOf(PspGroupState)], .@"8", 0);
         return null;
     };
     gs.* = .{ .completion_sema = sema };
@@ -805,7 +805,7 @@ fn groupAwait(_: ?*anyopaque, group: *Io.Group, _: *anyopaque) Io.Cancelable!voi
     // Clean up group state.
     kernel.delete_sema(gs.completion_sema) catch {};
     const mem: [*]u8 = @ptrCast(gs);
-    psp_alloc.rawFree(mem[0..@sizeOf(PspGroupState)], .@"8", 0);
+    alloc.rawFree(mem[0..@sizeOf(PspGroupState)], .@"8", 0);
     group.token.store(null, .release);
 
     if (was_canceled) {
@@ -830,7 +830,7 @@ fn groupCancel(_: ?*anyopaque, group: *Io.Group, _: *anyopaque) void {
 
     kernel.delete_sema(gs.completion_sema) catch {};
     const mem: [*]u8 = @ptrCast(gs);
-    psp_alloc.rawFree(mem[0..@sizeOf(PspGroupState)], .@"8", 0);
+    alloc.rawFree(mem[0..@sizeOf(PspGroupState)], .@"8", 0);
     group.token.store(null, .release);
 }
 
