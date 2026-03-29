@@ -568,7 +568,7 @@ fn spawnFuture(
 
     var name_buf: [32]u8 = undefined;
     const name = makeThreadName(&name_buf);
-    const priority = kernel.get_thread_current_priority();
+    const priority = kernel.get_thread_current_priority() +| 1;
 
     const thid = kernel.create_thread(name, &futureThreadEntry, priority, ASYNC_STACK_SIZE, .{ .user = true }, null) catch {
         future.destroy();
@@ -631,7 +631,7 @@ fn concurrent(
 
     var name_buf: [32]u8 = undefined;
     const name = makeThreadName(&name_buf);
-    const priority = kernel.get_thread_current_priority();
+    const priority = kernel.get_thread_current_priority() +| 1;
 
     const thid = kernel.create_thread(name, &futureThreadEntry, priority, ASYNC_STACK_SIZE, .{ .user = true }, null) catch {
         future.destroy();
@@ -731,7 +731,7 @@ fn groupAsync(
 
     var name_buf: [32]u8 = undefined;
     const name = makeThreadName(&name_buf);
-    const priority = kernel.get_thread_current_priority();
+    const priority = kernel.get_thread_current_priority() +| 1;
 
     const thid = kernel.create_thread(name, &groupThreadEntry, priority, ASYNC_STACK_SIZE, .{ .user = true }, null) catch {
         atomicDecrementRunningOnFail(gs);
@@ -768,7 +768,7 @@ fn groupConcurrent(
 
     var name_buf: [32]u8 = undefined;
     const name = makeThreadName(&name_buf);
-    const priority = kernel.get_thread_current_priority();
+    const priority = kernel.get_thread_current_priority() +| 1;
 
     const thid = kernel.create_thread(name, &groupThreadEntry, priority, ASYNC_STACK_SIZE, .{ .user = true }, null) catch {
         atomicDecrementRunningOnFail(gs);
