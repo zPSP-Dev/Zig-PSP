@@ -157,8 +157,11 @@ pub fn printTrace(trace: *std.builtin.StackTrace) void {
     const addrs = trace.instruction_addresses;
     const count = @min(trace.index, addrs.len);
     var i: usize = 0;
+
+    // PSP Load Base
+    const BASE = 0x08804000;
     while (i < count) : (i += 1) {
-        print("  [{d}] 0x{x:0>8}\n", .{ i, addrs[i] });
+        print("  [{d}] 0x{x:0>8}\n", .{ i, addrs[i] - BASE });
     }
 }
 
