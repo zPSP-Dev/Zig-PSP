@@ -114,10 +114,10 @@ pub fn configurePspExecutable(exe: *std.Build.Step.Compile) void {
     if (exe.root_module.import_table.get("pspsdk") == null) {
         const pspsdk_mod = findTransitiveImport(exe.root_module, "pspsdk") orelse
             b.createModule(.{
-            .root_source_file = self.path("src/pspsdk.zig"),
-            .target = getPspTarget(b),
-            .optimize = exe.root_module.optimize orelse .Debug,
-        });
+                .root_source_file = self.path("src/pspsdk.zig"),
+                .target = getPspTarget(b),
+                .optimize = exe.root_module.optimize orelse .Debug,
+            });
         exe.root_module.addImport("pspsdk", pspsdk_mod);
     }
 

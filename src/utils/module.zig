@@ -4,6 +4,7 @@ const kernel = @import("../sdk/kernel.zig");
 
 const debug = @import("debug.zig");
 const psp_allocator = @import("allocator.zig");
+const pool_allocator = @import("pool_allocator.zig");
 const psp_io = @import("Io.zig");
 
 const root = @import("root");
@@ -33,8 +34,22 @@ pub fn _module_main_thread(argc: usize, argv: ?*anyopaque) callconv(.c) c_int {
 
     psp_io.init(arg0);
 
+    // Allocate a large heap block from the PSP kernel. Size is user-configurable
+    // via `pub const psp_heap_kb_size: u32 = N;` in the root source file, or
+    // defaults to all available memory minus a 512 KB reserve.
+    const heap_kb: u32 = if (@hasDecl(root, "psp_heap_kb_size")) root.psp_heap_kb_size else 0;
+    const heap_size: usize = if (heap_kb > 0)
+        @as(usize, heap_kb) * 1024
+    else
+        kernel.max_free_mem_size() -| (512 * 1024);
+
+    const heap_uid = kernel.alloc_partition_memory(.user, "psp_heap", .mem_low, heap_size, null) catch return 1;
+    defer kernel.free_partition_memory(heap_uid) catch {};
+
+    const heap_base: [*]u8 = @ptrCast(kernel.get_block_head_addr(heap_uid) orelse return 1);
+    var pool = pool_allocator.PoolAlloc.init(heap_base[0..heap_size], "psp_heap");
+
     // PSP is freestanding: Args.vector is void, Environ.block is GlobalBlock.
-    // arena and gpa are backed by psp_page_allocator;
     var arena_allocator = std.heap.ArenaAllocator.init(psp_allocator.psp_page_allocator);
     defer arena_allocator.deinit();
 
@@ -44,7 +59,7 @@ pub fn _module_main_thread(argc: usize, argv: ?*anyopaque) callconv(.c) c_int {
             .environ = .{ .block = .empty },
         },
         .arena = &arena_allocator,
-        .gpa = psp_allocator.psp_page_allocator,
+        .gpa = pool.allocator(),
         .io = psp_io.psp_io,
         .environ_map = undefined,
         .preopens = .empty,
