@@ -579,7 +579,12 @@ fn writeProgramHeaders(
     ph0.p_filesz = std.mem.nativeToLittle(u32, layout.alloc_size);
     ph0.p_memsz = std.mem.nativeToLittle(u32, layout.mem_size);
     ph0.p_flags = std.mem.nativeToLittle(u32, 5); // R + X
-    ph0.p_align = std.mem.nativeToLittle(u32, 0x10);
+    // 64K alignment is required because the PSP kernel's HI16/LO16
+    // relocator uses unsigned add-with-carry without sign-extension
+    // compensation.  With a 64K-aligned base (base & 0xFFFF == 0),
+    // new_LO always equals old_LO, so the compiler's standard %hi/%lo
+    // compensation is correct for every address.
+    ph0.p_align = std.mem.nativeToLittle(u32, 0x10000);
 
     // PT_PRX_RELOC — tells the PSP kernel where relocation data lives.
     // This bypasses the buggy section-header relocation path which uses an
