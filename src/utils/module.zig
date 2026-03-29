@@ -50,7 +50,7 @@ pub fn _module_main_thread(argc: usize, argv: ?*anyopaque) callconv(.c) c_int {
     psp_io.init(arg0, pool.allocator());
 
     // PSP is freestanding: Args.vector is void, Environ.block is GlobalBlock.
-    var arena_allocator = std.heap.ArenaAllocator.init(psp_allocator.psp_page_allocator);
+    var arena_allocator = std.heap.ArenaAllocator.init(pool.allocator());
     defer arena_allocator.deinit();
 
     const init: std.process.Init = .{
