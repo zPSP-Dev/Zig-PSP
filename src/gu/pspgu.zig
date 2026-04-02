@@ -264,7 +264,7 @@ pub fn sendCommandf(cmd: u8, argument: f32) void {
 
 pub fn sceGuAlphaFunc(func: types.AlphaFunc, value: c_int, mask: c_int) void {
     const arg: c_int = @intFromEnum(func) | ((value & 0xff) << 8) | ((mask & 0xff) << 16);
-    sendCommandi(219, arg);
+    sendCommandi(219, @truncate(@as(c_uint, @bitCast(arg))));
 }
 
 pub fn sceGuAmbient(col: u32) void {
