@@ -853,7 +853,7 @@ pub fn sceGuFog(near: f32, far: f32, col: c_uint) void {
     if (distance > 0)
         distance = 1.0 / distance;
 
-    sendCommandi(207, @as(c_int, @intCast(col & 0xffffff)));
+    sendCommandi(207, @truncate(col));
     sendCommandf(205, far);
     sendCommandf(206, distance);
 }
