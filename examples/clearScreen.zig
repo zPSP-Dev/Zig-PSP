@@ -50,8 +50,7 @@ pub fn main(_: std.process.Init) !void {
 
         gu.clear_color(0x00ffff);
         gu.clear_depth(0);
-        gu.clear(@intFromEnum(sdk.ClearBitFlags.ColorBuffer) |
-            @intFromEnum(sdk.ClearBitFlags.DepthBuffer));
+        gu.clear(.{ .color = true, .depth = true });
 
         gu.finish();
         gu.sync(.Finish, .wait);

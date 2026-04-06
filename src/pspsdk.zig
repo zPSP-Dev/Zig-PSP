@@ -809,7 +809,7 @@ pub const GuQueueMode = _pspgutypes.GuQueueMode;
 pub const GuSyncMode = _pspgutypes.GuSyncMode;
 pub const GuCallbackId = _pspgutypes.GuCallbackId;
 pub const GuSignalBehavior = _pspgutypes.GuSignalBehavior;
-pub const ClearBitFlags = _pspgutypes.ClearBitFlags;
+pub const GuClearFlags = _pspgutypes.GuClearFlags;
 pub const GuLightBitFlags = _pspgutypes.GuLightBitFlags;
 pub const VertexType = _pspgutypes.VertexType;
 
