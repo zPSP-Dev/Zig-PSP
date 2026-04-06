@@ -1212,8 +1212,8 @@ pub fn sceGuTerm() void {
     ge.unset_callback(gu_settings.ge_callback_id) catch {};
 }
 
-pub fn sceGuTexEnvColor(color: c_int) void {
-    sendCommandi(202, color & 0xffffff);
+pub fn sceGuTexEnvColor(color: u24) void {
+    sendCommandi(202, color);
 }
 
 pub fn sceGuTexFilter(min: types.TextureFilter, mag: types.TextureFilter) void {
