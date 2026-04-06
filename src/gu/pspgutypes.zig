@@ -280,10 +280,10 @@ pub const GuSignalBehavior = enum(c_int) {
     Continue = 2,
 };
 
-pub const ClearBitFlags = enum(u24) {
-    ColorBuffer = 1,
-    StencilBuffer = 2,
-    DepthBuffer = 4,
+pub const GuClearFlags = packed struct(u3) {
+    color: bool = false,
+    stencil: bool = false,
+    depth: bool = false,
 };
 
 pub const GuLightBitFlags = enum(c_int) {

@@ -1,6 +1,8 @@
 const std = @import("std");
 
 pub const types = @import("pspgutypes.zig");
+const commands = @import("commands.zig");
+pub const GuCommand = commands.GuCommand;
 
 const c = @import("../c/modules.zig");
 pub const ScePspFVector3 = c.types.ScePspFVector3;
@@ -245,6 +247,11 @@ pub fn resetValues() void {
 
 pub fn sendCommandi(cmd: u8, argument: u24) void {
     gu_list.?.current[0] = (@as(u32, cmd) << 24) | argument;
+    gu_list.?.current += 1;
+}
+
+pub fn sendCommand(cmd: GuCommand) void {
+    gu_list.?.current[0] = commands.convert_to_u32(cmd);
     gu_list.?.current += 1;
 }
 
@@ -855,7 +862,7 @@ pub fn sceGuFog(near: f32, far: f32, col: c_uint) void {
 
     sendCommandi(207, @truncate(col));
     sendCommandf(205, far);
-    sendCommandf(206, distance);
+    sendCommand(.{ .fog_range = .make(distance) });
 }
 
 pub fn sceGuFrontFace(order: types.FrontFaceDirection) void {
@@ -1399,7 +1406,7 @@ pub fn sceGuStart(context_type: types.GuContextType, list: [*]align(16) u32) voi
     }
 }
 
-pub fn sceGuClear(flags: u24) void {
+pub fn sceGuClear(clear_flags: types.GuClearFlags) void {
     const Vertex = extern struct { color: u32, x: u16, y: u16, z: u16, pad: u16 };
 
     const vertex_type = types.VertexType{
@@ -1445,10 +1452,10 @@ pub fn sceGuClear(flags: u24) void {
         curr[i].z = context.clear_depth;
     }
 
-    sendCommandi(211, ((flags & (@intFromEnum(types.ClearBitFlags.ColorBuffer) | @intFromEnum(types.ClearBitFlags.StencilBuffer) | @intFromEnum(types.ClearBitFlags.DepthBuffer))) << 8) | 0x01);
+    sendCommand(.{ .clear = .{ .enable = true, .flags = clear_flags } });
 
     sceGuDrawArray(.Sprites, vertex_type, count, null, vertices);
-    sendCommandi(211, 0);
+    sendCommand(.{ .clear = .{ .enable = false, .flags = .{} } });
 }
 
 pub fn sceGuGetMemory(size: u32) *anyopaque {
