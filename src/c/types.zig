@@ -309,12 +309,14 @@ pub const PspCtrlButtons = packed struct(u32) {
     unknown_b28_31: u4,
 };
 
-pub const SceCtrlData = extern struct {
-    timeStamp: c_uint,
+pub const SceCtrlData = packed struct(u128) {
+    timeStamp: u32,
     buttons: PspCtrlButtons,
     Lx: u8,
     Ly: u8,
-    Rsrv: [6]u8,
+    Rx: u8, // Valid when using DualShock 3 on PSP GO,
+    Ry: u8, // a PS VITA system, through hardware/software hacking, or system emulation.
+    Rsrv: u32,
 };
 
 pub const SceCtrlLatch = extern struct {
