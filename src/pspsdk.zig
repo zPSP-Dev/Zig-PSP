@@ -201,6 +201,8 @@ pub const sceDmacTryMemcpy = dmac.try_memcpy;
 
 // -- ge (sceGe_user) --
 pub const ge = @import("sdk/ge.zig");
+pub const ge_list = @import("ge/list.zig");
+pub const ge_display_list = ge_list;
 pub const sceGeBreak = ge.@"break";
 pub const sceGeContinue = ge.@"continue";
 pub const sceGeDrawSync = ge.draw_sync;
@@ -1055,9 +1057,9 @@ pub const gu = struct {
     pub const @"break" = _gu.sceGuBreak;
     pub const @"continue" = _gu.sceGuContinue;
     // Low-level command helpers
-    pub const send_commandi = _gu.sendCommandi;
-    pub const send_commandf = _gu.sendCommandf;
-    pub const send_commandi_stall = _gu.sendCommandiStall;
+    pub const send_commandi = _gu.sceGuSendCommandi;
+    pub const send_commandf = _gu.sceGuSendCommandf;
+    pub const send_commandi_stall = _gu.sceGuSendCommandiStall;
     pub const reset_values = _gu.resetValues;
 };
 
