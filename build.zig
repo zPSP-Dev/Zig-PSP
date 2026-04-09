@@ -15,6 +15,7 @@ pub const PspEbootOptions = struct {
     pic0: ?std.Build.LazyPath = null,
     pic1: ?std.Build.LazyPath = null,
     snd0: ?std.Build.LazyPath = null,
+    encrypt: bool = false,
 };
 
 /// The three artifacts produced by the eboot pipeline.
@@ -42,6 +43,8 @@ pub const EbootOptions = struct {
     pic0: ?std.Build.LazyPath = null,
     pic1: ?std.Build.LazyPath = null,
     snd0: ?std.Build.LazyPath = null,
+    // This calls zPRXEncrypt. This doesn't cover all usecases yet so it's off by default.
+    encrypt: bool = false,
     /// Subdirectory under zig-out/bin/ for installed artifacts.
     /// When null, artifacts are added to the pipeline but not installed.
     output_dir: ?[]const u8 = null,
@@ -85,6 +88,7 @@ pub fn buildPspEboot(b: *std.Build, options: PspEbootOptions, output: PspOutputO
         .pic0 = options.pic0,
         .pic1 = options.pic1,
         .snd0 = options.snd0,
+        .encrypt = options.encrypt,
         .output_dir = output.dir orelse options.name,
     });
 }
@@ -173,6 +177,7 @@ pub fn addEbootSteps(b: *std.Build, exe: *std.Build.Step.Compile, options: Eboot
         self.artifact("zPRXGen"),
         self.artifact("zSFOTool"),
         self.artifact("zPBPTool"),
+        self.artifact("zPRXEncrypt"),
         options,
     );
 }
@@ -209,12 +214,18 @@ fn ebootPipeline(
     prxgen: *std.Build.Step.Compile,
     sfo_tool: *std.Build.Step.Compile,
     pbp_tool: *std.Build.Step.Compile,
+    prx_encrypt: *std.Build.Step.Compile,
     options: EbootOptions,
 ) PspEboot {
     // ELF -> PRX
     const mk_prx = b.addRunArtifact(prxgen);
     mk_prx.addArtifactArg(exe);
     const prx_file = mk_prx.addOutputFileArg("app.prx");
+
+    // ELF -> PSP
+    const encrypt_step = b.addRunArtifact(prx_encrypt);
+    encrypt_step.addFileArg(prx_file);
+    const psp_file = encrypt_step.addOutputFileArg("app.psp");
 
     // -> PARAM.SFO
     const mk_sfo = b.addRunArtifact(sfo_tool);
@@ -233,7 +244,9 @@ fn ebootPipeline(
     if (options.pic0) |p| pack_pbp.addFileArg(p) else pack_pbp.addArg("NULL");
     if (options.pic1) |p| pack_pbp.addFileArg(p) else pack_pbp.addArg("NULL");
     if (options.snd0) |p| pack_pbp.addFileArg(p) else pack_pbp.addArg("NULL");
-    pack_pbp.addFileArg(prx_file);
+
+    pack_pbp.addFileArg(if (options.encrypt) psp_file else prx_file);
+
     pack_pbp.addArg("NULL"); // DATA.PSAR not needed
 
     const result = PspEboot{
@@ -254,6 +267,14 @@ fn ebootPipeline(
             result.prx,
             std.mem.concat(alloc, u8, &.{ dir, "/app.prx" }) catch @panic("OOM"),
         ).step);
+
+        if (options.encrypt) {
+            b.getInstallStep().dependOn(&b.addInstallBinFile(
+                psp_file,
+                std.mem.concat(alloc, u8, &.{ dir, "/app.psp" }) catch @panic("OOM"),
+            ).step);
+        }
+
         b.getInstallStep().dependOn(&b.addInstallArtifact(result.elf, .{
             .dest_dir = .{ .override = .{ .custom = std.mem.concat(alloc, u8, &.{ "bin/", dir }) catch @panic("OOM") } },
             .dest_sub_path = "app.elf",
@@ -308,6 +329,18 @@ pub fn build(b: *std.Build) void {
     const install_pbp = b.addInstallArtifact(pbp_tool, .{});
     b.getInstallStep().dependOn(&install_pbp.step);
 
+    // Build PRX encrypt
+    const prx_encrypt = b.addExecutable(.{
+        .name = "zPRXEncrypt",
+        .root_module = b.createModule(.{
+            .root_source_file = b.path("tools/prxencrypt/main.zig"),
+            .target = host_target,
+            .optimize = host_optimize,
+        }),
+    });
+    const install_prx_encrypt = b.addInstallArtifact(prx_encrypt, .{});
+    b.getInstallStep().dependOn(&install_prx_encrypt.step);
+
     // Build main pspsdk module (used by examples + docs)
     const pspsdk_module = b.addModule("pspsdk", .{
         .root_source_file = b.path("src/pspsdk.zig"),
@@ -337,6 +370,7 @@ pub fn build(b: *std.Build) void {
     tools_step.dependOn(&install_prxgen.step);
     tools_step.dependOn(&install_sfo.step);
     tools_step.dependOn(&install_pbp.step);
+    tools_step.dependOn(&install_prx_encrypt.step);
 
     // Build examples
     const example_step = b.step("examples", "Build examples");
@@ -354,7 +388,7 @@ pub fn build(b: *std.Build) void {
         });
         configureExe(exe, linkfile, pspsdk_module);
 
-        const result = ebootPipeline(b, exe, prxgen, sfo_tool, pbp_tool, .{
+        const result = ebootPipeline(b, exe, prxgen, sfo_tool, pbp_tool, prx_encrypt, .{
             .title = example.title,
             .icon0 = if (example.icon0) |p| b.path(p) else null,
             .icon1 = if (example.icon1) |p| b.path(p) else null,
