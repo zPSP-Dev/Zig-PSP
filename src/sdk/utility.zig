@@ -15,7 +15,7 @@ const netparam = c.sceUtility_netparam_internal;
 
 // -- Re-exported types --------------------------------------------------
 
-pub const DialogCommon = c.types.PspUtilityDialogCommon;
+pub const DialogCommon = c.types.pspUtilityDialogCommon;
 pub const SavedataParam = c.types.SceUtilitySavedataParam;
 pub const OskParams = c.types.SceUtilityOskParams;
 pub const GameSharingParams = c.types.pspUtilityGameSharingParams;
