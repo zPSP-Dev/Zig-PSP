@@ -18,6 +18,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: mlugg/setup-zig@v2
       - run: zig build examples
+      - run: zig build test
 
   lint:
     runs-on: ubuntu-latest
