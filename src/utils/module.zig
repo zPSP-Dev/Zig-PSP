@@ -104,7 +104,7 @@ pub fn _module_main_thread(argc: usize, argv: ?*anyopaque) callconv(.c) c_int {
             const result = main_result catch |err| {
                 debug.print("ERROR CAUGHT: {s}\n", .{@errorName(err)});
                 if (@errorReturnTrace()) |trace| {
-                    debug.printTrace(trace);
+                    _ = debug.dump_stack_trace(trace, 0);
                 } else {
                     debug.print("(no return trace available)\n", .{});
                 }

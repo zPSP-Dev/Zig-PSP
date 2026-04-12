@@ -405,64 +405,176 @@ fn processRelocs(allocator: std.mem.Allocator, sections: []ElfSection, head: Elf
             out_count += 1;
         }
 
-        // Ensure each R_MIPS_HI16 is immediately followed by its paired LO16
-        // so the PSP kernel's sequential pairing scan works correctly.
-        sortHiLoPairs(new_rels[0..out_count]);
+        // Reorder so every R_MIPS_HI16 is immediately followed by its
+        // paired R_MIPS_LO16.  Uses forward-only search on the ORIGINAL
+        // (unsorted) table so natural pairs are never broken by greedy
+        // in-place stealing.  Duplicates a LO16 for genuinely orphaned
+        // HI16 (LLVM can emit N HI16 sharing 1 LO16 across branches).
+        const reordered = try reorderHiLoPairs(allocator, new_rels[0..out_count]);
 
-        const new_size: u32 = @intCast(out_count * REL_SIZE);
+        const new_size: u32 = @intCast(reordered.len * REL_SIZE);
         sections[i].size = new_size;
         if (new_size == 0) {
             sections[i].output = false;
         } else {
-            // Always write back: reloc order may have changed even when the
-            // entry count did not.
-            const bytes = std.mem.sliceAsBytes(new_rels[0..out_count]);
-            @memcpy(sections[i].data[0..new_size], bytes);
+            const new_data = try allocator.alloc(u8, new_size);
+            @memcpy(new_data, std.mem.sliceAsBytes(reordered));
+            sections[i].data = new_data;
         }
     }
 }
 
-// sortHiLoPairs ensures each R_MIPS_HI16 is immediately followed by its
-// canonical paired R_MIPS_LO16 (same symbol index) in the relocation table.
+// reorderHiLoPairs ensures every R_MIPS_HI16 is immediately followed by
+// its paired R_MIPS_LO16 in the output relocation table.
 //
-// The PSP kernel pairs HI16 with the next LO16 in the relocation table
-// (sequential scan, no symbol matching).  When the compiler interleaves
-// multiple HI16/LO16 pairs (e.g. HI16_A, HI16_B, LO16_B, LO16_A), the
-// kernel would mismatch them, causing wrong address reconstruction and a
-// bus-error crash at runtime.  Reordering fixes the pairing without
-// changing the meaning of any individual relocation.
-fn sortHiLoPairs(rels: []Elf32_Rel) void {
-    var i: usize = 0;
-    while (i < rels.len) : (i += 1) {
-        if (elfRelType(rels[i].r_info) != R_MIPS_HI16) continue;
+// Uses forward-only search on the ORIGINAL (unmodified) relocation table
+// to claim LO16 partners.  This is critical: an in-place sort can steal
+// a naturally-paired LO16 from a later HI16 through greedy rotation,
+// corrupting both addresses when the stolen LO16's addend doesn't match.
+// Building a new array from immutable source data avoids this entirely.
+//
+// For genuinely orphaned HI16 (LLVM emits N HI16 sharing 1 LO16 across
+// control-flow paths), duplicates the nearest-by-offset LO16 for that
+// symbol.  All such HI16 reference the same address, so the addend is
+// identical; r_offset proximity confirms it.
+fn reorderHiLoPairs(
+    allocator: std.mem.Allocator,
+    rels: []const Elf32_Rel,
+) ![]Elf32_Rel {
+    const n = rels.len;
+    if (n == 0) return try allocator.alloc(Elf32_Rel, 0);
 
-        const hi_sym = elfRelSym(rels[i].r_info);
+    const partner = try allocator.alloc(?usize, n);
+    @memset(partner, null);
+    const claimed = try allocator.alloc(bool, n);
+    @memset(claimed, false);
+    var orphan_count: usize = 0;
 
-        // Find the canonical paired LO16: first unplaced LO16 with the same
-        // symbol index after position i.
-        var lo_pos: ?usize = null;
-        for (i + 1..rels.len) |j| {
-            if (elfRelType(rels[j].r_info) == R_MIPS_LO16 and
-                elfRelSym(rels[j].r_info) == hi_sym)
+    // Two-pass pairing avoids cascading steals.
+    //
+    // Pass 1 — pair closest first: collect all HI16 indices, sort them by
+    // distance to their nearest forward same-symbol LO16 (ascending), then
+    // claim in that order.  This guarantees naturally adjacent pairs are
+    // claimed before a distant orphan can steal them.
+    //
+    // Pass 2 — orphans get a duplicate of the nearest-by-offset LO16.
+
+    // Collect HI16 indices.
+    var hi_count: usize = 0;
+    for (0..n) |i| {
+        if (elfRelType(rels[i].r_info) == R_MIPS_HI16) hi_count += 1;
+    }
+    const hi_indices = try allocator.alloc(usize, hi_count);
+    const hi_dists = try allocator.alloc(u32, hi_count);
+    {
+        var k: usize = 0;
+        for (0..n) |i| {
+            if (elfRelType(rels[i].r_info) != R_MIPS_HI16) continue;
+            hi_indices[k] = i;
+            // Distance to nearest forward same-symbol LO16 (unclaimed check
+            // skipped here — we just want the natural distance for sorting).
+            const sym = elfRelSym(rels[i].r_info);
+            hi_dists[k] = 0xFFFFFFFF;
+            for (i + 1..n) |j| {
+                if (elfRelType(rels[j].r_info) == R_MIPS_LO16 and
+                    elfRelSym(rels[j].r_info) == sym)
+                {
+                    hi_dists[k] = rels[j].r_offset -| rels[i].r_offset;
+                    break;
+                }
+            }
+            k += 1;
+        }
+    }
+
+    // Insertion-sort HI16 indices by distance (ascending).  Closest pairs
+    // are processed first so they claim their natural LO16 before a far-
+    // away orphan can reach past them.
+    {
+        var i: usize = 1;
+        while (i < hi_count) : (i += 1) {
+            const idx = hi_indices[i];
+            const dist = hi_dists[i];
+            var j = i;
+            while (j > 0 and hi_dists[j - 1] > dist) {
+                hi_indices[j] = hi_indices[j - 1];
+                hi_dists[j] = hi_dists[j - 1];
+                j -= 1;
+            }
+            hi_indices[j] = idx;
+            hi_dists[j] = dist;
+        }
+    }
+
+    // Claim LO16 entries in closest-first order.
+    for (0..hi_count) |k| {
+        const i = hi_indices[k];
+        const sym = elfRelSym(rels[i].r_info);
+        var found = false;
+        for (i + 1..n) |j| {
+            if (!claimed[j] and
+                elfRelType(rels[j].r_info) == R_MIPS_LO16 and
+                elfRelSym(rels[j].r_info) == sym)
             {
-                lo_pos = j;
+                partner[i] = j;
+                claimed[j] = true;
+                found = true;
                 break;
             }
         }
+        if (!found) orphan_count += 1;
+    }
 
-        if (lo_pos) |lp| {
-            if (lp != i + 1) {
-                // Move rels[lp] to position i+1 by rotating the slice.
-                const lo_entry = rels[lp];
-                var k: usize = lp;
-                while (k > i + 1) : (k -= 1) {
-                    rels[k] = rels[k - 1];
+    // Output size: all non-claimed entries + one LO16 per HI16 partner +
+    // one duplicate LO16 per orphan.
+    var out_len: usize = orphan_count;
+    for (0..n) |i| {
+        if (elfRelType(rels[i].r_info) == R_MIPS_LO16 and claimed[i]) continue;
+        out_len += 1;
+        if (partner[i] != null) out_len += 1;
+    }
+
+    const result = try allocator.alloc(Elf32_Rel, out_len);
+    var out: usize = 0;
+
+    for (0..n) |i| {
+        if (elfRelType(rels[i].r_info) == R_MIPS_LO16 and claimed[i]) continue;
+
+        result[out] = rels[i];
+        out += 1;
+
+        if (elfRelType(rels[i].r_info) != R_MIPS_HI16) continue;
+
+        if (partner[i]) |p| {
+            result[out] = rels[p];
+            out += 1;
+        } else {
+            // Orphan: find the LO16 with same symbol whose r_offset is
+            // nearest to this HI16 — proximity ensures matching addends.
+            const sym = elfRelSym(rels[i].r_info);
+            const hi_off = rels[i].r_offset;
+            var best: ?Elf32_Rel = null;
+            var best_dist: u32 = 0xFFFFFFFF;
+            for (rels) |r| {
+                if (elfRelType(r.r_info) != R_MIPS_LO16) continue;
+                if (elfRelSym(r.r_info) != sym) continue;
+                const dist = if (r.r_offset >= hi_off)
+                    r.r_offset - hi_off
+                else
+                    hi_off - r.r_offset;
+                if (dist < best_dist) {
+                    best_dist = dist;
+                    best = r;
                 }
-                rels[i + 1] = lo_entry;
             }
-            i += 1; // advance past the LO16 we just placed
+            if (best) |b| {
+                result[out] = b;
+                out += 1;
+            }
         }
     }
+
+    return result[0..out];
 }
 
 fn reindexSections(sections: []ElfSection) void {

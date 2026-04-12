@@ -151,20 +151,6 @@ fn internal_putchar(cx: u32, cy: u32, ch: u8) void {
     }
 }
 
-pub fn printTrace(trace: *std.builtin.StackTrace) void {
-    if (trace.index == 0) return;
-    print("Stack trace:\n", .{});
-    const addrs = trace.instruction_addresses;
-    const count = @min(trace.index, addrs.len);
-    var i: usize = 0;
-
-    // PSP Load Base
-    const BASE = 0x08804000;
-    while (i < count) : (i += 1) {
-        print("  [{d}] 0x{x:0>8}\n", .{ i, addrs[i] - BASE });
-    }
-}
-
 // Mostly from: https://github.com/ZigEmbeddedGroup/microzig/blob/zig-master/core/src/microzig.zig
 pub const panic = std.debug.FullPanic(struct {
     pub fn panic_fn(message: []const u8, first_trace_address: ?usize) noreturn {
@@ -197,7 +183,7 @@ pub fn dump_stack_trace(trace: *std.builtin.StackTrace, start_index: usize) usiz
         frame_index = (frame_index + 1) % trace.instruction_addresses.len;
     }) {
         const address = trace.instruction_addresses[frame_index];
-        print("{d: >3}: 0x{X:0>8}", .{ start_index + frame_index, address });
+        print("{d: >3}: 0x{X:0>8}\n", .{ start_index + frame_index, address });
     }
 
     return frame_count;
