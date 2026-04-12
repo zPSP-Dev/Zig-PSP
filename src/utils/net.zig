@@ -1,6 +1,7 @@
 const std = @import("std");
 
 const net = @import("../sdk/net.zig");
+const net_errors = @import("../sdk/errors/net.zig");
 const utility = @import("../sdk/utility.zig");
 const kernel = @import("../sdk/kernel.zig");
 
@@ -28,6 +29,7 @@ pub const SHUT_RDWR = 2;
 pub const SOL_SOCKET = 0xFFFF;
 pub const SO_REUSEADDR = 0x0004;
 pub const SO_NBIO = 0x1009;
+pub const TCP_NODELAY = 1;
 
 pub const InitError = error{
     LoadCommonModule,
@@ -45,6 +47,18 @@ pub const ConnectError = error{
 };
 
 var net_initialized = false;
+
+/// Set TCP_NODELAY for a TCP socket.
+/// Pass `true` to disable Nagle's algorithm.
+pub fn setTcpNoDelay(socket: i32, enabled: bool) net_errors.Error!void {
+    const value: c_int = if (enabled) 1 else 0;
+    return net.inet_setsockopt(socket, IPPROTO_TCP, TCP_NODELAY, &value, @sizeOf(c_int));
+}
+
+/// Disable Nagle's algorithm for a TCP socket.
+pub fn disableNagle(socket: i32) net_errors.Error!void {
+    return setTcpNoDelay(socket, true);
+}
 
 /// Initialize the PSP networking stack.
 /// Loads kernel modules, initializes sceNet, sceNetInet, sceNetApctl, and sceNetResolver.
