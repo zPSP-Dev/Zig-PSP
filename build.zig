@@ -365,6 +365,18 @@ pub fn build(b: *std.Build) void {
     const docs_step = b.step("docs", "Generate documentation");
     docs_step.dependOn(&install_docs.step);
 
+    // Test step
+    const prxencrypt_tests = b.addTest(.{
+        .root_module = b.createModule(.{
+            .root_source_file = b.path("tools/prxencrypt/test.zig"),
+            .target = host_target,
+            .optimize = host_optimize,
+        }),
+    });
+    const run_prxencrypt_tests = b.addRunArtifact(prxencrypt_tests);
+    const test_step = b.step("test", "Run unit tests");
+    test_step.dependOn(&run_prxencrypt_tests.step);
+
     // Build tools step
     const tools_step = b.step("tools", "Build PSP SDK tools");
     tools_step.dependOn(&install_prxgen.step);
