@@ -5,11 +5,12 @@
 
 const c = @import("../c/modules.zig");
 const internal = @import("internal.zig");
-const check = internal.check;
-const checkPositive = internal.checkPositive;
+const err = @import("errors/power.zig");
+const check = err.check;
+const checkPositive = err.checkPositive;
 const ci = internal.ci;
 const cu = internal.cu;
-const Error = internal.Error;
+const Error = err.Error;
 
 const pwr = c.scePower;
 
@@ -115,7 +116,7 @@ pub fn request_cold_reset(exitcode: u32) void {
 
 pub fn register_callback(slot: i32, cbid: SceUID) Error!i32 {
     const ret = pwr.scePowerRegisterCallback(@as(c_int, slot), cbid);
-    return checkPositive(ret);
+    return checkPositive(i32, ret);
 }
 
 pub fn unregister_callback(slot: i32) Error!void {

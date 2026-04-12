@@ -4,12 +4,12 @@
 //   c/module/sceJpeg.zig
 
 const c = @import("../c/modules.zig");
+const err = @import("errors/jpeg.zig");
 const internal = @import("internal.zig");
-const check = internal.check;
-const fromCode = internal.fromCode;
+const check = err.check;
 const ci = internal.ci;
 const cu = internal.cu;
-const Error = internal.Error;
+const Error = err.Error;
 
 const jpeg = c.sceJpeg;
 
@@ -38,7 +38,7 @@ pub const FrameSize = struct { width: u32, height: u32 };
 fn unpack_frame_size(ret: c_int) Error!FrameSize {
     if (ret < 0) {
         @branchHint(.unlikely);
-        return fromCode(@bitCast(ret));
+        return err.translate(@bitCast(ret));
     }
     const val: u32 = @intCast(ret);
     return .{ .width = val >> 16, .height = val & 0xFFFF };

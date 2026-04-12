@@ -4,10 +4,10 @@
 //   c/module/sceHttp.zig
 
 const c = @import("../c/modules.zig");
-const internal = @import("internal.zig");
-const check = internal.check;
-const checkPositive = internal.checkPositive;
-const Error = internal.Error;
+const err = @import("errors/http.zig");
+const check = err.check;
+const checkPositive = err.checkPositive;
+const Error = err.Error;
 
 const http = c.sceHttp;
 
@@ -45,7 +45,7 @@ pub fn https_load_default_cert(unk1: i32, unk2: i32) Error!void {
 
 pub fn create_template(agent: [*:0]const u8, unk1: i32, unk2: i32) Error!i32 {
     const ret = http.sceHttpCreateTemplate(@ptrCast(@constCast(agent)), @as(c_int, unk1), @as(c_int, unk2));
-    return checkPositive(ret);
+    return checkPositive(i32, ret);
 }
 
 pub fn delete_template(template_id: i32) Error!void {
@@ -56,12 +56,12 @@ pub fn delete_template(template_id: i32) Error!void {
 
 pub fn create_connection(template_id: i32, host: [*:0]const u8, scheme: [*:0]const u8, port: u16, unk: i32) Error!i32 {
     const ret = http.sceHttpCreateConnection(@as(c_int, template_id), @ptrCast(@constCast(host)), @ptrCast(@constCast(scheme)), @as(c_ushort, port), @as(c_int, unk));
-    return checkPositive(ret);
+    return checkPositive(i32, ret);
 }
 
 pub fn create_connection_with_url(template_id: i32, url: [*:0]const u8, unk: i32) Error!i32 {
     const ret = http.sceHttpCreateConnectionWithURL(@as(c_int, template_id), url, @as(c_int, unk));
-    return checkPositive(ret);
+    return checkPositive(i32, ret);
 }
 
 pub fn delete_connection(connection_id: i32) Error!void {
@@ -72,12 +72,12 @@ pub fn delete_connection(connection_id: i32) Error!void {
 
 pub fn create_request(connection_id: i32, method: Method, path: [*:0]const u8, content_length: u64) Error!i32 {
     const ret = http.sceHttpCreateRequest(@as(c_int, connection_id), method, @ptrCast(@constCast(path)), content_length);
-    return checkPositive(ret);
+    return checkPositive(i32, ret);
 }
 
 pub fn create_request_with_url(connection_id: i32, method: Method, url: [*:0]const u8, content_length: u64) Error!i32 {
     const ret = http.sceHttpCreateRequestWithURL(@as(c_int, connection_id), method, @ptrCast(@constCast(url)), content_length);
-    return checkPositive(ret);
+    return checkPositive(i32, ret);
 }
 
 pub fn delete_request(request_id: i32) Error!void {
@@ -94,7 +94,7 @@ pub fn abort_request(request_id: i32) Error!void {
 
 pub fn read_data(request_id: i32, data: ?*anyopaque, datasize: u32) Error!i32 {
     const ret = http.sceHttpReadData(@as(c_int, request_id), data, @as(c_uint, datasize));
-    return checkPositive(ret);
+    return checkPositive(i32, ret);
 }
 
 pub fn get_content_length(request_id: i32, content_length: *u64) Error!void {

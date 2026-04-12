@@ -9,10 +9,11 @@
 
 const c = @import("../c/modules.zig");
 const internal = @import("internal.zig");
-const check = internal.check;
-const checkPositive = internal.checkPositive;
+const err = @import("errors/usbcam.zig");
+const check = err.check;
+const checkPositive = err.checkPositive;
 const ci = internal.ci;
-const Error = internal.Error;
+const Error = err.Error;
 
 const cam = c.sceUsbCam;
 

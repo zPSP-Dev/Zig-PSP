@@ -7,11 +7,12 @@
 
 const c = @import("../c/modules.zig");
 const internal = @import("internal.zig");
-const check = internal.check;
-const checkPositive = internal.checkPositive;
+const err = @import("errors/adhoc.zig");
+const check = err.check;
+const checkPositive = err.checkPositive;
 const ci = internal.ci;
 const cu = internal.cu;
-const Error = internal.Error;
+const Error = err.Error;
 
 const adhoc = c.sceNetAdhoc;
 const ctl = c.sceNetAdhocctl;
@@ -44,7 +45,7 @@ pub fn term() Error!void {
 
 pub fn pdp_create(mac: [*]u8, port: u16, bufsize: u32, unk: i32) Error!i32 {
     const ret = adhoc.sceNetAdhocPdpCreate(mac, @as(c_ushort, port), @as(c_uint, bufsize), @as(c_int, unk));
-    return checkPositive(ret);
+    return checkPositive(i32, ret);
 }
 
 pub fn pdp_send(id: i32, dest_mac: [*]u8, port: u16, data: ?*anyopaque, len: u32, timeout: u32, nonblock: bool) Error!void {
@@ -67,7 +68,7 @@ pub fn get_pdp_stat(size: *i32, stat: [*c]PdpStat) Error!void {
 
 pub fn ptp_open(srcmac: [*]u8, srcport: u16, destmac: [*]u8, destport: u16, bufsize: u32, delay: u32, count: i32, unk: i32) Error!i32 {
     const ret = adhoc.sceNetAdhocPtpOpen(srcmac, @as(c_ushort, srcport), destmac, @as(c_ushort, destport), @as(c_uint, bufsize), @as(c_uint, delay), @as(c_int, count), @as(c_int, unk));
-    return checkPositive(ret);
+    return checkPositive(i32, ret);
 }
 
 pub fn ptp_connect(id: i32, timeout: u32, nonblock: bool) Error!void {
@@ -76,12 +77,12 @@ pub fn ptp_connect(id: i32, timeout: u32, nonblock: bool) Error!void {
 
 pub fn ptp_listen(srcmac: [*]u8, srcport: u16, bufsize: u32, delay: u32, count: i32, queue: i32, unk: i32) Error!i32 {
     const ret = adhoc.sceNetAdhocPtpListen(srcmac, @as(c_ushort, srcport), @as(c_uint, bufsize), @as(c_uint, delay), @as(c_int, count), @as(c_int, queue), @as(c_int, unk));
-    return checkPositive(ret);
+    return checkPositive(i32, ret);
 }
 
 pub fn ptp_accept(id: i32, mac: [*]u8, port: *u16, timeout: u32, nonblock: bool) Error!i32 {
     const ret = adhoc.sceNetAdhocPtpAccept(@as(c_int, id), mac, @ptrCast(port), @as(c_uint, timeout), @intFromBool(nonblock));
-    return checkPositive(ret);
+    return checkPositive(i32, ret);
 }
 
 pub fn ptp_send(id: i32, data: ?*anyopaque, datasize: *i32, timeout: u32, nonblock: bool) Error!void {
@@ -167,7 +168,7 @@ pub fn ctl_disconnect() Error!void {
 
 pub fn ctl_add_handler(handler: CtlHandler, unknown: ?*anyopaque) Error!i32 {
     const ret = ctl.sceNetAdhocctlAddHandler(handler, unknown);
-    return checkPositive(ret);
+    return checkPositive(i32, ret);
 }
 
 pub fn ctl_del_handler(id: i32) Error!void {
@@ -234,7 +235,7 @@ pub fn matching_term() Error!void {
 
 pub fn matching_create(mode: i32, maxpeers: i32, port: u16, bufsize: i32, hellodelay: u32, pingdelay: u32, initcount: i32, msgdelay: u32, callback: MatchingCallback) Error!i32 {
     const ret = matching.sceNetAdhocMatchingCreate(@as(c_int, mode), @as(c_int, maxpeers), @as(c_ushort, port), @as(c_int, bufsize), @as(c_uint, hellodelay), @as(c_uint, pingdelay), @as(c_int, initcount), @as(c_uint, msgdelay), callback);
-    return checkPositive(ret);
+    return checkPositive(i32, ret);
 }
 
 pub fn matching_start(id: i32, evthpri: i32, evthstack: i32, inthpri: i32, inthstack: i32, optlen: i32, optdata: ?*anyopaque) Error!void {

@@ -4,10 +4,10 @@
 //   c/module/sceAtrac3plus.zig
 
 const c = @import("../c/modules.zig");
-const internal = @import("internal.zig");
-const check = internal.check;
-const checkPositive = internal.checkPositive;
-const Error = internal.Error;
+const err = @import("errors/atrac3.zig");
+const check = err.check;
+const checkPositive = err.checkPositive;
+const Error = err.Error;
 
 const atrac = c.sceAtrac3plus;
 
@@ -35,12 +35,12 @@ pub fn set_halfway_buffer(atrac_id: i32, buf: [*]u8, read_size: u32, buf_size: u
 /// Creates a new Atrac ID from the specified data.
 pub fn set_data_and_get_id(buf: ?*anyopaque, bufsize: usize) Error!i32 {
     const ret = atrac.sceAtracSetDataAndGetID(buf, bufsize);
-    return checkPositive(ret);
+    return checkPositive(i32, ret);
 }
 
 pub fn set_halfway_buffer_and_get_id(buf: [*]u8, read_size: u32, buf_size: u32) Error!i32 {
     const ret = atrac.sceAtracSetHalfwayBufferAndGetID(buf, read_size, buf_size);
-    return checkPositive(ret);
+    return checkPositive(i32, ret);
 }
 
 // -- Decoding ----------------------------------------------------------

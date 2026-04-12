@@ -57,7 +57,7 @@ pub fn init() InitError!void {
     utility.load_net_module(.inet) catch
         return error.LoadInetModule;
 
-    net.init(128 * 1024, 42, 4 * 1024, 42, 4 * 1024) catch
+    net.init(128 * 1024, 16, 4 * 1024, 16, 4 * 1024) catch
         return error.NetInit;
 
     net.inet_init() catch

@@ -4,9 +4,9 @@
 //   c/module/sceDmac.zig
 
 const c = @import("../c/modules.zig");
-const internal = @import("internal.zig");
-const check = internal.check;
-const Error = internal.Error;
+const err = @import("errors/dmac.zig");
+const check = err.check;
+const Error = err.Error;
 
 const dmac = c.sceDmac;
 

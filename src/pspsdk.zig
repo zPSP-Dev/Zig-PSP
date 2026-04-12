@@ -491,7 +491,6 @@ pub const sceNetInetAccept = net.inet_accept;
 pub const sceNetInetBind = net.inet_bind;
 pub const sceNetInetClose = net.inet_close;
 pub const sceNetInetConnect = net.inet_connect;
-pub const sceNetInetGetErrno = net.inet_get_errno;
 pub const sceNetInetGetTcpcbstat = net.inet_get_tcpcb_stat;
 pub const sceNetInetGetUdpcbstat = net.inet_get_udpcb_stat;
 pub const sceNetInetGetpeername = net.inet_getpeername;

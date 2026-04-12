@@ -10,11 +10,12 @@
 //   c/module/sceSuspendForUser.zig
 //   c/module/UtilsForUser.zig
 
-const int = @import("internal.zig");
+const int = @import("errors/kernel.zig");
+const internal = @import("internal.zig");
 const check = int.check;
 const checkPositive = int.checkPositive;
-const ci = int.ci;
-const cu = int.cu;
+const ci = internal.ci;
+const cu = internal.cu;
 const c = @import("../c/modules.zig");
 
 const load_exec_mod = c.LoadExecForUser;

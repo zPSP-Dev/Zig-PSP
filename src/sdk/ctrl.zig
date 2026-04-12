@@ -3,11 +3,12 @@
 // Wraps:
 //   c/module/sceCtrl.zig
 
-const int = @import("internal.zig");
+const int = @import("errors/ctrl.zig");
+const internal = @import("internal.zig");
 const check = int.check;
 const checkPositive = int.checkPositive;
-const ci = int.ci;
-const cu = int.cu;
+const ci = internal.ci;
+const cu = internal.cu;
 const c = @import("../c/modules.zig");
 const module = c.sceCtrl;
 

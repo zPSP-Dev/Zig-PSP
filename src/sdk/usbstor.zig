@@ -5,10 +5,10 @@
 //   c/module/sceUsbstorBoot.zig
 
 const c = @import("../c/modules.zig");
-const internal = @import("internal.zig");
-const check = internal.check;
-const checkPositive = internal.checkPositive;
-const Error = internal.Error;
+const err = @import("errors/usbstor.zig");
+const check = err.check;
+const checkPositive = err.checkPositive;
+const Error = err.Error;
 
 const stor = c.sceUsbstor;
 const boot = c.sceUsbstorBoot;
@@ -29,7 +29,7 @@ pub fn set_load_addr(addr: u32) Error!void {
 
 pub fn get_data_size() Error!u32 {
     const ret = boot.sceUsbstorBootGetDataSize();
-    return checkPositive(ret);
+    return checkPositive(u32, ret);
 }
 
 pub fn set_status(status: u32) Error!void {

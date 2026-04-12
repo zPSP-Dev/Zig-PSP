@@ -5,10 +5,10 @@
 //   c/module/sceMpegbase.zig
 
 const c = @import("../c/modules.zig");
-const internal = @import("internal.zig");
-const check = internal.check;
-const checkPositive = internal.checkPositive;
-const Error = internal.Error;
+const err = @import("errors/mpeg.zig");
+const check = err.check;
+const checkPositive = err.checkPositive;
+const Error = err.Error;
 
 const mpeg = c.sceMpeg;
 const base = c.sceMpegbase;
@@ -36,7 +36,7 @@ pub fn finish() void {
 
 pub fn query_mem_size(unk: i32) Error!i32 {
     const ret = mpeg.sceMpegQueryMemSize(@as(c_int, unk));
-    return checkPositive(ret);
+    return checkPositive(i32, ret);
 }
 
 pub fn create(m: [*c]SceMpeg, data: ?*anyopaque, size: i32, ringbuffer: [*c]SceMpegRingbuffer, frame_width: i32, unk1: i32, unk2: i32) Error!void {
@@ -123,7 +123,7 @@ pub fn atrac_decode(m: [*c]SceMpeg, au: [*c]SceMpegAu, buffer: ?*anyopaque, init
 
 pub fn ringbuffer_query_mem_size(packets: i32) Error!i32 {
     const ret = mpeg.sceMpegRingbufferQueryMemSize(packets);
-    return checkPositive(ret);
+    return checkPositive(i32, ret);
 }
 
 pub fn ringbuffer_construct(rb: [*c]SceMpegRingbuffer, packets: i32, data: ?*anyopaque, size: i32, callback: RingbufferCB, cb_param: ?*anyopaque) Error!void {

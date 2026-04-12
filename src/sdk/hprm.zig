@@ -3,7 +3,7 @@
 // Wraps:
 //   c/module/sceHprm.zig
 
-const int = @import("internal.zig");
+const int = @import("errors/hprm.zig");
 const check = int.check;
 const module = @import("../c/modules.zig").sceHprm;
 

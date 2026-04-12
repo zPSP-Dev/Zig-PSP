@@ -1878,18 +1878,16 @@ fn netSend(_: ?*anyopaque, handle: net.Socket.Handle, messages: []net.OutgoingMe
     var total: usize = 0;
     for (messages) |*msg| {
         const sa = ipAddressToSockaddr(msg.address);
-        const sent: isize = @bitCast(psp_net.inet_sendto(
+        const sent = psp_net.inet_sendto(
             handle,
             msg.data_ptr,
             msg.data_len,
             0,
             &sa,
             @sizeOf(psp_net.sockaddr_in),
-        ));
-        if (sent < 0) return .{ error.SystemResources, total };
-        const sent_u: usize = @intCast(sent);
-        msg.data_len = sent_u;
-        total += sent_u;
+        ) catch return .{ error.SystemResources, total };
+        msg.data_len = sent;
+        total += sent;
     }
     return .{ null, total };
 }
@@ -1897,11 +1895,10 @@ fn netSend(_: ?*anyopaque, handle: net.Socket.Handle, messages: []net.OutgoingMe
 fn netRead(_: ?*anyopaque, handle: net.Socket.Handle, bufs: [][]u8) net.Stream.Reader.Error!usize {
     var total: usize = 0;
     for (bufs) |buf| {
-        const n: isize = @bitCast(psp_net.inet_recv(handle, buf.ptr, buf.len, 0));
-        if (n < 0) return error.ConnectionResetByPeer;
+        const n = psp_net.inet_recv(handle, buf.ptr, buf.len, 0) catch return error.ConnectionResetByPeer;
         if (n == 0) break;
-        total += @as(usize, @intCast(n));
-        if (@as(usize, @intCast(n)) < buf.len) break;
+        total += n;
+        if (n < buf.len) break;
     }
     return total;
 }
@@ -1909,27 +1906,22 @@ fn netRead(_: ?*anyopaque, handle: net.Socket.Handle, bufs: [][]u8) net.Stream.R
 fn netWrite(_: ?*anyopaque, handle: net.Socket.Handle, header: []const u8, payload: []const []const u8, splat: usize) net.Stream.Writer.Error!usize {
     var total: usize = 0;
     if (header.len > 0) {
-        const n: isize = @bitCast(psp_net.inet_send(handle, header.ptr, header.len, 0));
-        if (n < 0) return error.ConnectionResetByPeer;
-        total += @as(usize, @intCast(n));
+        const n = psp_net.inet_send(handle, header.ptr, header.len, 0) catch return error.ConnectionResetByPeer;
+        total += n;
     }
-    // Send all but the last element once
     if (payload.len > 1) {
         for (payload[0 .. payload.len - 1]) |chunk| {
             if (chunk.len == 0) continue;
-            const n: isize = @bitCast(psp_net.inet_send(handle, chunk.ptr, chunk.len, 0));
-            if (n < 0) return error.ConnectionResetByPeer;
-            total += @as(usize, @intCast(n));
+            const n = psp_net.inet_send(handle, chunk.ptr, chunk.len, 0) catch return error.ConnectionResetByPeer;
+            total += n;
         }
     }
-    // Send the last element `splat` times
     if (payload.len > 0) {
         const last = payload[payload.len - 1];
         if (last.len > 0) {
             for (0..splat) |_| {
-                const n: isize = @bitCast(psp_net.inet_send(handle, last.ptr, last.len, 0));
-                if (n < 0) return error.ConnectionResetByPeer;
-                total += @as(usize, @intCast(n));
+                const n = psp_net.inet_send(handle, last.ptr, last.len, 0) catch return error.ConnectionResetByPeer;
+                total += n;
             }
         }
     }
@@ -1939,9 +1931,8 @@ fn netWrite(_: ?*anyopaque, handle: net.Socket.Handle, header: []const u8, paylo
 fn netWriteFile(_: ?*anyopaque, handle: net.Socket.Handle, header: []const u8, file_reader: *Io.File.Reader, limit: Io.Limit) net.Stream.Writer.WriteFileError!usize {
     var total: usize = 0;
     if (header.len > 0) {
-        const n: isize = @bitCast(psp_net.inet_send(handle, header.ptr, header.len, 0));
-        if (n < 0) return error.NetworkDown;
-        total += @as(usize, @intCast(n));
+        const n = psp_net.inet_send(handle, header.ptr, header.len, 0) catch return error.NetworkDown;
+        total += n;
     }
     const max_bytes = @intFromEnum(limit);
     var buf: [4096]u8 = undefined;
@@ -1950,9 +1941,8 @@ fn netWriteFile(_: ?*anyopaque, handle: net.Socket.Handle, header: []const u8, f
         var read_bufs = [_][]u8{buf[0..to_read]};
         const got = file_reader.interface.readVec(&read_bufs) catch break;
         if (got == 0) break;
-        const n: isize = @bitCast(psp_net.inet_send(handle, &buf, got, 0));
-        if (n < 0) return error.NetworkDown;
-        total += @as(usize, @intCast(n));
+        const n = psp_net.inet_send(handle, &buf, got, 0) catch return error.NetworkDown;
+        total += n;
     }
     return total;
 }

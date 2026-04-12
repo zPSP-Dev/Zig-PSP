@@ -7,11 +7,12 @@
 
 const c = @import("../c/modules.zig");
 const internal = @import("internal.zig");
-const check = internal.check;
-const checkPositive = internal.checkPositive;
+const err = @import("errors/audio.zig");
+const check = err.check;
+const checkPositive = err.checkPositive;
 const ci = internal.ci;
 const cu = internal.cu;
-const Error = internal.Error;
+const Error = err.Error;
 
 const audio = c.sceAudio;
 const routing = c.sceAudioRouting;
@@ -32,7 +33,7 @@ pub const sample_max: i32 = 65472;
 
 pub fn ch_reserve(channel: i32, samplecount: i32, format: Format) Error!i32 {
     const ret = audio.sceAudioChReserve(@as(c_int, channel), @as(c_int, samplecount), @intFromEnum(format));
-    return checkPositive(ret);
+    return checkPositive(i32, ret);
 }
 
 pub fn ch_release(channel: i32) Error!void {
@@ -53,12 +54,12 @@ pub fn change_channel_volume(channel: i32, leftvol: i32, rightvol: i32) Error!vo
 
 pub fn get_channel_rest_len(channel: i32) Error!i32 {
     const ret = audio.sceAudioGetChannelRestLen(@as(c_int, channel));
-    return checkPositive(ret);
+    return checkPositive(i32, ret);
 }
 
 pub fn get_channel_rest_length(channel: i32) Error!i32 {
     const ret = audio.sceAudioGetChannelRestLength(@as(c_int, channel));
-    return checkPositive(ret);
+    return checkPositive(i32, ret);
 }
 
 // -- Output ------------------------------------------------------------
@@ -99,7 +100,7 @@ pub fn output2_output_blocking(vol: i32, buf: ?*anyopaque) Error!void {
 
 pub fn output2_get_rest_sample() Error!i32 {
     const ret = audio.sceAudioOutput2GetRestSample();
-    return checkPositive(ret);
+    return checkPositive(i32, ret);
 }
 
 // -- SRC (sample rate conversion) channel -----------------------------
@@ -136,7 +137,7 @@ pub fn input(samplecount: i32, freq: i32, buf: ?*anyopaque) Error!void {
 
 pub fn get_input_length() Error!i32 {
     const ret = audio.sceAudioGetInputLength();
-    return checkPositive(ret);
+    return checkPositive(i32, ret);
 }
 
 pub fn wait_input_end() Error!void {

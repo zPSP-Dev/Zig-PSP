@@ -5,12 +5,12 @@
 //   c/module/StdioForUser.zig
 
 const c = @import("../c/modules.zig");
+const err = @import("errors/io.zig");
 const internal = @import("internal.zig");
-const check = internal.check;
-const checkPositive = internal.checkPositive;
-const fromCode = internal.fromCode;
+const check = err.check;
+const checkPositive = err.checkPositive;
 const ci = internal.ci;
-const Error = internal.Error;
+const Error = err.Error;
 
 // -- Re-exported types --------------------------------------------------
 
@@ -120,7 +120,7 @@ pub fn dread(fd: SceUID, dir: *SceIoDirent) Error!bool {
     const ret = c.IoFileMgrForUser.sceIoDread(fd, dir);
     if (ret < 0) {
         @branchHint(.unlikely);
-        return fromCode(@bitCast(ret));
+        return err.translate(@bitCast(ret));
     }
     return ret > 0;
 }

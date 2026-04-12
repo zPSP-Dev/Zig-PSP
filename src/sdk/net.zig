@@ -8,10 +8,12 @@
 //   c/module/sceNet_lib.zig
 
 const c = @import("../c/modules.zig");
-const internal = @import("internal.zig");
-const check = internal.check;
-const checkPositive = internal.checkPositive;
-const Error = internal.Error;
+const err = @import("errors/net.zig");
+const errno = @import("errors/errno.zig");
+const check = err.check;
+const checkPositive = err.checkPositive;
+const Error = err.Error;
+pub const ErrnoError = errno.ErrnoError;
 
 const net = c.sceNet;
 const inet = c.sceNetInet;
@@ -98,33 +100,33 @@ pub fn inet_accept(s: i32, addr: *sockaddr_in, addrlen: *socklen_t) Error!i32 {
     return checkPositive(i32, inet.sceNetInetAccept(@as(c_int, s), addr, addrlen));
 }
 
-pub fn inet_send(s: i32, buf: ?*const anyopaque, len: usize, flags: i32) usize {
-    return inet.sceNetInetSend(@as(c_int, s), buf, len, @as(c_int, flags));
+pub fn inet_send(s: i32, buf: ?*const anyopaque, len: usize, flags: i32) ErrnoError!usize {
+    return errno.checkErrno(usize, inet.sceNetInetSend(@as(c_int, s), buf, len, @as(c_int, flags)));
 }
 
-pub fn inet_sendto(s: i32, buf: ?*const anyopaque, len: usize, flags: i32, to: *const sockaddr_in, tolen: socklen_t) usize {
-    return inet.sceNetInetSendto(@as(c_int, s), buf, len, @as(c_int, flags), to, tolen);
+pub fn inet_sendto(s: i32, buf: ?*const anyopaque, len: usize, flags: i32, to: *const sockaddr_in, tolen: socklen_t) ErrnoError!usize {
+    return errno.checkErrno(usize, inet.sceNetInetSendto(@as(c_int, s), buf, len, @as(c_int, flags), to, tolen));
 }
 
-pub fn inet_sendmsg(s: i32, msg: *const msghdr, flags: i32) isize {
-    return inet.sceNetInetSendmsg(@as(c_int, s), @constCast(msg), @as(c_int, flags));
+pub fn inet_sendmsg(s: i32, msg: *const msghdr, flags: i32) ErrnoError!isize {
+    return errno.checkErrno(isize, inet.sceNetInetSendmsg(@as(c_int, s), @constCast(msg), @as(c_int, flags)));
 }
 
-pub fn inet_recv(s: i32, buf: ?*anyopaque, len: usize, flags: i32) usize {
-    return inet.sceNetInetRecv(@as(c_int, s), buf, len, @as(c_int, flags));
+pub fn inet_recv(s: i32, buf: ?*anyopaque, len: usize, flags: i32) ErrnoError!usize {
+    return errno.checkErrno(usize, inet.sceNetInetRecv(@as(c_int, s), buf, len, @as(c_int, flags)));
 }
 
-pub fn inet_recvfrom(s: i32, buf: ?*anyopaque, len: usize, flags: i32, from: *sockaddr_in, fromlen: *socklen_t) usize {
-    return inet.sceNetInetRecvfrom(@as(c_int, s), buf, len, @as(c_int, flags), from, fromlen);
+pub fn inet_recvfrom(s: i32, buf: ?*anyopaque, len: usize, flags: i32, from: *sockaddr_in, fromlen: *socklen_t) ErrnoError!usize {
+    return errno.checkErrno(usize, inet.sceNetInetRecvfrom(@as(c_int, s), buf, len, @as(c_int, flags), from, fromlen));
 }
 
-pub fn inet_recvmsg(s: i32, msg: *msghdr, flags: i32) isize {
-    return inet.sceNetInetRecvmsg(@as(c_int, s), msg, @as(c_int, flags));
+pub fn inet_recvmsg(s: i32, msg: *msghdr, flags: i32) ErrnoError!isize {
+    return errno.checkErrno(isize, inet.sceNetInetRecvmsg(@as(c_int, s), msg, @as(c_int, flags)));
 }
 
 pub fn inet_select(n: i32, readfds: [*c]fd_set, writefds: [*c]fd_set, exceptfds: [*c]fd_set, timeout: [*c]SceNetInetTimeval) Error!i32 {
     const ret = inet.sceNetInetSelect(@as(c_int, n), readfds, writefds, exceptfds, timeout);
-    return checkPositive(ret);
+    return checkPositive(i32, ret);
 }
 
 pub fn inet_shutdown(s: i32, how: i32) Error!void {
@@ -145,10 +147,6 @@ pub fn inet_getpeername(s: i32, name: *sockaddr_in, namelen: *socklen_t) Error!v
 
 pub fn inet_getsockname(s: i32, name: *sockaddr_in, namelen: *socklen_t) Error!void {
     return check(inet.sceNetInetGetsockname(@as(c_int, s), name, namelen));
-}
-
-pub fn inet_get_errno() i32 {
-    return inet.sceNetInetGetErrno();
 }
 
 // Undocumented inet stubs
@@ -177,7 +175,7 @@ pub fn apctl_get_info(code: i32, info: *SceNetApctlInfo) Error!void {
 
 pub fn apctl_add_handler(handler: ApctlHandler, arg: ?*anyopaque) Error!i32 {
     const ret = apctl.sceNetApctlAddHandler(handler, arg);
-    return checkPositive(ret);
+    return checkPositive(i32, ret);
 }
 
 pub fn apctl_del_handler(handler_id: i32) Error!void {

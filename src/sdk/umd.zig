@@ -5,10 +5,11 @@
 
 const c = @import("../c/modules.zig");
 const internal = @import("internal.zig");
-const check = internal.check;
+const err = @import("errors/umd.zig");
+const check = err.check;
 const ci = internal.ci;
 const cu = internal.cu;
-const Error = internal.Error;
+const Error = err.Error;
 
 const umd = c.sceUmdUser;
 

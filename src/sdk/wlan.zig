@@ -5,9 +5,9 @@
 //   c/module/sceWlanDrv_lib.zig
 
 const c = @import("../c/modules.zig");
-const internal = @import("internal.zig");
-const check = internal.check;
-const Error = internal.Error;
+const err = @import("errors/wlan.zig");
+const check = err.check;
+const Error = err.Error;
 
 const drv = c.sceWlanDrv;
 const lib = c.sceWlanDrv_lib;

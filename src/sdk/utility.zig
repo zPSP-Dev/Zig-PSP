@@ -6,9 +6,10 @@
 
 const c = @import("../c/modules.zig");
 const internal = @import("internal.zig");
-const check = internal.check;
+const err = @import("errors/utility.zig");
+const check = err.check;
 const ci = internal.ci;
-const Error = internal.Error;
+const Error = err.Error;
 
 const util = c.sceUtility;
 const netparam = c.sceUtility_netparam_internal;

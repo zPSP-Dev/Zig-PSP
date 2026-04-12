@@ -5,9 +5,10 @@
 
 const c = @import("../c/modules.zig");
 const internal = @import("internal.zig");
-const check = internal.check;
+const err = @import("errors/rtc.zig");
+const check = err.check;
 const ci = internal.ci;
-const Error = internal.Error;
+const Error = err.Error;
 
 const rtc = c.sceRtc;
 

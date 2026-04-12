@@ -4,10 +4,10 @@
 //   c/module/sceMp3.zig
 
 const c = @import("../c/modules.zig");
-const internal = @import("internal.zig");
-const check = internal.check;
-const checkPositive = internal.checkPositive;
-const Error = internal.Error;
+const err = @import("errors/mp3.zig");
+const check = err.check;
+const checkPositive = err.checkPositive;
+const Error = err.Error;
 
 const mp3 = c.sceMp3;
 
