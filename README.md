@@ -11,7 +11,7 @@ Special thanks is given to the [Rust-PSP team](https://github.com/overdrivenpota
 
 ## Requirements
 
-- **Zig 0.16.0-dev** nightly (see `build.zig.zon` for the exact fingerprint)
+- **Zig 0.16.0**
 
 No legacy PSPSDK or external C toolchain is required. All build tools (`zPRXGen`, `zSFOTool`, `zPBPTool`) are written in Zig and built automatically.
 
