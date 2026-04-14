@@ -1,7 +1,7 @@
 .{
     .name = .psp_examples,
     .version = "0.0.0",
-    .minimum_zig_version = "0.16.0-dev.2682+02142a54d",
+    .minimum_zig_version = "0.16.0",
     .fingerprint = 0x7d0f0a7a1c0c1f7f,
 
     .dependencies = .{
