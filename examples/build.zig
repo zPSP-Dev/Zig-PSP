@@ -6,7 +6,7 @@ pub fn build(b: *std.Build) void {
 
     inline for (examples) |ex| {
         _ = pspsdk.buildPspEboot(b, .{
-            .name = ex.name,
+            .name = "example_" ++ ex.name,
             .root_source_file = b.path(ex.src),
             .title = ex.title,
             .optimize = optimize,

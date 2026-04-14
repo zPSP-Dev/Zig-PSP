@@ -390,7 +390,7 @@ pub fn build(b: *std.Build) void {
 
     inline for (example_list) |example| {
         const exe = b.addExecutable(.{
-            .name = "main",
+            .name = "example_" ++ example.name,
             .root_module = b.createModule(.{
                 .root_source_file = b.path(example.src_file),
                 .target = psp_target,

@@ -155,7 +155,7 @@ Copy the output to your memory stick:
 PSP/GAME/MyAppName/EBOOT.PBP
 ```
 
-The application will appear under **Game -> Memory Stick** in the XMB. Custom firmware (CFW) is required.
+The application will appear under **Game -> Memory Stick** in the XMB. A custom firmware (CFW) is required by default, but it's possible to encrypt your application for an official firmware (OFW) as well, just make sure to set `.encrypt = true` in `PspEbootOptions`.
 
 ## Examples
 
