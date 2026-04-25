@@ -342,6 +342,10 @@ pub const sceJpegInitMJpeg = jpeg.init_mjpeg;
 // -- kermit (sceKermitPeripheral) --
 pub const kermit = @import("sdk/kermit.zig");
 
+// -- model (Zig-only utility: PSP Phat/Slim detection) --
+pub const model = @import("sdk/model.zig");
+pub const PspModel = model.PspModel;
+
 // -- kernel (LoadExecForUser, ThreadManForUser, SysMemUserForUser, ModuleMgrForUser, etc.) --
 pub const kernel = @import("sdk/kernel.zig");
 pub const sceKernelAllocPartitionMemory = kernel.alloc_partition_memory;
