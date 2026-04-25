@@ -3,6 +3,7 @@ const std = @import("std");
 const kernel = @import("../sdk/kernel.zig");
 
 const debug = @import("debug.zig");
+const fpu = @import("fpu.zig");
 const psp_allocator = @import("allocator.zig");
 const pool_allocator = @import("pool_allocator.zig");
 const psp_io = @import("Io.zig");
@@ -22,6 +23,8 @@ const bad_main_ret = @compileError("Where is this from?!");
 
 //This calls your main function as a thread.
 pub fn _module_main_thread(argc: usize, argv: ?*anyopaque) callconv(.c) c_int {
+    fpu.setIEEE754();
+
     const fn_info = @typeInfo(@TypeOf(root.main)).@"fn";
 
     // Extract arg0 (program path) from the PSP argument buffer.

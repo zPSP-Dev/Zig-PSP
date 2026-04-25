@@ -767,6 +767,7 @@ pub const extra = struct {
     pub const allocator = @import("utils/allocator.zig");
     pub const constants = @import("utils/constants.zig");
     pub const debug = @import("utils/debug.zig");
+    pub const fpu = @import("utils/fpu.zig");
     pub const Io = @import("utils/Io.zig");
     pub const module = @import("utils/module.zig");
     pub const net = @import("utils/net.zig");
