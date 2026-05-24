@@ -141,6 +141,22 @@ fn toNullTerminated(path: []const u8, buf: *[1024]u8) ?[*:0]const u8 {
     return buf[0..path.len :0].ptr;
 }
 
+fn copyPathZ(path: []const u8, buf: *[1024]u8) ?[:0]const u8 {
+    if (path.len >= buf.len) return null;
+    @memcpy(buf[0..path.len], path);
+    buf[path.len] = 0;
+    return buf[0..path.len :0];
+}
+
+fn isPspAbsolutePath(path: []const u8) bool {
+    if (path.len == 0) return false;
+    if (path[0] == '/') return true;
+
+    const colon = std.mem.indexOfScalar(u8, path, ':') orelse return false;
+    if (colon == 0) return false;
+    return std.mem.indexOfScalar(u8, path[0..colon], '/') == null;
+}
+
 fn crashHandler(_: ?*anyopaque) void {
     @panic("Io.crashHandler not implemented");
 }
@@ -273,6 +289,52 @@ fn lookupFdPath(fd: SceUID) ?[]const u8 {
         }
     }
     return null;
+}
+
+fn isCwdHandle(handle: SceUID) bool {
+    return handle == -1;
+}
+
+fn dirBasePath(dir: Dir) ?[]const u8 {
+    if (isCwdHandle(dir.handle)) {
+        ensureCwdInit();
+        return cwd_buf[0..cwd_len];
+    }
+    return lookupFdPath(dir.handle);
+}
+
+fn joinPathZ(base: []const u8, sub_path: []const u8, buf: *[1024]u8) ?[:0]const u8 {
+    if (sub_path.len == 0) return copyPathZ(base, buf);
+    if (base.len == 0) return copyPathZ(sub_path, buf);
+
+    var len = base.len;
+    if (base[base.len - 1] == '/' and sub_path[0] == '/') {
+        len += sub_path.len - 1;
+        if (len >= buf.len) return null;
+        @memcpy(buf[0..base.len], base);
+        @memcpy(buf[base.len..len], sub_path[1..]);
+    } else if (base[base.len - 1] != '/' and sub_path[0] != '/') {
+        len += 1 + sub_path.len;
+        if (len >= buf.len) return null;
+        @memcpy(buf[0..base.len], base);
+        buf[base.len] = '/';
+        @memcpy(buf[base.len + 1 .. len], sub_path);
+    } else {
+        len += sub_path.len;
+        if (len >= buf.len) return null;
+        @memcpy(buf[0..base.len], base);
+        @memcpy(buf[base.len..len], sub_path);
+    }
+    buf[len] = 0;
+    return buf[0..len :0];
+}
+
+fn resolvePath(dir: Dir, sub_path: []const u8, buf: *[1024]u8) error{ NameTooLong, FileNotFound }![:0]const u8 {
+    if (isPspAbsolutePath(sub_path)) {
+        return copyPathZ(sub_path, buf) orelse error.NameTooLong;
+    }
+    const base = dirBasePath(dir) orelse return error.FileNotFound;
+    return joinPathZ(base, sub_path, buf) orelse error.NameTooLong;
 }
 
 // -- ScePspDateTime <-> Io.Timestamp helpers -----------------------------
@@ -991,21 +1053,20 @@ fn batchCancel(_: ?*anyopaque, _: *Io.Batch) void {
 
 // -- Directory operations ----------------------------------------------
 
-fn dirCreateDir(_: ?*anyopaque, _: Dir, sub_path: []const u8, _: Dir.Permissions) Dir.CreateDirError!void {
+fn dirCreateDir(_: ?*anyopaque, dir: Dir, sub_path: []const u8, _: Dir.Permissions) Dir.CreateDirError!void {
     var path_buf: [1024]u8 = undefined;
-    const path_z = toNullTerminated(sub_path, &path_buf) orelse return error.NameTooLong;
-    io.mkdir(path_z, 0o777) catch return error.AccessDenied;
+    const path_z = try resolvePath(dir, sub_path, &path_buf);
+    io.mkdir(path_z.ptr, 0o777) catch return error.AccessDenied;
 }
 
-fn dirCreateDirPath(_: ?*anyopaque, _: Dir, sub_path: []const u8, _: Dir.Permissions) Dir.CreateDirPathError!Dir.CreatePathStatus {
+fn dirCreateDirPath(_: ?*anyopaque, dir: Dir, sub_path: []const u8, _: Dir.Permissions) Dir.CreateDirPathError!Dir.CreatePathStatus {
     var path_buf: [1024]u8 = undefined;
-    if (sub_path.len >= path_buf.len) return error.NameTooLong;
-    @memcpy(path_buf[0..sub_path.len], sub_path);
+    const resolved = try resolvePath(dir, sub_path, &path_buf);
 
     // Create each component incrementally
     var created_any = false;
     var i: usize = 0;
-    while (i < sub_path.len) {
+    while (i < resolved.len) {
         if (path_buf[i] == '/') {
             if (i > 0) {
                 path_buf[i] = 0;
@@ -1020,8 +1081,8 @@ fn dirCreateDirPath(_: ?*anyopaque, _: Dir, sub_path: []const u8, _: Dir.Permiss
         i += 1;
     }
     // Create the final component
-    path_buf[sub_path.len] = 0;
-    const final_path: [*:0]const u8 = @ptrCast(path_buf[0..sub_path.len :0].ptr);
+    path_buf[resolved.len] = 0;
+    const final_path: [*:0]const u8 = @ptrCast(path_buf[0..resolved.len :0].ptr);
     if (io.mkdir(final_path, 0o777)) |_|
         return .created
     else |_| {}
@@ -1034,14 +1095,13 @@ fn dirCreateDirPath(_: ?*anyopaque, _: Dir, sub_path: []const u8, _: Dir.Permiss
     return error.AccessDenied;
 }
 
-fn dirCreateDirPathOpen(_: ?*anyopaque, _: Dir, sub_path: []const u8, _: Dir.Permissions, _: Dir.OpenOptions) Dir.CreateDirPathOpenError!Dir {
+fn dirCreateDirPathOpen(_: ?*anyopaque, dir: Dir, sub_path: []const u8, _: Dir.Permissions, _: Dir.OpenOptions) Dir.CreateDirPathOpenError!Dir {
     var path_buf: [1024]u8 = undefined;
-    if (sub_path.len >= path_buf.len) return error.NameTooLong;
-    @memcpy(path_buf[0..sub_path.len], sub_path);
+    const resolved = try resolvePath(dir, sub_path, &path_buf);
 
     // Create each component incrementally
     var i: usize = 0;
-    while (i < sub_path.len) {
+    while (i < resolved.len) {
         if (path_buf[i] == '/') {
             if (i > 0) {
                 path_buf[i] = 0;
@@ -1054,24 +1114,26 @@ fn dirCreateDirPathOpen(_: ?*anyopaque, _: Dir, sub_path: []const u8, _: Dir.Per
         i += 1;
     }
     // Create final component
-    path_buf[sub_path.len] = 0;
-    const final_path: [*:0]const u8 = @ptrCast(path_buf[0..sub_path.len :0].ptr);
+    path_buf[resolved.len] = 0;
+    const final_path: [*:0]const u8 = @ptrCast(path_buf[0..resolved.len :0].ptr);
     io.mkdir(final_path, 0o777) catch {};
 
     // Open it
     const fd = io.dopen(final_path) catch return error.FileNotFound;
+    trackFd(fd, resolved);
     return .{ .handle = fd };
 }
 
-fn dirOpenDir(_: ?*anyopaque, _: Dir, sub_path: []const u8, _: Dir.OpenOptions) Dir.OpenError!Dir {
+fn dirOpenDir(_: ?*anyopaque, dir: Dir, sub_path: []const u8, _: Dir.OpenOptions) Dir.OpenError!Dir {
     var path_buf: [1024]u8 = undefined;
-    const path_z = toNullTerminated(sub_path, &path_buf) orelse return error.NameTooLong;
-    const fd = io.dopen(path_z) catch return error.FileNotFound;
+    const path_z = try resolvePath(dir, sub_path, &path_buf);
+    const fd = io.dopen(path_z.ptr) catch return error.FileNotFound;
+    trackFd(fd, path_z);
     return .{ .handle = fd };
 }
 
 fn dirStat(_: ?*anyopaque, d: Dir) Dir.StatError!Dir.Stat {
-    const path = lookupFdPath(d.handle) orelse return error.AccessDenied;
+    const path = dirBasePath(d) orelse return error.AccessDenied;
     var path_buf: [1024]u8 = undefined;
     const path_z = toNullTerminated(path, &path_buf) orelse return error.AccessDenied;
     var stat_buf: io.SceIoStat = undefined;
@@ -1079,32 +1141,32 @@ fn dirStat(_: ?*anyopaque, d: Dir) Dir.StatError!Dir.Stat {
     return sceIoStatToFileStat(&stat_buf);
 }
 
-fn dirStatFile(_: ?*anyopaque, _: Dir, sub_path: []const u8, _: Dir.StatFileOptions) Dir.StatFileError!File.Stat {
+fn dirStatFile(_: ?*anyopaque, dir: Dir, sub_path: []const u8, _: Dir.StatFileOptions) Dir.StatFileError!File.Stat {
     var path_buf: [1024]u8 = undefined;
-    const path_z = toNullTerminated(sub_path, &path_buf) orelse return error.NameTooLong;
+    const path_z = try resolvePath(dir, sub_path, &path_buf);
     var stat_buf: io.SceIoStat = undefined;
-    io.getstat(path_z, &stat_buf) catch return error.FileNotFound;
+    io.getstat(path_z.ptr, &stat_buf) catch return error.FileNotFound;
     return sceIoStatToFileStat(&stat_buf);
 }
 
-fn dirAccess(_: ?*anyopaque, _: Dir, sub_path: []const u8, _: Dir.AccessOptions) Dir.AccessError!void {
+fn dirAccess(_: ?*anyopaque, dir: Dir, sub_path: []const u8, _: Dir.AccessOptions) Dir.AccessError!void {
     var path_buf: [1024]u8 = undefined;
-    const path_z = toNullTerminated(sub_path, &path_buf) orelse return error.NameTooLong;
+    const path_z = try resolvePath(dir, sub_path, &path_buf);
     var stat_buf: io.SceIoStat = undefined;
-    io.getstat(path_z, &stat_buf) catch return error.FileNotFound;
+    io.getstat(path_z.ptr, &stat_buf) catch return error.FileNotFound;
 }
 
-fn dirCreateFile(_: ?*anyopaque, _: Dir, sub_path: []const u8, flags: File.CreateFlags) File.OpenError!File {
+fn dirCreateFile(_: ?*anyopaque, dir: Dir, sub_path: []const u8, flags: File.CreateFlags) File.OpenError!File {
     var path_buf: [1024]u8 = undefined;
-    const path_z = toNullTerminated(sub_path, &path_buf) orelse return error.NameTooLong;
-    const fd = io.open(path_z, .{
+    const path_z = try resolvePath(dir, sub_path, &path_buf);
+    const fd = io.open(path_z.ptr, .{
         .read = flags.read,
         .write = true,
         .create = true,
         .truncate = flags.truncate,
         .excl = flags.exclusive,
     }, 0o777) catch return error.AccessDenied;
-    trackFd(fd, sub_path);
+    trackFd(fd, path_z);
     return .{ .handle = fd, .flags = .{ .nonblocking = false } };
 }
 
@@ -1112,21 +1174,22 @@ fn dirCreateFileAtomic(_: ?*anyopaque, _: Dir, _: []const u8, _: Dir.CreateFileA
     return error.AccessDenied;
 }
 
-fn dirOpenFile(_: ?*anyopaque, _: Dir, sub_path: []const u8, flags: File.OpenFlags) File.OpenError!File {
+fn dirOpenFile(_: ?*anyopaque, dir: Dir, sub_path: []const u8, flags: File.OpenFlags) File.OpenError!File {
     var path_buf: [1024]u8 = undefined;
-    const path_z = toNullTerminated(sub_path, &path_buf) orelse return error.NameTooLong;
+    const path_z = try resolvePath(dir, sub_path, &path_buf);
     const open_flags: io.OpenFlags = switch (flags.mode) {
         .read_only => .{ .read = true },
         .write_only => .{ .write = true },
         .read_write => .{ .read = true, .write = true },
     };
-    const fd = io.open(path_z, open_flags, 0o777) catch return error.FileNotFound;
-    trackFd(fd, sub_path);
+    const fd = io.open(path_z.ptr, open_flags, 0o777) catch return error.FileNotFound;
+    trackFd(fd, path_z);
     return .{ .handle = fd, .flags = .{ .nonblocking = false } };
 }
 
 fn dirClose(_: ?*anyopaque, dirs: []const Dir) void {
     for (dirs) |dir| {
+        untrackFd(dir.handle);
         io.dclose(dir.handle) catch {};
     }
 }
@@ -1172,24 +1235,24 @@ fn dirRealPathFile(_: ?*anyopaque, _: Dir, _: []const u8, _: []u8) Dir.RealPathF
     return error.OperationUnsupported;
 }
 
-fn dirDeleteFile(_: ?*anyopaque, _: Dir, sub_path: []const u8) Dir.DeleteFileError!void {
+fn dirDeleteFile(_: ?*anyopaque, dir: Dir, sub_path: []const u8) Dir.DeleteFileError!void {
     var path_buf: [1024]u8 = undefined;
-    const path_z = toNullTerminated(sub_path, &path_buf) orelse return error.NameTooLong;
-    io.remove(path_z) catch return error.AccessDenied;
+    const path_z = try resolvePath(dir, sub_path, &path_buf);
+    io.remove(path_z.ptr) catch return error.AccessDenied;
 }
 
-fn dirDeleteDir(_: ?*anyopaque, _: Dir, sub_path: []const u8) Dir.DeleteDirError!void {
+fn dirDeleteDir(_: ?*anyopaque, dir: Dir, sub_path: []const u8) Dir.DeleteDirError!void {
     var path_buf: [1024]u8 = undefined;
-    const path_z = toNullTerminated(sub_path, &path_buf) orelse return error.NameTooLong;
-    io.rmdir(path_z) catch return error.AccessDenied;
+    const path_z = try resolvePath(dir, sub_path, &path_buf);
+    io.rmdir(path_z.ptr) catch return error.AccessDenied;
 }
 
-fn dirRename(_: ?*anyopaque, _: Dir, old_path: []const u8, _: Dir, new_path: []const u8) Dir.RenameError!void {
+fn dirRename(_: ?*anyopaque, old_dir: Dir, old_path: []const u8, new_dir: Dir, new_path: []const u8) Dir.RenameError!void {
     var old_buf: [1024]u8 = undefined;
     var new_buf: [1024]u8 = undefined;
-    const old_z = toNullTerminated(old_path, &old_buf) orelse return error.NameTooLong;
-    const new_z = toNullTerminated(new_path, &new_buf) orelse return error.NameTooLong;
-    io.rename(old_z, new_z) catch return error.AccessDenied;
+    const old_z = try resolvePath(old_dir, old_path, &old_buf);
+    const new_z = try resolvePath(new_dir, new_path, &new_buf);
+    io.rename(old_z.ptr, new_z.ptr) catch return error.AccessDenied;
 }
 
 fn dirRenamePreserve(_: ?*anyopaque, _: Dir, _: []const u8, _: Dir, _: []const u8) Dir.RenamePreserveError!void {
@@ -1220,13 +1283,13 @@ fn dirSetFilePermissions(_: ?*anyopaque, _: Dir, _: []const u8, _: File.Permissi
     // No-op: PSP doesn't have a meaningful permission model.
 }
 
-fn dirSetTimestamps(_: ?*anyopaque, _: Dir, sub_path: []const u8, options: Dir.SetTimestampsOptions) Dir.SetTimestampsError!void {
+fn dirSetTimestamps(_: ?*anyopaque, dir: Dir, sub_path: []const u8, options: Dir.SetTimestampsOptions) Dir.SetTimestampsError!void {
     var path_buf: [1024]u8 = undefined;
-    const path_z = toNullTerminated(sub_path, &path_buf) orelse return error.AccessDenied;
+    const path_z = resolvePath(dir, sub_path, &path_buf) catch return error.AccessDenied;
 
     // Read current stat so we can update only what's requested
     var stat_buf: io.SceIoStat = undefined;
-    io.getstat(path_z, &stat_buf) catch return error.AccessDenied;
+    io.getstat(path_z.ptr, &stat_buf) catch return error.AccessDenied;
 
     var bits: c_int = 0;
     switch (options.access_timestamp) {
@@ -1253,7 +1316,7 @@ fn dirSetTimestamps(_: ?*anyopaque, _: Dir, sub_path: []const u8, options: Dir.S
     }
 
     if (bits != 0) {
-        io.chstat(path_z, &stat_buf, @intCast(bits)) catch return error.AccessDenied;
+        io.chstat(path_z.ptr, &stat_buf, @intCast(bits)) catch return error.AccessDenied;
     }
 }
 
@@ -1607,13 +1670,15 @@ fn processSetCurrentDir(_: ?*anyopaque, _: Dir) std.process.SetCurrentDirError!v
 }
 
 fn processSetCurrentPath(_: ?*anyopaque, path: []const u8) std.process.SetCurrentPathError!void {
-    if (path.len >= cwd_buf.len) return error.NameTooLong;
     var path_z_buf: [1024]u8 = undefined;
-    const path_z = toNullTerminated(path, &path_z_buf) orelse return error.NameTooLong;
-    io.chdir(path_z) catch return error.FileNotFound;
+    const path_z = resolvePath(.{ .handle = -1 }, path, &path_z_buf) catch |err| switch (err) {
+        error.NameTooLong => return error.NameTooLong,
+        error.FileNotFound => return error.FileNotFound,
+    };
+    io.chdir(path_z.ptr) catch return error.FileNotFound;
     // Update tracked cwd
-    @memcpy(cwd_buf[0..path.len], path);
-    cwd_len = path.len;
+    @memcpy(cwd_buf[0..path_z.len], path_z);
+    cwd_len = path_z.len;
     cwd_initialized = true;
 }
 
