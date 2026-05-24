@@ -34,7 +34,7 @@ const pspsdk = @import("pspsdk");
 pub fn build(b: *std.Build) void {
     const optimize = b.standardOptimizeOption(.{});
 
-    pspsdk.buildPspEboot(b, .{
+    _ = pspsdk.buildPspEboot(b, .{
         .name             = "my_app",
         .root_source_file = b.path("src/main.zig"),
         .title            = "My App Title",
