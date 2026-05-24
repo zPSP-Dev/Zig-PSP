@@ -17,7 +17,7 @@ comptime {
     asm (sdk.extra.module.module_info("SDK Ziggy Cube", .{ .mode = .User }, 1, 0));
 }
 
-var display_list: [0x40000]u32 align(16) = [_]u32{0} ** 0x40000;
+var display_list: [0x40000]u32 align(16) = @splat(0);
 
 const Vertex = packed struct {
     u: f32,

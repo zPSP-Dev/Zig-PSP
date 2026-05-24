@@ -16,7 +16,7 @@ const Record = struct {
 
 pub var enabled: bool = false;
 var writer: ?*std.Io.Writer = null;
-var records: [max_records]Record = [_]Record{.{}} ** max_records;
+var records: [max_records]Record = @splat(.{});
 
 pub fn set_enabled(value: bool) void {
     enabled = value;

@@ -47,7 +47,7 @@ pub fn cmd0(out: []u8, in: []const u8) !void {
 // and a multiple of 16. src and dst may be different buffers (no in-place).
 fn aes_cbc_encrypt(key: [16]u8, src: []const u8, dst: []u8) void {
     const enc = std.crypto.core.aes.Aes128.initEnc(key);
-    var iv = [_]u8{0} ** 16;
+    var iv: [16]u8 = @splat(0);
     var i: usize = 0;
     while (i < src.len) : (i += 16) {
         var block: [16]u8 = undefined;

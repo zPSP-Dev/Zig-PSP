@@ -6,7 +6,7 @@ pub const ScePspFVector3 = c.types.ScePspFVector3;
 
 //Internal
 var gum_current_mode: u8 = 0;
-var gum_matrix_update: [4]u8 = [_]u8{0} ** 4;
+var gum_matrix_update: [4]u8 = @splat(0);
 var gum_current_matrix_update: u8 = 0;
 
 var gum_current_matrix: *ScePspFMatrix4 = @as(*ScePspFMatrix4, @ptrCast(&gum_matrix_stack[0]));

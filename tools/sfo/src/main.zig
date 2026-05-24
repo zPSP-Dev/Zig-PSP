@@ -133,7 +133,7 @@ pub fn writeSFO(allocator: std.mem.Allocator, io: std.Io, path: []const u8, entr
     var key_segment = std.array_list.Managed(u8).init(allocator);
 
     var table_entries = std.array_list.Managed(TableEntry).init(allocator);
-    const PAD = [_]u8{0} ** 4;
+    const PAD: [4]u8 = @splat(0);
     for (entries) |entry| {
         const data_len = switch (entry.type) {
             .Bin => entry.data.?.len,

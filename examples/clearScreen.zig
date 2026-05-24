@@ -15,7 +15,7 @@ comptime {
     asm (sdk.extra.module.module_info("SDK Clear Screen", .{ .mode = .User }, 1, 0));
 }
 
-var display_list: [0x40000]u32 align(16) = [_]u32{0} ** 0x40000;
+var display_list: [0x40000]u32 align(16) = @splat(0);
 
 pub fn main(_: std.process.Init) !void {
     const SCREEN_WIDTH = sdk.extra.constants.SCREEN_WIDTH;

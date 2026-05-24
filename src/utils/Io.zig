@@ -160,7 +160,7 @@ const ThreadState = struct {
     cancel_acknowledged: bool = false,
 };
 
-var thread_states: [MAX_PSP_THREADS]ThreadState = [_]ThreadState{.{}} ** MAX_PSP_THREADS;
+var thread_states: [MAX_PSP_THREADS]ThreadState = @splat(.{});
 
 fn getThreadState() ?*ThreadState {
     const tid = kernel.get_thread_id();
@@ -241,7 +241,7 @@ const FdPathEntry = struct {
     path: [1024]u8 = undefined,
     len: usize = 0,
 };
-var fd_table: [MAX_TRACKED_FDS]FdPathEntry = [_]FdPathEntry{.{}} ** MAX_TRACKED_FDS;
+var fd_table: [MAX_TRACKED_FDS]FdPathEntry = @splat(.{});
 
 fn trackFd(fd: SceUID, path: []const u8) void {
     // Find a free slot (fd == -1) or reuse one

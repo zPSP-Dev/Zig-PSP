@@ -649,7 +649,7 @@ pub const sockaddr_in = extern struct {
     sin_family: u8 = 2, // AF_INET
     sin_port: u16, // network byte order (big-endian)
     sin_addr: in_addr,
-    sin_zero: [8]u8 = .{0} ** 8,
+    sin_zero: [8]u8 = @splat(0),
 };
 
 pub const pspUmdInfo = extern struct {

@@ -208,13 +208,13 @@ fn cmac_forge(key: *const [16]u8, data: []u8, target: *const [16]u8) void {
     const dec = Aes128.initDec(key.*);
 
     // Derive CMAC subkey K1: double(AES(0...0))
-    var k1 = [_]u8{0} ** 16;
+    var k1: [16]u8 = @splat(0);
     enc.encrypt(&k1, &k1);
     k1 = double_block(k1);
 
     // Run CBC forward over all blocks except the last to get X_{n-1}
     const n = data.len / 16;
-    var x = [_]u8{0} ** 16;
+    var x: [16]u8 = @splat(0);
     for (0..n - 1) |i| {
         for (&x, data[i * 16 ..][0..16]) |*xb, mb| xb.* ^= mb;
         enc.encrypt(&x, &x);
