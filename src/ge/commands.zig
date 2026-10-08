@@ -580,9 +580,10 @@ pub fn encode_command(command: Command) u32 {
 
 pub fn CommandArgument(comptime op: Op) type {
     @setEvalBranchQuota(10_000);
-    inline for (@typeInfo(Command).@"union".fields) |field| {
-        if (std.mem.eql(u8, field.name, @tagName(op))) {
-            return field.type;
+    const info = @typeInfo(Command).@"union";
+    inline for (info.field_names, info.field_types) |name, field_type| {
+        if (std.mem.eql(u8, name, @tagName(op))) {
+            return field_type;
         }
     }
     @compileError("GE command has no payload type: " ++ @tagName(op));

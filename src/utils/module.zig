@@ -80,17 +80,17 @@ pub fn _module_main_thread(argc: usize, argv: ?*anyopaque) callconv(.c) c_int {
 
     switch (@typeInfo(fn_info.return_type.?)) {
         .noreturn => {
-            if (fn_info.params.len == 0)
+            if (fn_info.param_types.len == 0)
                 root.main()
-            else if (fn_info.params[0].type.? == std.process.Init.Minimal)
+            else if (fn_info.param_types[0].? == std.process.Init.Minimal)
                 root.main(init.minimal)
             else
                 root.main(init);
         },
         .void => {
-            if (fn_info.params.len == 0)
+            if (fn_info.param_types.len == 0)
                 root.main()
-            else if (fn_info.params[0].type.? == std.process.Init.Minimal)
+            else if (fn_info.param_types[0].? == std.process.Init.Minimal)
                 root.main(init.minimal)
             else
                 root.main(init);
@@ -98,17 +98,17 @@ pub fn _module_main_thread(argc: usize, argv: ?*anyopaque) callconv(.c) c_int {
         },
         .int => |info| {
             if (info.bits != 8 or info.is_signed) @compileError(bad_main_ret);
-            return if (fn_info.params.len == 0)
+            return if (fn_info.param_types.len == 0)
                 root.main()
-            else if (fn_info.params[0].type.? == std.process.Init.Minimal)
+            else if (fn_info.param_types[0].? == std.process.Init.Minimal)
                 root.main(init.minimal)
             else
                 root.main(init);
         },
         .error_union => {
-            const main_result = if (fn_info.params.len == 0)
+            const main_result = if (fn_info.param_types.len == 0)
                 root.main()
-            else if (fn_info.params[0].type.? == std.process.Init.Minimal)
+            else if (fn_info.param_types[0].? == std.process.Init.Minimal)
                 root.main(init.minimal)
             else
                 root.main(init);
