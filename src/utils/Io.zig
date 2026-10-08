@@ -105,12 +105,12 @@ pub const vtable: Io.VTable = .{
     .processSetCurrentDir = processSetCurrentDir,
     .processSetCurrentPath = processSetCurrentPath,
     .processReplace = processReplace,
-    .processReplacePath = processReplacePath,
     .processSpawn = processSpawn,
-    .processSpawnPath = processSpawnPath,
     .childWait = childWait,
     .childKill = childKill,
     .progressParentFile = progressParentFile,
+    .inheritParentDir = inheritParentDir,
+    .inheritParentFile = inheritParentFile,
     .now = now,
     .clockResolution = clockResolution,
     .sleep = sleep,
@@ -123,9 +123,6 @@ pub const vtable: Io.VTable = .{
     .netListenUnix = netListenUnix,
     .netConnectUnix = netConnectUnix,
     .netSocketCreatePair = netSocketCreatePair,
-    .netSend = netSend,
-    .netRead = netRead,
-    .netWrite = netWrite,
     .netWriteFile = netWriteFile,
     .netClose = netClose,
     .netShutdown = netShutdown,
@@ -367,7 +364,7 @@ fn sceIoStatToFileStat(psp_stat: *const io.SceIoStat) File.Stat {
         .inode = 0,
         .nlink = 0,
         .size = if (psp_stat.st_size < 0) 0 else @intCast(psp_stat.st_size),
-        .permissions = @enumFromInt(@as(u32, @bitCast(psp_stat.st_mode))),
+        .permissions = @fromBackingInt(@intCast(@as(u32, @bitCast(psp_stat.st_mode)))),
         .kind = if (psp_stat.st_attr & 0x10 != 0) .directory else .file,
         .atime = pspDateTimeToTimestamp(psp_stat.st_atime),
         .mtime = pspDateTimeToTimestamp(psp_stat.st_mtime),
@@ -989,6 +986,9 @@ fn operate(_: ?*anyopaque, op: Io.Operation) Io.Cancelable!Io.Operation.Result {
     switch (op) {
         .device_io_control => @panic("Io.operate: Device io_ctl Not Implemented"),
         .net_receive => @panic("Io.operate: net_receive Not Implemented"),
+        .net_send => |o| return .{ .net_send = netSend(o) },
+        .net_read => |o| return .{ .net_read = netRead(o) },
+        .net_write => |o| return .{ .net_write = netWrite(o) },
         .file_read_streaming => |r| {
             const fd = r.file.handle;
             var total: usize = 0;
@@ -1156,7 +1156,7 @@ fn dirAccess(_: ?*anyopaque, dir: Dir, sub_path: []const u8, _: Dir.AccessOption
     io.getstat(path_z.ptr, &stat_buf) catch return error.FileNotFound;
 }
 
-fn dirCreateFile(_: ?*anyopaque, dir: Dir, sub_path: []const u8, flags: File.CreateFlags) File.OpenError!File {
+fn dirCreateFile(_: ?*anyopaque, dir: Dir, sub_path: []const u8, flags: Dir.CreateFileOptions) File.OpenError!File {
     var path_buf: [1024]u8 = undefined;
     const path_z = try resolvePath(dir, sub_path, &path_buf);
     const fd = io.open(path_z.ptr, .{
@@ -1174,7 +1174,7 @@ fn dirCreateFileAtomic(_: ?*anyopaque, _: Dir, _: []const u8, _: Dir.CreateFileA
     return error.AccessDenied;
 }
 
-fn dirOpenFile(_: ?*anyopaque, dir: Dir, sub_path: []const u8, flags: File.OpenFlags) File.OpenError!File {
+fn dirOpenFile(_: ?*anyopaque, dir: Dir, sub_path: []const u8, flags: Dir.OpenFileOptions) File.OpenError!File {
     var path_buf: [1024]u8 = undefined;
     const path_z = try resolvePath(dir, sub_path, &path_buf);
     const open_flags: io.OpenFlags = switch (flags.mode) {
@@ -1410,7 +1410,7 @@ fn fileWriteFileStreaming(_: ?*anyopaque, file: File, header: []const u8, reader
 
     // Copy from reader to fd in chunks
     var buf: [4096]u8 = undefined;
-    var remaining: usize = @intFromEnum(limit);
+    var remaining: usize = @backingInt(limit);
     while (remaining > 0) {
         const to_read = @min(buf.len, remaining);
         var bufs = [_][]u8{buf[0..to_read]};
@@ -1442,7 +1442,7 @@ fn fileWriteFilePositional(_: ?*anyopaque, file: File, header: []const u8, reade
 
     // Copy from reader to fd in chunks
     var buf: [4096]u8 = undefined;
-    var remaining: usize = @intFromEnum(limit);
+    var remaining: usize = @backingInt(limit);
     while (remaining > 0) {
         const to_read = @min(buf.len, remaining);
         var bufs = [_][]u8{buf[0..to_read]};
@@ -1608,7 +1608,7 @@ fn fileMemoryMapWrite(_: ?*anyopaque, _: *File.MemoryMap) File.WritePositionalEr
 
 // -- Process -----------------------------------------------------------
 
-fn processExecutableOpen(_: ?*anyopaque, _: File.OpenFlags) std.process.OpenExecutableError!File {
+fn processExecutableOpen(_: ?*anyopaque, _: Dir.OpenFileOptions) std.process.OpenExecutableError!File {
     @panic("Io.processExecutableOpen not implemented");
 }
 
@@ -1686,16 +1686,8 @@ fn processReplace(_: ?*anyopaque, _: std.process.ReplaceOptions) std.process.Rep
     @panic("Io.processReplace not implemented");
 }
 
-fn processReplacePath(_: ?*anyopaque, _: Dir, _: std.process.ReplaceOptions) std.process.ReplaceError {
-    @panic("Io.processReplacePath not implemented");
-}
-
 fn processSpawn(_: ?*anyopaque, _: std.process.SpawnOptions) std.process.SpawnError!std.process.Child {
     @panic("Io.processSpawn not implemented");
-}
-
-fn processSpawnPath(_: ?*anyopaque, _: Dir, _: std.process.SpawnOptions) std.process.SpawnError!std.process.Child {
-    @panic("Io.processSpawnPath not implemented");
 }
 
 fn childWait(_: ?*anyopaque, _: *std.process.Child) std.process.Child.WaitError!std.process.Child.Term {
@@ -1708,6 +1700,14 @@ fn childKill(_: ?*anyopaque, _: *std.process.Child) void {
 
 fn progressParentFile(_: ?*anyopaque) std.Progress.ParentFileError!File {
     @panic("Io.progressParentFile not implemented");
+}
+
+fn inheritParentDir(_: ?*anyopaque, handle: Dir.Handle) Io.InheritParentHandleError!Dir {
+    return .{ .handle = handle };
+}
+
+fn inheritParentFile(_: ?*anyopaque, handle: File.Handle, flags: File.Flags) Io.InheritParentHandleError!File {
+    return .{ .handle = handle, .flags = flags };
 }
 
 // -- Time/Random -------------------------------------------------------
@@ -1938,13 +1938,12 @@ fn netSocketCreatePair(_: ?*anyopaque, _: net.Socket.CreatePairOptions) net.Sock
     return error.AddressFamilyUnsupported;
 }
 
-fn netSend(_: ?*anyopaque, handle: net.Socket.Handle, messages: []net.OutgoingMessage, flags: net.SendFlags) struct { ?net.Socket.SendError, usize } {
-    _ = flags;
+fn netSend(o: Io.Operation.NetSend) Io.Operation.NetSend.Result {
     var total: usize = 0;
-    for (messages) |*msg| {
+    for (o.messages) |*msg| {
         const sa = ipAddressToSockaddr(msg.address);
         const sent = psp_net.inet_sendto(
-            handle,
+            o.socket_handle,
             msg.data_ptr,
             msg.data_len,
             0,
@@ -1957,18 +1956,22 @@ fn netSend(_: ?*anyopaque, handle: net.Socket.Handle, messages: []net.OutgoingMe
     return .{ null, total };
 }
 
-fn netRead(_: ?*anyopaque, handle: net.Socket.Handle, bufs: [][]u8) net.Stream.Reader.Error!usize {
+fn netRead(o: Io.Operation.NetRead) Io.Operation.NetRead.Result {
     var total: usize = 0;
-    for (bufs) |buf| {
-        const n = psp_net.inet_recv(handle, buf.ptr, buf.len, 0) catch return error.ConnectionResetByPeer;
+    for (o.data) |buf| {
+        const n = psp_net.inet_recv(o.socket_handle, buf.ptr, buf.len, 0) catch return error.ConnectionResetByPeer;
         if (n == 0) break;
         total += n;
         if (n < buf.len) break;
     }
-    return total;
+    return .{ .data_len = total };
 }
 
-fn netWrite(_: ?*anyopaque, handle: net.Socket.Handle, header: []const u8, payload: []const []const u8, splat: usize) net.Stream.Writer.Error!usize {
+fn netWrite(o: Io.Operation.NetWrite) Io.Operation.NetWrite.Result {
+    const handle = o.socket_handle;
+    const header = o.header;
+    const payload = o.data;
+    const splat = o.splat;
     var total: usize = 0;
     if (header.len > 0) {
         const n = psp_net.inet_send(handle, header.ptr, header.len, 0) catch return error.ConnectionResetByPeer;
@@ -1999,7 +2002,7 @@ fn netWriteFile(_: ?*anyopaque, handle: net.Socket.Handle, header: []const u8, f
         const n = psp_net.inet_send(handle, header.ptr, header.len, 0) catch return error.NetworkDown;
         total += n;
     }
-    const max_bytes = @intFromEnum(limit);
+    const max_bytes = @backingInt(limit);
     var buf: [4096]u8 = undefined;
     while (max_bytes == 0 or total < max_bytes) {
         const to_read = if (max_bytes == 0) buf.len else @min(buf.len, max_bytes - total);
@@ -2012,9 +2015,9 @@ fn netWriteFile(_: ?*anyopaque, handle: net.Socket.Handle, header: []const u8, f
     return total;
 }
 
-fn netClose(_: ?*anyopaque, handles: []const net.Socket.Handle) void {
-    for (handles) |handle| {
-        psp_net.inet_close(handle) catch {};
+fn netClose(_: ?*anyopaque, sockets: []const net.Socket) void {
+    for (sockets) |socket| {
+        psp_net.inet_close(socket.handle) catch {};
     }
 }
 
