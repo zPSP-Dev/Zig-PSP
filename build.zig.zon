@@ -1,8 +1,8 @@
 .{
     .name = .pspsdk,
-    .version = "0.7.0",
+    .version = "0.8.0",
     .fingerprint = 0xe2eb569bca619a05, // Changing this has security and trust implications.
-    .minimum_zig_version = "0.16.0",
+    .minimum_zig_version = "0.17.0",
     .dependencies = .{},
     .paths = .{
         "build.zig",
